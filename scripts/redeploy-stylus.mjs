@@ -126,9 +126,13 @@ function cargoStylus(contractDir, args, env = {}) {
   ], { captureOutput: true });
 }
 
+const CAST_BIN = process.env.CAST_BIN ?? (process.platform === 'win32'
+  ? 'C:/Users/prate/.foundry/bin/cast.exe'
+  : 'cast');
+
 function castSend(to, sig, args, pk) {
   const cmd = ['send', '--rpc-url', RPC, '--private-key', pk, to, sig, ...args];
-  return run('cast', cmd, { captureOutput: true });
+  return run(CAST_BIN, cmd, { captureOutput: true });
 }
 
 // =============================================================================
