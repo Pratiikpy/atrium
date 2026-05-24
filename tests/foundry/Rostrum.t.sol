@@ -557,10 +557,14 @@ contract RostrumTest is Test {
             f
         );
 
-        // Use SignedMath-style abs that handles INT256_MIN without negation
-        // overflow. Plain `uint256(-size)` panics when size is type(int256).min
-        // since -type(int256).min is unrepresentable in int256.
-        uint256 absSize = size < 0 ? uint256(uint256(0) - uint256(size)) : uint256(size);
+        // Solidity 0.8 checked arithmetic panics on -INT256.min OR on
+        // 0 - uint256(negative_int_cast). The unchecked block lets the
+        // two's-complement wrap give the correct magnitude for every
+        // input including INT256.min (whose abs == 2^255 in uint256).
+        uint256 absSize;
+        unchecked {
+            absSize = size < 0 ? uint256(-size) : uint256(size);
+        }
         assertLe(absSize, uint256(per_action_cap_wei),
             "iter95: |result| MUST be bounded by per_action_cap_wei");
     }

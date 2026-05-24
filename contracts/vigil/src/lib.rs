@@ -284,7 +284,7 @@ impl Vigil {
         // Hoist all job.* reads to local vars so the `job` getter borrow is
         // released before we make external (mut-context) calls below.
         let (job_position_id, job_user, job_is_complete, job_deadline_block,
-             job_margin_version_at_queue, job_max_liq_bps) = {
+             job_margin_version_at_queue, _job_max_liq_bps) = {
             let job = self.jobs.getter(job_id);
             (
                 job.position_id.get(),
