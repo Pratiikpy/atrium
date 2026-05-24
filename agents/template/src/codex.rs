@@ -147,7 +147,7 @@ mod tests {
         // is_operational=false so missing-data is treated as "venue down"
         // (loud), not "venue up with 0bps spread" (silent + dangerous).
         let h = VenueHealth::default();
-        assert_eq!(h.is_operational, false);
+        assert!(!h.is_operational);
         assert_eq!(h.quoted_spread_bps, 0);
     }
 
