@@ -37,29 +37,26 @@ export function middleware(req: NextRequest) {
 
   if (!isMobile) return NextResponse.next();
 
-  // `/` → mobile landing
+  // `/` -> mobile landing
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/mobile-landing.html';
     return NextResponse.rewrite(url);
   }
 
-  // Any `/app/*` route → mobile app shell. The mobile-app.html handles
-  // its own internal navigation between Home/Trade/Move/Agents/More via
-  // tab buttons, so we don't need to preserve the sub-path. Querystring
-  // (e.g. `?tab=trade`) is preserved so a deep-link is still possible.
-  if (pathname === '/app' || pathname.startsWith('/app/')) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/mobile-app.html';
-    return NextResponse.rewrite(url);
-  }
-
+  // Audit 2026-05-24 (Auditor B C-4) Path B fix: prior middleware
+  // rewrote every /app/* hit from a mobile UA to /mobile-app.html, a
+  // static decorative mockup that doesn't connect a wallet or transact.
+  // The React /app/* tree is already responsive (AppShell hides the
+  // sidebar on small viewports, swaps to the mobile nav, and scales
+  // grids via `lg:grid-cols-2`), so mobile users get the live app on
+  // the same routes desktop users use. The static mockup stays
+  // available at /mobile/app for design-preview parity until a
+  // dedicated mobile React port lands.
   return NextResponse.next();
 }
 
-// Run on the two routes we actually rewrite. Anything else (verify, lantern,
-// docs, brand, etc.) passes through untouched — those pages have their own
-// React-side responsive treatment.
+// Run only on `/`. /app/* falls through to the responsive React tree.
 export const config = {
-  matcher: ['/', '/app', '/app/:path*'],
+  matcher: ['/'],
 };
