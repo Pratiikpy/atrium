@@ -17,7 +17,7 @@ use std::time::Duration;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use tracing::{info, warn};
 
 mod strategy;
@@ -50,6 +50,7 @@ struct Args {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)] // quoted_spread_bps is part of the upstream API shape; we read is_operational today.
 struct VenueHealth {
     is_operational: bool,
     quoted_spread_bps: u16,
