@@ -1,7 +1,12 @@
 # Atrium, Launch Ready
 
-Last updated: 2026-05-24 (post-redeploy + Phase beta.3 schedule)
+Last updated: 2026-05-25 (post-redeploy + Phase beta.3 schedule + 8/8 CI green)
 Current score: **6 of 15 user flows WORK end-to-end today. 6 more are WIRED-PENDING-TIMELOCK (executable 2026-05-26T15:43Z). 3 are HUMAN-BLOCKED (Safe ceremony, cohort outreach, domain).**
+
+CI: all 8 GitHub Actions jobs on master are GREEN as of 2026-05-25:
+Lint+format, Frontend build+Lighthouse, Frontend unit tests (vitest 586/586),
+Solidity tests (Foundry), Rust+Stylus tests, Kani formal verification,
+Subgraph build, Secrets scan (gitleaks).
 
 (Prior reading said 3/15 works. After the 2026-05-24 redeploy + initialize()
 + corrected timelock batch, the wired-uninit count drops to 0; the new
