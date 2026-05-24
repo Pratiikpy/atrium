@@ -100,11 +100,19 @@
       "kind": "solidity"
     },
     "adapter-aave-horizon": {
+      "address": "0xa68361cCBd819F4A38a31501D399888F9187d0b9",
+      "tx": "0xe15ce5928dc27fc6e4906c86125548d6db094344d7492b18db447790b4b71583",
+      "deployed_at": "2026-05-24T15:36:00.000Z",
+      "kind": "solidity",
+      "version": "v1.1",
+      "note": "Redeployed 2026-05-24 (Audit C-6 fix). Was AaveHorizonAdapter v1.0 at 0xe991...; v1.1 swaps tx.origin for an explicit originator param + adds ReentrancyGuard. Aave Pool placeholder = deployer (no Aave testnet on Arb Sepolia). Constructor wired to new Coffer 0xd169..."
+    },
+    "adapter-aave-horizon-v1.0-deprecated": {
       "address": "0xe991ec988a62bcc38740f8b8c549e5400ded8d5d",
       "tx": "0xdff7722214573f3a27dc832875b6d30b456df0e88173944feb9edc086f64c8e8",
       "block": 270727659,
       "kind": "solidity",
-      "note": "Aave Pool placeholder = deployer (no Aave testnet on Arb Sepolia)"
+      "note": "DEPRECATED v1.0 (uses tx.origin, no ReentrancyGuard). Kept for reference; PorticoRegistry registerAdapter call goes to v1.1 above."
     },
     "adapter-curve": {
       "address": "0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682",
