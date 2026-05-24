@@ -557,7 +557,10 @@ contract RostrumTest is Test {
             f
         );
 
-        uint256 absSize = size < 0 ? uint256(-size) : uint256(size);
+        // Use SignedMath-style abs that handles INT256_MIN without negation
+        // overflow. Plain `uint256(-size)` panics when size is type(int256).min
+        // since -type(int256).min is unrepresentable in int256.
+        uint256 absSize = size < 0 ? uint256(uint256(0) - uint256(size)) : uint256(size);
         assertLe(absSize, uint256(per_action_cap_wei),
             "iter95: |result| MUST be bounded by per_action_cap_wei");
     }

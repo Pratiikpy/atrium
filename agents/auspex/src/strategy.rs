@@ -2,13 +2,18 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Signal {
-    EnterBasis,    // long Pendle YT + short Aave equivalent
-    Close,         // gap converged
+    EnterBasis, // long Pendle YT + short Aave equivalent
+    Close,      // gap converged
     Hold,
 }
 
 /// Decide based on the spread between Pendle implied APY and Aave T-bill APY.
-pub fn signal(pendle_implied_apy_bps: i32, aave_apy_bps: i32, enter_threshold_bps: i32, exit_threshold_bps: i32) -> Signal {
+pub fn signal(
+    pendle_implied_apy_bps: i32,
+    aave_apy_bps: i32,
+    enter_threshold_bps: i32,
+    exit_threshold_bps: i32,
+) -> Signal {
     let spread = pendle_implied_apy_bps - aave_apy_bps;
     if spread > enter_threshold_bps {
         Signal::EnterBasis

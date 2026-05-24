@@ -12,7 +12,9 @@ mod strategy;
 struct AuspexStrategy;
 
 impl Strategy for AuspexStrategy {
-    fn name(&self) -> &'static str { "auspex" }
+    fn name(&self) -> &'static str {
+        "auspex"
+    }
 
     fn decide(&self, _prices: &[f64], _current_position_notional: f64) -> Signal {
         // Real signals come from comparing Pendle implied APY vs Aave T-bill APY.
@@ -34,7 +36,8 @@ async fn main() -> Result<()> {
         anyhow::bail!("AUSPEX_INSTRUMENT_ID must not be empty");
     }
     let config = AgentConfig {
-        codex_url: std::env::var("CODEX_URL").unwrap_or_else(|_| "https://codex.atrium.fi".to_string()),
+        codex_url: std::env::var("CODEX_URL")
+            .unwrap_or_else(|_| "https://codex.atrium.fi".to_string()),
         instrument_id,
         venue_id: 3,
         interval_seconds: 24 * 3600,

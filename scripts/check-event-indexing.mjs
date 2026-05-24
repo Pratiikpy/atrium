@@ -61,6 +61,20 @@ const INDEXING_IGNORE = new Map([
   ['Aqueduct.LinkDeposited', 'operational top-up; LINK balance polled directly from ERC-20'],
   ['Edict.SumsubVerifierUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['LanternAttestor.SigningKeyRotated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
+  // Faucet onboarding events: per-claim flow does not need a subgraph entity
+  // (the /api/faucet/status route reads claim state from on-chain via viem),
+  // and the Stocked event is a Praetor manual top-up that PraetorTimelock
+  // does not currently route through.
+  ['Faucet.Claimed', 'per-user claim history not surfaced in subgraph; on-chain lastClaim[user] is canonical'],
+  ['Faucet.Stocked', 'manual top-up from Praetor; balance polled directly from USDC.balanceOf'],
+  // Stylus pause/resume admin events added in the 2026-05-24 audit C-5 fix.
+  // PraetorTimelock.Executed already captures the calldata for resume calls
+  // (timelock-only). Direct multisig pause is the only non-timelock path;
+  // the UI surfaces it via /api/deployments/status reading is_paused live.
+  ['Sigil.SigilPausedEvent', 'admin pause hook; live is_paused state read directly via viem in deployments/status'],
+  ['Sigil.SigilResumedEvent', 'timelock-only; captured via PraetorTimelock.Executed'],
+  ['Vigil.VigilPausedEvent', 'admin pause hook; live is_paused state read directly via viem in deployments/status'],
+  ['Vigil.VigilResumedEvent', 'timelock-only; captured via PraetorTimelock.Executed'],
 ]);
 
 const EVENT_RE = /^\s*event\s+([A-Z]\w*)\s*\(/gm;

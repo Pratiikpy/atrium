@@ -18,13 +18,19 @@ impl Bands {
     /// Compute mean and standard deviation over the last `window` prices.
     pub fn compute(prices: &[f64], window: usize) -> Self {
         if prices.is_empty() || window == 0 {
-            return Self { mean: 0.0, sigma: 0.0 };
+            return Self {
+                mean: 0.0,
+                sigma: 0.0,
+            };
         }
         let start = prices.len().saturating_sub(window);
         let slice = &prices[start..];
         let mean = slice.iter().sum::<f64>() / slice.len() as f64;
         let variance = slice.iter().map(|p| (p - mean).powi(2)).sum::<f64>() / slice.len() as f64;
-        Self { mean, sigma: variance.sqrt() }
+        Self {
+            mean,
+            sigma: variance.sqrt(),
+        }
     }
 
     pub fn signal_for(&self, price: f64) -> Signal {
@@ -59,7 +65,10 @@ mod tests {
         // mean=100, sigma=10, price=70 → z = -3 → EnterLong
         let prices: Vec<f64> = (0..20).map(|i| 100.0 + (i as f64) * 0.1).collect();
         let b = Bands::compute(&prices, 20);
-        assert_eq!(b.signal_for(b.mean - 3.0 * b.sigma.max(1.0)), Signal::EnterLong);
+        assert_eq!(
+            b.signal_for(b.mean - 3.0 * b.sigma.max(1.0)),
+            Signal::EnterLong
+        );
     }
 
     // ── Iter 77: cover remaining branches ──────────────────────────────
@@ -69,7 +78,10 @@ mod tests {
         let prices: Vec<f64> = (0..20).map(|i| 100.0 + (i as f64) * 0.1).collect();
         let b = Bands::compute(&prices, 20);
         // z = +3 → EnterShort
-        assert_eq!(b.signal_for(b.mean + 3.0 * b.sigma.max(1.0)), Signal::EnterShort);
+        assert_eq!(
+            b.signal_for(b.mean + 3.0 * b.sigma.max(1.0)),
+            Signal::EnterShort
+        );
     }
 
     #[test]

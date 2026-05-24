@@ -28,7 +28,12 @@ pub async fn run(network: &str, contract: &str, reason: &str) -> Result<()> {
     // PraetorTimelock.emergencyPause(target, reason) — multisig-only, no
     // timelock per security.md.
     let calldata_output = Command::new("cast")
-        .args(["calldata", "emergencyPause(address,string)", &target, reason])
+        .args([
+            "calldata",
+            "emergencyPause(address,string)",
+            &target,
+            reason,
+        ])
         .output()
         .context("cast calldata failed")?;
     if !calldata_output.status.success() {
@@ -37,7 +42,9 @@ pub async fn run(network: &str, contract: &str, reason: &str) -> Result<()> {
             String::from_utf8_lossy(&calldata_output.stderr)
         );
     }
-    let calldata = String::from_utf8(calldata_output.stdout)?.trim().to_string();
+    let calldata = String::from_utf8(calldata_output.stdout)?
+        .trim()
+        .to_string();
 
     println!("Submit this to the Gnosis Safe (Praetor multisig):");
     println!("  to:     {timelock}");
@@ -101,7 +108,9 @@ pub async fn resume(network: &str, contract: &str, action: Option<&str>) -> Resu
             String::from_utf8_lossy(&calldata_output.stderr)
         );
     }
-    let calldata = String::from_utf8(calldata_output.stdout)?.trim().to_string();
+    let calldata = String::from_utf8(calldata_output.stdout)?
+        .trim()
+        .to_string();
 
     println!("Submit this to the Gnosis Safe (Praetor multisig):");
     println!("  to:       {target} ({contract})");

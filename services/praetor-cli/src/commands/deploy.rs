@@ -10,9 +10,15 @@ use tracing::{info, warn};
 
 /// Wave-by-wave deploy per TDD §15.2.
 const WAVE_1: &[(&str, &str)] = &[
-    ("praetor-timelock", "contracts/praetor-timelock/src/PraetorTimelock.sol:PraetorTimelock"),
+    (
+        "praetor-timelock",
+        "contracts/praetor-timelock/src/PraetorTimelock.sol:PraetorTimelock",
+    ),
     ("coffer", "stylus:contracts/coffer"),
-    ("portico-registry", "contracts/portico-registry/src/PorticoRegistry.sol:PorticoRegistry"),
+    (
+        "portico-registry",
+        "contracts/portico-registry/src/PorticoRegistry.sol:PorticoRegistry",
+    ),
     ("sigil", "stylus:contracts/sigil"),
     ("edict", "contracts/edict/src/Edict.sol:Edict"),
 ];
@@ -20,23 +26,59 @@ const WAVE_1: &[(&str, &str)] = &[
 const WAVE_2: &[(&str, &str)] = &[
     ("plinth", "stylus:contracts/plinth"),
     ("vigil", "stylus:contracts/vigil"),
-    ("postern-key-registry", "contracts/postern-kill-switch/src/PosternKeyRegistry.sol:PosternKeyRegistry"),
-    ("postern-kill-switch", "contracts/postern-kill-switch/src/PosternKillSwitch.sol:PosternKillSwitch"),
-    ("research-attestation", "contracts/research-attestation/src/ResearchAttestation.sol:ResearchAttestation"),
-    ("lantern-attestor", "contracts/lantern-attestor/src/LanternAttestor.sol:LanternAttestor"),
+    (
+        "postern-key-registry",
+        "contracts/postern-kill-switch/src/PosternKeyRegistry.sol:PosternKeyRegistry",
+    ),
+    (
+        "postern-kill-switch",
+        "contracts/postern-kill-switch/src/PosternKillSwitch.sol:PosternKillSwitch",
+    ),
+    (
+        "research-attestation",
+        "contracts/research-attestation/src/ResearchAttestation.sol:ResearchAttestation",
+    ),
+    (
+        "lantern-attestor",
+        "contracts/lantern-attestor/src/LanternAttestor.sol:LanternAttestor",
+    ),
     ("rostrum", "contracts/rostrum/src/Rostrum.sol:Rostrum"),
 ];
 
 const WAVE_3: &[(&str, &str)] = &[
     ("aqueduct", "contracts/aqueduct/src/Aqueduct.sol:Aqueduct"),
-    ("aqueduct-receiver", "contracts/aqueduct/src/AqueductReceiver.sol:AqueductReceiver"),
-    ("aqueduct-claimback", "contracts/aqueduct/src/AqueductClaimback.sol:AqueductClaimback"),
-    ("adapter-aave-horizon", "contracts/adapters/aave-horizon/src/AaveHorizonAdapterV11.sol:AaveHorizonAdapterV11"),
-    ("adapter-hyperliquid", "contracts/adapters/hyperliquid/src/HyperliquidHybridAdapter.sol:HyperliquidHybridAdapter"),
-    ("adapter-pendle", "contracts/adapters/pendle/src/PendleV2Adapter.sol:PendleV2Adapter"),
-    ("adapter-trade-xyz", "contracts/adapters/trade-xyz/src/TradeXyzAdapter.sol:TradeXyzAdapter"),
-    ("adapter-curve", "contracts/adapters/curve/src/CurveAdapter.sol:CurveAdapter"),
-    ("adapter-polymarket", "contracts/adapters/polymarket/src/PolymarketAdapter.sol:PolymarketAdapter"),
+    (
+        "aqueduct-receiver",
+        "contracts/aqueduct/src/AqueductReceiver.sol:AqueductReceiver",
+    ),
+    (
+        "aqueduct-claimback",
+        "contracts/aqueduct/src/AqueductClaimback.sol:AqueductClaimback",
+    ),
+    (
+        "adapter-aave-horizon",
+        "contracts/adapters/aave-horizon/src/AaveHorizonAdapterV11.sol:AaveHorizonAdapterV11",
+    ),
+    (
+        "adapter-hyperliquid",
+        "contracts/adapters/hyperliquid/src/HyperliquidHybridAdapter.sol:HyperliquidHybridAdapter",
+    ),
+    (
+        "adapter-pendle",
+        "contracts/adapters/pendle/src/PendleV2Adapter.sol:PendleV2Adapter",
+    ),
+    (
+        "adapter-trade-xyz",
+        "contracts/adapters/trade-xyz/src/TradeXyzAdapter.sol:TradeXyzAdapter",
+    ),
+    (
+        "adapter-curve",
+        "contracts/adapters/curve/src/CurveAdapter.sol:CurveAdapter",
+    ),
+    (
+        "adapter-polymarket",
+        "contracts/adapters/polymarket/src/PolymarketAdapter.sol:PolymarketAdapter",
+    ),
 ];
 
 /// Wave 4 — orchestration (audit EEEE-1 + Fire 74). Must run AFTER all 6
@@ -45,9 +87,10 @@ const WAVE_3: &[(&str, &str)] = &[
 /// still has to call `coffer.set_adapter(router, approved=true)` plus
 /// `adapter.setAuthorizedCaller(router, true)` on every adapter to wire the
 /// orchestrator path. The verify command checks this wiring.
-const WAVE_4: &[(&str, &str)] = &[
-    ("atrium-router", "contracts/atrium-router/src/AtriumRouter.sol:AtriumRouter"),
-];
+const WAVE_4: &[(&str, &str)] = &[(
+    "atrium-router",
+    "contracts/atrium-router/src/AtriumRouter.sol:AtriumRouter",
+)];
 
 /// Wave 5 — Phase-2 conditional contracts. Ship only when the gating grant
 /// lands (Trailblazer AI for Stoa, Stylus Sprint for the Phase-2 adapters)
@@ -55,10 +98,22 @@ const WAVE_4: &[(&str, &str)] = &[
 /// adapter's bytecode hash. Per PRD §17, default `deploy --all` skips this
 /// wave; the user opts in with `--phase2`.
 const WAVE_5_PHASE2: &[(&str, &str)] = &[
-    ("adapter-gmx", "contracts/adapters/gmx/src/GmxV2Adapter.sol:GmxV2Adapter"),
-    ("adapter-synthetix", "contracts/adapters/synthetix/src/SynthetixV3Adapter.sol:SynthetixV3Adapter"),
-    ("adapter-morpho", "contracts/adapters/morpho/src/MorphoBlueAdapter.sol:MorphoBlueAdapter"),
-    ("stoa-black-scholes", "contracts/stoa/src/StoaBlackScholes.sol:StoaBlackScholes"),
+    (
+        "adapter-gmx",
+        "contracts/adapters/gmx/src/GmxV2Adapter.sol:GmxV2Adapter",
+    ),
+    (
+        "adapter-synthetix",
+        "contracts/adapters/synthetix/src/SynthetixV3Adapter.sol:SynthetixV3Adapter",
+    ),
+    (
+        "adapter-morpho",
+        "contracts/adapters/morpho/src/MorphoBlueAdapter.sol:MorphoBlueAdapter",
+    ),
+    (
+        "stoa-black-scholes",
+        "contracts/stoa/src/StoaBlackScholes.sol:StoaBlackScholes",
+    ),
 ];
 
 #[derive(Serialize, Deserialize, Default)]
@@ -109,7 +164,11 @@ pub async fn run(network: &str, all: bool, contract: Option<String>, phase2: boo
     Ok(())
 }
 
-fn deploy_set(set: &[(&str, &str)], network: &str, registry: &mut DeploymentRegistry) -> Result<()> {
+fn deploy_set(
+    set: &[(&str, &str)],
+    network: &str,
+    registry: &mut DeploymentRegistry,
+) -> Result<()> {
     for (name, path) in set {
         deploy_one(name, path, network, registry)?;
     }
@@ -159,9 +218,8 @@ fn forge_create(name: &str, path: &str, network: &str) -> Result<String> {
     let mut cmd = Command::new("forge");
     cmd.args(["create", path, "--rpc-url", &rpc, "--broadcast"]);
     if let Ok(keystore) = std::env::var("DEPLOYER_KEYSTORE") {
-        let password = std::env::var("DEPLOYER_KEYSTORE_PASSWORD").context(
-            "DEPLOYER_KEYSTORE set but DEPLOYER_KEYSTORE_PASSWORD missing",
-        )?;
+        let password = std::env::var("DEPLOYER_KEYSTORE_PASSWORD")
+            .context("DEPLOYER_KEYSTORE set but DEPLOYER_KEYSTORE_PASSWORD missing")?;
         cmd.args(["--keystore", &keystore, "--password", &password]);
     } else {
         let key = std::env::var("DEPLOYER_PRIVATE_KEY").context(
@@ -195,9 +253,8 @@ fn cargo_stylus_deploy(name: &str, dir: &str, network: &str) -> Result<String> {
     if let Ok(key_path) = std::env::var("DEPLOYER_PRIVATE_KEY_PATH") {
         cmd.args(["--private-key-path", &key_path]);
     } else {
-        let key = std::env::var("DEPLOYER_PRIVATE_KEY").context(
-            "Set DEPLOYER_PRIVATE_KEY_PATH (preferred) or DEPLOYER_PRIVATE_KEY",
-        )?;
+        let key = std::env::var("DEPLOYER_PRIVATE_KEY")
+            .context("Set DEPLOYER_PRIVATE_KEY_PATH (preferred) or DEPLOYER_PRIVATE_KEY")?;
         cmd.args(["--private-key", &key]);
     }
     let output = cmd
@@ -288,7 +345,10 @@ mod tests {
     //!
     //! Also pins I-10 atomic-write on save_registry: the path.tmp is
     //! never left behind after a successful write.
-    use super::{load_registry, network_rpc, save_registry, registry_path, DeploymentRegistry, ContractRecord};
+    use super::{
+        load_registry, network_rpc, registry_path, save_registry, ContractRecord,
+        DeploymentRegistry,
+    };
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static SEQ: AtomicU64 = AtomicU64::new(0);
@@ -330,10 +390,20 @@ mod tests {
         std::env::remove_var("ARBITRUM_SEPOLIA_RPC_URL");
         std::env::remove_var("ETHEREUM_SEPOLIA_RPC_URL");
         assert_eq!(network_rpc("local").unwrap(), "http://127.0.0.1:8545");
-        assert_eq!(network_rpc("arbitrum_sepolia").unwrap(), "https://arbitrum-sepolia.publicnode.com");
-        assert_eq!(network_rpc("ethereum_sepolia").unwrap(), "https://ethereum-sepolia.publicnode.com");
-        if let Some(v) = prev_a { std::env::set_var("ARBITRUM_SEPOLIA_RPC_URL", v); }
-        if let Some(v) = prev_e { std::env::set_var("ETHEREUM_SEPOLIA_RPC_URL", v); }
+        assert_eq!(
+            network_rpc("arbitrum_sepolia").unwrap(),
+            "https://arbitrum-sepolia.publicnode.com"
+        );
+        assert_eq!(
+            network_rpc("ethereum_sepolia").unwrap(),
+            "https://ethereum-sepolia.publicnode.com"
+        );
+        if let Some(v) = prev_a {
+            std::env::set_var("ARBITRUM_SEPOLIA_RPC_URL", v);
+        }
+        if let Some(v) = prev_e {
+            std::env::set_var("ETHEREUM_SEPOLIA_RPC_URL", v);
+        }
     }
 
     #[test]
@@ -365,7 +435,10 @@ mod tests {
         );
         save_registry(&reg).expect("save 2");
         let loaded2 = load_registry(&net).expect("load 2");
-        assert_eq!(loaded2.contracts.get("coffer").map(|c| c.address.as_str()), Some("0xCAFE"));
+        assert_eq!(
+            loaded2.contracts.get("coffer").map(|c| c.address.as_str()),
+            Some("0xCAFE")
+        );
         // Cleanup.
         let _ = std::fs::remove_file(registry_path(&net));
     }

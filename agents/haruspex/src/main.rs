@@ -14,20 +14,34 @@ mod strategy;
 struct HaruspexStrategy;
 
 impl Strategy for HaruspexStrategy {
-    fn name(&self) -> &'static str { "haruspex" }
+    fn name(&self) -> &'static str {
+        "haruspex"
+    }
 
     fn decide(&self, prices: &[f64], current_position_notional: f64) -> Signal {
         let rsi_value = strategy::rsi(prices, 10);
         let signal = strategy::signal_from_rsi(rsi_value);
         match signal {
             strategy::Signal::EnterLong => {
-                if current_position_notional > 0.0 { Signal::Hold } else { Signal::EnterLong }
+                if current_position_notional > 0.0 {
+                    Signal::Hold
+                } else {
+                    Signal::EnterLong
+                }
             }
             strategy::Signal::EnterShort => {
-                if current_position_notional < 0.0 { Signal::Hold } else { Signal::EnterShort }
+                if current_position_notional < 0.0 {
+                    Signal::Hold
+                } else {
+                    Signal::EnterShort
+                }
             }
             strategy::Signal::Close => {
-                if current_position_notional == 0.0 { Signal::Hold } else { Signal::Close }
+                if current_position_notional == 0.0 {
+                    Signal::Hold
+                } else {
+                    Signal::Close
+                }
             }
             strategy::Signal::Hold => Signal::Hold,
         }
@@ -48,7 +62,8 @@ async fn main() -> Result<()> {
         anyhow::bail!("HARUSPEX_INSTRUMENT_ID must not be empty");
     }
     let config = AgentConfig {
-        codex_url: std::env::var("CODEX_URL").unwrap_or_else(|_| "https://codex.atrium.fi".to_string()),
+        codex_url: std::env::var("CODEX_URL")
+            .unwrap_or_else(|_| "https://codex.atrium.fi".to_string()),
         instrument_id,
         venue_id: 1,
         interval_seconds: 3600,

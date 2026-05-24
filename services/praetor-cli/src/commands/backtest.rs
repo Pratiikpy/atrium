@@ -15,9 +15,11 @@ use crate::BacktestAction;
 
 pub async fn run(network: &str, action: BacktestAction) -> Result<()> {
     match action {
-        BacktestAction::Publish { notebook, ipfs_cid, json_path } => {
-            publish(network, &notebook, &ipfs_cid, json_path.as_deref()).await
-        }
+        BacktestAction::Publish {
+            notebook,
+            ipfs_cid,
+            json_path,
+        } => publish(network, &notebook, &ipfs_cid, json_path.as_deref()).await,
     }
 }
 
@@ -34,7 +36,10 @@ fn check_publishable(json_path: &str) -> Result<()> {
     // schema_version 2+ carries is_publishable. v1 omits it — treat that as
     // pre-fix output that operators must NOT publish (the v1 era is when
     // synthetic-pairs were silently published).
-    let schema_version = parsed.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(1);
+    let schema_version = parsed
+        .get("schema_version")
+        .and_then(|v| v.as_u64())
+        .unwrap_or(1);
     if schema_version < 2 {
         anyhow::bail!(
             "backtest JSON {} is schema v{} (pre-honesty-pass). Regenerate \
@@ -45,7 +50,10 @@ fn check_publishable(json_path: &str) -> Result<()> {
         );
     }
     let is_publishable = parsed.get("is_publishable").and_then(|v| v.as_bool());
-    let data_mode = parsed.get("data_mode").and_then(|v| v.as_str()).unwrap_or("unknown");
+    let data_mode = parsed
+        .get("data_mode")
+        .and_then(|v| v.as_str())
+        .unwrap_or("unknown");
     match is_publishable {
         Some(true) => Ok(()),
         Some(false) => anyhow::bail!(
@@ -64,8 +72,16 @@ fn check_publishable(json_path: &str) -> Result<()> {
     }
 }
 
-async fn publish(network: &str, notebook: &str, ipfs_cid: &str, json_path: Option<&str>) -> Result<()> {
-    info!(network, notebook, ipfs_cid, json_path, "building research-attestation publish tx");
+async fn publish(
+    network: &str,
+    notebook: &str,
+    ipfs_cid: &str,
+    json_path: Option<&str>,
+) -> Result<()> {
+    info!(
+        network,
+        notebook, ipfs_cid, json_path, "building research-attestation publish tx"
+    );
 
     // Iteration 29 audit fix: honor the is_publishable flag from
     // span_backtest.py's v2 JSON output. Without this gate, the CLI would
@@ -96,7 +112,8 @@ async fn publish(network: &str, notebook: &str, ipfs_cid: &str, json_path: Optio
     // collateral_delta_bps separately. Year-1: read them from env so the
     // CLI doesn't have to embed a notebook parser.
     let trades_count = std::env::var("TRADES_COUNT").context("TRADES_COUNT must be set")?;
-    let delta_bps = std::env::var("COLLATERAL_DELTA_BPS").context("COLLATERAL_DELTA_BPS must be set")?;
+    let delta_bps =
+        std::env::var("COLLATERAL_DELTA_BPS").context("COLLATERAL_DELTA_BPS must be set")?;
 
     // ResearchAttestation.publish(bytes32 ipfs_hash, uint256 trades_count,
     // int256 collateral_delta_bps, string notebook_url) — timelock-only.
@@ -117,11 +134,18 @@ async fn publish(network: &str, notebook: &str, ipfs_cid: &str, json_path: Optio
             String::from_utf8_lossy(&publish_calldata.stderr)
         );
     }
-    let publish_data = String::from_utf8(publish_calldata.stdout)?.trim().to_string();
+    let publish_data = String::from_utf8(publish_calldata.stdout)?
+        .trim()
+        .to_string();
 
     // Wrap in PraetorTimelock.schedule(target, data).
     let schedule_calldata = Command::new("cast")
-        .args(["calldata", "schedule(address,bytes)", &attestation, &publish_data])
+        .args([
+            "calldata",
+            "schedule(address,bytes)",
+            &attestation,
+            &publish_data,
+        ])
         .output()
         .context("cast calldata failed")?;
     // Audit fix (iteration 25): symmetric to the inner check on line 47-52
@@ -136,9 +160,13 @@ async fn publish(network: &str, notebook: &str, ipfs_cid: &str, json_path: Optio
             String::from_utf8_lossy(&schedule_calldata.stderr)
         );
     }
-    let schedule_data = String::from_utf8(schedule_calldata.stdout)?.trim().to_string();
+    let schedule_data = String::from_utf8(schedule_calldata.stdout)?
+        .trim()
+        .to_string();
     if schedule_data.is_empty() {
-        anyhow::bail!("cast calldata (schedule wrap) produced empty output; refusing to ship empty Safe data");
+        anyhow::bail!(
+            "cast calldata (schedule wrap) produced empty output; refusing to ship empty Safe data"
+        );
     }
 
     println!("Step 1 — submit to the Gnosis Safe (Praetor multisig) NOW:");
@@ -223,7 +251,10 @@ mod tests {
             }"#,
         );
         let result = check_publishable(path.to_str().unwrap());
-        assert!(result.is_ok(), "expected Ok for real-trades publishable, got {result:?}");
+        assert!(
+            result.is_ok(),
+            "expected Ok for real-trades publishable, got {result:?}"
+        );
         let _ = std::fs::remove_file(&path);
     }
 
@@ -239,9 +270,17 @@ mod tests {
             }"#,
         );
         let result = check_publishable(path.to_str().unwrap());
-        let err = result.expect_err("expected Err for synthetic-pairs").to_string();
-        assert!(err.contains("is_publishable=false"), "err missing flag mention: {err}");
-        assert!(err.contains("synthetic-pairs"), "err missing data_mode: {err}");
+        let err = result
+            .expect_err("expected Err for synthetic-pairs")
+            .to_string();
+        assert!(
+            err.contains("is_publishable=false"),
+            "err missing flag mention: {err}"
+        );
+        assert!(
+            err.contains("synthetic-pairs"),
+            "err missing data_mode: {err}"
+        );
         assert!(
             err.contains("real-trades"),
             "err should name the unblock action: {err}"
@@ -263,7 +302,10 @@ mod tests {
         );
         let result = check_publishable(path.to_str().unwrap());
         let err = result.expect_err("expected Err for schema v1").to_string();
-        assert!(err.contains("schema v1"), "err missing schema version: {err}");
+        assert!(
+            err.contains("schema v1"),
+            "err missing schema version: {err}"
+        );
         assert!(
             err.contains("pre-honesty-pass"),
             "err should name the era: {err}"
@@ -284,7 +326,9 @@ mod tests {
             }"#,
         );
         let result = check_publishable(path.to_str().unwrap());
-        let err = result.expect_err("expected Err for missing flag").to_string();
+        let err = result
+            .expect_err("expected Err for missing flag")
+            .to_string();
         assert!(
             err.contains("missing is_publishable"),
             "err should name the missing field: {err}"
@@ -297,7 +341,9 @@ mod tests {
         // Non-existent path. Refuse loudly (the caller is publishing a
         // financial attestation; "file not found" is not an OK state).
         let result = check_publishable("/nonexistent/path/atrium-backtest-9999.json");
-        let err = result.expect_err("expected Err for missing file").to_string();
+        let err = result
+            .expect_err("expected Err for missing file")
+            .to_string();
         assert!(
             err.contains("could not read"),
             "err should name the file-read failure: {err}"
@@ -308,7 +354,9 @@ mod tests {
     fn bails_on_malformed_json() {
         let path = write_fixture("malformed", "not actually json {{{");
         let result = check_publishable(path.to_str().unwrap());
-        let err = result.expect_err("expected Err for malformed JSON").to_string();
+        let err = result
+            .expect_err("expected Err for malformed JSON")
+            .to_string();
         assert!(
             err.contains("not valid JSON"),
             "err should name the parse failure: {err}"
@@ -360,7 +408,10 @@ mod tests {
 
     #[test]
     fn network_rpc_respects_env_override() {
-        std::env::set_var("ARBITRUM_SEPOLIA_RPC_URL", "https://my-private-rpc.example.com");
+        std::env::set_var(
+            "ARBITRUM_SEPOLIA_RPC_URL",
+            "https://my-private-rpc.example.com",
+        );
         let url = network_rpc("arbitrum_sepolia").expect("arbitrum_sepolia env override");
         assert_eq!(url, "https://my-private-rpc.example.com");
         std::env::remove_var("ARBITRUM_SEPOLIA_RPC_URL");
@@ -426,7 +477,10 @@ mod tests {
     #[test]
     fn load_address_bails_when_contract_absent_from_registry() {
         let net = format!("test_iter75_missing_contract_{}", std::process::id());
-        let path = write_deployments_fixture(&net, r#"{ "contracts": { "plinth": { "address": "0xPL" } } }"#);
+        let path = write_deployments_fixture(
+            &net,
+            r#"{ "contracts": { "plinth": { "address": "0xPL" } } }"#,
+        );
         let result = load_address(&net, "coffer");
         let err = result.expect_err("absent contract bails").to_string();
         assert!(

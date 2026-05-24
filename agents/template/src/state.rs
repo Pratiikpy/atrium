@@ -28,7 +28,10 @@ impl AgentState {
             let text = std::fs::read_to_string(&path)?;
             Ok(serde_json::from_str(&text)?)
         } else {
-            Ok(Self { name: name.to_string(), ..Default::default() })
+            Ok(Self {
+                name: name.to_string(),
+                ..Default::default()
+            })
         }
     }
 

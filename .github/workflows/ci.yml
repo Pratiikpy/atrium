@@ -44,12 +44,19 @@ jobs:
       - name: cargo test
         run: cargo test --workspace --all-features
       - name: Build Stylus contracts
+        env:
+          STYLUS_ENDPOINT: https://arbitrum-sepolia.publicnode.com
         run: |
-          cargo install --force cargo-stylus
-          cd contracts/plinth && cargo stylus check
-          cd ../coffer && cargo stylus check
-          cd ../vigil && cargo stylus check
-          cd ../sigil && cargo stylus check
+          # Pin cargo-stylus to the same 0.10.7 the local docker image
+          # uses and the on-chain deploys were made with. The Stylus.toml
+          # files use the 0.10 workspace schema; older cargo-stylus rejects.
+          cargo install --force cargo-stylus --version 0.10.7
+          cd contracts/plinth      && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
+          cd ../coffer             && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
+          cd ../vigil              && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
+          cd ../sigil              && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
+          cd ../plinth-math        && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
+          cd ../plinth-oracle      && cargo stylus check --endpoint "$STYLUS_ENDPOINT"
 
   test-solidity:
     name: Solidity tests (Foundry)

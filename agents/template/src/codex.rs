@@ -23,7 +23,11 @@ pub async fn fetch_venue_health(
     let url = format!("{codex_url}/v1/venues/health");
     let resp = client.get(&url).send().await.context("venues health")?;
     let body: serde_json::Value = resp.json().await?;
-    let venues = body.get("venues").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    let venues = body
+        .get("venues")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
     for v in venues {
         if v.get("id").and_then(|i| i.as_u64()) == Some(venue_id as u64) {
             let h = v.get("health").cloned().unwrap_or_default();
@@ -90,13 +94,19 @@ mod tests {
         // lands, fetch_prices returns Ok(vec![]). The harness's tick()
         // checks `prices.is_empty()` and warn-skips, so the gap is loud
         // in operator stdout but doesn't crash the agent.
-        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         rt.block_on(async {
             let client = reqwest::Client::new();
             let result = fetch_prices(&client, "http://localhost", "0xinstrument").await;
             assert!(result.is_ok(), "fetch_prices stub should return Ok");
             let prices = result.unwrap();
-            assert!(prices.is_empty(), "stub returns empty Vec until endpoint wired");
+            assert!(
+                prices.is_empty(),
+                "stub returns empty Vec until endpoint wired"
+            );
         });
     }
 
@@ -105,11 +115,17 @@ mod tests {
         // Critical anti-silent-failure: pre-fix this returned Ok(default()).
         // Strategy code that interprets default() (notional=0) as "no
         // position" would then over-open. Post-fix: bail loudly.
-        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         rt.block_on(async {
             let client = reqwest::Client::new();
             let result = fetch_open_position(&client, "http://localhost", "agent-x").await;
-            assert!(result.is_err(), "fetch_open_position MUST bail until endpoint wired");
+            assert!(
+                result.is_err(),
+                "fetch_open_position MUST bail until endpoint wired"
+            );
             let err = result.unwrap_err().to_string();
             assert!(
                 err.contains("not wired") || err.contains("stub"),

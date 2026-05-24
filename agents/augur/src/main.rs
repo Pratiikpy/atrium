@@ -20,8 +20,8 @@ use clap::Parser;
 use serde::Deserialize;
 use tracing::{info, warn};
 
-mod strategy;
 mod state;
+mod strategy;
 
 use strategy::{Bands, Signal};
 
@@ -109,7 +109,10 @@ async fn tick(args: &Args, client: &reqwest::Client, state: &mut state::AgentSta
         Signal::EnterLong | Signal::EnterShort | Signal::Close => {
             // Real impl: build ActionSigil from IntentSigil, sign with session key,
             // call EntryPoint via Pimlico bundler. Year-1 scaffold logs the intent.
-            info!(?signal, "would submit ActionSigil — wire to Pimlico in production");
+            info!(
+                ?signal,
+                "would submit ActionSigil — wire to Pimlico in production"
+            );
         }
     }
 

@@ -152,13 +152,21 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     let cli = Cli::parse();
     match cli.cmd {
-        Cmd::Deploy { all, contract, phase2 } => commands::deploy::run(&cli.network, all, contract, phase2).await,
+        Cmd::Deploy {
+            all,
+            contract,
+            phase2,
+        } => commands::deploy::run(&cli.network, all, contract, phase2).await,
         Cmd::Verify { contract } => commands::verify::run(&cli.network, &contract).await,
         Cmd::Multisig { action } => commands::multisig::run(&cli.network, action).await,
         Cmd::Keepers { action } => commands::keepers::run(&cli.network, action).await,
         Cmd::Lantern { action } => commands::lantern::run(&cli.network, action).await,
-        Cmd::Pause { contract, reason } => commands::pause::run(&cli.network, &contract, &reason).await,
-        Cmd::Resume { contract, action } => commands::pause::resume(&cli.network, &contract, action.as_deref()).await,
+        Cmd::Pause { contract, reason } => {
+            commands::pause::run(&cli.network, &contract, &reason).await
+        }
+        Cmd::Resume { contract, action } => {
+            commands::pause::resume(&cli.network, &contract, action.as_deref()).await
+        }
         Cmd::Backtest { action } => commands::backtest::run(&cli.network, action).await,
         Cmd::Seed => commands::seed::run(&cli.network).await,
     }

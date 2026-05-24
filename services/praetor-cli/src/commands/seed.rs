@@ -60,8 +60,10 @@ pub async fn run(network: &str) -> Result<()> {
 
 fn rpc_url_for_network(network: &str) -> Result<String> {
     match network {
-        "local" => Ok(std::env::var("ANVIL_RPC_URL")
-            .unwrap_or_else(|_| "http://127.0.0.1:8545".to_string())),
+        "local" => {
+            Ok(std::env::var("ANVIL_RPC_URL")
+                .unwrap_or_else(|_| "http://127.0.0.1:8545".to_string()))
+        }
         "arbitrum_sepolia" => std::env::var("ARBITRUM_SEPOLIA_RPC_URL")
             .map_err(|_| anyhow!("ARBITRUM_SEPOLIA_RPC_URL env var required for sepolia seed")),
         other => Err(anyhow!("unknown network: {other}")),

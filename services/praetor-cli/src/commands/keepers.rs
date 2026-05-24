@@ -62,7 +62,9 @@ async fn stake(network: &str, keeper: &str, amount: &str) -> Result<()> {
             String::from_utf8_lossy(&calldata_output.stderr)
         );
     }
-    let calldata = String::from_utf8(calldata_output.stdout)?.trim().to_string();
+    let calldata = String::from_utf8(calldata_output.stdout)?
+        .trim()
+        .to_string();
 
     println!("Submit this as keeper {keeper}:");
     println!("  to:    {vigil}");
@@ -92,7 +94,9 @@ async fn slash(network: &str, keeper: &str, reason: &str) -> Result<()> {
             String::from_utf8_lossy(&calldata_output.stderr)
         );
     }
-    let calldata = String::from_utf8(calldata_output.stdout)?.trim().to_string();
+    let calldata = String::from_utf8(calldata_output.stdout)?
+        .trim()
+        .to_string();
 
     println!("Submit this to the Gnosis Safe (Praetor multisig):");
     println!("  to:     {vigil}");
@@ -106,7 +110,9 @@ async fn slash(network: &str, keeper: &str, reason: &str) -> Result<()> {
     println!("Vigil also enforces on-chain that the keeper has missed enough windows;");
     println!("if not, the call reverts with NotEnoughMisses(misses). Run `praetor keepers list`");
     println!("first to confirm missedWindows24h >= max_misses_per_window (default 3).");
-    println!("(Iter 48 rename: this error was previously named TooManyMisses — inverted semantic.)");
+    println!(
+        "(Iter 48 rename: this error was previously named TooManyMisses — inverted semantic.)"
+    );
     Ok(())
 }
 

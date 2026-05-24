@@ -13,8 +13,8 @@
 //! produce envelopes in the exact layout `contracts/sigil/src/eip712.rs`
 //! expects, so future drift on either side is caught at the type-level.
 
-use anyhow::Result;
 use alloy_primitives::{Address, FixedBytes, I256, U256};
+use anyhow::Result;
 
 use crate::{codex::OpenPosition, AgentConfig, Signal};
 
@@ -50,7 +50,9 @@ pub fn encode_intent_envelope(
             MAX_INSTRUMENTS
         );
     }
-    let mut buf = Vec::with_capacity(256 + 32 + 32 * venues_allowed.len() + 32 + 32 * instruments_allowed.len() + 65);
+    let mut buf = Vec::with_capacity(
+        256 + 32 + 32 * venues_allowed.len() + 32 + 32 * instruments_allowed.len() + 65,
+    );
 
     // Fixed body (256 bytes). Each slot is 32-byte aligned, big-endian.
     let mut slot = [0u8; 32];
@@ -207,11 +209,13 @@ mod tests {
         // the other doesn't, the on-chain decoder would reject the
         // larger one silently — agent would log "submitted" but never
         // land. Pin BOTH boundaries.
-        let too_many: Vec<FixedBytes<32>> = (0..9).map(|i| {
-            let mut b = [0u8; 32];
-            b[31] = i;
-            FixedBytes::<32>::from(b)
-        }).collect();
+        let too_many: Vec<FixedBytes<32>> = (0..9)
+            .map(|i| {
+                let mut b = [0u8; 32];
+                b[31] = i;
+                FixedBytes::<32>::from(b)
+            })
+            .collect();
         let result = encode_intent_envelope(
             Address::ZERO,
             Address::ZERO,
@@ -248,7 +252,8 @@ mod tests {
             0,
             &[],
             &[],
-        ).unwrap();
+        )
+        .unwrap();
         // Slot 0 = bytes [0..32]. Owner lives at offset 12..32.
         assert_eq!(&bytes[0..12], &[0u8; 12], "left-padding must be zero");
         assert_eq!(&bytes[12..32], &owner_bytes, "owner right-aligned in slot");
@@ -283,13 +288,33 @@ mod tests {
         // slot would shift the instruments_count offset, making the
         // decoder mis-read the count value.
         let bytes_with_0 = encode_intent_envelope(
-            Address::ZERO, Address::ZERO, U256::ZERO, U256::ZERO,
-            0, 0, U256::ZERO, 0, &[], &[],
-        ).unwrap().len();
+            Address::ZERO,
+            Address::ZERO,
+            U256::ZERO,
+            U256::ZERO,
+            0,
+            0,
+            U256::ZERO,
+            0,
+            &[],
+            &[],
+        )
+        .unwrap()
+        .len();
         let bytes_with_3 = encode_intent_envelope(
-            Address::ZERO, Address::ZERO, U256::ZERO, U256::ZERO,
-            0, 0, U256::ZERO, 0, &[1, 2, 3], &[],
-        ).unwrap().len();
+            Address::ZERO,
+            Address::ZERO,
+            U256::ZERO,
+            U256::ZERO,
+            0,
+            0,
+            U256::ZERO,
+            0,
+            &[1, 2, 3],
+            &[],
+        )
+        .unwrap()
+        .len();
         assert_eq!(bytes_with_3 - bytes_with_0, 32 * 3, "each venue = 32 bytes");
     }
 
@@ -307,7 +332,10 @@ mod tests {
         // When Pimlico wiring lands this test moves to assert success.
         // Until then, asserting the bail keeps the silent-failure
         // regression locked.
-        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         rt.block_on(async {
             let client = reqwest::Client::new();
             let config = crate::AgentConfig {
@@ -325,10 +353,17 @@ mod tests {
                 "test_agent",
                 crate::Signal::EnterLong,
                 &crate::codex::OpenPosition::default(),
-            ).await;
-            assert!(result.is_err(), "K-10: must bail until Pimlico wiring lands");
+            )
+            .await;
+            assert!(
+                result.is_err(),
+                "K-10: must bail until Pimlico wiring lands"
+            );
             let err = result.unwrap_err().to_string();
-            assert!(err.contains("not yet wired"), "err msg names the unwired state: {err}");
+            assert!(
+                err.contains("not yet wired"),
+                "err msg names the unwired state: {err}"
+            );
         });
     }
 }

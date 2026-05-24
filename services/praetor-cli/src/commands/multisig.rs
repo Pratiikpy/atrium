@@ -34,7 +34,9 @@ async fn schedule(network: &str, target: &str, call: &str) -> Result<()> {
             String::from_utf8_lossy(&calldata_output.stderr)
         );
     }
-    let calldata = String::from_utf8(calldata_output.stdout)?.trim().to_string();
+    let calldata = String::from_utf8(calldata_output.stdout)?
+        .trim()
+        .to_string();
 
     println!("Submit this to the Gnosis Safe (Praetor multisig):");
     println!("  to:    {timelock}");
@@ -42,7 +44,9 @@ async fn schedule(network: &str, target: &str, call: &str) -> Result<()> {
     println!("  data:  {calldata}");
     println!("  rpc:   {rpc}");
     println!();
-    println!("Once 3 of 5 signers approve and execute, the schedule_at timestamp is recorded on-chain.");
+    println!(
+        "Once 3 of 5 signers approve and execute, the schedule_at timestamp is recorded on-chain."
+    );
     println!("Run `praetor multisig list` to see pending schedules.");
     Ok(())
 }
@@ -53,10 +57,17 @@ async fn execute(network: &str, id: &str) -> Result<()> {
     let rpc = network_rpc(network)?;
     let target = std::env::var("EXEC_TARGET").context("EXEC_TARGET must be set")?;
     let data = std::env::var("EXEC_DATA").context("EXEC_DATA must be set")?;
-    let scheduled_at = std::env::var("EXEC_SCHEDULED_AT").context("EXEC_SCHEDULED_AT must be set")?;
+    let scheduled_at =
+        std::env::var("EXEC_SCHEDULED_AT").context("EXEC_SCHEDULED_AT must be set")?;
 
     let exec_calldata = Command::new("cast")
-        .args(["calldata", "execute(address,bytes,uint64)", &target, &data, &scheduled_at])
+        .args([
+            "calldata",
+            "execute(address,bytes,uint64)",
+            &target,
+            &data,
+            &scheduled_at,
+        ])
         .output()
         .context("cast calldata failed")?;
     // Audit fix (iteration 23): pre-fix this skipped the exit-status check

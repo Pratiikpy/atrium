@@ -77,7 +77,8 @@ async fn tick<S: Strategy>(
 
     // 2. Fetch recent prices + current position
     let prices = codex::fetch_prices(client, &config.codex_url, &config.instrument_id).await?;
-    let current_position = codex::fetch_open_position(client, &config.codex_url, strategy.name()).await?;
+    let current_position =
+        codex::fetch_open_position(client, &config.codex_url, strategy.name()).await?;
 
     // Silent-failure guard: fetch_prices is currently a stub returning [].
     // Strategies invariably return Hold on empty prices (RSI=NaN, Bollinger
@@ -97,13 +98,19 @@ async fn tick<S: Strategy>(
 
     // 3. Decide
     let signal = strategy.decide(&prices, current_position.notional_signed);
-    info!(agent = strategy.name(), ?signal, current = current_position.notional_signed, "decision");
+    info!(
+        agent = strategy.name(),
+        ?signal,
+        current = current_position.notional_signed,
+        "decision"
+    );
 
     // 4. Act
     match signal {
         Signal::Hold => {}
         Signal::EnterLong | Signal::EnterShort | Signal::Close => {
-            sigil::submit_action_sigil(client, config, strategy.name(), signal, &current_position).await?;
+            sigil::submit_action_sigil(client, config, strategy.name(), signal, &current_position)
+                .await?;
         }
     }
 
