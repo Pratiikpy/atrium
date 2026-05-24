@@ -30,3 +30,4 @@ k256 = { version = "0.13", features = ["ecdsa", "alloc"], default-features = fal
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
+contract-client-gen = []

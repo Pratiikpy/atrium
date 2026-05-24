@@ -39,6 +39,10 @@ proptest = "1.5"
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
+# Declared empty to match the cfg gate cargo-stylus 0.10 emits inside
+# the storage / public attribute macros. Without this, cargo check under
+# RUSTFLAGS=-D warnings fails with "unexpected cfg condition value".
+contract-client-gen = []
 
 # cargo-stylus 0.5.x ships its own optimized release profile that produced
 # 25.9 KB for Coffer — adding any [profile.release] here made it bigger

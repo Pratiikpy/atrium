@@ -234,7 +234,9 @@ contract PraetorTimelockTest is Test {
         vm.prank(multisig);
         timelock.emergencyPause(address(target), "drill");
         assertTrue(target.isPaused());
-        assertEq(target.lastReason(), "drill");
+        // emergencyPause keccak256s the operator string before forwarding,
+        // so the mock receives the digest (auditor C-5 fix).
+        assertEq(target.lastReason(), keccak256(bytes("drill")));
     }
 
     function test_emergencyPause_onlyMultisig() public {
@@ -406,7 +408,7 @@ contract MockPausable {
     function isPaused() external view returns (bool) {
         return _paused;
     }
-    function lastReason() external view returns (string memory) {
+    function lastReason() external view returns (bytes32) {
         return _lastReason;
     }
 }

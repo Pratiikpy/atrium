@@ -39,6 +39,7 @@ proptest = "1.5"
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 serde = ["dep:serde", "alloy-primitives/serde"]
+contract-client-gen = []
 
 [package.metadata.kani.flags]
 unwind = "5"
