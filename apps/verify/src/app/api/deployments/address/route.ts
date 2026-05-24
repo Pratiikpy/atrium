@@ -40,6 +40,12 @@ const ALLOWED_SLUGS = new Set([
   'adapter-curve',
   'adapter-trade-xyz',
   'adapter-polymarket',
+  // Audit 2026-05-24 G-6 fix (auditor G): three deployed adapter slugs
+  // were missing from the allowlist so /api/deployments/address returned
+  // 400 even when the registry held a valid address.
+  'adapter-gmx',
+  'adapter-morpho',
+  'adapter-synthetix',
   // Wave A.7 split-contract slugs — Plinth's SPAN compute and oracle
   // reading live in separate Stylus contracts to fit EIP-170. Front end
   // never needs to call these directly (Plinth proxies the calls), but

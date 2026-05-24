@@ -29,14 +29,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # wasm32 target for Stylus.
 RUN rustup target add wasm32-unknown-unknown
 
-# Pre-install cargo-stylus so the container is ready to go. Version pinned
-# to match the version used in CI (`cargo install --force cargo-stylus`
-# without a version yields the latest from crates.io; pin once we observe
-# a Stylus toolchain regression — see `.claude/rules/security.md` "Stylus
-# toolchain regression" entry).
-# Pinned to 0.5.x — matches the stylus-sdk = "0.6" used by Atrium contracts.
-# Newer cargo-stylus (0.10+) requires Stylus.toml manifests we haven't authored.
-RUN cargo install --force cargo-stylus --version 0.5.6
+# Pre-install cargo-stylus. Version 0.10.7 matches stylus-sdk = "0.10" in
+# contracts/{coffer,plinth,sigil,vigil}/Cargo.toml and is the version used
+# for the 2026-05-23 multi-fragment factory deploys recorded in
+# deployments/arbitrum_sepolia.json. Bumping requires checking the
+# `cargo stylus check` ABI output for selector changes.
+RUN cargo install --force cargo-stylus --version 0.10.7
 
 # Workspace stays as a volume mount; nothing to copy at image-build time.
 WORKDIR /workspace

@@ -36,6 +36,11 @@ sol! {
         uint256 next,
         uint256 amount,
     );
+    /// Audit 2026-05-24 (Auditor A C-5): pause + resume lifecycle events.
+    /// reason is keccak256(human-readable code); off-chain decoders map digest
+    /// to message. Cuts ~400 bytes vs string-typed reason on no_std wasm.
+    event SigilPausedEvent(bytes32 reason, uint64 block_number);
+    event SigilResumedEvent(uint64 block_number);
 }
 
 sol! {
@@ -48,6 +53,12 @@ sol! {
     error MandateRevoked(bytes32 intent_hash);
     error UnauthorizedCaller(address caller);
     error CreditCapExceeded(uint256 attempted_open, uint256 max_credit);
+    /// Audit 2026-05-24 (Auditor A C-5): Sigil now exposes pause(bytes32)
+    /// for PraetorTimelock.emergencyPause compatibility. Reverts on validate
+    /// when the flag is set.
+    error SigilPaused();
+    /// Audit 2026-05-24 (Auditor E): reentrancy guard on validate_action.
+    error SigilReentrant();
 }
 
 #[derive(SolidityError)]
@@ -61,6 +72,8 @@ pub enum SigilError {
     MandateRevoked(MandateRevoked),
     Unauthorized(UnauthorizedCaller),
     CreditCapExceeded(CreditCapExceeded),
+    Paused(SigilPaused),
+    Reentrant(SigilReentrant),
 }
 
 sol_storage! {
@@ -107,6 +120,15 @@ sol_storage! {
         address postern_kill_switch;
 
         SigilParams params;
+
+        // Audit 2026-05-24 (Auditor A C-5 + E reentrancy gap):
+        // `is_paused` lets PraetorTimelock.emergencyPause halt mandate
+        // validation across all agents in a single tx. `is_updating` is the
+        // reentrancy flag mirroring Plinth's pattern; validate_action does
+        // not currently make external calls, but the flag is in place for
+        // when post-Wave-1 signature-recovery enables a CALL_EOA path.
+        bool is_paused;
+        bool is_updating;
     }
 
     pub struct SigilParams {
@@ -183,6 +205,28 @@ impl Sigil {
     ///
     /// Returns true if the action is authorized.
     pub fn validate_action(
+        &mut self,
+        intent_bytes: alloc::vec::Vec<u8>,
+        action_bytes: alloc::vec::Vec<u8>,
+    ) -> Result<bool, SigilError> {
+        // Audit 2026-05-24 (Auditor A C-5 + Auditor E reentrancy gap):
+        // global pause check first, reentrancy guard second. Same shape as
+        // Plinth's open_position. Pre-fix, a paused Sigil still validated
+        // (the pause flag did not exist) and a future external-call hook
+        // could re-enter to bypass rate limits.
+        if self.is_paused.get() {
+            return Err(SigilError::Paused(SigilPaused {}));
+        }
+        if self.is_updating.get() {
+            return Err(SigilError::Reentrant(SigilReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.validate_action_inner(intent_bytes, action_bytes);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn validate_action_inner(
         &mut self,
         intent_bytes: alloc::vec::Vec<u8>,
         action_bytes: alloc::vec::Vec<u8>,
@@ -453,6 +497,47 @@ impl Sigil {
 
     pub fn get_open_notional(&self, agent: Address) -> U256 {
         self.open_notional_wei.getter(agent).get()
+    }
+
+    // ===== Init-state getters (Audit 2026-05-24 G-2 fix) =====
+    pub fn praetor_multisig(&self) -> Address {
+        self.praetor_multisig.get()
+    }
+
+    pub fn praetor_timelock(&self) -> Address {
+        self.praetor_timelock.get()
+    }
+
+    pub fn plinth_address(&self) -> Address {
+        self.plinth_address.get()
+    }
+
+    // ===== Pause (multisig or timelock) =====
+    /// Audit 2026-05-24 (Auditor A C-5, "no pause function on Sigil"):
+    /// PraetorTimelock.emergencyPause forwards `IPausable(target).pause(bytes32)`.
+    /// Mirrors Coffer + Plinth. Accepts caller in {multisig, timelock}.
+    /// Sets the global is_paused flag; validate_action reverts while set.
+    pub fn pause(&mut self, reason: B256) -> Result<(), SigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_multisig.get() && caller != self.praetor_timelock.get() {
+            return Err(SigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.is_paused.set(true);
+        let block_now = self.vm().block_number();
+        self.vm().log(SigilPausedEvent { reason, block_number: block_now });
+        Ok(())
+    }
+
+    /// Resume is a parameter change so timelock-only (F-32 pattern).
+    pub fn resume(&mut self) -> Result<(), SigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_timelock.get() {
+            return Err(SigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.is_paused.set(false);
+        let block_now = self.vm().block_number();
+        self.vm().log(SigilResumedEvent { block_number: block_now });
+        Ok(())
     }
 }
 

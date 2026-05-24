@@ -32,8 +32,10 @@ async function call(stepParam: string | null) {
   return (await res.json()) as {
     step: number;
     ready: boolean;
+    init_state: 'initialized' | 'uninitialized' | 'unknown';
     required_contracts: string[];
     missing: string[];
+    probes: Record<string, { address: string | null; init: string; reason: string | null }>;
   };
 }
 
@@ -123,11 +125,14 @@ describe('GET /api/deployments/status — response invariants', () => {
       const json = await call(String(i));
       expect(json).toHaveProperty('step');
       expect(json).toHaveProperty('ready');
+      expect(json).toHaveProperty('init_state');
       expect(json).toHaveProperty('required_contracts');
       expect(json).toHaveProperty('missing');
+      expect(json).toHaveProperty('probes');
       expect(Array.isArray(json.required_contracts)).toBe(true);
       expect(Array.isArray(json.missing)).toBe(true);
       expect(typeof json.ready).toBe('boolean');
+      expect(['initialized', 'uninitialized', 'unknown']).toContain(json.init_state);
     }
   });
 

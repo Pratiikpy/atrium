@@ -8,7 +8,7 @@
   ],
   "env": {
     "ENV": "production",
-    "SCRIBE_URL": "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.3",
+    "SCRIBE_URL": "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/version/latest",
     "ARBITRUM_SEPOLIA_RPC": "https://arbitrum-sepolia.publicnode.com",
     "CODEX_USDC_ADDRESS": "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
     "CODEX_PAY_TO_ADDRESS": "0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42",

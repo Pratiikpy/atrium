@@ -21,7 +21,12 @@ import path from 'node:path';
  * overrides via path (1) or (2).
  */
 interface KaniStatus {
-  state: 'pass' | 'fail' | 'unknown';
+  // 'in-development' is the honest interim state when the proofs exist in
+  // repo but the Kani CI lane hasn't been activated yet, distinct from
+  // 'unknown' (no measurement at all) and 'pass'/'fail' (real CI verdict).
+  // Audit 2026-05-24 alpha.4 introduced this when kani-status.json was
+  // changed from claimed `pass` to honest `in-development`.
+  state: 'pass' | 'fail' | 'unknown' | 'in-development';
   /**
    * Iteration 38 audit fix: was `number` with a `?? 0` fallback when the
    * upstream didn't provide the field. That meant the route returned

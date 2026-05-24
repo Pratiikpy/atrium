@@ -69,6 +69,13 @@ sol! {
     // Audit KKK-3 fix: surface Plinth call failures during adapter_pull
     // so the pending-liquidation pause check is not silently bypassed.
     error PlinthUnreachable(address user);
+    // Audit 2026-05-24 (Auditor A C-7): Coffer had no reentrancy guard. A
+    // hostile USDC-shaped token (set as `asset` via timelock typo) or a
+    // future hook callback could re-enter deposit/withdraw/adapter_pull
+    // mid-flight and double-mint shares. Mirrors Plinth's is_updating
+    // pattern; this error fires when the prologue sees the flag already
+    // set.
+    error CofferReentrant();
 }
 
 #[derive(SolidityError)]
@@ -88,6 +95,7 @@ pub enum CofferError {
     // Audit KKK-3: fail-loud on Plinth call failure during adapter_pull
     // instead of silent fail-open.
     PlinthUnreachable(PlinthUnreachable),
+    Reentrant(CofferReentrant),
 }
 
 // =============================================================================
@@ -141,6 +149,12 @@ sol_storage! {
         uint256 last_tvl_snapshot_wei;
         uint64 last_tvl_snapshot_time;
         uint16 tvl_drop_threshold_bps;       // 3000 (30%)
+
+        // Audit 2026-05-24 (Auditor A C-7): single-slot reentrancy flag.
+        // Set by the public deposit/withdraw/adapter_pull wrapper before
+        // any external call, cleared on return. Plinth has the same
+        // pattern (see `contracts/plinth/src/lib.rs`).
+        bool is_updating;
     }
 
     pub struct AdapterBudget {
@@ -200,6 +214,23 @@ impl Coffer {
     // ===== ERC-4626 standard =====
     pub fn asset(&self) -> Address {
         self.asset.get()
+    }
+
+    // ===== Init-state getters (Audit 2026-05-24 G-2 fix) =====
+    // `/api/deployments/status` reads these via viem to confirm initialize()
+    // ran on the deployed address. Coffer's `asset()` already serves as the
+    // canonical init probe, but exposing the admin slots lets the route
+    // assert the *correct* multisig is wired, not just any non-zero value.
+    pub fn praetor_multisig(&self) -> Address {
+        self.praetor_multisig.get()
+    }
+
+    pub fn praetor_timelock(&self) -> Address {
+        self.praetor_timelock.get()
+    }
+
+    pub fn plinth_address(&self) -> Address {
+        self.plinth_address.get()
     }
 
     pub fn total_assets(&self) -> U256 {
@@ -264,6 +295,16 @@ impl Coffer {
     }
 
     pub fn deposit(&mut self, assets: U256, receiver: Address) -> Result<U256, CofferError> {
+        if self.is_updating.get() {
+            return Err(CofferError::Reentrant(CofferReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.deposit_inner(assets, receiver);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn deposit_inner(&mut self, assets: U256, receiver: Address) -> Result<U256, CofferError> {
         if assets.is_zero() {
             return Err(CofferError::ZeroAssets(ZeroAssets {}));
         }
@@ -340,6 +381,21 @@ impl Coffer {
     }
 
     pub fn withdraw(
+        &mut self,
+        assets: U256,
+        receiver: Address,
+        owner: Address,
+    ) -> Result<U256, CofferError> {
+        if self.is_updating.get() {
+            return Err(CofferError::Reentrant(CofferReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.withdraw_inner(assets, receiver, owner);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn withdraw_inner(
         &mut self,
         assets: U256,
         receiver: Address,
@@ -449,6 +505,21 @@ impl Coffer {
         from_user: Address,
         to: Address,
     ) -> Result<(), CofferError> {
+        if self.is_updating.get() {
+            return Err(CofferError::Reentrant(CofferReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.adapter_pull_inner(amount, from_user, to);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn adapter_pull_inner(
+        &mut self,
+        amount: U256,
+        from_user: Address,
+        to: Address,
+    ) -> Result<(), CofferError> {
         let caller = self.vm().msg_sender();
         if !self.approved_adapters.getter(caller).get() {
             return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
@@ -530,7 +601,7 @@ impl Coffer {
     }
 
     // ===== Admin (timelock for params, multisig for emergency pause) =====
-    /// Audit F-32 fix: adapter approval is a parameter change → timelock-only.
+    /// Audit F-32 fix: adapter approval is a parameter change, so timelock-only.
     pub fn set_adapter(
         &mut self,
         adapter: Address,
@@ -541,6 +612,17 @@ impl Coffer {
         self.approved_adapters.setter(adapter).set(approved);
         self.adapter_budgets.setter(adapter).per_block_cap_wei.set(per_block_cap_wei);
         Ok(())
+    }
+
+    /// View: is `adapter` on the approved orchestrators list? Used by
+    /// `AtriumRouter` (defense-in-depth check that no sub-adapter is also a
+    /// direct orchestrator). Audit-fix 2026-05-24 (Auditor A C-4): pre-fix the
+    /// Router referenced `is_adapter_approved` but Coffer did not expose any
+    /// public getter for the `approved_adapters` mapping, so every Router
+    /// call reverted with empty data. Stylus auto-exports this as
+    /// `isAdapterApproved(address)(bool)`.
+    pub fn is_adapter_approved(&self, adapter: Address) -> bool {
+        self.approved_adapters.getter(adapter).get()
     }
 
     /// Unified pause — pauses both deposits and withdrawals. Audit G-6 fix:

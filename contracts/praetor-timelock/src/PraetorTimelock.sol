@@ -9,7 +9,16 @@ pragma solidity ^0.8.28;
 ///         calls `schedule`, waits 48h, then calls `execute`. No single key
 ///         path anywhere.
 interface IPausable {
-    function pause(string calldata reason) external;
+    /// Audit-fix 2026-05-24 (Auditor A C-5): was `pause(string)`.
+    /// Coffer + Plinth (Stylus) export `pause(bytes32)`. The mismatching
+    /// selectors meant emergencyPause silently passed selector `0x6da66355`
+    /// while Stylus contracts dispatched on `0xed56531a`, so every
+    /// emergency-pause attempt reverted at the target. Sigil and Vigil now
+    /// also expose `pause(bytes32)` after the same audit (see
+    /// `contracts/{sigil,vigil}/src/lib.rs`). The reason argument is the
+    /// keccak256 of a human-readable code; off-chain decoders map the
+    /// digest back to the message.
+    function pause(bytes32 reason) external;
 }
 
 contract PraetorTimelock {
@@ -89,14 +98,17 @@ contract PraetorTimelock {
         emit Cancelled(id);
     }
 
-    /// @notice Instant pause. No timelock. Pause-only — cannot upgrade or change state.
+    /// @notice Instant pause. No timelock. Pause-only, cannot upgrade or change state.
+    /// @param reason Free-text reason from the multisig. Hashed to bytes32 to match
+    ///        the Stylus contracts' `pause(bytes32)` selector. Off-chain decoders
+    ///        match the digest against a published reason-code catalog.
     function emergencyPause(address target, string calldata reason) external onlyMultisig {
         // Audit LLL-5 fix: void interface call to EOA returns (true, "")
         // without revert. Without this check a typo'd target would emit the
         // EmergencyPaused event suggesting the subsystem is paused when it is
-        // not — operators acting on the event would miss a real incident.
+        // not. Operators acting on the event would miss a real incident.
         if (target.code.length == 0) revert TargetNotAContract(target);
-        IPausable(target).pause(reason);
+        IPausable(target).pause(keccak256(bytes(reason)));
         emit EmergencyPaused(target, reason);
     }
 }

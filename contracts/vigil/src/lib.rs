@@ -24,16 +24,19 @@ sol! {
     event LiquidationTriggered(uint256 indexed job_id, uint256 indexed position_id, uint64 deadline_block, uint8 priority);
     event LiquidationExecuted(uint256 indexed job_id, address indexed keeper, int256 recovered_collateral_wei, uint16 actual_liquidation_bps);
     event KeeperStaked(address indexed keeper, uint256 stake_amount_wei);
-    // `reason` was `string`; bytes32 saves ~400 bytes of no_std alloc/format
+    // `reason` was `string`. bytes32 saves about 400 bytes of no_std alloc/format
     // machinery. Off-chain consumers keccak256() the human-readable text.
     event KeeperSlashed(address indexed keeper, uint256 slashed_amount_wei, bytes32 reason);
     event KeeperRewarded(address indexed keeper, uint256 reward_wei);
     // Audit GGGG-1: fires when Praetor marks a keeper as having missed a
-    // liquidation window. Off-chain Lantern monitor surfaces the evidence;
+    // liquidation window. Off-chain Lantern monitor surfaces the evidence,
     // multisig records on-chain. After max_misses (default 3) marks,
     // `slash_keeper` clears the precondition + can fire.
     event KeeperMissedWindow(address indexed keeper, uint32 new_miss_count);
     event StaleJobRejected(uint256 indexed job_id, uint256 expected_version, uint256 actual_version);
+    /// Audit 2026-05-24 (Auditor A C-5): pause + resume lifecycle events.
+    event VigilPausedEvent(bytes32 reason, uint64 block_number);
+    event VigilResumedEvent(uint64 block_number);
 }
 
 sol! {
@@ -67,6 +70,11 @@ sol! {
     // check would silently pass and liquidate against possibly-real state.
     // Closes the #28 family for Vigil's path.
     error PlinthGetMarginVersionFailed(address user);
+    /// Audit 2026-05-24 (Auditor A C-5 + Auditor E reentrancy gap):
+    /// Vigil now exposes pause(bytes32) and reentrancy guards on
+    /// execute_liquidation (the only mutating fn that makes external calls).
+    error VigilPaused();
+    error VigilReentrant();
 }
 
 #[derive(SolidityError)]
@@ -83,6 +91,8 @@ pub enum VigilError {
     PlinthCloseFailed(PlinthCloseFailed),
     PlinthGetPositionsFailed(PlinthGetPositionsFailed),
     PlinthGetMarginVersionFailed(PlinthGetMarginVersionFailed),
+    Paused(VigilPaused),
+    Reentrant(VigilReentrant),
 }
 
 sol_interface! {
@@ -118,6 +128,14 @@ sol_storage! {
         uint256 next_job_id;
 
         VigilParams params;
+
+        // Audit 2026-05-24 (Auditor A C-5 + Auditor E reentrancy gap):
+        // `is_paused` halts queue + execute paths during incident response.
+        // `is_updating` guards execute_liquidation, which calls into Plinth.
+        // Both flags are zero by default so existing deployments behave
+        // identically until the multisig sets them.
+        bool is_paused;
+        bool is_updating;
     }
 
     pub struct Keeper {
@@ -239,7 +257,24 @@ impl Vigil {
     }
 
     /// Keepers race to call this. Margin-version check closes the M6 race.
+    /// Audit 2026-05-24 (Auditor A C-5 + E reentrancy): wrapped in pause +
+    /// reentrancy-guard prologue/epilogue. The Plinth.closePosition call
+    /// inside is the external-state-changing call that motivates the
+    /// is_updating flag.
     pub fn execute_liquidation(&mut self, job_id: U256) -> Result<U256, VigilError> {
+        if self.is_paused.get() {
+            return Err(VigilError::Paused(VigilPaused {}));
+        }
+        if self.is_updating.get() {
+            return Err(VigilError::Reentrant(VigilReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.execute_liquidation_inner(job_id);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn execute_liquidation_inner(&mut self, job_id: U256) -> Result<U256, VigilError> {
         let caller = self.vm().msg_sender();
         let keeper = self.keepers.getter(caller);
         if !keeper.is_active.get() {
@@ -502,6 +537,49 @@ impl Vigil {
 
     pub fn active_keeper_count(&self) -> u32 {
         self.active_keepers.len() as u32
+    }
+
+    // ===== Init-state getters (Audit 2026-05-24 G-2 fix) =====
+    pub fn praetor_multisig(&self) -> Address {
+        self.praetor_multisig.get()
+    }
+
+    pub fn praetor_timelock(&self) -> Address {
+        self.praetor_timelock.get()
+    }
+
+    pub fn plinth_address(&self) -> Address {
+        self.plinth_address.get()
+    }
+
+    pub fn coffer_address(&self) -> Address {
+        self.coffer_address.get()
+    }
+
+    // ===== Pause (multisig or timelock) =====
+    /// Audit 2026-05-24 (Auditor A C-5): PraetorTimelock.emergencyPause
+    /// forwards `IPausable(target).pause(bytes32)`. Mirrors Coffer + Plinth
+    /// + Sigil. Halts queue_liquidation + execute_liquidation while set.
+    pub fn pause(&mut self, reason: B256) -> Result<(), VigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_multisig.get() && caller != self.praetor_timelock.get() {
+            return Err(VigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.is_paused.set(true);
+        let block_now = self.vm().block_number();
+        self.vm().log(VigilPausedEvent { reason, block_number: block_now });
+        Ok(())
+    }
+
+    pub fn resume(&mut self) -> Result<(), VigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_timelock.get() {
+            return Err(VigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.is_paused.set(false);
+        let block_now = self.vm().block_number();
+        self.vm().log(VigilResumedEvent { block_number: block_now });
+        Ok(())
     }
 }
 

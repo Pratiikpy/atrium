@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
+import { AppShellWalletCard } from './app-shell-wallet-card';
 
 /**
  * AppShell — left-sidebar chrome wrapping every `/app/*` page.
@@ -26,7 +27,7 @@ import { AppShellActions } from './app-shell-actions';
  *   │ ACCOUNT     │                                              │
  *   │ Settings    │                                              │
  *   │             │                                              │
- *   │ 0x1a3b…7f29 │                                              │
+ *   │ 0x…wallet…  │                                              │
  *   └─────────────┴──────────────────────────────────────────────┘
  *
  * Section header eyebrows are uppercase muted text. Active items have a
@@ -34,11 +35,15 @@ import { AppShellActions } from './app-shell-actions';
  * + chain context.
  */
 
+// Audit 2026-05-24 H-3 fix: prior nav omitted /app/markets and
+// /app/notifications even though both routes exist under src/app/app/.
+// Adding them lets users discover the surfaces without typing the URL.
 const NAV_GROUPS = [
   {
     heading: 'Trade',
     items: [
       { href: '/app/portfolio', label: 'Portfolio', icon: 'rect' },
+      { href: '/app/markets', label: 'Markets', icon: 'graph' },
       { href: '/app/trade', label: 'Trade', icon: 'graph' },
       { href: '/app/transfer', label: 'Transfer', icon: 'arrows' },
     ],
@@ -56,7 +61,10 @@ const NAV_GROUPS = [
   },
   {
     heading: 'Account',
-    items: [{ href: '/app/settings', label: 'Settings', icon: 'gear' }],
+    items: [
+      { href: '/app/notifications', label: 'Notifications', icon: 'bell' },
+      { href: '/app/settings', label: 'Settings', icon: 'gear' },
+    ],
   },
 ] as const;
 
@@ -137,15 +145,9 @@ export function AppShell({
           ))}
         </nav>
 
-        {/* Wallet card */}
-        <div className="mx-3 mb-4 mt-2 flex items-center gap-2 rounded-md border border-divider bg-parchment-light p-2">
-          <span className="size-7 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-terracotta)] to-[var(--color-ink-soft)]" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-mono text-xs text-ink">0x1a3b…7f29</p>
-            <p className="text-[10px] text-muted">arb-sepolia · rh-chain</p>
-          </div>
-          <span className="text-muted">›</span>
-        </div>
+        {/* Wallet card: split out as a client component so it can read the
+           live wagmi account (audit 2026-05-24 H-2 fix). */}
+        <AppShellWalletCard />
       </aside>
 
       {/* ── Main column ────────────────────────────────────────── */}

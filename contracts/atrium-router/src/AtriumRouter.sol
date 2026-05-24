@@ -4,10 +4,13 @@ pragma solidity ^0.8.28;
 import {IPorticoAdapter} from "../../portico-registry/src/IPorticoAdapter.sol";
 
 /// Plinth (Stylus) is callable from Solidity via standard call ABI.
-/// `open_position` returns the position id; `getAccount` returns the
-/// `(collateral, required, _, is_paused)` tuple used for margin gating.
+/// Stylus 0.10 auto-converts snake_case Rust fn names to camelCase selectors,
+/// so the on-chain ABI is `openPosition`, `closePosition`, `getPosition`.
+/// Audit-fix 2026-05-24 (Auditor A C-4 sweep): the interface previously
+/// declared snake_case names, which produce DIFFERENT selectors and reverted
+/// every Plinth call from the Router with empty data.
 interface IPlinth {
-    function open_position(
+    function openPosition(
         uint8 venue_id,
         bytes32 instrument_id,
         int256 notional_signed,
@@ -15,7 +18,7 @@ interface IPlinth {
         bytes calldata intent_sigil
     ) external returns (uint256);
 
-    function close_position(uint256 position_id) external returns (int256);
+    function closePosition(uint256 position_id) external returns (int256);
 
     function getAccount(address user)
         external
@@ -25,7 +28,7 @@ interface IPlinth {
     /// Returns (owner, venue_id, instrument_id, notional, opened_at). Used by
     /// the Router's `close_position_via_adapter` to enforce that the caller
     /// owns the position before unwinding it.
-    function get_position(uint256 position_id)
+    function getPosition(uint256 position_id)
         external
         view
         returns (address owner, uint8 venue_id, bytes32 instrument_id, int256 notional, uint256 opened_at);
@@ -34,8 +37,9 @@ interface IPlinth {
 /// Coffer's `adapter_pull` moves USDC from the vault to an adapter on
 /// behalf of a user (auth-gated by `approved_adapters[caller] == true`).
 /// The Router must be added to that set by Praetor before it can pull.
+/// Stylus exports it as `adapterPull(uint256,address,address)`.
 interface ICoffer {
-    function adapter_pull(uint256 amount, address from_user, address to) external;
+    function adapterPull(uint256 amount, address from_user, address to) external;
 }
 
 /// PorticoRegistry tells the Router which adapter handles a given venue.
@@ -48,13 +52,14 @@ interface IPorticoRegistry {
 /// the sole approved orchestrator for any adapter it routes through.
 /// Pre-fix, if a sub-adapter was ALSO individually on Coffer's
 /// approved-adapters list (belt-and-suspenders configuration mistake),
-/// it could call `coffer.adapter_pull` directly and bypass Router-level
-/// position limits. Now the Router queries Coffer's `is_adapter_approved`
+/// it could call `coffer.adapterPull` directly and bypass Router-level
+/// position limits. Now the Router queries Coffer's `isAdapterApproved`
 /// view before routing and reverts loudly if it sees a sub-adapter on
-/// the same approved-set. Defense-in-depth — the canonical guard is
-/// the Praetor multisig discipline when calling `coffer.set_adapter`.
+/// the same approved-set. Defense-in-depth, the canonical guard is the
+/// Praetor multisig discipline when calling `coffer.setAdapter`.
+/// Stylus exports the view as `isAdapterApproved(address)(bool)`.
 interface ICofferApprovedQuery {
-    function is_adapter_approved(address adapter) external view returns (bool);
+    function isAdapterApproved(address adapter) external view returns (bool);
 }
 
 /// @title AtriumRouter
@@ -169,7 +174,7 @@ contract AtriumRouter {
         (, uint256 required_before,,) = plinth.getAccount(user);
 
         // Step 1: Plinth validates margin and records the margin-side row.
-        plinth_position_id = plinth.open_position(
+        plinth_position_id = plinth.openPosition(
             venue_id, instrument_id, notional_signed, action_sigil, intent_sigil
         );
 
@@ -192,7 +197,7 @@ contract AtriumRouter {
         // Coffer's approved-orchestrators list, refuse to route through it.
         // The canonical answer is "Router-only as approved orchestrator; the
         // adapter receives funds via the Router, never via direct adapter_pull."
-        if (ICofferApprovedQuery(address(coffer)).is_adapter_approved(adapter_addr)) {
+        if (ICofferApprovedQuery(address(coffer)).isAdapterApproved(adapter_addr)) {
             revert AdapterAlsoApprovedAsOrchestrator(adapter_addr);
         }
 
@@ -210,7 +215,7 @@ contract AtriumRouter {
         if (amount == 0) {
             amount = uint256(notional_signed > 0 ? notional_signed : -notional_signed);
         }
-        coffer.adapter_pull(amount, user, adapter_addr);
+        coffer.adapterPull(amount, user, adapter_addr);
 
         // Step 4: adapter opens the venue-side position. The originator (the
         // actual user, not the Router) is the first 20 bytes of venue_payload
@@ -238,7 +243,7 @@ contract AtriumRouter {
         // Audit FIRE76-1 fix (HIGH from sub-agent audit): verify ownership
         // BEFORE any downstream call. Pre-fix, any caller could pass another
         // user's plinth_position_id and trigger an unconsented unwind.
-        (address pos_owner, , , , ) = plinth.get_position(plinth_position_id);
+        (address pos_owner, , , , ) = plinth.getPosition(plinth_position_id);
         if (pos_owner != user) revert NotPositionOwner(plinth_position_id, user, pos_owner);
 
         address adapter_addr = registry.getAdapter(venue_id);
@@ -250,7 +255,7 @@ contract AtriumRouter {
         // Close path matters too: a malicious sub-adapter could call
         // coffer.adapter_pull during close_position to drain more than the
         // position's actual redemption.
-        if (ICofferApprovedQuery(address(coffer)).is_adapter_approved(adapter_addr)) {
+        if (ICofferApprovedQuery(address(coffer)).isAdapterApproved(adapter_addr)) {
             revert AdapterAlsoApprovedAsOrchestrator(adapter_addr);
         }
 
@@ -263,7 +268,7 @@ contract AtriumRouter {
         );
 
         // Step 2: Plinth closes the margin-side row.
-        plinth.close_position(plinth_position_id);
+        plinth.closePosition(plinth_position_id);
 
         emit PositionClosedViaRouter(
             user, venue_id, plinth_position_id, venue_position_id, realized_pnl_signed

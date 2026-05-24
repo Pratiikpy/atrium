@@ -33,23 +33,23 @@ afterEach(() => {
 });
 
 describe('GET /api/kani/status — no upstream configured', () => {
-  it('returns honest "unknown" state when KANI_STATUS_URL is unset', async () => {
+  it('returns "in-development" state from committed kani-status.json fallback', async () => {
+    // Audit 2026-05-24 alpha.4 plus alpha.6: prior route had no public/
+    // kani-status.json so unconfigured runs returned 'unknown'. The file
+    // is now committed with state='in-development', total=9 (real proof
+    // count per /scripts grep). When no upstream URL is set, the file
+    // fallback is the source of truth.
     const res = await GET();
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.state).toBe('unknown');
-    // Iteration 38: unmeasured passed is null, not 0. Pre-fix `0` made the
-    // badge render "0 of 6" which reads as "0 proofs passed CI" — the
-    // honest state is "no measurement yet."
+    expect(json.state).toBe('in-development');
     expect(json.passed).toBeNull();
-    // Honest floor: in-repo Kani proof count (math.rs 4 + span.rs 2 = 6).
-    // CI authority overrides this via KANI_STATUS_URL or public/kani-status.json.
-    expect(json.total).toBe(6);
+    // Real Kani proof floor: math.rs 4 + span.rs 2 + sigil/eip712.rs 2 +
+    // sigil/lib.rs 1 = 9. Bumped from 6 after Auditor E found undercount.
+    expect(json.total).toBe(9);
     expect(json.last_run_at).toBeNull();
     expect(json.proof_run_url).toBeNull();
-    // Honesty discipline: the source field MUST name the no-config state
-    // so the badge UI can render the "checking" placeholder accurately.
-    expect(json.source).toBe('no-status-source-configured');
+    expect(json.source).toBe('public/kani-status.json');
   });
 
   it('does NOT call fetch when no URL is configured', async () => {
@@ -102,8 +102,10 @@ describe('GET /api/kani/status — upstream success', () => {
     // so the UI distinguishes "all-passed-but-count-missing" (anomalous,
     // worth flagging) from "all-failed" (real measurement).
     expect(json.passed).toBeNull();
-    // Partial-upstream: total falls through to in-repo Kani proof floor (6).
-    expect(json.total).toBe(6);
+    // Partial-upstream: total falls through to KANI_PROOF_FLOOR. Bumped
+    // from 6 to 9 in alpha.4 after Auditor E recounted (math.rs 4 +
+    // span.rs 2 + sigil/eip712.rs 2 + sigil/lib.rs 1 = 9).
+    expect(json.total).toBe(9);
     expect(json.last_run_at).toBeNull();
     expect(json.proof_run_url).toBeNull();
   });
@@ -138,33 +140,38 @@ describe('GET /api/kani/status — upstream failure falls back honestly', () => 
     process.env.KANI_STATUS_URL = 'https://broken.example.com/status.json';
   });
 
-  it('falls back to unknown when upstream returns non-2xx', async () => {
+  // After alpha.4, the file fallback is committed so upstream-failure scenarios
+  // resolve to 'in-development' from the file rather than 'unknown'. The route
+  // only returns 'no-status-source-configured' when BOTH upstream fails and
+  // the file is unreadable.
+
+  it('falls back to file (in-development) when upstream returns non-2xx', async () => {
     (global.fetch as any).mockResolvedValue(new Response('', { status: 503 }));
     const json = await (await GET()).json();
-    expect(json.state).toBe('unknown');
-    expect(json.source).toBe('no-status-source-configured');
+    expect(json.state).toBe('in-development');
+    expect(json.source).toBe('public/kani-status.json');
   });
 
-  it('falls back to unknown on network error', async () => {
+  it('falls back to file (in-development) on network error', async () => {
     (global.fetch as any).mockRejectedValue(new Error('ENOTFOUND'));
     const json = await (await GET()).json();
-    expect(json.state).toBe('unknown');
+    expect(json.state).toBe('in-development');
   });
 
-  it('falls back to unknown on JSON parse error', async () => {
+  it('falls back to file (in-development) on JSON parse error', async () => {
     (global.fetch as any).mockResolvedValue(
       new Response('not-json', { status: 200 }),
     );
     const json = await (await GET()).json();
-    expect(json.state).toBe('unknown');
+    expect(json.state).toBe('in-development');
   });
 
-  it('falls back to unknown on timeout (2s abort)', async () => {
+  it('falls back to file (in-development) on timeout (2s abort)', async () => {
     const abortErr = new Error('aborted');
     abortErr.name = 'AbortError';
     (global.fetch as any).mockRejectedValue(abortErr);
     const json = await (await GET()).json();
-    expect(json.state).toBe('unknown');
+    expect(json.state).toBe('in-development');
   });
 });
 
@@ -199,7 +206,7 @@ describe('GET /api/kani/status — response shape invariants', () => {
       expect(json).toHaveProperty('last_run_at');
       expect(json).toHaveProperty('proof_run_url');
       expect(json).toHaveProperty('source');
-      expect(['pass', 'fail', 'unknown']).toContain(json.state);
+      expect(['pass', 'fail', 'unknown', 'in-development']).toContain(json.state);
     }
   });
 });

@@ -2,8 +2,7 @@ import type { MetadataRoute } from 'next';
 
 /**
  * sitemap.xml — every public-facing URL. Excludes /app/* (wallet-gated),
- * /api/* (server endpoints), /monitoring (Sentry tunnel), and the legacy
- * landing under /legacy.
+ * /api/* (server endpoints), /monitoring (Sentry tunnel).
  *
  * Keep this list in sync with the routes in apps/verify/src/app/. When
  * we add a new public page, add a row here so search engines + judges

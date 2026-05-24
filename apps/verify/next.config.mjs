@@ -7,31 +7,21 @@ const nextConfig = {
   experimental: {
     typedRoutes: true,
   },
-  // Serve the new visual landing (apps/verify/public/landing-v2.html) at `/`.
-  // `beforeFiles` runs before the App Router so the request never hits
-  // src/app/page.tsx — the previous landing is preserved under /legacy
-  // for fast revert. The URL bar stays `/` (rewrite, not redirect).
+  // Audit 2026-05-24 C-3 fix: `/` no longer rewrites to landing-v2.html.
+  // The root is now the React landing at src/app/page.tsx, which reproduces
+  // the same 11-section design but hydrates numbers from /api routes that
+  // read Scribe + RPC. Mobile + design-preview rewrites stay; the static
+  // bundle is deleted from /public.
   rewrites: async () => ({
     beforeFiles: [
-      // Desktop landing — served at `/` unless middleware rewrites to the
-      // mobile variant for a small-viewport User-Agent. The middleware
-      // adds a `?m=1` marker query so this rewrite can still match the
-      // root path for desktop without breaking the mobile rewrite.
-      { source: '/', destination: '/landing-v2.html' },
-      // Mobile landing per the new design (desing/Mobile Landing.html).
-      // Anyone can hit /mobile directly to preview the mobile experience.
+      // Mobile landing: the OLED-dark mobile-native page from
+      // `desing/Mobile Landing.html`. Anyone can hit /mobile directly to
+      // preview the mobile experience.
       { source: '/mobile', destination: '/mobile-landing.html' },
-      // Mobile app shell (5-tab Home/Trade/Move/Agents/More) — the
-      // mobile-native counterpart to the React /app/* routes.
+      // Mobile app shell (5-tab Home/Trade/Move/Agents/More): design
+      // preview until the React /app/* routes are made responsive
+      // (Phase delta.2 of the 2026-05-24 fix plan).
       { source: '/mobile/app', destination: '/mobile-app.html' },
-      // The bundled landing HTML hardcodes two links from when it was
-      // authored as a static file pair. Map them to the real Next.js
-      // routes so judges clicking "Open testnet" or "Brand kit" land
-      // somewhere alive instead of a 404.
-      { source: '/Atrium App.html', destination: '/app/portfolio' },
-      { source: '/Atrium%20App.html', destination: '/app/portfolio' },
-      { source: '/Brand Kit.html', destination: '/brand' },
-      { source: '/Brand%20Kit.html', destination: '/brand' },
     ],
     afterFiles: [],
     fallback: [],

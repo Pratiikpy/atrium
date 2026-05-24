@@ -568,6 +568,29 @@ impl Plinth {
         self.accounts.getter(user).margin_version.get()
     }
 
+    // ===== Init-state getters (Audit 2026-05-24 G-2 fix) =====
+    // `/api/deployments/status` reads these via viem to confirm initialize()
+    // ran and that the wiring matches the registry. Stale-deploy guard.
+    pub fn praetor_multisig(&self) -> Address {
+        self.praetor_multisig.get()
+    }
+
+    pub fn praetor_timelock(&self) -> Address {
+        self.praetor_timelock.get()
+    }
+
+    pub fn coffer_address(&self) -> Address {
+        self.coffer_address.get()
+    }
+
+    pub fn vigil_address(&self) -> Address {
+        self.vigil_address.get()
+    }
+
+    pub fn sigil_address(&self) -> Address {
+        self.sigil_address.get()
+    }
+
     /// Timelock-only: register or update instrument risk config.
     /// Audit F-32 fix: parameter changes must come from PraetorTimelock,
     /// not the multisig directly, so the 48h delay is enforced on-chain.
