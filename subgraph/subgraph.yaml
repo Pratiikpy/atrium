@@ -7,9 +7,9 @@ dataSources:
     name: Plinth
     network: arbitrum-sepolia
     source:
-      address: "0x485218e340d1e3b272bed337ec59ffe0a3dc4781"
+      address: "0xef31b4b75badc0faf323e3448248585b57a78ecd"
       abi: Plinth
-      startBlock: 270725278
+      startBlock: 270803107
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,9 +51,9 @@ dataSources:
     name: Vigil
     network: arbitrum-sepolia
     source:
-      address: "0x67713074650ad05c832c781101ac447cb847522e"
+      address: "0x08f3d3a878a75aa454be6bd07f0b74d3e6e46dc8"
       abi: Vigil
-      startBlock: 270668869
+      startBlock: 270802353
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -90,9 +90,9 @@ dataSources:
     name: Coffer
     network: arbitrum-sepolia
     source:
-      address: "0x7420084855421ef0794a971bd5190f5c0c292071"
+      address: "0xd169554caf920f1fbcffbafcff3068a84892b0d8"
       abi: Coffer
-      startBlock: 270659716
+      startBlock: 270800974
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -193,9 +193,9 @@ dataSources:
     name: Sigil
     network: arbitrum-sepolia
     source:
-      address: "0xefd38821466ca31e0b1734f89f1d6ec9a4bc70d0"
+      address: "0xc9933ebe7dc8c4849a1720b2e5b33e381442c873"
       abi: Sigil
-      startBlock: 270667451
+      startBlock: 270801710
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

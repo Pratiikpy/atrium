@@ -38,25 +38,30 @@
       "block": 270408479
     },
     "coffer": {
-      "address": "0x7420084855421ef0794a971bd5190f5c0c292071",
-      "tx": "0x10d87459fc32ffcd351f5fb0f14d1053f17de7d87ef943457dbf61285a123537",
-      "activationTx": "0x7ca26822e99cb210050b2e81f2614cbbbc1ddcadb238ad385ecb9ad08e19e2fd",
-      "block": 270659716,
-      "kind": "stylus"
+      "address": "0xd169554caf920f1fbcffbafcff3068a84892b0d8",
+      "tx": "0x07ae5e44df7b6ada1a390af825389c8b37804421031f18f71490c2dee3a0e04b",
+      "block": 270800974,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:17:02.917Z",
+      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, and initialize() was called immediately after deploy."
     },
     "sigil": {
-      "address": "0xefd38821466ca31e0b1734f89f1d6ec9a4bc70d0",
-      "tx": "0xbba0edf9bdbb62b07cdc2375d1acdd5111f1add0de1097a5adbe225222ba4e54",
-      "activationTx": "0xd0cc747cd7751b1c7b5a9239d262442cb112a5887403b52d489af62d9be7753c",
-      "block": 270667451,
-      "kind": "stylus"
+      "address": "0xc9933ebe7dc8c4849a1720b2e5b33e381442c873",
+      "tx": "0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371",
+      "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
+      "block": 270801710,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:21:15.358Z",
+      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, pause(bytes32) emergency-pause hook, and initialize() was called immediately after deploy."
     },
     "vigil": {
-      "address": "0x67713074650ad05c832c781101ac447cb847522e",
-      "tx": "0x7340cc34b3520c0fa70dafd0590d0142c4a10cdd79d51ec297e49ddc36119d6f",
-      "activationTx": "0x9f8355874f962ca18634af2cd37378649555942773ff433e612a1b32e6ba331d",
-      "block": 270668869,
-      "kind": "stylus"
+      "address": "0x08f3d3a878a75aa454be6bd07f0b74d3e6e46dc8",
+      "tx": "0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e",
+      "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
+      "block": 270802353,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:24:46.090Z",
+      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, pause(bytes32) emergency-pause hook, and initialize() was called immediately after deploy."
     },
     "plinth-math": {
       "address": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
@@ -75,11 +80,12 @@
       "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) — Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
-      "address": "0x485218e340d1e3b272bed337ec59ffe0a3dc4781",
-      "tx": "0xff86fb70b9ad464e55bcb68bd887565f4c3a5566a3e3a7cc569862abacd65721",
-      "block": 270725278,
+      "address": "0xef31b4b75badc0faf323e3448248585b57a78ecd",
+      "tx": "0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0",
+      "block": 270803107,
       "kind": "stylus",
-      "note": "Deployed via cargo-stylus 0.10.7 multi-fragment factory (bypasses single-CREATE EIP-170 cap). Constructor wired to coffer/vigil/sigil/portico-registry/chainlink-eth-usd/pyth/praetor/timelock/plinth-math/plinth-oracle."
+      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, and multi-fragment factory deploy via cargo-stylus 0.10.7.",
+      "deployed_at": "2026-05-24T15:28:58.569Z"
     },
     "atrium-router": {
       "address": "0xf134127cc2762d3ebc5645aba6c99cd5a8b82717",
