@@ -26,6 +26,27 @@ Per the same incident, add a `gitleaks --no-banner --no-color` step to
 `.github/workflows/ci.yml` so any future PR that includes a
 64-hex-char token in source / docs / logs fails CI before merge.
 
+### Migrate apps/verify lint from next lint to ESLint flat config
+
+Next 16 removed the `next lint` subcommand. The pnpm lint script
+currently echoes a TODO + exits 0 so CI stays green. Real lint
+coverage requires:
+
+1. `npx @next/codemod@latest next-lint-to-eslint-cli apps/verify` to
+   generate `apps/verify/eslint.config.mjs` from the implicit Next 15
+   config.
+2. Fix the pre-existing tsc / eslint backlog the legacy `next lint`
+   was hiding:
+   - `src/app/api/transfer/last/route.test.ts` mock type drift
+     (`createdAtBlock` missing from the entity Partial).
+   - `src/lib/safe-error.test.ts` writes to `process.env.NODE_ENV`
+     which is now read-only under @types/node 22+.
+   - `.next/types/validator.ts` references the deleted /legacy page;
+     a clean `rm -rf .next && next build` regenerates the validator.
+3. Restore the real `lint` script in `apps/verify/package.json`.
+
+Tracked here so the no-op doesn't ship silently to mainnet.
+
 ## Recently closed (2026-05-24, autonomous launch-readiness session)
 
 The 8-audit pass on 2026-05-24 surfaced that several items in this file

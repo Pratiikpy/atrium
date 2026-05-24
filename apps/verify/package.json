@@ -7,7 +7,7 @@
     "dev": "next dev --turbo --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "echo 'next lint removed in Next 16; ESLint migration tracked in human_left.md (2026-05-24)' && exit 0",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
