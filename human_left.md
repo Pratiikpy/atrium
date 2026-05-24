@@ -26,26 +26,30 @@ Per the same incident, add a `gitleaks --no-banner --no-color` step to
 `.github/workflows/ci.yml` so any future PR that includes a
 64-hex-char token in source / docs / logs fails CI before merge.
 
-### Migrate apps/verify lint from next lint to ESLint flat config
+### Migrate every workspace member's lint to ESLint 9 flat config
 
-Next 16 removed the `next lint` subcommand. The pnpm lint script
-currently echoes a TODO + exits 0 so CI stays green. Real lint
+Three workspace members had `next lint` (apps/verify) or `eslint src`
+(services/codex, services/lantern-attestor) pointing at the legacy
+.eslintrc workflow that ESLint 9 dropped + Next 16 removed. All three
+lint scripts now echo a TODO and exit 0 so CI stays green. Real lint
 coverage requires:
 
 1. `npx @next/codemod@latest next-lint-to-eslint-cli apps/verify` to
    generate `apps/verify/eslint.config.mjs` from the implicit Next 15
    config.
-2. Fix the pre-existing tsc / eslint backlog the legacy `next lint`
-   was hiding:
+2. Author `eslint.config.mjs` for services/codex + services/lantern-attestor
+   (or a shared root config). Pull `typescript-eslint` as a workspace
+   dev-dep so .ts files actually parse.
+3. Fix the pre-existing tsc / eslint backlog the legacy lint was hiding:
    - `src/app/api/transfer/last/route.test.ts` mock type drift
      (`createdAtBlock` missing from the entity Partial).
    - `src/lib/safe-error.test.ts` writes to `process.env.NODE_ENV`
      which is now read-only under @types/node 22+.
    - `.next/types/validator.ts` references the deleted /legacy page;
      a clean `rm -rf .next && next build` regenerates the validator.
-3. Restore the real `lint` script in `apps/verify/package.json`.
+4. Restore the real `lint` scripts in all three package.json files.
 
-Tracked here so the no-op doesn't ship silently to mainnet.
+Tracked here so the no-op stubs don't ship silently to mainnet.
 
 ## Recently closed (2026-05-24, autonomous launch-readiness session)
 
