@@ -95,8 +95,30 @@ async function saveCheckpoint(cp) {
 // =============================================================================
 // Shell helpers
 // =============================================================================
+function redact(args) {
+  // Strip any arg following --private-key or --private-key-path so the
+  // deployer EOA's key never leaks to stdout / log files / scrollback.
+  // Also scans inside concatenated `bash -c "..."` strings, since the
+  // docker wrapper passes the entire cargo-stylus invocation as one arg.
+  const out = [];
+  for (let i = 0; i < args.length; i++) {
+    let v = args[i];
+    if (typeof v === 'string') {
+      v = v.replace(/(--private-key(?:-path)?[\s=])(0x[0-9a-fA-F]+|\S+)/g, '$1***REDACTED***');
+      // Last-resort: any 64-hex-chars token preceded by 0x.
+      v = v.replace(/0x[0-9a-fA-F]{64}/g, '0x***REDACTED***');
+    }
+    out.push(v);
+    if (args[i] === '--private-key' || args[i] === '--private-key-path') {
+      out.push('***REDACTED***');
+      i++; // skip the actual key value
+    }
+  }
+  return out;
+}
+
 function run(cmd, args, opts = {}) {
-  console.log(`\n$ ${cmd} ${args.join(' ')}`);
+  console.log(`\n$ ${cmd} ${redact(args).join(' ')}`);
   const result = spawnSync(cmd, args, {
     stdio: opts.captureOutput ? ['ignore', 'pipe', 'pipe'] : 'inherit',
     shell: false,
@@ -150,15 +172,21 @@ async function deployStylusNoConstructor(name, contractDir, pk) {
     '--max-fee-per-gas-gwei', MAX_FEE_GWEI,
   ]);
   process.stdout.write(result.stdout);
-  // Parse "deployed code at address: 0x..." OR "deployed contract: 0x..."
-  const m = result.stdout.match(/(?:deployed (?:code at address|contract|to)):?\s*(0x[a-fA-F0-9]{40})/i);
-  if (!m) {
-    throw new Error(`failed to parse deployed address from output:\n${result.stdout}`);
+  // Combine stdout + stderr (cargo-stylus 0.10 logs to stderr via tracing).
+  const combined = (result.stdout ?? '') + '\n' + (result.stderr ?? '');
+  // Strip ANSI color codes that the tracing logger leaves in the stream.
+  // eslint-disable-next-line no-control-regex
+  const clean = combined.replace(/\x1b\[[0-9;]*m/g, '');
+  // 0.10 format: "deployed code at address: 0x..."
+  // 0.5  format: "deployed contract: 0x..." / "deployed to: 0x..."
+  const addrMatch = clean.match(/deployed (?:code at address|contract|to)\s*:?\s*(0x[a-fA-F0-9]{40})/i)
+    ?? clean.match(/contract address\s*:?\s*(0x[a-fA-F0-9]{40})/i);
+  if (!addrMatch) {
+    throw new Error(`failed to parse deployed address from output:\n${clean.slice(-1500)}`);
   }
-  const address = m[1];
+  const address = addrMatch[1];
   console.log(`-> ${name}: ${address}`);
-  // Tx hash (separate match).
-  const txMatch = result.stdout.match(/(?:tx hash|deployment tx):\s*(0x[a-fA-F0-9]{64})/i);
+  const txMatch = clean.match(/(?:deployment tx hash|tx hash|deployment tx)\s*:?\s*(0x[a-fA-F0-9]{64})/i);
   return { address, tx: txMatch?.[1] ?? null };
 }
 
@@ -188,9 +216,14 @@ async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, regi
     '--constructor-args', ...args,
   ]);
   process.stdout.write(result.stdout);
-  const m = result.stdout.match(/(?:deployed (?:code at address|contract|to)):?\s*(0x[a-fA-F0-9]{40})/i);
-  if (!m) throw new Error(`failed to parse Plinth address from output:\n${result.stdout}`);
-  return { address: m[1], tx: result.stdout.match(/(?:tx hash|deployment tx):\s*(0x[a-fA-F0-9]{64})/i)?.[1] ?? null };
+  const combined = (result.stdout ?? '') + '\n' + (result.stderr ?? '');
+  // eslint-disable-next-line no-control-regex
+  const clean = combined.replace(/\x1b\[[0-9;]*m/g, '');
+  const addrMatch = clean.match(/deployed (?:code at address|contract|to)\s*:?\s*(0x[a-fA-F0-9]{40})/i)
+    ?? clean.match(/contract address\s*:?\s*(0x[a-fA-F0-9]{40})/i);
+  if (!addrMatch) throw new Error(`failed to parse Plinth address from output:\n${clean.slice(-1500)}`);
+  const txMatch = clean.match(/(?:deployment tx hash|tx hash|deployment tx)\s*:?\s*(0x[a-fA-F0-9]{64})/i);
+  return { address: addrMatch[1], tx: txMatch?.[1] ?? null };
 }
 
 // =============================================================================

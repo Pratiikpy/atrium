@@ -1,5 +1,31 @@
 # Tasks left for the human team
 
+## New items added 2026-05-24
+
+### Rotate deployer EOA before mainnet (incident-driven)
+
+The deployer EOA private key (`0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`)
+leaked to a local temp log on 2026-05-24 during the Stylus redeploy
+push. See `incidents/2026-05-24-deployer-key-leaked-to-local-temp-log.md`
+for the full write-up.
+
+Required before mainnet flip:
+1. Generate a fresh EOA offline (hardware wallet preferred).
+2. PraetorTimelock-schedule + execute the swap of `praetor_multisig` on
+   every Stylus + Solidity contract to the new key (or the 3-of-5 Safe
+   from item below).
+3. Move residual Sepolia ETH out of the old EOA.
+4. Update Vercel env var `LANTERN_KEY_ENVELOPE_JSON` to wrap the new
+   key (or stop using the deployer envelope entirely once Lantern
+   rotation lands).
+5. Wipe the old envelope from `~/.atrium/`.
+
+### Add a secret-detection CI gate
+
+Per the same incident, add a `gitleaks --no-banner --no-color` step to
+`.github/workflows/ci.yml` so any future PR that includes a
+64-hex-char token in source / docs / logs fails CI before merge.
+
 ## Recently closed (2026-05-24, autonomous launch-readiness session)
 
 The 8-audit pass on 2026-05-24 surfaced that several items in this file
