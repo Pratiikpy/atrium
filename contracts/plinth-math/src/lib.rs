@@ -13,7 +13,6 @@ extern crate alloc;
 
 use alloc::{vec, vec::Vec};
 use alloy_primitives::{I256, U256};
-use alloy_sol_types::sol;
 use stylus_sdk::prelude::*;
 
 sol_storage! {

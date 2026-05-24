@@ -70,7 +70,10 @@ jobs:
       - run: forge build --sizes
       - run: forge test -vvv
       - name: Coverage
-        run: forge coverage --report lcov
+        # --ir-minimum keeps viaIR on while disabling optimization for
+        # accurate coverage maps. Without it, large adapter contracts trip
+        # "stack too deep" the moment optimizer is dropped.
+        run: forge coverage --report lcov --ir-minimum
       - uses: codecov/codecov-action@v4
         if: always()
         with:

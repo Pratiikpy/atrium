@@ -1,5 +1,10 @@
-//! Auspex basis-trade strategy — pure functions.
+//! Auspex basis-trade strategy - pure functions.
 
+// auspex's `tick()` does not yet consume Signal / signal() directly; the
+// integration into the action submission path lands with the Pimlico
+// bundler wiring (same blocked-on as the agents/template Sigil submission).
+// Keep the strategy module compiled so the next wave can drop it in.
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Signal {
     EnterBasis, // long Pendle YT + short Aave equivalent
@@ -8,6 +13,7 @@ pub enum Signal {
 }
 
 /// Decide based on the spread between Pendle implied APY and Aave T-bill APY.
+#[allow(dead_code)]
 pub fn signal(
     pendle_implied_apy_bps: i32,
     aave_apy_bps: i32,
