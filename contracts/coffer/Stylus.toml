@@ -1,6 +1,11 @@
-[contract]
+[workspace]
+networks = {}
+
+[workspace.contracts.coffer]
+path = "."
 # Coffer's 25.9 KB at optimize="speed" exceeded the 24 KB EVM code-size cap
 # (compressed wasm is stored as runtime code on the deploy tx). "size" trims
-# inlining and codegen aggressiveness — we lose a few hundred gas per call
-# but get under the limit.
+# inlining and codegen aggressiveness; we lose a few hundred gas per call
+# but get under the EIP-170 limit without needing the multi-fragment
+# factory path Plinth uses.
 optimize = "size"

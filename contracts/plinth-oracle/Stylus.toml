@@ -1,2 +1,6 @@
-[contract]
+[workspace]
+networks = {}
+
+[workspace.contracts.plinth-oracle]
+path = "."
 optimize = "speed"

@@ -1,2 +1,6 @@
-[contract]
+[workspace]
+networks = {}
+
+[workspace.contracts.sigil]
+path = "."
 optimize = "speed"
