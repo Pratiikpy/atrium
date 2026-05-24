@@ -18,7 +18,7 @@
 // different struct hash and every signature would fail verification silently.
 
 use alloc::vec::Vec;
-use alloy_primitives::{address, keccak256, Address, FixedBytes, I256, U256, B256};
+use alloy_primitives::{keccak256, Address, FixedBytes, I256, U256, B256};
 
 // EIP-712 type strings. Typehashes are computed deterministically at compile
 // time from the type strings below using `keccak_const` so the constants

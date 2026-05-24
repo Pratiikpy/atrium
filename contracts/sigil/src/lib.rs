@@ -12,7 +12,6 @@
 
 extern crate alloc;
 
-use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use alloy_primitives::{Address, FixedBytes, Uint, U256, B256};

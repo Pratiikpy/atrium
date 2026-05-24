@@ -26,8 +26,9 @@ pub const MAX_INSTRUMENTS: usize = 8;
 
 /// Build an IntentSigil envelope in the on-chain Sigil decoder layout.
 /// Returns the raw bytes (body + signature). The signature must be appended
-/// by the caller after EIP-712 hashing — this function emits a 65-byte
+/// by the caller after EIP-712 hashing - this function emits a 65-byte
 /// zero tail that the caller overwrites.
+#[allow(clippy::too_many_arguments)] // layout maps 1:1 to the Sigil decoder body slots; struct hides intent
 pub fn encode_intent_envelope(
     owner: Address,
     agent: Address,

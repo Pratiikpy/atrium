@@ -31,3 +31,10 @@ k256 = { version = "0.13", features = ["ecdsa", "alloc"], default-features = fal
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 contract-client-gen = []
+
+# Declare the `kani` cfg so check-cfg under -D warnings does not flag the
+# #[cfg(kani)] gates around the formal-verification proofs. Kani is a
+# separate workflow (see .github/workflows/ci.yml `kani` job); when not
+# running under it, those modules are silently excluded.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)'] }

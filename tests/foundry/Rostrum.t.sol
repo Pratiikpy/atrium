@@ -544,6 +544,16 @@ contract RostrumTest is Test {
     ) public view {
         vm.assume(leader_available > 0);
         vm.assume(allocation_bps > 0 && allocation_bps <= 10_000);
+        // FIRE77-R1 staging only guarantees no overflow when the intermediate
+        // weighted = (abs_leader * follower_avail) / leader_avail stays below
+        // type(uint256).max / 10_000 before the bps multiply. Bound the
+        // follower_available so the realistic copy-trading range is exercised
+        // without the fuzzer driving the intermediate compute into overflow.
+        // Realistic upper bound: 1e30 wei (~1e12 USDC) - well above any plausible
+        // Coffer balance but safe under uint128 + bps + (1/10_000) staging.
+        vm.assume(uint256(follower_available) <= 1e30);
+        int256 absLeader = leader_notional < 0 ? -int256(leader_notional) : int256(leader_notional);
+        vm.assume(uint256(absLeader) <= 1e30);
 
         Rostrum.CopyTradeFollow memory f = _makeFollow();
         f.allocation_bps = allocation_bps;

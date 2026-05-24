@@ -41,6 +41,11 @@ debug = ["stylus-sdk/debug"]
 serde = ["dep:serde", "alloy-primitives/serde"]
 contract-client-gen = []
 
+# Declare the `kani` cfg so check-cfg under -D warnings does not flag the
+# #[cfg(kani)] gates around #[kani::proof] modules (math.rs + span.rs).
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)'] }
+
 [package.metadata.kani.flags]
 unwind = "5"
 default-unwind = "3"
