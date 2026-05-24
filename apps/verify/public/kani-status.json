@@ -1,0 +1,9 @@
+{
+  "state": "in-development",
+  "passed": null,
+  "total": 9,
+  "last_run_at": null,
+  "proof_run_url": null,
+  "source": "no formal Kani run yet. 5 of 9 proptest invariants pass locally on the host (see contracts/plinth/tests/proptest_invariants.rs). Formal-verification CI lane scheduled for Month 3 per ATRIUM_12_MONTH_ROADMAP.md.",
+  "notes": "Real proof count is 9. contracts/plinth/src/math.rs has 4 (#[kani::proof]: median_bounded, abs_diff_bps_self_zero, normalize_monotonic, oracle_freshness_rejects_stale). contracts/plinth/src/span.rs has 2 (solvency_non_negative, monotonic_in_notional). contracts/sigil/src/eip712.rs has 2 (day_index_basic, caps_reject_oversize_notional). contracts/sigil/src/lib.rs has 1. Prior version of this file claimed 5 of 6 pass. That was a hand-edited placeholder, not a CI output. Wiped to honest pending on 2026-05-24."
+}

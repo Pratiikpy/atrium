@@ -1,0 +1,84 @@
+import Link from 'next/link';
+import { Wordmark } from '@/components/wordmark';
+
+export const metadata = {
+  title: 'Atrium — security',
+  description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+};
+
+export default function SecurityPage() {
+  return (
+    <main className="mx-auto max-w-3xl px-6 py-16">
+      <Wordmark size="sm" />
+      <h1 className="mt-12 font-display text-5xl text-ink">Security</h1>
+      <p className="mt-4 max-w-prose text-ink-soft">
+        Atrium targets Arbitrum Sepolia testnet in Year 1. No user funds will be at real economic
+        risk. Below is the security model we design to. Where live code differs, the gap is
+        tracked openly in the audit findings register.
+      </p>
+
+      <section className="mt-12 space-y-6">
+        <Block heading="Design intent">
+          <ul className="space-y-2 text-ink-soft">
+            <li>• Kani plus proptest formal-method invariants in CI. 3 of 5 wired today; 5 of 5 by Month 6.</li>
+            <li>• Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.</li>
+            <li>• 3-keeper redundancy with economic slashing.</li>
+            <li>• Praetor 3-of-5 multisig plus 48-hour PraetorTimelock on every parameter change.</li>
+            <li>• ERC-7201 namespaced storage for safe upgrades.</li>
+            <li>• Per-adapter per-block notional cap on Coffer.</li>
+            <li>• Postern Kill Switch revokes every Sigil mandate plus every ERC-7715 session key in one batched tx.</li>
+          </ul>
+        </Block>
+
+        <Block heading="Audit-findings register" id="audit-findings-register">
+          <p className="text-ink-soft">
+            Cross-cutting audit was run on 2026-05-18 by six parallel sub-agents covering contracts,
+            adapters, services, UI, honesty, and security. Findings are tracked in{' '}
+            <code className="font-mono text-ink">docs/AUDIT_FINDINGS.md</code>. Each row has a file
+            reference, an owner, and a target month.
+          </p>
+        </Block>
+
+        <Block heading="Disclose a vulnerability">
+          <p className="text-ink-soft">
+            Email <a className="text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
+            We respond within 48 hours. Critical issues are triaged same-day. PGP key at{' '}
+            <code className="font-mono">/.well-known/pgp.asc</code>.
+          </p>
+        </Block>
+
+        <Block heading="Bug bounty">
+          <ul className="space-y-2 text-ink-soft">
+            <li>• Year 1 testnet: Immunefi standard tier, $25K ceiling.</li>
+            <li>• Year 2 mainnet flip: raised on board sign-off; target $250K+ tier.</li>
+          </ul>
+        </Block>
+      </section>
+
+      <Link
+        href="/"
+        className="mt-16 inline-block text-sm text-ink underline-offset-2 hover:underline"
+      >
+        Back to Atrium
+      </Link>
+    </main>
+  );
+}
+
+function Block({
+  heading,
+  children,
+  id,
+}: {
+  heading: string;
+  children: React.ReactNode;
+  /** Optional fragment anchor — see learn/page.tsx for the same pattern. */
+  id?: string;
+}) {
+  return (
+    <div id={id} className="rounded-md border border-divider bg-parchment p-6 scroll-mt-24">
+      <h2 className="font-display text-2xl text-ink">{heading}</h2>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}

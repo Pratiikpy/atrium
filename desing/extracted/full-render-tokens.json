@@ -1,0 +1,108 @@
+{
+  "capturedAt": "2026-05-18T12:57:00Z",
+  "source": "browser-extracted from desing/Atrium.html via playwright MCP, post-React-render",
+  "title": "Atrium — unified margin prime brokerage for the EVM",
+  "navigation": [
+    { "href": "#", "text": "Atrium" },
+    { "href": "#product", "text": "Product" },
+    { "href": "#agents", "text": "Agents" },
+    { "href": "#network", "text": "Network" },
+    { "href": "#system", "text": "Subsystems" },
+    { "href": "#docs", "text": "Docs" },
+    { "href": "Atrium App.html", "text": "Open testnet ↗" }
+  ],
+  "marketingSectionsInOrder": [
+    { "key": "hero", "headline": "One wallet. Every venue. One number.", "eyebrow": "Unified margin · EVM-native · testnet" },
+    { "key": "product", "section": "The product", "headline": "Seven live venues feed one buying-power number.", "sub": "Plinth, the Stylus margin engine, reads collateral across every venue you hold positions in and computes a SPAN-style cross-product margin figure — live, on testnet." },
+    { "key": "plinth", "section": "Plinth · margin engine", "headline": "Capital efficiency, mathematically.", "sub": "Plinth computes a SPAN-style cross-product margin number in Rust, deployed as Stylus. The same math costs 10–100× more gas in equivalent Solidity — which is why it has not shipped onchain elsewhere." },
+    { "key": "aqueduct", "section": "Aqueduct · Chainlink CCIP", "headline": "Move collateral between chains in one transaction.", "sub": "Aqueduct routes assets through Chainlink CCIP. Collateral posted on Robinhood Chain becomes Plinth credit on Arbitrum in under ten seconds." },
+    { "key": "sigil", "section": "Sigil · ERC-8004 mandates", "headline": "Agents trade with bounded mandates.", "sub": "You sign one Intent Sigil — an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves.", "variant": "dark" },
+    { "key": "lantern", "section": "Lantern · proof-of-reserves", "headline": "Every dollar, on the public record.", "sub": "Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally — without trusting Atrium." },
+    { "key": "numbers", "headline": "Live testnet stats", "stats": ["TVL", "Registered agents", "Codex queries · 24h", "Venue adapters live"] },
+    { "key": "subsystems", "section": "Subsystems", "headline": "Eighteen named pieces. Four architectural blocks.", "sub": "Each subsystem owns one responsibility. Thirteen are live on testnet today; all eighteen ship at launch — with Stoa conditional on Phase-2 funding.", "blocks": ["Risk engine", "Venues + cross-chain", "Agents + APIs", "Trust + ops"] },
+    { "key": "architecture", "section": "Architecture", "headline": "Stylus for hot math. Solidity for the venue layer.", "sub": "Risk math lives in Rust, deployed as Stylus. The venue layer lives in Solidity, on OpenZeppelin patterns. Chainlink CCIP is the messaging bus between chains." },
+    { "key": "cohort", "section": "Built with", "headline": "Eight venue and infrastructure partners across the EVM stack, shipping with us from day one.", "partners": ["Pendle Labs", "Variational", "Horizen", "IOSG", "Robinhood Chain", "Hyperliquid", "Aave Labs", "Coinbase"] },
+    { "key": "closing", "eyebrow": "Testnet · now open", "headline": "Step inside. The testnet is open.", "sub": "Faucet drops $10,000 test USDC and $5,000 rAAPL on landing. Three minutes from passkey login to first cross-margin trade.", "cta": ["Open testnet ↗", "Brand kit"] }
+  ],
+  "colors": {
+    "_note": "All colors are in OKLCH color space. Convert via https://oklch.com/ if needed.",
+    "ink": {
+      "darkest": "oklch(0.11 0.008 60)",
+      "dark":    "oklch(0.13 0.008 60)",
+      "default": "oklch(0.15 0.008 60)",
+      "soft":    "oklch(0.18 0.006 60)",
+      "softer":  "oklch(0.22 0.006 60)",
+      "muted":   "oklch(0.28 0.006 60)"
+    },
+    "neutral": {
+      "muted":   "oklch(0.54 0.005 60)",
+      "labels":  "oklch(0.72 0.004 60)",
+      "border":  "oklch(0.88 0.004 60)",
+      "divider": "oklch(0.93 0.003 60)",
+      "soft":    "oklch(0.96 0.003 60)"
+    },
+    "parchment": {
+      "warm":      "oklch(0.96 0.005 85)",
+      "default":   "oklch(0.984 0.004 85)",
+      "lightest":  "oklch(0.996 0.003 85)",
+      "translucent_lo": "oklch(0.984 0.004 85 / 0.28)",
+      "translucent_md": "oklch(0.984 0.004 85 / 0.88)"
+    },
+    "accent": {
+      "green":      "oklch(0.58 0.13 145)",
+      "green_soft": "oklch(0.58 0.13 145 / 0.12)",
+      "amber":      "oklch(0.7 0.13 70)",
+      "terracotta": "rgb(126, 42, 32)"
+    },
+    "dark_section": {
+      "_note": "Sigil section inverts to a dark canvas",
+      "background": "rgb(16, 16, 16)",
+      "text":       "rgb(255, 255, 255)",
+      "translucent_white_24": "oklch(0.999994 0.0000497986 none / 0.24)",
+      "translucent_white_40": "oklch(0.999994 0.0000497986 none / 0.4)",
+      "translucent_white_50": "oklch(0.999994 0.0000497986 none / 0.5)",
+      "translucent_white_55": "oklch(0.999994 0.0000497986 none / 0.55)"
+    }
+  },
+  "typography": {
+    "fontFamilies": {
+      "display": "\"Instrument Serif\", \"Times New Roman\", serif",
+      "body":    "Geist, ui-sans-serif, system-ui, sans-serif",
+      "mono":    "\"Geist Mono\", ui-monospace, monospace"
+    },
+    "weights_in_use": [400, 500],
+    "fontSizesAll_px": [9.5, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 26, 28, 42, 49.96, 54.956, 56, 87.43],
+    "lineHeightsAll_px": [14.25, 15.75, 16.5, 17.25, 18, 18.75, 18.85, 19.5, 20.25, 21, 21.7, 21.75, 22, 22.475, 22.5, 24, 24.8, 25.5, 26, 27, 27.1033, 28.5, 30, 30.8, 33, 42, 49.96, 56, 57.1542, 63, 89.1786, 90.9272],
+    "letterSpacingsAll_px": [
+      "-2.6229", "-1.4", "-1.3739", "-1.249", "-1.008",
+      "-0.56", "-0.504", "-0.312", "-0.308", "-0.269784",
+      "-0.228", "-0.09", "-0.08", "-0.0725", "-0.065",
+      "-0.0625", "-0.0405",
+      "0.46", "0.84", "0.88", "1.1", "1.33", "1.54"
+    ]
+  },
+  "borderRadii_px": [6, 10, 12, 14, 16, 999],
+  "boxShadows": {
+    "subtle":     "oklch(0.13 0.008 60 / 0.05) 0px 1px 1px 0px, oklch(0.13 0.008 60 / 0.06) 0px 10px 30px 0px, oklch(0.13 0.008 60 / 0.07) 0px 40px 80px 0px",
+    "subtle_dark": "rgba(0, 0, 0, 0.4) 0px 1px 1px 0px, rgba(0, 0, 0, 0.4) 0px 10px 30px 0px, rgba(0, 0, 0, 0.5) 0px 40px 80px 0px",
+    "focus_ring": "oklab(0.7 0.0444626 0.12216 / 0.245111) 0px 0px 0px 3.05867px"
+  },
+  "transitions": {
+    "color_fast":           "color 0.12s",
+    "transform_fast":       "transform 0.14s, opacity 0.14s",
+    "border_transform_bg":  "border-color 0.16s, transform 0.16s, background 0.16s",
+    "stroke":               "stroke 0.16s, stroke-width 0.16s",
+    "border_color":         "border-color 0.2s",
+    "transform_medium":     "transform 0.2s",
+    "card_lift":            "transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.2s, box-shadow 0.2s",
+    "color_background":     "color 0.2s, background 0.2s",
+    "opacity_slow":         "opacity 0.4s",
+    "breathing":            "0.6s",
+    "background_growth":    "background 0.16s, width 0.6s"
+  },
+  "honestyNotes": [
+    "Placeholder numbers in the design HTML ($4.20M TVL, 37 agents, 42,392 queries, $12.3M wallet, 8 named partners, '7/8 venues live') are NOT honest at Day -7 — the live site must render 0 / 'pending' until Scribe indexes real values.",
+    "Faucet promise '$10,000 test USDC and $5,000 rAAPL on landing' becomes truthful once the faucet route ships with the contracts (Month 1 W2).",
+    "The eight cohort logos (Pendle Labs, Variational, Horizen, IOSG, Robinhood Chain, Hyperliquid, Aave Labs, Coinbase) are aspirational. Currently 0 partners signed per `human_left.md` #4."
+  ]
+}

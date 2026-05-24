@@ -1,0 +1,66 @@
+# Runs the three reference agents as long-lived services on a single
+# Docker host. Restart policy unless-stopped so they survive droplet
+# reboots and individual process crashes.
+#
+# All three share the same image (built once) and differ only in CMD +
+# env. Logs go to journalctl via the default JSON driver; tail with
+# `docker compose logs -f augur`.
+
+services:
+  augur:
+    build:
+      context: ..
+      dockerfile: agents/Dockerfile
+    image: atrium-agents:latest
+    container_name: augur
+    command: ["/app/augur"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - AGENT_NAME=augur
+      - AUGUR_STATE_PATH=/var/atrium/state/augur.json
+    volumes:
+      - agent-state:/var/atrium/state
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  haruspex:
+    image: atrium-agents:latest
+    container_name: haruspex
+    command: ["/app/haruspex"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - AGENT_NAME=haruspex
+    depends_on:
+      - augur  # share the same built image; depends_on ensures build happens once
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  auspex:
+    image: atrium-agents:latest
+    container_name: auspex
+    command: ["/app/auspex"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - AGENT_NAME=auspex
+    depends_on:
+      - augur
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  agent-state:

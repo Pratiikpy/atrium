@@ -1,0 +1,32 @@
+[package]
+name = "atrium-sigil"
+description = "Atrium agent mandate contract — EIP-712 IntentSigil + ActionSigil"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[[bin]]
+name = "atrium-sigil"
+path = "src/main.rs"
+
+[dependencies]
+# Stylus 0.10 migration: align alloy with what stylus-sdk 0.10 internally uses.
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+mini-alloc = "0.6"
+# Audit A-2 fix: compile-time keccak for EIP-712 typehashes.
+keccak-const = "0.2"
+
+[dev-dependencies]
+proptest = "1.5"
+k256 = { version = "0.13", features = ["ecdsa", "alloc"], default-features = false }
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]

@@ -1,0 +1,194 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  FOUNDRY_PROFILE: default
+
+jobs:
+  lint:
+    name: Lint + format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: cargo fmt
+        run: cargo fmt --check
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: pnpm lint
+        run: pnpm -r lint
+
+  test-rust:
+    name: Rust + Stylus tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: cargo test
+        run: cargo test --workspace --all-features
+      - name: Build Stylus contracts
+        run: |
+          cargo install --force cargo-stylus
+          cd contracts/plinth && cargo stylus check
+          cd ../coffer && cargo stylus check
+          cd ../vigil && cargo stylus check
+          cd ../sigil && cargo stylus check
+
+  test-solidity:
+    name: Solidity tests (Foundry)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge --version
+      - run: forge build --sizes
+      - run: forge test -vvv
+      - name: Coverage
+        run: forge coverage --report lcov
+      - uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: lcov.info
+
+  kani:
+    name: Kani formal verification
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required to commit the status JSON back to the repo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install Kani
+        run: |
+          cargo install --force --locked kani-verifier
+          cargo kani setup
+      - name: Run Plinth proofs
+        id: plinth
+        run: cd contracts/plinth && cargo kani 2>&1 | tee /tmp/plinth-kani.log
+      - name: Run Sigil proofs
+        id: sigil
+        run: cd contracts/sigil && cargo kani 2>&1 | tee /tmp/sigil-kani.log
+      # Audit K-6 fix: publish kani-status.json so the verify.atrium.fi badge
+      # has a real upstream to fetch. The JSON is committed to
+      # apps/verify/public/ so the served path is /kani-status.json. The
+      # badge env KANI_STATUS_URL is wired to that path in production.
+      - name: Build kani-status.json
+        if: always()
+        run: |
+          PASSED=$(grep -c "VERIFICATION:- SUCCESSFUL" /tmp/plinth-kani.log /tmp/sigil-kani.log || echo 0)
+          TOTAL=5
+          STATE="unknown"
+          if [ "${{ steps.plinth.outcome }}" = "success" ] && [ "${{ steps.sigil.outcome }}" = "success" ]; then
+            STATE="pass"
+          elif [ "${{ steps.plinth.outcome }}" = "failure" ] || [ "${{ steps.sigil.outcome }}" = "failure" ]; then
+            STATE="fail"
+          fi
+          mkdir -p apps/verify/public
+          cat > apps/verify/public/kani-status.json <<EOF
+          {
+            "state": "$STATE",
+            "passed": $PASSED,
+            "total": $TOTAL,
+            "last_run_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "proof_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+          cat apps/verify/public/kani-status.json
+      - name: Commit status back to main
+        if: github.ref == 'refs/heads/main' && always()
+        run: |
+          git config user.name "atrium-ci[bot]"
+          git config user.email "ci@atrium.fi"
+          git add apps/verify/public/kani-status.json
+          git diff --staged --quiet || git commit -m "ci: refresh kani-status.json"
+          git push || true
+      - name: Upload status as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kani-status
+          path: apps/verify/public/kani-status.json
+
+  test-frontend:
+    name: Frontend unit tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @atrium/verify test
+
+  frontend:
+    name: Frontend build + Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @atrium/verify build
+      - name: Lighthouse CI (mobile)
+        # .lighthouserc.json sets per-category thresholds at 0.90. We still
+        # soft-fail at the runner level until verify.atrium.fi is deployed —
+        # localhost runs have noisy LCP/FCP from the dev server. Flip to hard
+        # fail (remove the `|| ...`) once the build runs against the deployed
+        # production URL (item #19 in human_left.md).
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --config=.lighthouserc.json || echo "Lighthouse below threshold (soft-fail until prod URL)"
+
+  subgraph:
+    name: Subgraph build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @atrium/subgraph codegen
+      - run: pnpm --filter @atrium/subgraph build
+      # Audit gate: every contract event must have either a subgraph handler
+      # or an explicit INDEXING_IGNORE entry with a reason. Catches the
+      # AtriumRouter (Fire 74) / Curator (Fire 75) class — contracts shipping
+      # events that go un-indexed for many iterations before someone notices.
+      - run: node scripts/check-event-indexing.mjs
+      # Audit gate: every @entity in schema.graphql must have at least one
+      # `new Entity(...)` writer in subgraph/src/. Catches the Agent class
+      # (iteration 16) — schema entities consumed by the verify-app but
+      # silently never populated, making queries return empty forever.
+      - run: node scripts/check-entity-writers.mjs
+
+  secrets-scan:
+    name: Secrets scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

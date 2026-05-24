@@ -1,0 +1,64 @@
+[profile.default]
+src = "contracts"
+out = "foundry-out"
+libs = ["resources/openzeppelin-contracts/contracts", "resources/account-abstraction/contracts", "resources/chainlink-brownie-contracts/contracts"]
+test = "tests/foundry"
+cache_path = ".forge-cache"
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 1_000_000
+via_ir = true
+evm_version = "cancun"
+
+# Compilation paths for adapters
+remappings = [
+    "@openzeppelin/contracts/=resources/openzeppelin-contracts/contracts/",
+    "@openzeppelin/contracts-upgradeable/=resources/openzeppelin-contracts/contracts/upgradeable/",
+    "@account-abstraction/=resources/account-abstraction/contracts/",
+    "@chainlink/contracts/=resources/chainlink-brownie-contracts/contracts/",
+    "@chainlink/contracts-ccip/=resources/chainlink-brownie-contracts/contracts/",
+    "@pyth/=resources/pyth-crosschain/target_chains/ethereum/sdk/solidity/",
+    "@erc8004/=resources/erc-8004-contracts/contracts/",
+    "@aave-v3/=resources/aave-v3-core/contracts/",
+    "@pendle/=resources/pendle-core-v2-public/contracts/",
+    "@hyperliquid/=resources/hyperliquid-contracts/",
+    "@x402/=resources/x402/contracts/",
+    # Audit U-9 fix: tests/foundry use `import "forge-std/Test.sol"`; we
+    # vendor through trustless-agents-erc-ri's lib (which has a full
+    # forge-std clone). F1 may install a top-level `lib/forge-std`
+    # later for cleaner CI, but this avoids a 6th submodule today.
+    "forge-std/=resources/trustless-agents-erc-ri/lib/forge-std/src/",
+]
+
+# Fuzzer
+[fuzz]
+runs = 256
+max_test_rejects = 65_536
+seed = "0xdeadbeef"
+include_storage = true
+include_push_bytes = true
+
+# Invariant testing
+[invariant]
+runs = 256
+depth = 32
+fail_on_revert = false
+call_override = false
+
+[rpc_endpoints]
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+ethereum_sepolia = "${ETHEREUM_SEPOLIA_RPC_URL}"
+polygon_amoy = "${POLYGON_AMOY_RPC_URL}"
+
+[etherscan]
+arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api" }
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+multiline_func_header = "all"
+quote_style = "double"
+number_underscore = "thousands"
+sort_imports = true

@@ -1,0 +1,96 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+
+interface Summary {
+  tvlUsd: string | null;
+  lastAttestedTvlUsd: string | null;
+  lastAttestedAgo: string;
+  leafCount: number | null;
+  /** Server-computed: attestation is older than 2× hourly cadence + grace. */
+  isStale: boolean;
+  /** Human-readable reason when isStale=true. null when fresh. */
+  staleReason: string | null;
+  staleThresholdMin: number;
+  source: 'scribe' | 'pending';
+}
+
+async function fetchSummary(): Promise<Summary> {
+  try {
+    const r = await fetch('/api/reserves/summary');
+    if (!r.ok) throw new Error();
+    return await r.json();
+  } catch {
+    // Honesty contract (iteration 34): unknown freshness → render as stale.
+    // The alternative — defaulting to isStale=false on fetch failure — would
+    // show green on the dashboard during an outage of the verify-app itself,
+    // exactly when an operator most needs the truth.
+    return {
+      tvlUsd: null,
+      lastAttestedTvlUsd: null,
+      lastAttestedAgo: 'pending',
+      leafCount: null,
+      isStale: true,
+      staleReason: 'verify-app could not reach its own /api/reserves/summary',
+      staleThresholdMin: 130,
+      source: 'pending',
+    };
+  }
+}
+
+export function ReservesStatRow() {
+  const { data } = useQuery({ queryKey: ['reserves-summary'], queryFn: fetchSummary, refetchInterval: 60_000 });
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Tile label="Live TVL" value={data?.tvlUsd ?? '—'} sub="from Coffer ERC-4626" />
+      <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '—'} sub="last hourly attestation" />
+      <Tile
+        label="Last attestation"
+        value={data?.lastAttestedAgo ?? '—'}
+        sub={
+          data?.isStale
+            ? `STALE · ${data.staleReason ?? 'past freshness threshold'}`
+            : 'every 60 min'
+        }
+        // Iteration 34: visual flag when stale. The "every 60 min" sub-label
+        // pre-fix was the only freshness signal — implicit, and only readable
+        // to a user who notices the discrepancy between "25 hours ago" + "every
+        // 60 min." Now the sub-label flips to STALE + reason when isStale.
+        warn={data?.isStale === true}
+      />
+      <Tile label="Leaves in tree" value={data?.leafCount?.toLocaleString('en-US') ?? '—'} sub="one per Coffer balance" />
+    </div>
+  );
+}
+
+function Tile({
+  label,
+  value,
+  sub,
+  warn,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  warn?: boolean;
+}) {
+  return (
+    <div
+      className={
+        warn
+          ? 'rounded-md border border-warning/40 bg-warning/5 p-4'
+          : 'rounded-md border border-divider bg-parchment p-4'
+      }
+    >
+      <p className="text-[10px] uppercase tracking-wider text-label">{label}</p>
+      <p className={'mt-2 font-mono text-2xl ' + (warn ? 'text-warning' : 'text-ink')}>{value}</p>
+      <p
+        className={
+          'mt-1 text-[10px] uppercase tracking-wider ' + (warn ? 'text-warning' : 'text-muted')
+        }
+      >
+        {sub}
+      </p>
+    </div>
+  );
+}

@@ -1,0 +1,15 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["../../resources/openzeppelin-contracts/contracts", "../../resources/account-abstraction/contracts"]
+test = "test"
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 1_000_000
+via_ir = true
+evm_version = "cancun"
+
+remappings = [
+    "@openzeppelin/contracts/=../../resources/openzeppelin-contracts/contracts/",
+    "@account-abstraction/=../../resources/account-abstraction/contracts/",
+]

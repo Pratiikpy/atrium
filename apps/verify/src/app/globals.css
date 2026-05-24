@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+/* Atrium design tokens — extracted from desing/Atrium.html via playwright
+ * post-React-render. Source-of-truth file at
+ * desing/extracted/full-render-tokens.json.
+ *
+ * All colors are OKLCH. Modern color space; modern browsers support it.
+ * Tailwind v4 reads these as native CSS vars.
+ */
+
+@theme {
+  /* ── Ink (text / dark surfaces) ─────────────────────────────────── */
+  --color-ink-darkest:  oklch(0.11 0.008 60);
+  --color-ink-dark:     oklch(0.13 0.008 60);
+  --color-ink:          oklch(0.15 0.008 60);
+  --color-ink-soft:     oklch(0.22 0.006 60);
+  --color-ink-muted:    oklch(0.28 0.006 60);
+
+  /* ── Neutrals ────────────────────────────────────────────────────── */
+  --color-muted:        oklch(0.54 0.005 60);
+  --color-label:        oklch(0.72 0.004 60);
+  --color-divider:      oklch(0.88 0.004 60);
+  --color-divider-soft: oklch(0.93 0.003 60);
+  --color-surface-soft: oklch(0.96 0.003 60);
+
+  /* ── Parchment (page background + light surfaces) ────────────────── */
+  --color-parchment-warm:    oklch(0.96 0.005 85);
+  --color-parchment-soft:    oklch(0.96 0.003 60);
+  --color-parchment:         oklch(0.984 0.004 85);
+  --color-parchment-light:   oklch(0.996 0.003 85);
+
+  /* ── Accent (sparingly) ──────────────────────────────────────────── */
+  --color-success:      oklch(0.58 0.13 145);
+  --color-success-soft: oklch(0.58 0.13 145 / 0.12);
+  --color-warning:      oklch(0.7 0.13 70);
+  --color-terracotta:   rgb(126, 42, 32);
+  --color-danger:       rgb(126, 42, 32);
+
+  /* ── Dark-section variant (Sigil section in marketing) ───────────── */
+  --color-dark-bg:        rgb(16, 16, 16);
+  --color-dark-fg:        rgb(255, 255, 255);
+  --color-dark-white-24:  oklch(1 0 0 / 0.24);
+  --color-dark-white-40:  oklch(1 0 0 / 0.4);
+  --color-dark-white-50:  oklch(1 0 0 / 0.5);
+  --color-dark-white-55:  oklch(1 0 0 / 0.55);
+
+  /* ── Status (favicon + on-page pills) ────────────────────────────── */
+  --color-status-amber: oklch(0.7 0.13 70);
+  --color-status-green: oklch(0.58 0.13 145);
+  --color-status-red:   rgb(126, 42, 32);
+
+  /* ── Typography ──────────────────────────────────────────────────── */
+  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --font-body:    Geist, ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, monospace;
+
+  /* ── Spacing scale (matches the extracted px values) ─────────────── */
+  /* NOTE: prefixed with --gap- instead of --spacing- because Tailwind v4
+   * consumes --spacing-3xl, --spacing-2xl, etc. as the source for
+   * max-w-3xl / max-w-2xl utilities. Defining --spacing-3xl = 4rem here
+   * silently collapsed every `max-w-3xl` container in the app to 64px
+   * (visual bug found on /verify/[step]). Renamed so the design tokens
+   * stay accessible without trampling Tailwind's max-width scale. */
+  --gap-2xs: 0.25rem;   /*  4px */
+  --gap-xs:  0.5rem;    /*  8px */
+  --gap-sm:  0.75rem;   /* 12px */
+  --gap-md:  1rem;      /* 16px */
+  --gap-lg:  1.5rem;    /* 24px */
+  --gap-xl:  2rem;      /* 32px */
+  --gap-2xl: 3rem;      /* 48px */
+  --gap-3xl: 4rem;      /* 64px */
+  --gap-4xl: 6rem;      /* 96px */
+
+  /* ── Radii (from extracted values: 6, 10, 12, 14, 16, 999) ───────── */
+  --radius-xs:   6px;
+  --radius-sm:  10px;
+  --radius-md:  12px;
+  --radius-lg:  14px;
+  --radius-xl:  16px;
+  --radius-pill: 999px;
+
+  /* ── Shadows (three-layer, oklch-tinted) ─────────────────────────── */
+  --shadow-sm: oklch(0.13 0.008 60 / 0.04) 0 1px 1px 0;
+  --shadow-md:
+    oklch(0.13 0.008 60 / 0.05) 0 1px 1px 0,
+    oklch(0.13 0.008 60 / 0.06) 0 10px 30px 0;
+  --shadow-lg:
+    oklch(0.13 0.008 60 / 0.05) 0 1px 1px 0,
+    oklch(0.13 0.008 60 / 0.06) 0 10px 30px 0,
+    oklch(0.13 0.008 60 / 0.07) 0 40px 80px 0;
+  --shadow-lg-dark:
+    rgba(0, 0, 0, 0.4) 0 1px 1px 0,
+    rgba(0, 0, 0, 0.4) 0 10px 30px 0,
+    rgba(0, 0, 0, 0.5) 0 40px 80px 0;
+  --shadow-focus:
+    oklab(0.7 0.0444626 0.12216 / 0.245111) 0 0 0 3.05867px;
+
+  /* ── Transition aliases (extracted as canonical durations) ───────── */
+  --transition-color-fast: color 0.12s;
+  --transition-card-lift:
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.2s,
+    box-shadow 0.2s;
+  --transition-medium: 0.16s;
+  --transition-color-bg: color 0.2s, background 0.2s;
+}
+
+/* Base */
+:root {
+  font-family: var(--font-body);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  color: var(--color-ink);
+  background: var(--color-parchment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html, body { min-height: 100vh; background: var(--color-parchment); }
+body { margin: 0; padding: 0; font-weight: 400; }
+
+* { box-sizing: border-box; }
+
+/* Display type — only on hero, brand marks, big numbers */
+.font-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+/* The Atrium wordmark — matches desing/ logo treatment */
+.wordmark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+  position: relative;
+  display: inline-block;
+}
+.wordmark::after {
+  content: "";
+  display: block;
+  width: 55%;
+  height: 2px;
+  background: currentColor;
+  margin: 0.2em auto 0;
+}
+
+/* Hero display lockup — large negative letter-spacing per extracted tokens
+ * (max font-size 87.43px ≈ 5.46rem, letter-spacing -1.4 to -2.6 px) */
+.font-display-hero {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+/* Eyebrow — small caps above section heading */
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+}
+
+/* Focus ring — keyboard accessible per ui.md */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-xs);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Skeleton — for loading states (per ui.md: skeleton, not spinner) */
+@keyframes skeleton-pulse {
+  0% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.45; }
+}
+.skeleton {
+  background: var(--color-surface-soft);
+  border-radius: var(--radius-xs);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* Section heading lockup helper */
+.section-head {
+  text-align: center;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.section-head .eyebrow + h2,
+.section-head h2 {
+  margin-top: 0.5rem;
+}
+
+/* Dark section variant (Sigil section in marketing) */
+.section-dark {
+  background: var(--color-dark-bg);
+  color: var(--color-dark-fg);
+}
+.section-dark .eyebrow { color: var(--color-dark-white-55); }
+.section-dark .section-sub { color: var(--color-dark-white-55); }

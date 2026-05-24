@@ -1,0 +1,22 @@
+Sigil revokeAllOnBehalfOf - audit fix wiring note
+
+Add the following public method to contracts/sigil/src/lib.rs in the [public] impl block.
+Postern Kill Switch is the only contract authorized to call it.
+
+#[public]
+impl Sigil {
+    pub fn revoke_all_on_behalf_of(&mut self, owner: Address, agent: Address) -> Result<(), SigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.postern_kill_switch.get() {
+            return Err(SigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        let new_nonce = self.agent_revocation_nonce.getter(agent).get().to::<u64>() + 1;
+        self.agent_revocation_nonce.setter(agent).set(U256::from(new_nonce));
+        self.vm().log(SigilRevokeAll { owner, agent, new_nonce });
+        Ok(())
+    }
+}
+
+Sigil storage gets a new `postern_kill_switch: address` field set during initialize().
+
+Per Agent F audit MUST-FIX #2.

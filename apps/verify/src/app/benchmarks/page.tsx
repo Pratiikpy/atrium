@@ -1,0 +1,56 @@
+import { Wordmark } from '@/components/wordmark';
+
+export default function BenchmarksPage() {
+  return (
+    <main className="mx-auto max-w-5xl px-6 py-16">
+      <Wordmark size="md" />
+      <h1 className="mt-12 font-display text-5xl text-ink">Benchmarks</h1>
+      <p className="mt-4 max-w-prose text-ink-soft">
+        Side-by-side against the closest comparables. Numbers come from competitor docs and on-chain reads.
+        Where Atrium loses, we say so.
+      </p>
+
+      <section className="mt-12 overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-divider text-left text-muted">
+              <th className="py-3 pr-6 font-normal">Dimension</th>
+              <th className="py-3 pr-6 font-normal">Atrium</th>
+              <th className="py-3 pr-6 font-normal">Cascade (Solana)</th>
+              <th className="py-3 pr-6 font-normal">August (Solana)</th>
+            </tr>
+          </thead>
+          <tbody className="text-ink-soft">
+            <Row dim="Chain" a="Arbitrum + RH-Chain (when SDK)" c="Solana" b="Solana" />
+            <Row dim="Margin compute" a="Stylus (Rust, 10–100× cheaper for compute-heavy ops)" c="Native Solana programs" b="N/A" />
+            <Row dim="Open adapter standard" a="IPorticoAdapter v1.0 (MIT)" c="Closed" b="Closed" />
+            <Row dim="Agent integration" a="Sigil EIP-712 + Postern session keys + ERC-8004" c="Limited" b="None" />
+            <Row dim="Formal verification" a="5 Kani+proptest invariants in CI" c="Audit only" b="Audit only" />
+            <Row dim="Year-1 budget" a="$0 founder capital" c="$15M raised" b="$10M raised" />
+            <Row dim="UX polish today" a="Foundation only — see ROADMAP" c="Stronger (more mature)" b="Stronger" />
+            <Row dim="Mainnet live" a="No (Year-2 gate)" c="Yes" b="Yes" />
+          </tbody>
+        </table>
+      </section>
+
+      <section className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
+        <p className="text-sm text-ink-soft">
+          Honest read: Cascade and August have UX polish and mainnet liveness we do not yet match.
+          Atrium leads on chain choice (EVM is bigger), open standards, agent layer depth, and formal
+          verification. By Year-2 mainnet flip our gap on polish closes; their gap on standards stays.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+function Row({ dim, a, c, b }: { dim: string; a: string; c: string; b: string }) {
+  return (
+    <tr className="border-b border-divider/60">
+      <td className="py-3 pr-6 font-medium text-ink">{dim}</td>
+      <td className="py-3 pr-6">{a}</td>
+      <td className="py-3 pr-6">{c}</td>
+      <td className="py-3 pr-6">{b}</td>
+    </tr>
+  );
+}

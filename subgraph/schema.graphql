@@ -1,0 +1,554 @@
+"""
+Scribe — Atrium subgraph schema.
+
+Every entity is indexed from on-chain events. The frontends, Codex API, and
+Lantern dashboard read from here. No off-chain data smuggled in — the schema
+is intentionally a faithful image of contract events.
+"""
+
+type MarginAccount @entity {
+  "user address"
+  id: ID!
+  user: Bytes!
+  collateralValueWei: BigInt!
+  requiredMarginWei: BigInt!
+  marginVersion: BigInt!
+  lastUpdateBlock: BigInt!
+  isPaused: Boolean!
+  positions: [Position!]! @derivedFrom(field: "owner")
+  updates: [MarginUpdate!]! @derivedFrom(field: "account")
+  liquidations: [LiquidationEvent!]! @derivedFrom(field: "account")
+}
+
+type Position @entity {
+  "position id from Plinth"
+  id: ID!
+  owner: MarginAccount!
+  venueId: Int!
+  instrumentId: Bytes!
+  notionalSigned: BigInt!
+  entryPriceQ64: BigInt!
+  openedAtBlock: BigInt!
+  openedAtTimestamp: BigInt!
+  closedAtBlock: BigInt
+  closedAtTimestamp: BigInt
+  realizedPnlSigned: BigInt
+}
+
+type MarginUpdate @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  account: MarginAccount!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  collateralValueWei: BigInt!
+  requiredMarginWei: BigInt!
+  marginVersion: BigInt!
+}
+
+type LiquidationEvent @entity(immutable: true) {
+  id: ID!
+  # Audit YYY-1 fix: was `account: MarginAccount!` (non-null). But
+  # `subgraph/src/vigil.ts:27` sets `liq.account = ''` until the
+  # `Vigil.jobs(job_id).user` view-call binding lands (Wave-2 wiring).
+  # The empty-string ID maps to a non-existent MarginAccount → resolver
+  # returns null → query errors due to the `!` constraint. Making it
+  # nullable matches the documented deferral; consumers already handle
+  # null via the @derivedFrom pattern on MarginAccount.liquidations.
+  account: MarginAccount
+  positionId: BigInt!
+  keeper: Bytes!
+  recoveredCollateralWei: BigInt!
+  actualLiquidationBps: Int!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type Keeper @entity {
+  "keeper address"
+  id: ID!
+  stakeWei: BigInt!
+  missedWindows24h: Int!
+  isActive: Boolean!
+  totalLiquidationsExecuted: BigInt!
+  totalRewardsWei: BigInt!
+  totalSlashedWei: BigInt!
+  lastActionTimestamp: BigInt
+}
+
+type CofferDeposit @entity(immutable: true) {
+  id: ID!
+  sender: Bytes!
+  owner: Bytes!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type CofferWithdraw @entity(immutable: true) {
+  id: ID!
+  sender: Bytes!
+  receiver: Bytes!
+  owner: Bytes!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type CircuitBreakerEvent @entity(immutable: true) {
+  id: ID!
+  trigger: String!
+  measurement: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type CrossChainCredit @entity {
+  "CCIP message id"
+  id: ID!
+  user: Bytes!
+  sourceChainSelector: BigInt!
+  destChainSelector: BigInt!
+  amountWei: BigInt!
+  expiresAtTimestamp: BigInt!
+  isSettled: Boolean!
+  isClaimedBack: Boolean!
+  claimedBackAmountWei: BigInt
+  createdAtBlock: BigInt!
+  settledAtBlock: BigInt
+  claimedBackAtBlock: BigInt
+}
+
+# Audit K-3 fix: lifecycle state for Aqueduct emergency-pause and resume.
+# Single-row entity ("singleton") keyed by the literal "0".
+type AqueductPauseState @entity {
+  id: ID!
+  isPaused: Boolean!
+  lastPausedBy: Bytes
+  lastPausedAtBlock: BigInt
+  lastResumedBy: Bytes
+  lastResumedAtBlock: BigInt
+}
+
+# Audit K-4 fix: lifecycle state for Plinth global pause and Coffer split
+# deposit/withdrawal pause. Singletons keyed by the literal "0".
+type PlinthPauseState @entity {
+  id: ID!
+  isGloballyPaused: Boolean!
+  lastReason: String
+  lastPausedAtBlock: BigInt
+  lastResumedAtBlock: BigInt
+}
+
+type CofferPauseState @entity {
+  id: ID!
+  isDepositsPaused: Boolean!
+  isWithdrawalsPaused: Boolean!
+  lastDepositReason: String
+  lastWithdrawalReason: String
+  lastChangedAtBlock: BigInt
+}
+
+# Audit K-5 fix: positive proof Sigil validated an action under a mandate.
+# Read by Verifier Mode "agent acted under mandate" panel.
+type SigilValidation @entity(immutable: true) {
+  id: ID!
+  owner: Bytes!
+  agent: Bytes!
+  intentHash: Bytes!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type CohortPartner @entity {
+  "partner address"
+  id: ID!
+  joinedAtBlock: BigInt!
+  joinedAtTimestamp: BigInt!
+  totalDepositsWei: BigInt!
+  totalTradesCount: BigInt!
+  lastActionTimestamp: BigInt!
+  displayName: String
+}
+
+type Agent @entity {
+  "agent address (ERC-8004 identity)"
+  id: ID!
+  identityRegistryAgentId: BigInt
+  totalActionsCount: BigInt!
+  totalPnlSigned: BigInt!
+  reputationScore: Int!
+  lastActionTimestamp: BigInt!
+}
+
+type BacktestAttestation @entity(immutable: true) {
+  "ipfs hash of the notebook"
+  id: ID!
+  ipfsHash: Bytes!
+  tradesCount: BigInt!
+  collateralDeltaBps: Int!
+  timestampSeconds: BigInt!
+  notebookUrl: String!
+  blockNumber: BigInt!
+}
+
+"Counter helpers for the public counters (PRD §28.1 honest-numbers patch)."
+type Counter @entity {
+  id: ID!
+  activeAgentsCount: Int!
+  cohortPartnersCount: Int!
+  liveKeepersCount: Int!
+  totalTvlWei: BigInt!
+  lastUpdated: BigInt!
+}
+
+"Per-user Coffer balance derived from deposit + withdraw events. Read by Lantern."
+type CofferUserBalance @entity {
+  "user address"
+  id: ID!
+  user: Bytes!
+  balanceWei: BigInt!
+  salt: Bytes!
+  lastUpdatedBlock: BigInt!
+}
+
+"Sigil revocation event log."
+type SigilRevocation @entity(immutable: true) {
+  id: ID!
+  owner: Bytes!
+  agent: Bytes
+  intentHash: Bytes
+  newNonce: BigInt
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"Edict tier assignments."
+type TierAssignment @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  tier: Int!
+  assignedBy: Bytes!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"Portico adapter registry lifecycle."
+type AdapterEvent @entity(immutable: true) {
+  id: ID!
+  venueId: Int!
+  adapter: Bytes!
+  majorVersion: BigInt
+  action: String!  # "registered" | "deregistered"
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"PraetorTimelock scheduled ops — public visibility for the 48h window."
+type TimelockSchedule @entity {
+  "id from PraetorTimelock"
+  id: ID!
+  target: Bytes!
+  data: Bytes!
+  scheduledAt: BigInt!
+  executedAt: BigInt
+  cancelledAt: BigInt
+}
+
+"Kill Switch activations — chaos events feed."
+type KillSwitchEvent @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  sigilAgentsRevoked: BigInt!
+  sessionKeysCancelled: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"Lantern attestation publishes (replaces ad-hoc reads in Codex /v1/attestation/latest)."
+type LanternAttestation @entity {
+  id: ID!
+  root: Bytes!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  leafCount: Int!
+  ipfsCid: String
+}
+
+"""
+PosternKeyEvent — closes `human_left.md` #21.
+
+Pre-fix, the subgraph indexed Sigil mandates but had no Postern session-key
+aggregation. Codex `/agents/summary` had to return null for activeSessionKeys
+(honest fallback per audit JJ-7). With this entity, Codex queries the real
+count.
+"""
+type PosternKeyEvent @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  user: Bytes!
+  sessionKey: Bytes!
+  "issued | revoked | expired_cleaned"
+  kind: String!
+  "non-null only on `issued` events"
+  expiresAt: BigInt
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+PosternSessionKey — derived state aggregating PosternKeyEvent.
+Active set = rows with state='active' AND expiresAt > current_block_timestamp.
+"""
+type PosternSessionKey @entity {
+  "user + sessionKey concatenated"
+  id: ID!
+  user: Bytes!
+  sessionKey: Bytes!
+  "active | revoked | expired"
+  state: String!
+  issuedAt: BigInt!
+  expiresAt: BigInt!
+  revokedAt: BigInt
+}
+
+"""
+Curator grant lifecycle. A grant is created by the Praetor timelock,
+claimed by the grantee once the cliff passes, or cancelled by Praetor
+multisig with a reason. The state field collapses the lifecycle into
+an enum so a single Scribe query gives the dashboard the current
+status without a join. Audit followup #26 — Curator events were
+emitted on-chain but never indexed pre-fix; without this entity the
+verify-app Cohort page can't show grant history at all.
+"""
+type CuratorGrant @entity {
+  "grant_id from the on-chain event"
+  id: ID!
+  grantee: Bytes!
+  amountWei: BigInt!
+  ipfsAttestationCid: Bytes!
+  state: String!
+  createdAtBlock: BigInt!
+  createdAtTimestamp: BigInt!
+  claimedAtBlock: BigInt
+  claimedAtTimestamp: BigInt
+  cancelledAtBlock: BigInt
+  cancelledAtTimestamp: BigInt
+  cancelReason: String
+}
+
+"""
+Per-funding-event log on Curator. Tracks who funded the Curator pool
+and the running total. Used by the verify-app dashboard to surface
+"$X of $Y committed" honestly.
+"""
+type CuratorFunding @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  from: Bytes!
+  amountWei: BigInt!
+  newTotalFundedWei: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+AtriumRouter orchestration log. The Router orchestrates Plinth →
+Coffer → Adapter as one atomic operation; this entity captures the
+end-to-end record so the verify-app can show "tx 0xabc opened a
+hedged position on venue 1 via Router" without joining 3+ events.
+
+The Plinth-side PositionOpened event is still indexed at the Plinth
+data source — this entity is the Router-specific orchestration
+metadata (plinth_position_id ↔ venue_position_id binding).
+"""
+type RouterPositionEvent @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  user: Bytes!
+  venueId: Int!
+  instrumentId: Bytes
+  notionalSigned: BigInt
+  plinthPositionId: BigInt!
+  venuePositionId: BigInt!
+  realizedPnlSigned: BigInt
+  action: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+Rostrum copy-trade follow relationship. Mutable — flips between
+'active' and 'ended' via FollowStarted / FollowEnded. The verify-app
+copy-trade leaderboard reads `rostrumFollows(where: { state: "active" })`
+for the live follower-count surface.
+
+Note on @derivedFrom: per-leader follower count is derived client-side
+from `rostrumFollows(where: { leader: $leader, state: "active" })` —
+simpler than maintaining a Leader entity with cached counts that drift.
+"""
+type RostrumFollow @entity {
+  "follower-address + '-' + leader-address (lowercased)"
+  id: ID!
+  follower: Bytes!
+  leader: Bytes!
+  allocationBps: Int!
+  expiresAt: BigInt!
+  state: String!
+  startedAtBlock: BigInt!
+  startedAtTimestamp: BigInt!
+  endedAtBlock: BigInt
+  endedAtTimestamp: BigInt
+  endedReason: String
+}
+
+"""
+Rostrum per-mirror-trade record. Immutable. Captures both successful
+mirrors (filled) AND failed mirrors (with a `reason` string). The
+verify-app dashboard surfaces "trades mirrored vs trades failed" per
+follower so the user sees the real fill rate, not just the wins.
+"""
+type RostrumMirrorTrade @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  follower: Bytes!
+  leader: Bytes!
+  leaderPositionId: BigInt!
+  state: String!
+  followerNotionalSigned: BigInt
+  reason: String
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+Rostrum leader deboost event. Praetor multisig demotes a leader for
+slashing-worthy behavior. Immutable; rendered as a per-leader incident
+log on the leaderboard so followers can see why their leader was
+removed from the active set.
+"""
+type RostrumLeaderDeboost @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  leader: Bytes!
+  reason: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+Rostrum per-action-kind log. Drives the agent-action attribution
+surface — Augur/Haruspex/Auspex each record their decisions on-chain
+so the public leaderboard can rank by action volume, not just PnL.
+"""
+type RostrumAgentAction @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  agent: Bytes!
+  actionKind: Bytes!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+"""
+Rostrum agent reputation snapshot. Mutable; ReputationUpdated event
+flips the cached score with every action. The verify-app shows the
+current score + the most-recent delta (`next - previous`) on the
+agent profile card.
+"""
+type RostrumReputation @entity {
+  "agent address (lowercased)"
+  id: ID!
+  agent: Bytes!
+  currentScore: BigInt!
+  previousScore: BigInt!
+  lastUpdatedAtBlock: BigInt!
+  lastUpdatedAtTimestamp: BigInt!
+}
+
+"""
+Unified defensive-observability log. Captures the six Tier-2 events
+from subgraph/indexing-todo.md as one entity so the verify-app's
+adapter/keeper/mandate dashboards each query the slice they need
+without scanning per-contract entities. Mirrors the AlertEvent
+pattern but at lower signal — these are diagnostic surfaces, not
+PagerDuty-driving alerts.
+
+Per kind, the populated fields are:
+- haircut_applied: user, amountWei (=haircut), toleranceBps (=haircut bps)
+- adapter_cap_hit: adapter, amountWei (=attempted), capWei
+- keeper_rewarded: keeper, amountWei (=reward)
+- keeper_stale_job_rejected: jobId, expectedVersion, actualVersion
+- sigil_open_notional_decremented: agent, previousNotionalWei, nextNotionalWei, amountWei
+- sigil_revoke_skipped: user, agent, reasonBytes
+"""
+type SubsystemDiagnosticEvent @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  "haircut_applied | adapter_cap_hit | keeper_rewarded | keeper_stale_job_rejected | sigil_open_notional_decremented | sigil_revoke_skipped"
+  kind: String!
+  "Coffer | Vigil | Sigil | PosternKillSwitch"
+  contract: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  # Generic actor fields. Each kind populates only its relevant ones.
+  user: Bytes
+  agent: Bytes
+  keeper: Bytes
+  adapter: Bytes
+  # Generic value fields. amountWei + capWei cover the haircut/cap/reward shapes;
+  # previousNotionalWei + nextNotionalWei cover the Sigil decrement delta.
+  amountWei: BigInt
+  capWei: BigInt
+  toleranceBps: Int
+  previousNotionalWei: BigInt
+  nextNotionalWei: BigInt
+  # Vigil stale-job specific.
+  jobId: BigInt
+  expectedVersion: BigInt
+  actualVersion: BigInt
+  # PosternKillSwitch.SigilRevokeSkipped carries an opaque bytes reason
+  # (the raw revert data from the wrapped Sigil call). Stored as Bytes for
+  # forensic replay; the verify-app displays a truncated hex tag.
+  reasonBytes: Bytes
+}
+
+"""
+Unified ops-alert timeline. Captures the five Tier-1 events from
+subgraph/indexing-todo.md as one entity so the verify-app's ops
+dashboard can render the alert timeline with a single query
+(`alertEvents(orderBy: timestamp, orderDirection: desc, first: 50)`)
+instead of joining 5 contract-specific feeds client-side.
+
+Each alert kind populates the subset of fields it has. The dashboard
+reads `kind` to decide which fields to render. New alert kinds in the
+future are a `kind` string value, not a schema migration.
+"""
+type AlertEvent @entity(immutable: true) {
+  "tx hash + log index"
+  id: ID!
+  "oracle_disagreement | vigil_queue_failed | link_balance_low | usdc_paused | adapter_emergency_deregistered | emergency_pause_invoked"
+  kind: String!
+  "Plinth | Aqueduct | Coffer | PorticoRegistry"
+  contract: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  # Oracle disagreement (Plinth)
+  chainlinkPriceQ64: BigInt
+  pythPriceQ64: BigInt
+  toleranceBps: Int
+  # Vigil queue failed (Plinth)
+  user: Bytes
+  marginVersion: BigInt
+  # LINK balance low (Aqueduct)
+  linkBalanceWei: BigInt
+  link30dUsageWei: BigInt
+  # USDC paused (Coffer) — no params, just timestamp.
+  # Adapter emergency deregister (PorticoRegistry)
+  venueId: Int
+  adapter: Bytes
+  reason: String
+}

@@ -1,0 +1,463 @@
+specVersion: 0.0.5
+description: Scribe — Atrium event indexer for The Graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Plinth
+    network: arbitrum-sepolia
+    source:
+      address: "0x485218e340d1e3b272bed337ec59ffe0a3dc4781"
+      abi: Plinth
+      startBlock: 270725278
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - MarginAccount
+        - Position
+        - MarginUpdate
+        - PlinthPauseState
+      abis:
+        - name: Plinth
+          file: ./abis/Plinth.json
+      eventHandlers:
+        - event: MarginUpdated(indexed address,uint256,uint256,uint256,uint64)
+          handler: handleMarginUpdated
+        - event: PositionOpened(indexed uint256,indexed address,uint8,bytes32,int256)
+          handler: handlePositionOpened
+        - event: PositionClosed(indexed uint256,int256)
+          handler: handlePositionClosed
+        # Wave A.7: reason field changed from `string` to `bytes32` so Plinth
+        # fits under EIP-170. Off-chain consumers keccak256() the human text.
+        - event: AccountPaused(indexed address,bytes32)
+          handler: handleAccountPaused
+        - event: AccountResumed(indexed address)
+          handler: handleAccountResumed
+        # Audit K-4 fix: G-6 uniform pause(string) emits PlinthPaused/PlinthResumed
+        - event: PlinthPaused(bytes32,uint64)
+          handler: handlePlinthPaused
+        - event: PlinthResumed(uint64)
+          handler: handlePlinthResumed
+        # Tier-1 ops alerts. AlertEvent entity feeds the verify-app ops timeline.
+        - event: OracleDisagreement(uint256,uint256,uint16)
+          handler: handleOracleDisagreement
+        - event: VigilQueueFailed(indexed address,uint256)
+          handler: handleVigilQueueFailed
+      file: ./src/plinth.ts
+
+  - kind: ethereum
+    name: Vigil
+    network: arbitrum-sepolia
+    source:
+      address: "0x67713074650ad05c832c781101ac447cb847522e"
+      abi: Vigil
+      startBlock: 270668869
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LiquidationEvent
+        - Keeper
+      abis:
+        - name: Vigil
+          file: ./abis/Vigil.json
+      eventHandlers:
+        - event: LiquidationTriggered(indexed uint256,indexed uint256,uint64,uint8)
+          handler: handleLiquidationTriggered
+        - event: LiquidationExecuted(indexed uint256,indexed address,int256,uint16)
+          handler: handleLiquidationExecuted
+        - event: KeeperStaked(indexed address,uint256)
+          handler: handleKeeperStaked
+        - event: KeeperSlashed(indexed address,uint256,bytes32)
+          handler: handleKeeperSlashed
+        # Audit KKKK-1: wired alongside GGGG-1's mark_keeper_missed_window
+        # function. Without this handler the on-chain miss-count bump would
+        # never reach the keeper-monitoring dashboard ("2 of 3 misses, slash
+        # imminent" display has no data source).
+        - event: KeeperMissedWindow(indexed address,uint32)
+          handler: handleKeeperMissedWindow
+        # Tier-2 defensive observability.
+        - event: KeeperRewarded(indexed address,uint256)
+          handler: handleKeeperRewarded
+        - event: StaleJobRejected(indexed uint256,uint256,uint256)
+          handler: handleStaleJobRejected
+      file: ./src/vigil.ts
+
+  - kind: ethereum
+    name: Coffer
+    network: arbitrum-sepolia
+    source:
+      address: "0x7420084855421ef0794a971bd5190f5c0c292071"
+      abi: Coffer
+      startBlock: 270659716
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CofferDeposit
+        - CofferWithdraw
+        - CofferPauseState
+      abis:
+        - name: Coffer
+          file: ./abis/Coffer.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: CircuitBreakerTripped(bytes32,uint256)
+          handler: handleCircuitBreaker
+        # Audit K-4 fix: G-6 split pause emits these four events
+        - event: DepositsPaused(bytes32)
+          handler: handleDepositsPaused
+        - event: DepositsResumed()
+          handler: handleDepositsResumed
+        - event: WithdrawalsPaused(bytes32)
+          handler: handleWithdrawalsPaused
+        - event: WithdrawalsResumed()
+          handler: handleWithdrawalsResumed
+        # Tier-1 ops alert. Fired when the upstream USDC contract is paused
+        # by Circle; Coffer halts deposits + withdrawals automatically.
+        - event: UsdcPausedDetected()
+          handler: handleUsdcPausedDetected
+        # Tier-2 defensive observability.
+        - event: HaircutApplied(indexed address,uint256,uint16)
+          handler: handleHaircutApplied
+        - event: AdapterCapHit(indexed address,uint256,uint256)
+          handler: handleAdapterCapHit
+      file: ./src/coffer.ts
+
+  - kind: ethereum
+    name: Aqueduct
+    network: arbitrum-sepolia
+    source:
+      address: "0x6139449bf43f44385d08640b2e6fd2b82cb87ec2"
+      abi: Aqueduct
+      startBlock: 270683155
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CrossChainCredit
+        - AqueductPauseState
+      abis:
+        - name: Aqueduct
+          file: ./abis/Aqueduct.json
+      eventHandlers:
+        # Audit K-1 fix: signature now matches the actual emission (6 args,
+        # 2 indexed) — the prior 7-arg / 3-indexed signature produced a
+        # different topic hash so the handler never fired.
+        - event: CrossChainCredit(indexed bytes32,indexed address,uint64,uint64,uint256,uint256)
+          handler: handleCrossChainCredit
+        # Audit K-3 fix: lifecycle events that flip CrossChainCredit state.
+        - event: CrossChainCreditSettled(indexed bytes32)
+          handler: handleCrossChainCreditSettled
+        - event: CrossChainCreditClaimedBack(indexed bytes32,indexed address,uint256)
+          handler: handleCrossChainCreditClaimedBack
+        - event: EmergencyPaused(indexed address)
+          handler: handleEmergencyPaused
+        - event: Resumed(indexed address)
+          handler: handleResumed
+        # Tier-1 ops alert. AlertEvent feed for ops timeline.
+        - event: LinkBalanceLow(uint256,uint256)
+          handler: handleLinkBalanceLow
+      file: ./src/aqueduct.ts
+
+  - kind: ethereum
+    name: ResearchAttestation
+    network: arbitrum-sepolia
+    source:
+      address: "0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba"
+      abi: ResearchAttestation
+      startBlock: 270408474
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BacktestAttestation
+      abis:
+        - name: ResearchAttestation
+          file: ./abis/ResearchAttestation.json
+      eventHandlers:
+        - event: BacktestPublished(indexed bytes32,uint256,int256,uint256,string)
+          handler: handleBacktestPublished
+      file: ./src/research.ts
+
+  - kind: ethereum
+    name: Sigil
+    network: arbitrum-sepolia
+    source:
+      address: "0xefd38821466ca31e0b1734f89f1d6ec9a4bc70d0"
+      abi: Sigil
+      startBlock: 270667451
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - SigilRevocation
+        - SigilValidation
+      abis:
+        - name: Sigil
+          file: ./abis/Sigil.json
+      eventHandlers:
+        - event: SigilRevoked(indexed address,indexed bytes32)
+          handler: handleSigilRevoked
+        - event: SigilRevokeAll(indexed address,indexed address,uint64)
+          handler: handleSigilRevokeAll
+        # Audit K-5 fix: positive proof that Sigil validated an action under
+        # a mandate. Verifier Mode "agent acted under mandate" panel reads
+        # this entity.
+        - event: IntentValidated(indexed address,indexed address,bytes32)
+          handler: handleIntentValidated
+        # Tier-2 defensive observability. Plinth-driven credit-line decrement
+        # (audit HHH-4) — mandate-usage cap dashboard data source.
+        - event: SigilOpenNotionalDecremented(indexed address,uint256,uint256,uint256)
+          handler: handleSigilOpenNotionalDecremented
+      file: ./src/sigil.ts
+
+  - kind: ethereum
+    name: Edict
+    network: arbitrum-sepolia
+    source:
+      address: "0x66577042b4d47312e554bbfa5e29ae20f55dd631"
+      abi: Edict
+      startBlock: 270408469
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - TierAssignment
+      abis:
+        - name: Edict
+          file: ./abis/Edict.json
+      eventHandlers:
+        - event: TierAssigned(indexed address,uint8,uint64,indexed address)
+          handler: handleTierAssigned
+      file: ./src/edict.ts
+
+  - kind: ethereum
+    name: PorticoRegistry
+    network: arbitrum-sepolia
+    source:
+      address: "0x9a9af6e50491cd4694699d48564bbff18f9b40bc"
+      abi: PorticoRegistry
+      startBlock: 270408449
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AdapterEvent
+      abis:
+        - name: PorticoRegistry
+          file: ./abis/PorticoRegistry.json
+      eventHandlers:
+        - event: AdapterRegistered(indexed uint8,indexed address,uint256)
+          handler: handleAdapterRegistered
+        - event: AdapterDeregistered(indexed uint8,indexed address)
+          handler: handleAdapterDeregistered
+        # Tier-1 ops alert. Rare; always incident-response.
+        - event: AdapterEmergencyDeregistered(indexed uint8,indexed address,string)
+          handler: handleAdapterEmergencyDeregistered
+      file: ./src/portico_registry.ts
+
+  - kind: ethereum
+    name: PraetorTimelock
+    network: arbitrum-sepolia
+    source:
+      address: "0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4"
+      abi: PraetorTimelock
+      startBlock: 270408443
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - TimelockSchedule
+      abis:
+        - name: PraetorTimelock
+          file: ./abis/PraetorTimelock.json
+      eventHandlers:
+        - event: Scheduled(indexed bytes32,indexed address,bytes,uint64)
+          handler: handleScheduled
+        - event: Executed(indexed bytes32,indexed address,bytes)
+          handler: handleExecuted
+        - event: Cancelled(indexed bytes32)
+          handler: handleCancelled
+        # Ops alert. The 48h-timelock-bypass instant-pause path; needs
+        # operator surveillance since it has no delay.
+        - event: EmergencyPaused(indexed address,string)
+          handler: handleEmergencyPaused
+      file: ./src/praetor_timelock.ts
+
+  - kind: ethereum
+    name: PosternKillSwitch
+    network: arbitrum-sepolia
+    source:
+      address: "0xb90a51a726740065bd0dbc20cd79306b30d8b676"
+      abi: PosternKillSwitch
+      startBlock: 270683177
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - KillSwitchEvent
+      abis:
+        - name: PosternKillSwitch
+          file: ./abis/PosternKillSwitch.json
+      eventHandlers:
+        - event: KillSwitchActivated(indexed address,uint256,uint256,uint256)
+          handler: handleKillSwitchActivated
+        # Tier-2 defensive observability. Partial-failure path of the kill
+        # switch — without indexing this, the UI would render "everything
+        # revoked" even when some agents were skipped.
+        - event: SigilRevokeSkipped(indexed address,indexed address,bytes)
+          handler: handleSigilRevokeSkipped
+      file: ./src/postern.ts
+
+  # Audit Month-2 #21 (closes `human_left.md` #21): PosternKeyRegistry
+  # session-key lifecycle events. Codex /agents/summary now resolves
+  # activeSessionKeys to a real count via PosternSessionKey aggregation.
+  - kind: ethereum
+    name: PosternKeyRegistry
+    network: arbitrum-sepolia
+    source:
+      address: "0x28c9fd500d2d8e3b56259a1054e9da05dec747d8"
+      abi: PosternKeyRegistry
+      startBlock: 270683171
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PosternKeyEvent
+        - PosternSessionKey
+      abis:
+        - name: PosternKeyRegistry
+          file: ./abis/PosternKeyRegistry.json
+      eventHandlers:
+        - event: SessionKeyIssued(indexed address,indexed address,uint256)
+          handler: handleSessionKeyIssued
+        - event: SessionKeyRevoked(indexed address,indexed address)
+          handler: handleSessionKeyRevoked
+        - event: SessionKeyExpiredCleaned(indexed address,indexed address)
+          handler: handleSessionKeyExpiredCleaned
+      file: ./src/postern.ts
+
+  - kind: ethereum
+    name: LanternAttestor
+    network: arbitrum-sepolia
+    source:
+      address: "0x900a9fb4bab7576fc11e4bb3c002d89dbe261168"
+      abi: LanternAttestor
+      startBlock: 270408455
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LanternAttestation
+      abis:
+        - name: LanternAttestor
+          file: ./abis/LanternAttestor.json
+      eventHandlers:
+        - event: AttestationPublished(indexed bytes32,uint256,uint256)
+          handler: handleAttestationPublished
+      file: ./src/lantern.ts
+
+  - kind: ethereum
+    name: Rostrum
+    network: arbitrum-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: Rostrum
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RostrumFollow
+        - RostrumMirrorTrade
+        - RostrumLeaderDeboost
+        - RostrumAgentAction
+        - RostrumReputation
+      abis:
+        - name: Rostrum
+          file: ./abis/Rostrum.json
+      eventHandlers:
+        - event: FollowStarted(indexed address,indexed address,uint16,uint256)
+          handler: handleFollowStarted
+        - event: FollowEnded(indexed address,indexed address,string)
+          handler: handleFollowEnded
+        - event: MirrorTradeFilled(indexed address,indexed address,indexed uint256,int256)
+          handler: handleMirrorTradeFilled
+        - event: MirrorTradeFailed(indexed address,indexed address,indexed uint256,string)
+          handler: handleMirrorTradeFailed
+        - event: LeaderDeboosted(indexed address,string)
+          handler: handleLeaderDeboosted
+        - event: ActionRecorded(indexed address,indexed bytes32)
+          handler: handleActionRecorded
+        - event: ReputationUpdated(indexed address,uint64,uint64)
+          handler: handleReputationUpdated
+      file: ./src/rostrum.ts
+
+  - kind: ethereum
+    name: AtriumRouter
+    network: arbitrum-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: AtriumRouter
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RouterPositionEvent
+      abis:
+        - name: AtriumRouter
+          file: ./abis/AtriumRouter.json
+      eventHandlers:
+        - event: PositionOpenedViaRouter(indexed address,indexed uint8,indexed bytes32,int256,uint256,uint256)
+          handler: handlePositionOpenedViaRouter
+        - event: PositionClosedViaRouter(indexed address,indexed uint8,indexed uint256,uint256,int256)
+          handler: handlePositionClosedViaRouter
+      file: ./src/atrium_router.ts
+
+  - kind: ethereum
+    name: Curator
+    network: arbitrum-sepolia
+    source:
+      address: "0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d"
+      abi: Curator
+      startBlock: 270408461
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CuratorGrant
+        - CuratorFunding
+      abis:
+        - name: Curator
+          file: ./abis/Curator.json
+      eventHandlers:
+        - event: GrantCreated(indexed uint256,indexed address,uint256,bytes32)
+          handler: handleGrantCreated
+        - event: GrantClaimed(indexed uint256,indexed address,uint256)
+          handler: handleGrantClaimed
+        - event: GrantCancelled(indexed uint256,string)
+          handler: handleGrantCancelled
+        - event: FundsReceived(indexed address,uint256,uint256)
+          handler: handleFundsReceived
+      file: ./src/curator.ts

@@ -1,0 +1,54 @@
+[workspace]
+resolver = "2"
+# Stylus contracts target wasm32-unknown-unknown and link against host-only
+# symbols (native_keccak256, etc.) that the default host target cannot resolve.
+# They build via `cargo stylus check` from their own directories. The root
+# workspace contains only host-side crates (agents + CLI). The Stylus crates
+# keep their own crate-level Cargo.toml unchanged.
+members = [
+    "agents/augur",
+    "agents/haruspex",
+    "agents/auspex",
+    "agents/template",
+    "services/praetor-cli",
+]
+exclude = [
+    "contracts/plinth",
+    "contracts/plinth-math",
+    "contracts/plinth-oracle",
+    "contracts/coffer",
+    "contracts/vigil",
+    "contracts/sigil",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[workspace.dependencies]
+# Standard host deps used by agents and CLI
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+tokio = { version = "1.40", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+ethers = "2.0"
+clap = { version = "4.5", features = ["derive", "env"] }
+proptest = "1.5"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+
+[profile.release]
+codegen-units = 1
+strip = true
+lto = "fat"
+opt-level = "z"

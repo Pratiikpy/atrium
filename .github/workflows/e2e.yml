@@ -1,0 +1,55 @@
+name: E2E (Playwright on Sepolia)
+
+# Audit K-8 fix: TDD §9 + testing.md require nightly Playwright runs of the
+# five user journeys against deployed Sepolia. Without this workflow, the
+# Verifier Mode flows are unverified between manual demo rehearsals.
+
+on:
+  # Nightly at 03:00 UTC (after Lantern's hourly attestation cycle).
+  schedule:
+    - cron: '0 3 * * *'
+  # Run on every PR that touches the verifier surface or its tests.
+  pull_request:
+    paths:
+      - 'apps/verify/**'
+      - 'apps/verify/tests/**'
+      - '.github/workflows/e2e.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: Five-journey E2E on Sepolia
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Tests run against the deployed verify.atrium.fi by default; override
+      # via repo variable for staging branches.
+      VERIFY_BASE_URL: ${{ vars.VERIFY_BASE_URL || 'https://verify.atrium.fi' }}
+      ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
+      E2E_TEST_WALLET_PRIVATE_KEY: ${{ secrets.E2E_TEST_WALLET_PRIVATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm --filter @atrium/verify exec playwright install --with-deps chromium
+      - name: Run E2E journeys
+        run: pnpm --filter @atrium/verify test:e2e
+      # Upload artifacts on failure so F3 can replay the demo rehearsal log.
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/verify/playwright-report/
+          retention-days: 30
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/verify/test-results/
+          retention-days: 30

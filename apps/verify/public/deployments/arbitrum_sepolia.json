@@ -1,0 +1,203 @@
+{
+  "network": "arbitrum_sepolia",
+  "chainId": 421614,
+  "contracts": {
+    "praetor-timelock": {
+      "address": "0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4",
+      "tx": "0xa05cfa1caa5cfd7f1b743c34ea546349c6220d1a9652836a75ba5c96db89fe33",
+      "block": 270408443
+    },
+    "portico-registry": {
+      "address": "0x9a9af6e50491cd4694699d48564bbff18f9b40bc",
+      "tx": "0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505",
+      "block": 270408449
+    },
+    "lantern-attestor": {
+      "address": "0x900a9fb4bab7576fc11e4bb3c002d89dbe261168",
+      "tx": "0x2343d14a743cef74768ec818de86d9154409d13ef3c97c987a8b79d1ca56a53c",
+      "block": 270408455
+    },
+    "curator": {
+      "address": "0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d",
+      "tx": "0xb0386fceceaaa2db9022913d7a4b169f1bb5018fa27940cd5037374097c5a4b5",
+      "block": 270408461
+    },
+    "edict": {
+      "address": "0x66577042b4d47312e554bbfa5e29ae20f55dd631",
+      "tx": "0xf208cc99c46de4b7a26c1d3efc1f006ccf809c06a93374b6195f77495e7af140",
+      "block": 270408469
+    },
+    "research-attestation": {
+      "address": "0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba",
+      "tx": "0xc5aa317ca635282de65dca0a116100cdcbd3535df74279b3bf9efdb66713705c",
+      "block": 270408474
+    },
+    "stoa": {
+      "address": "0x6d655803bac4bf61ad5ad26fd3b88429671cb5db",
+      "tx": "0x4b74f2454e4fbaf5319f45360979d28d95f8d675d4a29e9bcf32b0ed99270b42",
+      "block": 270408479
+    },
+    "coffer": {
+      "address": "0x7420084855421ef0794a971bd5190f5c0c292071",
+      "tx": "0x10d87459fc32ffcd351f5fb0f14d1053f17de7d87ef943457dbf61285a123537",
+      "activationTx": "0x7ca26822e99cb210050b2e81f2614cbbbc1ddcadb238ad385ecb9ad08e19e2fd",
+      "block": 270659716,
+      "kind": "stylus"
+    },
+    "sigil": {
+      "address": "0xefd38821466ca31e0b1734f89f1d6ec9a4bc70d0",
+      "tx": "0xbba0edf9bdbb62b07cdc2375d1acdd5111f1add0de1097a5adbe225222ba4e54",
+      "activationTx": "0xd0cc747cd7751b1c7b5a9239d262442cb112a5887403b52d489af62d9be7753c",
+      "block": 270667451,
+      "kind": "stylus"
+    },
+    "vigil": {
+      "address": "0x67713074650ad05c832c781101ac447cb847522e",
+      "tx": "0x7340cc34b3520c0fa70dafd0590d0142c4a10cdd79d51ec297e49ddc36119d6f",
+      "activationTx": "0x9f8355874f962ca18634af2cd37378649555942773ff433e612a1b32e6ba331d",
+      "block": 270668869,
+      "kind": "stylus"
+    },
+    "plinth-math": {
+      "address": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
+      "tx": "0x27a07432f7834f3e83bd7452137572a46a10833e73a80692dd42ad31ae4e7e3b",
+      "activationTx": "0xfdb99e333ba8dbc4273b27dfa0a12ec2bbc41d788a35fe4ade6974fe595e7bd7",
+      "block": 270678961,
+      "kind": "stylus",
+      "note": "SPAN compute extracted from Plinth (Phase A.7) to fit EIP-170 24 KB cap"
+    },
+    "plinth-oracle": {
+      "address": "0x66064d18722f50e055d74daf51a13fd8e331f0b7",
+      "tx": "0xad2928f777e608c1108032a0148025e781a759c6655d5c0e0bc9e8d06560d4ea",
+      "activationTx": "0x69bff2c17e520de5a7ebe2081d01821eadf42922508c4a49d946c898b6cb7248",
+      "block": 270688421,
+      "kind": "stylus",
+      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) — Chainlink + Pyth + median + 50bps tolerance"
+    },
+    "plinth": {
+      "address": "0x485218e340d1e3b272bed337ec59ffe0a3dc4781",
+      "tx": "0xff86fb70b9ad464e55bcb68bd887565f4c3a5566a3e3a7cc569862abacd65721",
+      "block": 270725278,
+      "kind": "stylus",
+      "note": "Deployed via cargo-stylus 0.10.7 multi-fragment factory (bypasses single-CREATE EIP-170 cap). Constructor wired to coffer/vigil/sigil/portico-registry/chainlink-eth-usd/pyth/praetor/timelock/plinth-math/plinth-oracle."
+    },
+    "atrium-router": {
+      "address": "0xf134127cc2762d3ebc5645aba6c99cd5a8b82717",
+      "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
+      "block": 270726101,
+      "kind": "solidity"
+    },
+    "rostrum": {
+      "address": "0xbaf348e61fb555844973398b51332d93f674b0af",
+      "tx": "0x0106d5cbe7852a6877678161e32fb99abc5639942bad95efd49aa45285a49a33",
+      "block": 270726103,
+      "kind": "solidity"
+    },
+    "adapter-aave-horizon": {
+      "address": "0xe991ec988a62bcc38740f8b8c549e5400ded8d5d",
+      "tx": "0xdff7722214573f3a27dc832875b6d30b456df0e88173944feb9edc086f64c8e8",
+      "block": 270727659,
+      "kind": "solidity",
+      "note": "Aave Pool placeholder = deployer (no Aave testnet on Arb Sepolia)"
+    },
+    "adapter-curve": {
+      "address": "0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682",
+      "tx": "0x2d6d5a2ad389fa5ec11b6793fb8144fbde6039773f9fd7c32e3f5c5d98acf5e7",
+      "block": 270727666,
+      "kind": "solidity"
+    },
+    "adapter-gmx": {
+      "address": "0x2531af9f7596d74f412bfab7d3b84ee7a32cd2d4",
+      "tx": "0x7a47f5d89f54d80f06131f7140522c83361bfb2af7a3b46cd2c1f053f95b24c9",
+      "block": 270727672,
+      "kind": "solidity"
+    },
+    "adapter-hyperliquid": {
+      "address": "0x87014fbace9ade49bf923bcfae74b4c858cf371e",
+      "tx": "0xab0a7b44445194087a9c019793bbfaa42372aa5110c6e660bd93d6b33b98fda0",
+      "block": 270727679,
+      "kind": "solidity",
+      "note": "Shared by HIP-3 + HIP-4. Bridge placeholder = deployer."
+    },
+    "adapter-morpho": {
+      "address": "0xfabe2b0d1c66bc2976ed3b0c58f3cdcb7878344e",
+      "tx": "0x139d0cc7e9bb47101eea1a341ca70152f8f4986deef3f0cd307e5a47147a9cd0",
+      "block": 270727682,
+      "kind": "solidity"
+    },
+    "adapter-pendle": {
+      "address": "0x54a1bc2c5c73cc531035b0f008c8a252a02daf7d",
+      "tx": "0xfb7ccf368fc5e9f802e27cab10dd4c7cd2bad3792bda0b35f97346aef1eb6b5f",
+      "block": 270727686,
+      "kind": "solidity"
+    },
+    "adapter-polymarket": {
+      "address": "0x98a688723c47ab6909be04fd0aa3eca5ee8b08db",
+      "tx": "0x5e5686ac5371703f09625a691ddf876204f5ad2e5d30234a943439f1b981d6c0",
+      "block": 270727693,
+      "kind": "solidity",
+      "note": "Routes via Aqueduct to Polygon Amoy testnet (CCIP selector 16281711391670634445)"
+    },
+    "adapter-synthetix": {
+      "address": "0x62b3b34ffa76fb62245702c0b7efd37832eb39b8",
+      "tx": "0x3e72aa7ee5ef0da71b516022edcfddef178536d12d2aa6e6983bdb30bbd10632",
+      "block": 270727698,
+      "kind": "solidity"
+    },
+    "adapter-trade-xyz": {
+      "address": "0xf34c38d9e61a1b1beafffbb681b07e489c36a1ce",
+      "tx": "0xac4298a2ab96e2c88d22b3677153835558323208019539145381345b672b1a64",
+      "block": 270727704,
+      "kind": "solidity"
+    },
+    "aqueduct": {
+      "address": "0x6139449bf43f44385d08640b2e6fd2b82cb87ec2",
+      "tx": "0x057918f272f61d6992350b8b7da9f6ad2ef0bcaa30947c829a4e8672af69f9a1",
+      "block": 270683155,
+      "kind": "solidity"
+    },
+    "aqueduct-receiver": {
+      "address": "0x9a66c9cb43dcfafa696cec66b33bec74c94ddc70",
+      "tx": "0x196108115a52f667d03232d3e8a691e62754cd5c7014f885d07159ddb3e1fd28",
+      "block": 270683161,
+      "kind": "solidity"
+    },
+    "aqueduct-claimback": {
+      "address": "0x4d441fca986d51d17c71f979814e2a492a429382",
+      "tx": "0x5776f1bd0e66c366f5b95cdaa214fe4cb3f3f5d3f37ff79e369380d494d60787",
+      "block": 270683165,
+      "kind": "solidity"
+    },
+    "postern-key-registry": {
+      "address": "0x28c9fd500d2d8e3b56259a1054e9da05dec747d8",
+      "tx": "0xacf2cbc0431449283efd496ccdd4bf235830ed1b0530a203b0af8fa61ac81ee4",
+      "block": 270683171,
+      "kind": "solidity"
+    },
+    "postern-kill-switch": {
+      "address": "0xb90a51a726740065bd0dbc20cd79306b30d8b676",
+      "tx": "0x3f6ef96a4c24f3408c811b688e158ba55b9fd1cb39d4d470776de90ec90885e3",
+      "block": 270683177,
+      "kind": "solidity"
+    },
+    "faucet": {
+      "address": "0x7f3a714c824c0926ae98ecfb2e59513e78d82bbc",
+      "tx": "0x269cdc4cb11280422c9d36096f26829e07166851e2673f529923c60fa696724d",
+      "block": 270742814,
+      "kind": "solidity",
+      "stockTxs": {
+        "usdc": "0xcf33df8d9d9a46528ee0319dbceabe059df83209429a96124461a1ada093581c",
+        "eth": "0xbc414270e6fbba3bd7a1d9cdb0d3802cd0546811f9f5ce027a09f9c082d31e45"
+      },
+      "note": "5 USDC + 0.0005 ETH per claim, 24h cooldown. Stocked with 40 USDC + 0.04 ETH (8 full claims). Sourcify exact_match. Replaced 0xb982 which used 100-USDC drop incompatible with the Circle testnet drip cadence."
+    },
+    "faucet-deprecated-v1": {
+      "address": "0xb982c46d7a4aa7f1ebef91ca4cc0a34be1cf8549",
+      "tx": "0x0ef3e3271b2243dcb6ad9411222ac2cdd331b05bd06bcc28d1e04bf1ae48e001",
+      "block": 270691652,
+      "kind": "solidity",
+      "note": "DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence. Kept for reference; do not point UI at it."
+    }
+  },
+  "lastUpdated": "2026-05-24T22:00:00.000Z"
+}

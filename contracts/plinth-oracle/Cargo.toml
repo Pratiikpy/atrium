@@ -1,0 +1,25 @@
+[package]
+name = "atrium-plinth-oracle"
+description = "Dual-oracle price reader extracted from Plinth to fit EIP-170"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[[bin]]
+name = "atrium-plinth-oracle"
+path = "src/main.rs"
+
+[dependencies]
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+mini-alloc = "0.6"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]

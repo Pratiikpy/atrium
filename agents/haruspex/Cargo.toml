@@ -1,0 +1,24 @@
+[package]
+name = "atrium-haruspex"
+description = "Haruspex — momentum reference agent for Atrium"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "haruspex"
+path = "src/main.rs"
+
+[dependencies]
+tokio.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+clap.workspace = true
+chrono = "0.4"
+atrium-agent-template = { path = "../template" }

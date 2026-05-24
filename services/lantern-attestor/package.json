@@ -1,0 +1,27 @@
+{
+  "name": "@atrium/lantern-attestor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lantern — hourly proof-of-reserves attestor for Atrium",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "clean": "rm -rf dist node_modules/.cache"
+  },
+  "dependencies": {
+    "@vercel/node": "^5.8.4",
+    "keccak256": "^1.0.6",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,302 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_plinth",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_coffer",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_registry",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_praetor",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "close_position_via_adapter",
+    "inputs": [
+      {
+        "name": "venue_id",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "plinth_position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "venue_position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "venue_payload",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "realized_pnl_signed",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "coffer",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract ICoffer"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "open_position_via_adapter",
+    "inputs": [
+      {
+        "name": "venue_id",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "instrument_id",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "notional_signed",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "action_sigil",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "intent_sigil",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "venue_payload",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "plinth_position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "venue_position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "plinth",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IPlinth"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "praetor_multisig",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "registry",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IPorticoRegistry"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "PositionClosedViaRouter",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "venue_id",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "plinth_position_id",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "venue_position_id",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "realized_pnl_signed",
+        "type": "int256",
+        "indexed": false,
+        "internalType": "int256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PositionOpenedViaRouter",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "venue_id",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "instrument_id",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "notional_signed",
+        "type": "int256",
+        "indexed": false,
+        "internalType": "int256"
+      },
+      {
+        "name": "plinth_position_id",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "venue_position_id",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AccountPaused",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "AdapterAlsoApprovedAsOrchestrator",
+    "inputs": [
+      {
+        "name": "adapter",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NotPositionOwner",
+    "inputs": [
+      {
+        "name": "plinth_position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "caller",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "Unauthorized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "VenueNotRegistered",
+    "inputs": [
+      {
+        "name": "venue_id",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ]
+  }
+]

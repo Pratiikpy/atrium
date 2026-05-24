@@ -1,0 +1,39 @@
+import { AppShell } from '@/components/app-shell';
+import { TradeView } from '@/components/trade/trade-view';
+
+export const metadata = {
+  title: 'Atrium · Trade',
+  description: 'Execute across every Atrium-registered Portico adapter.',
+};
+
+// Audit U-20: OrderForm now calls wagmi's useAccount + useWriteContract
+// from useOpenPosition. Those hooks need WagmiProvider in context, so
+// force-dynamic prevents prerender from throwing. Matches /app/vault and
+// /app/agents.
+export const dynamic = 'force-dynamic';
+
+export default function TradePage() {
+  return (
+    <AppShell
+      active="/app/trade"
+      breadcrumb={[
+        { label: 'Trade' },
+        { label: 'Portico · venue execution' },
+      ]}
+    >
+      <header className="flex items-baseline justify-between">
+        <div>
+          <p className="eyebrow">Trade · Portico</p>
+          <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
+            Execute across every Atrium-registered venue
+          </h1>
+          <p className="mt-2 max-w-prose text-sm text-muted">
+            Use signature stamp, adjust, or create a new authorised Portico adapter.
+          </p>
+        </div>
+      </header>
+
+      <TradeView />
+    </AppShell>
+  );
+}

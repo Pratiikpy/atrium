@@ -1,0 +1,25 @@
+[package]
+name = "atrium-plinth-math"
+description = "SPAN margin compute extracted from Plinth to fit EIP-170 24 KB cap"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[[bin]]
+name = "atrium-plinth-math"
+path = "src/main.rs"
+
+[dependencies]
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+mini-alloc = "0.6"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]

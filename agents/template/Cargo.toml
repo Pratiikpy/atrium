@@ -1,0 +1,26 @@
+[package]
+name = "atrium-agent-template"
+description = "Reference template for community-built Atrium agents (Curator grants)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "atrium_agent_template"
+path = "src/lib.rs"
+
+[dependencies]
+tokio.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+clap.workspace = true
+chrono = "0.4"
+# Audit K-10: encoders that mirror the on-chain Sigil decoder layout —
+# version-pinned to the same alloy-primitives the contracts use.
+alloy-primitives = "0.8"

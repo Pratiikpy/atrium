@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  # Audit XX-4 fix: services/* glob matched 3 non-Node members (archive +
+  # praetor-cli + tablet — Python + Rust). pnpm install errors on
+  # `services/archive/package.json` not found. List the Node services explicitly.
+  - "services/codex"
+  - "services/lantern-attestor"
+  - "subgraph"
+  # Audit XX-2: tests/e2e was an empty directory dangling in the workspace.
+  # Playwright specs live in apps/verify/tests/e2e/ (inside the verify package);
+  # they don't need a separate workspace member.

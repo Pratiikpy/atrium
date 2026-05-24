@@ -1,0 +1,25 @@
+[package]
+name = "atrium-coffer"
+description = "Atrium unified collateral vault (ERC-4626) on Arbitrum Stylus"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
+stylus-sdk = "0.6"
+alloy-primitives = "0.8"
+alloy-sol-types = "0.8"
+openzeppelin-stylus = "0.2"
+mini-alloc = "0.6"
+
+[dev-dependencies]
+proptest = "1.5"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]

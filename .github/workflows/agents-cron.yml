@@ -1,0 +1,44 @@
+name: Atrium agents — 5-minute cron loop
+
+# GitHub Actions cron syntax matches Vercel's. 5-min cadence is the
+# tightest GHA supports. Each tick pings the Vercel-hosted agent
+# endpoint with the CRON_SECRET — Vercel's daily-cron limit on Hobby
+# does NOT cap external invocations, so this is the real heartbeat
+# while we're on the free tier.
+#
+# When we upgrade to Vercel Pro (or move agents to DigitalOcean), the
+# Vercel-side cron in services/agents/vercel.json takes over and this
+# workflow can be retired.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: agents-cron
+  cancel-in-progress: true
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sanity — required secrets present
+        run: |
+          test -n "${{ secrets.AGENTS_BASE_URL }}" || { echo 'AGENTS_BASE_URL secret missing'; exit 1; }
+          test -n "${{ secrets.CRON_SECRET }}" || { echo 'CRON_SECRET secret missing'; exit 1; }
+
+      - name: Tick augur / haruspex / auspex in parallel
+        env:
+          BASE: ${{ secrets.AGENTS_BASE_URL }}
+          AUTH: 'Bearer ${{ secrets.CRON_SECRET }}'
+        run: |
+          set -e
+          ( curl -sS -o /tmp/augur.json    -w "augur %{http_code}\n"    -H "Authorization: $AUTH" "$BASE/api/augur"    ) &
+          ( curl -sS -o /tmp/haruspex.json -w "haruspex %{http_code}\n" -H "Authorization: $AUTH" "$BASE/api/haruspex" ) &
+          ( curl -sS -o /tmp/auspex.json   -w "auspex %{http_code}\n"   -H "Authorization: $AUTH" "$BASE/api/auspex"   ) &
+          wait
+          echo "--- augur ---"    ; cat /tmp/augur.json
+          echo "--- haruspex ---" ; cat /tmp/haruspex.json
+          echo "--- auspex ---"   ; cat /tmp/auspex.json

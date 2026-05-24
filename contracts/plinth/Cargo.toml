@@ -1,0 +1,45 @@
+[package]
+name = "atrium-plinth"
+description = "Atrium SPAN-style portfolio margin engine on Arbitrum Stylus"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+# cargo-stylus 0.5.x runs `cargo run --features=export-abi` during deploy to
+# validate the contract's ABI export. Provide an explicit bin target so the
+# runner doesn't error out with "a bin target must be available for cargo run"
+# on a lib-only crate.
+[[bin]]
+name = "atrium-plinth"
+path = "src/main.rs"
+
+[dependencies]
+# Stylus 0.10 migration: align alloy versions with what stylus-sdk 0.10
+# internally re-exports (1.x). Mixing 0.8 + 1.x causes derive macros to
+# silently fail because the trait paths resolve to two different copies.
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+serde = { version = "1.0", features = ["derive"], optional = true }
+mini-alloc = "0.6"
+
+[dev-dependencies]
+proptest = "1.5"
+# Note: stylus-sdk 0.6 does not yet expose a `stylus-test` feature. Host-side
+# tests run via plain `cargo test` on pure functions; integration tests run
+# against a local Nitro dev node via Foundry. Re-introduce the test harness
+# feature when stylus-sdk publishes it.
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]
+serde = ["dep:serde", "alloy-primitives/serde"]
+
+[package.metadata.kani.flags]
+unwind = "5"
+default-unwind = "3"

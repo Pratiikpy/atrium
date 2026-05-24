@@ -1,0 +1,45 @@
+[package]
+name = "atrium-coffer"
+description = "Atrium unified collateral vault (ERC-4626) on Arbitrum Stylus"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+# cargo-stylus 0.5.x runs `cargo run --features=export-abi` during deploy to
+# validate the contract's ABI export. Provide an explicit bin target so the
+# runner doesn't error out with "a bin target must be available for cargo run"
+# on a lib-only crate.
+[[bin]]
+name = "atrium-coffer"
+path = "src/main.rs"
+
+[dependencies]
+# stylus-sdk 0.10 internally uses alloy-primitives/alloy-sol-types 1.x.
+# The sol! macro expands to absolute paths `::alloy_sol_types::SolEvent`,
+# so we need them as direct deps at the SAME major version the SDK uses
+# (1.x, NOT the 0.8.x our codebase used pre-migration).
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+# openzeppelin-stylus removed: Coffer doesn't import from it (grep confirmed
+# zero usages). The OZ ERC4626 base was a header on the audit doc but the
+# implementation here is hand-rolled. Keeping it as a dep silently pulled
+# stylus-sdk 0.9 + alloy 0.8 in parallel with 0.10/1.x, breaking every
+# trait derive.
+mini-alloc = "0.6"
+
+[dev-dependencies]
+proptest = "1.5"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]
+
+# cargo-stylus 0.5.x ships its own optimized release profile that produced
+# 25.9 KB for Coffer — adding any [profile.release] here made it bigger
+# (28.8 KB with opt-level=z+thin LTO). Leave it default; tune via Stylus.toml.

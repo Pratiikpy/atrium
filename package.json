@@ -1,0 +1,29 @@
+{
+  "name": "atrium",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-venue portfolio margin for the EVM",
+  "license": "MIT",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --filter @atrium/verify dev",
+    "lint": "pnpm -r lint && cargo fmt --check && cargo clippy --workspace -- -D warnings",
+    "test": "pnpm -r test && cargo test --workspace && forge test",
+    "test:e2e": "pnpm --filter @atrium/verify test:e2e",
+    "kani": "node scripts/run-kani.mjs",
+    "subgraph:abis": "node scripts/extract-abis.mjs",
+    "subgraph:build": "pnpm --filter @atrium/subgraph build",
+    "subgraph:deploy": "pnpm --filter @atrium/subgraph deploy",
+    "clean": "pnpm -r clean && cargo clean && forge clean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0"
+  }
+}

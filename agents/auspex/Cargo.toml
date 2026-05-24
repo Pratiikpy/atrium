@@ -1,0 +1,24 @@
+[package]
+name = "atrium-auspex"
+description = "Auspex — basis-trade reference agent for Atrium (Pendle YT vs Aave T-bill)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "auspex"
+path = "src/main.rs"
+
+[dependencies]
+tokio.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+clap.workspace = true
+chrono = "0.4"
+atrium-agent-template = { path = "../template" }

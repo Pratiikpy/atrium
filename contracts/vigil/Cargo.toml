@@ -1,0 +1,29 @@
+[package]
+name = "atrium-vigil"
+description = "Atrium liquidation engine — NMS-aware partial liquidations with keeper economic security"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Atrium Contributors"]
+repository = "https://github.com/atrium-fi/atrium"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[[bin]]
+name = "atrium-vigil"
+path = "src/main.rs"
+
+[dependencies]
+# Stylus 0.10 migration: align alloy with what stylus-sdk 0.10 internally uses.
+stylus-sdk = "0.10"
+alloy-primitives = "1"
+alloy-sol-types = "1"
+mini-alloc = "0.6"
+
+[dev-dependencies]
+proptest = "1.5"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+debug = ["stylus-sdk/debug"]
