@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn save_leaves_no_tmp_file_after_success_OOOO1() {
+    fn save_leaves_no_tmp_file_after_success_oooo1() {
         use_temp_state_dir();
         let name = unique_name("no_tmp");
         let s = AgentState::load_or_init(&name).expect("init");

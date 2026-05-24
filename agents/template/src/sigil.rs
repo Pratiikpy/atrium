@@ -296,7 +296,7 @@ mod tests {
     // ── K-10: submit_action_sigil bails (silent-failure prevention) ─────
 
     #[test]
-    fn submit_action_sigil_bails_until_pimlico_wired_K10() {
+    fn submit_action_sigil_bails_until_pimlico_wired_k10() {
         // Pre-K-10: the function logged + returned Ok(()), so every
         // strategy signal silently no-op'd. The harness's tick wrapper
         // treated Ok as "submitted" → operator had no signal the

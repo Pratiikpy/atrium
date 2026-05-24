@@ -521,7 +521,9 @@ contract FakePlinth {
     /// to abs(notional).
     function setMarginIncreasePerOpen(uint256 v) external { marginIncreasePerOpen = v; }
 
-    function open_position(uint8 venue, bytes32 instrument, int256 notional, bytes calldata, bytes calldata)
+    // Renamed to match the Stylus camelCase ABI selector that
+    // AtriumRouter calls after the 2026-05-24 C-3 selector fix.
+    function openPosition(uint8 venue, bytes32 instrument, int256 notional, bytes calldata, bytes calldata)
         external
         returns (uint256 id)
     {
@@ -539,11 +541,11 @@ contract FakePlinth {
         requiredMarginByUser[tx.origin] += marginIncreasePerOpen;
     }
 
-    function close_position(uint256) external pure returns (int256) {
+    function closePosition(uint256) external pure returns (int256) {
         return int256(0);
     }
 
-    function get_position(uint256 position_id)
+    function getPosition(uint256 position_id)
         external
         view
         returns (address owner, uint8 venue_id, bytes32 instrument_id, int256 notional, uint256 opened_at)
@@ -581,16 +583,15 @@ contract FakeCoffer {
     function setApprovedAdapter(address a, bool v) external { approvedAdapters[a] = v; }
     function creditShares(address u, uint256 amt) external { shares[u] += amt; }
 
-    // Iter 50: matches Coffer.is_adapter_approved view that the Router's
-    // FIRE78-COF2 check calls before routing through an adapter. The
-    // existing tests don't configure approved adapters for the resolved
-    // adapter_addr, so this view returns false and the Router routes
-    // normally (correct behavior — Router is the only orchestrator).
-    function is_adapter_approved(address a) external view returns (bool) {
+    // Renamed to camelCase to match the Stylus auto-converted ABI
+    // selectors that AtriumRouter calls after the 2026-05-24 C-3 fix
+    // (snake_case stayed in Rust source, but Stylus exports camelCase
+    // selectors; the Router interface now matches).
+    function isAdapterApproved(address a) external view returns (bool) {
         return approvedAdapters[a];
     }
 
-    function adapter_pull(uint256 amount, address from_user, address to) external {
+    function adapterPull(uint256 amount, address from_user, address to) external {
         require(approvedAdapters[msg.sender], "not approved adapter");
         require(shares[from_user] >= amount, "insufficient shares");
         shares[from_user] -= amount;

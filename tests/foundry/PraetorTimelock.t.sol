@@ -390,10 +390,13 @@ contract PraetorTimelockTest is Test {
 
 contract MockPausable {
     bool internal _paused;
-    string internal _lastReason;
+    bytes32 internal _lastReason;
     uint256 public n;
 
-    function pause(string calldata reason) external {
+    // Renamed to pause(bytes32) to match the Coffer/Plinth/Sigil/Vigil
+    // Stylus ABI selector. PraetorTimelock.emergencyPause keccak256s the
+    // operator string before forwarding, so the mock receives the digest.
+    function pause(bytes32 reason) external {
         _paused = true;
         _lastReason = reason;
     }
