@@ -1,0 +1,30 @@
+[submodule "resources/openzeppelin-contracts"]
+	path = resources/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "resources/account-abstraction"]
+	path = resources/account-abstraction
+	url = https://github.com/eth-infinitism/account-abstraction
+[submodule "resources/chainlink-brownie-contracts"]
+	path = resources/chainlink-brownie-contracts
+	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "resources/pyth-crosschain"]
+	path = resources/pyth-crosschain
+	url = https://github.com/pyth-network/pyth-crosschain
+[submodule "resources/erc-8004-contracts"]
+	path = resources/erc-8004-contracts
+	url = https://github.com/erc-8004/erc-8004-contracts
+[submodule "resources/aave-v3-core"]
+	path = resources/aave-v3-core
+	url = https://github.com/aave/aave-v3-core
+[submodule "resources/pendle-core-v2-public"]
+	path = resources/pendle-core-v2-public
+	url = https://github.com/pendle-finance/pendle-core-v2-public
+[submodule "resources/hyperliquid-contracts"]
+	path = resources/hyperliquid-contracts
+	url = https://github.com/hyperliquid-dex/contracts
+[submodule "resources/x402"]
+	path = resources/x402
+	url = https://github.com/coinbase/x402
+[submodule "resources/trustless-agents-erc-ri"]
+	path = resources/trustless-agents-erc-ri
+	url = https://github.com/ChaosChain/trustless-agents-erc-ri

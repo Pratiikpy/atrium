@@ -68,8 +68,19 @@ coverage/
 .cache/
 
 # External reference clones (re-clonable, large, mixed-license. See RESOURCES.md
-# for the list and what each is for. Always grep them locally, never publish them).
+# for the list and what each is for. The 10 build-deps below are tracked as
+# git submodules so CI can resolve foundry imports; the others stay local-only.
 resources/
+!resources/openzeppelin-contracts/
+!resources/account-abstraction/
+!resources/chainlink-brownie-contracts/
+!resources/pyth-crosschain/
+!resources/erc-8004-contracts/
+!resources/aave-v3-core/
+!resources/pendle-core-v2-public/
+!resources/hyperliquid-contracts/
+!resources/x402/
+!resources/trustless-agents-erc-ri/
 
 # Local caches we don't ship
 .forge-cache/
