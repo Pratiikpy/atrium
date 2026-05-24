@@ -1,9 +1,25 @@
 # Atrium, Launch Ready
 
-Last updated: 2026-05-24 (post-8-audit reconciliation)
-Current score: **3 of 15 user flows ACTUALLY work end-to-end. 6 are CONTRACTUALLY WIRED but blocked on init or data. 6 are NOT YET BUILT or BLOCKED on humans.**
+Last updated: 2026-05-24 (post-redeploy + Phase beta.3 schedule)
+Current score: **6 of 15 user flows WORK end-to-end today. 6 more are WIRED-PENDING-TIMELOCK (executable 2026-05-26T15:43Z). 3 are HUMAN-BLOCKED (Safe ceremony, cohort outreach, domain).**
 
-(Prior headline said "9/15 60%". That conflated wired with working. The 8-audit pass on 2026-05-24 caught this. Honest count below.)
+(Prior reading said 3/15 works. After the 2026-05-24 redeploy + initialize()
++ corrected timelock batch, the wired-uninit count drops to 0; the new
+gating is the 48h timelock window.)
+
+Headline state as of this update:
+- Coffer / Plinth / Sigil / Vigil REDEPLOYED with new bytecode and INITIALIZED
+  (init probes confirmed via cast call on praetorMultisig, plinthAddress,
+  cofferAddress, asset).
+- AaveHorizonAdapter v1.1 deployed at 0xa68361..d0b9; v1.0 deprecated in the
+  registry under adapter-aave-horizon-v1.0-deprecated.
+- 33 corrected timelock actions scheduled via PraetorTimelock; executable
+  2026-05-26T15:43:52.646Z. Manifest at .forge-cache/phase-b3-schedule-corrected.json.
+- Subgraph manifest repointed to the new Stylus addresses + Rostrum + Router.
+  Next subgraph deploy (Graph Studio v0.0.5) indexes from the new start blocks.
+- Verify-app: real React landing at /, init-state probes on /api/deployments/status,
+  on-chain faucet probe on /api/faucet/status, AppShell reads wagmi for the
+  wallet card display.
 
 ## Status taxonomy
 
