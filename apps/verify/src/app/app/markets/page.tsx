@@ -6,42 +6,75 @@ export const metadata = {
   description: 'Every Portico-whitelisted instrument. Haircut, correlation class, oracle source.',
 };
 
+// Audit 2026-05-24 H-1 (Auditor B) fix: prior list shipped 6 of 9 deployed
+// adapters. The missing three (gmx, morpho, synthetix) all have registry
+// entries at deployments/arbitrum_sepolia.json and are referenced from the
+// /api/deployments/address allowlist. Each adapter slug maps to its
+// Portico-whitelisted venue and gets a dedicated card here so the user
+// can see the full venue surface.
 const VENUES = [
   {
     name: 'Hyperliquid HIP-3',
+    slug: 'adapter-hyperliquid',
     desc: 'Perpetual futures via the HIP-3 bridge + validator attestation.',
     risk: 'Perp; haircut 10%; correlation class CRYPTO_PERP.',
     instruments: 'BTC-PERP, ETH-PERP, SOL-PERP, +12 more',
   },
   {
     name: 'Aave Horizon',
+    slug: 'adapter-aave-horizon',
     desc: 'Tokenized T-bills via Aave Horizon supply markets.',
     risk: 'Cash-equiv; haircut 1%; correlation class TBILL.',
     instruments: 'USDC, USDT, DAI, sUSDe',
   },
   {
     name: 'Pendle V2',
+    slug: 'adapter-pendle',
     desc: 'Yield-bearing principal tokens (PT) and yield tokens (YT).',
     risk: 'Yield-bearing; haircut 5%; correlation class YIELD.',
     instruments: 'USDC-YT-MAR26, GLP-PT-JUN26, +n more',
   },
   {
     name: 'Curve',
+    slug: 'adapter-curve',
     desc: 'Stable LP positions. Treated as netting cash equivalent if pool composition stable.',
     risk: 'LP; haircut 5%; correlation class STABLE_LP.',
     instruments: '3pool, FRAX-USDC, +5 more',
   },
   {
     name: 'Trade.xyz',
+    slug: 'adapter-trade-xyz',
     desc: 'Equity perps (NVDA, AAPL, TSLA, MSFT).',
     risk: 'Equity perp; haircut 15%; correlation class EQUITY_PERP.',
     instruments: 'NVDA-PERP, AAPL-PERP, TSLA-PERP, MSFT-PERP',
   },
   {
     name: 'Polymarket (via CCIP)',
+    slug: 'adapter-polymarket',
     desc: 'Prediction markets settled on Polygon Amoy. Cross-chain via Aqueduct CCIP.',
     risk: 'Binary event; haircut 50%; correlation class BINARY.',
     instruments: '2026 election cycle, +macro/sports',
+  },
+  {
+    name: 'GMX V2',
+    slug: 'adapter-gmx',
+    desc: 'Perp DEX with GLP-style multi-asset pool. Decentralized order book on Arbitrum.',
+    risk: 'Perp; haircut 12%; correlation class CRYPTO_PERP.',
+    instruments: 'BTC-USD, ETH-USD, ARB-USD, LINK-USD',
+  },
+  {
+    name: 'Morpho Blue',
+    slug: 'adapter-morpho',
+    desc: 'Isolated lending markets with custom risk parameters per market.',
+    risk: 'Lend; haircut 2%; correlation class LENDING.',
+    instruments: 'wstETH/USDC, WBTC/USDC, plus permissionless markets',
+  },
+  {
+    name: 'Synthetix V3',
+    slug: 'adapter-synthetix',
+    desc: 'Multi-collateral synth perps with cross-margined account abstraction.',
+    risk: 'Perp; haircut 14%; correlation class CRYPTO_PERP.',
+    instruments: 'BTC-PERP, ETH-PERP, SOL-PERP, +20 synthetic perps',
   },
 ];
 

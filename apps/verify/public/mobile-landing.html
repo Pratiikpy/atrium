@@ -901,35 +901,42 @@
                     <div class="amt">$1.25M</div>
                     <div class="bar"><span style="width: 100%; background: var(--accent);"></span></div>
                   </div>
-                  <div class="venue">
+                  <!--
+                    Audit 2026-05-24 (Auditor E + B): per-venue dollar
+                    amounts ($892K / $401K / $320K / $483K / $186K) were
+                    hardcoded fake numbers per writing.md. Until a
+                    /api/protocol/venues endpoint hydrates real Coffer
+                    adapter pulls, the amount + bar default to "pending".
+                  -->
+                  <div class="venue" data-venue-slug="adapter-aave-horizon">
                     <div class="name">AAVE-V3</div>
                     <div class="sub">RWA · USTB</div>
-                    <div class="amt">$892K</div>
-                    <div class="bar"><span style="width: 71%;"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
-                  <div class="venue">
+                  <div class="venue" data-venue-slug="adapter-trade-xyz">
                     <div class="name">TRADE</div>
                     <div class="sub">RFQ · dark pool</div>
-                    <div class="amt">$401K</div>
-                    <div class="bar"><span style="width: 32%;"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
-                  <div class="venue">
+                  <div class="venue" data-venue-slug="adapter-pendle">
                     <div class="name">PENDLE</div>
                     <div class="sub">PT · stETH</div>
-                    <div class="amt">$320K</div>
-                    <div class="bar"><span style="width: 26%;"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
-                  <div class="venue">
+                  <div class="venue" data-venue-slug="adapter-hyperliquid">
                     <div class="name">HL-HIP4</div>
                     <div class="sub">Permissioned</div>
-                    <div class="amt">$483K</div>
-                    <div class="bar"><span style="width: 39%;"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
-                  <div class="venue">
+                  <div class="venue" data-venue-slug="adapter-curve">
                     <div class="name">CURVE</div>
                     <div class="sub">3pool LP</div>
-                    <div class="amt">$186K</div>
-                    <div class="bar"><span style="width: 15%;"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
                 </div>
 

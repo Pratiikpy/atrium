@@ -1,0 +1,320 @@
+#!/usr/bin/env node
+/**
+ * Phase beta.2 Stylus redeploy automation.
+ *
+ * Redeploys Coffer / Sigil / Vigil / Plinth via cargo-stylus 0.10.7 in the
+ * `atrium-stylus` docker image, then calls initialize() on the three that
+ * need it. Writes new addresses + tx hashes to deployments/arbitrum_sepolia.json
+ * and the verify-app mirror.
+ *
+ * Order (resolves the circular dep):
+ *   1. Deploy Coffer (no constructor args)
+ *   2. Deploy Sigil (no constructor args)
+ *   3. Deploy Vigil (no constructor args)
+ *   4. Deploy Plinth with constructor args wiring 1-3 plus oracle/timelock peers
+ *   5. initialize() Coffer with USDC + new Plinth
+ *   6. initialize() Sigil with new Plinth + erc8004/postern
+ *   7. initialize() Vigil with new Plinth + new Coffer
+ *
+ * Halts on first failure. Records partial state to a checkpoint file so a
+ * re-run can resume from the failed step.
+ *
+ * Usage:
+ *   ATRIUM_KEYDIR=/c/Users/prate/.atrium node scripts/redeploy-stylus.mjs [contracts...]
+ *
+ * Args (optional): subset of {coffer, sigil, vigil, plinth, init-coffer,
+ *   init-sigil, init-vigil}. Default: all in order.
+ */
+import { readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createDecipheriv, scryptSync } from 'node:crypto';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = resolve(__dirname, '..');
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
+const REGISTRY_PATH = resolve(REPO_ROOT, 'deployments/arbitrum_sepolia.json');
+const MIRROR_PATH = resolve(REPO_ROOT, 'apps/verify/public/deployments/arbitrum_sepolia.json');
+const CHECKPOINT_PATH = resolve(REPO_ROOT, '.forge-cache/stylus-redeploy-checkpoint.json');
+const DOCKER_IMAGE = 'atrium-stylus';
+const MAX_FEE_GWEI = '0.1';
+
+// =============================================================================
+// Decrypt deployer key
+// =============================================================================
+async function loadDeployerKey() {
+  const envelopePath = resolve(KEYDIR, 'lantern-key-deployer.json');
+  const passphrasePath = resolve(KEYDIR, 'lantern-passphrase.txt');
+  const envelope = JSON.parse(await readFile(envelopePath, 'utf8'));
+  const passphrase = (await readFile(passphrasePath, 'utf8')).trim();
+  if (envelope.kdf !== 'scrypt') throw new Error(`unsupported kdf ${envelope.kdf}`);
+  const salt = Buffer.from(envelope.salt_hex, 'hex');
+  const iv = Buffer.from(envelope.iv_hex, 'hex');
+  const authTag = Buffer.from(envelope.auth_tag_hex, 'hex');
+  const ciphertext = Buffer.from(envelope.ciphertext_hex, 'hex');
+  const derivedKey = scryptSync(passphrase, salt, 32, {
+    N: envelope.scrypt_N, r: envelope.scrypt_r, p: envelope.scrypt_p,
+    maxmem: 256 * 1024 * 1024,
+  });
+  const decipher = createDecipheriv('aes-256-gcm', derivedKey, iv);
+  decipher.setAuthTag(authTag);
+  const plain = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  const pk = '0x' + plain.toString('hex');
+  derivedKey.fill(0);
+  plain.fill(0);
+  return { pk, address: envelope.public_address };
+}
+
+// =============================================================================
+// Registry helpers
+// =============================================================================
+async function loadRegistry() {
+  return JSON.parse(await readFile(REGISTRY_PATH, 'utf8'));
+}
+
+async function saveRegistry(reg) {
+  const json = JSON.stringify(reg, null, 2) + '\n';
+  await writeFile(REGISTRY_PATH, json);
+  if (existsSync(dirname(MIRROR_PATH))) {
+    await writeFile(MIRROR_PATH, json);
+  }
+}
+
+async function loadCheckpoint() {
+  if (!existsSync(CHECKPOINT_PATH)) return {};
+  return JSON.parse(await readFile(CHECKPOINT_PATH, 'utf8'));
+}
+
+async function saveCheckpoint(cp) {
+  await writeFile(CHECKPOINT_PATH, JSON.stringify(cp, null, 2));
+}
+
+// =============================================================================
+// Shell helpers
+// =============================================================================
+function run(cmd, args, opts = {}) {
+  console.log(`\n$ ${cmd} ${args.join(' ')}`);
+  const result = spawnSync(cmd, args, {
+    stdio: opts.captureOutput ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+    shell: false,
+    cwd: opts.cwd ?? REPO_ROOT,
+    encoding: 'utf8',
+    env: { ...process.env, ...opts.env },
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    if (opts.captureOutput) {
+      process.stderr.write(result.stderr ?? '');
+    }
+    throw new Error(`exit ${result.status}`);
+  }
+  return result;
+}
+
+function cargoStylus(contractDir, args, env = {}) {
+  // Mount repo + map docker `bash -c` to avoid `bash -lc` PATH issue.
+  return run('docker', [
+    'run', '--rm',
+    '-v', `${REPO_ROOT}:/workspace`,
+    '-w', `/workspace/${contractDir}`,
+    ...Object.entries(env).flatMap(([k, v]) => ['-e', `${k}=${v}`]),
+    DOCKER_IMAGE,
+    'bash', '-c', `cargo stylus ${args.join(' ')}`,
+  ], { captureOutput: true });
+}
+
+function castSend(to, sig, args, pk) {
+  const cmd = ['send', '--rpc-url', RPC, '--private-key', pk, to, sig, ...args];
+  return run('cast', cmd, { captureOutput: true });
+}
+
+// =============================================================================
+// Deploy + init steps
+// =============================================================================
+const STEPS = ['coffer', 'sigil', 'vigil', 'plinth', 'init-coffer', 'init-sigil', 'init-vigil'];
+
+async function deployStylusNoConstructor(name, contractDir, pk) {
+  console.log(`\n### Deploying ${name} ###`);
+  const result = cargoStylus(contractDir, [
+    'deploy',
+    '--endpoint', RPC,
+    '--private-key', pk,
+    '--no-verify',
+    '--max-fee-per-gas-gwei', MAX_FEE_GWEI,
+  ]);
+  process.stdout.write(result.stdout);
+  // Parse "deployed code at address: 0x..." OR "deployed contract: 0x..."
+  const m = result.stdout.match(/(?:deployed (?:code at address|contract|to)):?\s*(0x[a-fA-F0-9]{40})/i);
+  if (!m) {
+    throw new Error(`failed to parse deployed address from output:\n${result.stdout}`);
+  }
+  const address = m[1];
+  console.log(`-> ${name}: ${address}`);
+  // Tx hash (separate match).
+  const txMatch = result.stdout.match(/(?:tx hash|deployment tx):\s*(0x[a-fA-F0-9]{64})/i);
+  return { address, tx: txMatch?.[1] ?? null };
+}
+
+async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, registry, pk, deployer) {
+  console.log(`\n### Deploying Plinth (constructor + multi-fragment factory) ###`);
+  // Arbitrum Sepolia well-known oracle addresses per DEPLOY_PLAN.md.
+  // Sepolia Pyth runs the mainnet-equity relay (see TDD §13.2 + the
+  // 2026-05-24 tripwire on Pyth Sepolia equity-feed status).
+  const CHAINLINK_ETH_USD_SEPOLIA = '0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165';
+  const PYTH_SEPOLIA = '0x4374e5a8b9C22271E9EB878A2AA31DE97DF15DAF';
+  const args = [
+    coffer, vigil, sigil,
+    registry['portico-registry'].address,
+    registry['chainlink-eth-usd-oracle']?.address ?? CHAINLINK_ETH_USD_SEPOLIA,
+    registry['pyth-oracle']?.address ?? PYTH_SEPOLIA,
+    deployer,
+    registry['praetor-timelock'].address,
+    plinthMath,
+    plinthOracle,
+  ];
+  const result = cargoStylus('contracts/plinth', [
+    'deploy',
+    '--endpoint', RPC,
+    '--private-key', pk,
+    '--no-verify',
+    '--max-fee-per-gas-gwei', MAX_FEE_GWEI,
+    '--constructor-args', ...args,
+  ]);
+  process.stdout.write(result.stdout);
+  const m = result.stdout.match(/(?:deployed (?:code at address|contract|to)):?\s*(0x[a-fA-F0-9]{40})/i);
+  if (!m) throw new Error(`failed to parse Plinth address from output:\n${result.stdout}`);
+  return { address: m[1], tx: result.stdout.match(/(?:tx hash|deployment tx):\s*(0x[a-fA-F0-9]{64})/i)?.[1] ?? null };
+}
+
+// =============================================================================
+// Main
+// =============================================================================
+async function main() {
+  const stepsArg = process.argv.slice(2);
+  const stepsToRun = stepsArg.length > 0 ? stepsArg : STEPS;
+  const invalid = stepsToRun.filter((s) => !STEPS.includes(s));
+  if (invalid.length > 0) {
+    throw new Error(`unknown steps: ${invalid.join(', ')}\nvalid: ${STEPS.join(', ')}`);
+  }
+
+  console.log(`Atrium Stylus redeploy starting`);
+  console.log(`Steps: ${stepsToRun.join(', ')}`);
+  console.log(`RPC: ${RPC}`);
+  console.log(`Image: ${DOCKER_IMAGE}`);
+
+  const { pk, address: deployer } = await loadDeployerKey();
+  console.log(`Deployer: ${deployer}`);
+
+  const registry = await loadRegistry();
+  const checkpoint = await loadCheckpoint();
+
+  // Pre-flight: confirm USDC address known.
+  const usdc = registry.contracts['usdc']?.address ?? '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
+  console.log(`USDC: ${usdc}`);
+
+  // Step 1-3: deploy Coffer, Sigil, Vigil.
+  for (const [name, dir] of [
+    ['coffer', 'contracts/coffer'],
+    ['sigil', 'contracts/sigil'],
+    ['vigil', 'contracts/vigil'],
+  ]) {
+    if (!stepsToRun.includes(name)) continue;
+    if (checkpoint[name]?.address) {
+      console.log(`\n${name} already deployed in checkpoint: ${checkpoint[name].address}`);
+      continue;
+    }
+    const { address, tx } = await deployStylusNoConstructor(name, dir, pk);
+    checkpoint[name] = { address, tx, deployed_at: new Date().toISOString() };
+    await saveCheckpoint(checkpoint);
+  }
+
+  // Step 4: deploy Plinth with new Coffer/Sigil/Vigil addresses.
+  if (stepsToRun.includes('plinth')) {
+    if (checkpoint.plinth?.address) {
+      console.log(`\nplinth already deployed in checkpoint: ${checkpoint.plinth.address}`);
+    } else {
+      const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
+      const sigilAddr = checkpoint.sigil?.address ?? registry.contracts.sigil.address;
+      const vigilAddr = checkpoint.vigil?.address ?? registry.contracts.vigil.address;
+      const plinthMath = registry.contracts['plinth-math'].address;
+      const plinthOracle = registry.contracts['plinth-oracle'].address;
+      const { address, tx } = await deployPlinth(
+        cofferAddr, sigilAddr, vigilAddr, plinthMath, plinthOracle,
+        registry.contracts, pk, deployer,
+      );
+      checkpoint.plinth = { address, tx, deployed_at: new Date().toISOString() };
+      await saveCheckpoint(checkpoint);
+    }
+  }
+
+  // Steps 5-7: initialize() on each.
+  const plinthAddr = checkpoint.plinth?.address ?? registry.contracts.plinth.address;
+  const timelock = registry.contracts['praetor-timelock'].address;
+
+  if (stepsToRun.includes('init-coffer') && !checkpoint.coffer?.initialized) {
+    const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
+    // initialize(asset, plinth, praetor, praetor_timelock, deposit_cap_wei, per_user_cap_wei)
+    // Year-1 testnet caps: 100k USDC global, 5k USDC per user.
+    const depositCap = (100_000n * 10n ** 6n).toString();
+    const perUserCap = (5_000n * 10n ** 6n).toString();
+    console.log(`\n### initialize Coffer @ ${cofferAddr} ###`);
+    castSend(cofferAddr, 'initialize(address,address,address,address,uint256,uint256)', [
+      usdc, plinthAddr, deployer, timelock, depositCap, perUserCap,
+    ], pk);
+    checkpoint.coffer.initialized = true;
+    await saveCheckpoint(checkpoint);
+  }
+
+  if (stepsToRun.includes('init-sigil') && !checkpoint.sigil?.initialized) {
+    const sigilAddr = checkpoint.sigil?.address ?? registry.contracts.sigil.address;
+    // initialize(praetor, praetor_timelock, plinth, erc8004_registry, postern_kill_switch)
+    const erc8004 = registry.contracts['erc8004-registry']?.address ?? '0x0000000000000000000000000000000000000000';
+    const postern = registry.contracts['postern-kill-switch']?.address ?? '0x0000000000000000000000000000000000000000';
+    console.log(`\n### initialize Sigil @ ${sigilAddr} ###`);
+    castSend(sigilAddr, 'initialize(address,address,address,address,address)', [
+      deployer, timelock, plinthAddr, erc8004, postern,
+    ], pk);
+    checkpoint.sigil.initialized = true;
+    await saveCheckpoint(checkpoint);
+  }
+
+  if (stepsToRun.includes('init-vigil') && !checkpoint.vigil?.initialized) {
+    const vigilAddr = checkpoint.vigil?.address ?? registry.contracts.vigil.address;
+    const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
+    const portico = registry.contracts['portico-registry'].address;
+    // initialize(plinth, coffer, portico_registry, praetor, praetor_timelock)
+    console.log(`\n### initialize Vigil @ ${vigilAddr} ###`);
+    castSend(vigilAddr, 'initialize(address,address,address,address,address)', [
+      plinthAddr, cofferAddr, portico, deployer, timelock,
+    ], pk);
+    checkpoint.vigil.initialized = true;
+    await saveCheckpoint(checkpoint);
+  }
+
+  // Commit checkpoint into registry on success.
+  console.log(`\n### Writing new addresses into deployments registry ###`);
+  for (const name of ['coffer', 'sigil', 'vigil', 'plinth']) {
+    if (checkpoint[name]?.address) {
+      registry.contracts[name] = {
+        ...registry.contracts[name],
+        address: checkpoint[name].address,
+        tx: checkpoint[name].tx ?? registry.contracts[name].tx,
+        deployed_at: checkpoint[name].deployed_at,
+        note: `Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, ${name === 'sigil' || name === 'vigil' ? 'pause(bytes32) emergency-pause hook, ' : ''}and ${name === 'plinth' ? 'multi-fragment factory deploy via cargo-stylus 0.10.7.' : 'initialize() was called immediately after deploy.'}`,
+      };
+    }
+  }
+  await saveRegistry(registry);
+
+  console.log(`\nAll requested steps complete.`);
+  console.log(`Checkpoint: ${CHECKPOINT_PATH}`);
+  console.log(`Registry:   ${REGISTRY_PATH}`);
+}
+
+main().catch((err) => {
+  console.error(`\nFATAL: ${err.message ?? err}`);
+  process.exit(1);
+});

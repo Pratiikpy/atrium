@@ -1,0 +1,93 @@
+# Build sandbox only sources the contracts/ + scripts/ tree.
+# Keep image build contexts under 50MB so the daemon transfer stays under
+# a second instead of several minutes.
+
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Rust + Stylus
+target/
+**/target/
+**/*.rs.bk
+Cargo.lock
+!Cargo.lock
+.cargo/
+
+# Foundry
+out/
+**/out/
+cache/
+**/cache/
+broadcast/
+foundry-out/
+.forge-cache/
+
+# Next.js / build artefacts
+.next/
+**/.next/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Subgraph
+generated/
+**/generated/
+**/build/
+
+# Python
+__pycache__/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Local reference clones (huge, never needed in build)
+resources/
+
+# Local caches we don't ship
+.playwright-mcp/
+.forge-cache/
+
+# Test fixtures + coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.log
+.cache/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Founder personal notes (also gitignored)
+my convo with one ai agent.txt
+read this.txt
+think_data.md
+atrium-site-tokens.json
+*.jpeg
+*.jpg
+*.png
+london_version_open_house_buildathon_terms___conditions.pdf
+openhouse_london_tc.pdf
+
+# Repo-wide docs that the Stylus build doesn't need
+audits/
+desing/
+docs/
+rehearsals/
+runbooks/
+qa/
+ops/
+agents/
+apps/
+services/
+subgraph/
+tests/
+deployments/
+.github/
+.claude/
+.playwright-mcp/
+.forge-cache/
