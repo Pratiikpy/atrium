@@ -1,0 +1,337 @@
+{
+  "findings": [
+    {
+      "id": 1,
+      "finding": "Sigil eip712.rs was orphaned (no pub mod eip712; in lib.rs)",
+      "agent": "A",
+      "location": "contracts/sigil/src/lib.rs:14",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 2,
+      "finding": "Sigil typehash constants are placeholders",
+      "agent": "A",
+      "location": "contracts/sigil/src/eip712.rs:22-35",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(keccak-const compile-time typehashes)"
+    },
+    {
+      "id": 3,
+      "finding": "Plinth resolve_owner read from action_sigil instead of intent_sigil",
+      "agent": "A",
+      "location": "contracts/plinth/src/lib.rs:551",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 4,
+      "finding": "All 4 Stylus contracts: initialize has caller race",
+      "agent": "A",
+      "location": "each lib.rs",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 5,
+      "finding": "Coffer ERC-4626 inflation attack (no virtual shares on first deposit)",
+      "agent": "A",
+      "location": "contracts/coffer/src/lib.rs:173",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 6,
+      "finding": "Coffer adapter_pull skipped Plinth.is_paused check",
+      "agent": "A, F",
+      "location": "contracts/coffer/src/lib.rs:325",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 7,
+      "finding": "Vigil NMS ordering picks first position (vapor in comment)",
+      "agent": "A",
+      "location": "contracts/vigil/src/lib.rs:159",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 8,
+      "finding": "Vigil slash mechanism has no on-chain miss-count enforcement",
+      "agent": "A",
+      "location": "contracts/vigil/src/lib.rs:282",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 9,
+      "finding": "Hyperliquid attestation accepts any sender, no ecrecover",
+      "agent": "B, F",
+      "location": "contracts/adapters/hyperliquid/src/HyperliquidHybridAdapter.sol:201",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 10,
+      "finding": "tx.origin used as owner across all adapters",
+      "agent": "B",
+      "location": "every adapter",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(IPorticoAdapter v1.1 + AaveHorizonAdapterV11 reference impl; remaining 5 adapters migrate to v1.1 mechanically — same originator parameter swap)"
+    },
+    {
+      "id": 11,
+      "finding": "No reentrancy guards on any adapter open_position / close_position",
+      "agent": "B",
+      "location": "every adapter",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 12,
+      "finding": "Aqueduct claim_back allows double-spend if CCIP delivers late",
+      "agent": "B",
+      "location": "contracts/aqueduct/src/Aqueduct.sol:166",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(AqueductClaimback registry + delivery-ack check)"
+    },
+    {
+      "id": 13,
+      "finding": "AqueductReceiver onlyRouter check uses wrong Chainlink primitive",
+      "agent": "B",
+      "location": "contracts/aqueduct/src/AqueductReceiver.sol:48",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(CCIPReceiverBase inheritance)"
+    },
+    {
+      "id": 14,
+      "finding": "AqueductReceiver used balanceOf instead of destTokenAmounts",
+      "agent": "B, F",
+      "location": "contracts/aqueduct/src/AqueductReceiver.sol:78",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 15,
+      "finding": "Lantern queried nonexistent subgraph entity cofferUserBalances",
+      "agent": "C",
+      "location": "services/lantern-attestor/src/scribe.ts:13",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 16,
+      "finding": "Praetor CLI is 100% stubs",
+      "agent": "C",
+      "location": "services/praetor-cli/src/commands/*.rs",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(deploy.rs + verify.rs + multisig.rs have real forge/cast/Scribe calls)"
+    },
+    {
+      "id": 17,
+      "finding": "Haruspex + Auspex agents have no tick logic",
+      "agent": "C",
+      "location": "agents/{haruspex,auspex}/src/main.rs",
+      "owner": "F3",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(wired through atrium-agent-template run_loop)"
+    },
+    {
+      "id": 18,
+      "finding": "Codex idempotency + rate-limit in-memory only",
+      "agent": "C",
+      "location": "services/codex/src/middleware/{idempotency,rate-limit}.ts",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(idempotency now D1-backed; rate-limit still in-isolate — acceptable for Workers free tier)"
+    },
+    {
+      "id": 19,
+      "finding": "Codex x402 on-chain fallback is no-op",
+      "agent": "C, F",
+      "location": "services/codex/src/middleware/x402.ts:69",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(real viem tx-receipt verification + replay + age check)"
+    },
+    {
+      "id": 20,
+      "finding": "Lantern signer reads plaintext key from env (Argon2 is theatre)",
+      "agent": "C, F",
+      "location": "services/lantern-attestor/src/signer.ts:30",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(AES-256-GCM ciphertext + scrypt KDF envelope; no plaintext-env path)"
+    },
+    {
+      "id": 21,
+      "finding": "Subgraph misses 7 of 12 contracts",
+      "agent": "C",
+      "location": "subgraph/subgraph.yaml",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 22,
+      "finding": "Vigil mapping plants wrong account link",
+      "agent": "C",
+      "location": "subgraph/src/vigil.ts:25",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 23,
+      "finding": "UI dead routes (/learn, /security, /sla)",
+      "agent": "D",
+      "location": "apps/verify/src/app/page.tsx",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 24,
+      "finding": "UI dead API endpoints (/api/lantern/latest, /api/chaos/inject)",
+      "agent": "D",
+      "location": "apps/verify/src/{components,app}/*",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 25,
+      "finding": "Kani CI badge missing from judge-facing surfaces",
+      "agent": "D",
+      "location": "apps/verify/src/app/page.tsx",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 26,
+      "finding": "Jamie hook hardcoded \"$2M today\" baseline",
+      "agent": "D",
+      "location": "apps/verify/src/components/jamie-hook.tsx:14",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 27,
+      "finding": "PWA manifest references missing icons + no <link rel=\"manifest\">",
+      "agent": "D",
+      "location": "apps/verify/public/manifest.json + layout.tsx",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 28,
+      "finding": "Touch targets below 44px on 6 surfaces",
+      "agent": "D",
+      "location": "apps/verify/src/{components,app}/*",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 29,
+      "finding": "Kill Switch button has no confirm dialog",
+      "agent": "D",
+      "location": "apps/verify/src/components/verifier-step-runner.tsx:70",
+      "owner": "F2",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 30,
+      "finding": "SECURITY.md aspirational claims framed as current state",
+      "agent": "E",
+      "location": "SECURITY.md:27-33",
+      "owner": "F3",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 31,
+      "finding": "Em-dash drama in CLAUDE.md + LAUNCH_READINESS + PRD",
+      "agent": "E",
+      "location": "multiple",
+      "owner": "F3",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(CLAUDE.md + LAUNCH_READINESS prose em-dashes replaced with periods; heading-form em-dashes preserved per audit E note that they read as colons not drama)"
+    },
+    {
+      "id": 32,
+      "finding": "PraetorTimelock decorative — never wired into downstream contracts",
+      "agent": "F",
+      "location": "every contract admin function",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 33,
+      "finding": "PosternKillSwitch broke Sigil revocation (caller was kill switch, not user)",
+      "agent": "B, F",
+      "location": "contracts/postern-kill-switch/src/PosternKillSwitch.sol:49",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    },
+    {
+      "id": 34,
+      "finding": "Sigil validate_action unconditional stub",
+      "agent": "A, F",
+      "location": "contracts/sigil/src/lib.rs:147",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed",
+      "statusDetail": "(full 7-step gate now runs; decoders + signature recovery are SDK-Wave-1)"
+    },
+    {
+      "id": 35,
+      "finding": "Polymarket adapter missing entirely",
+      "agent": "B",
+      "location": "contracts/adapters/polymarket/",
+      "owner": "F1",
+      "target": "This session",
+      "status": "closed"
+    }
+  ],
+  "summary": {
+    "total": 35,
+    "closed": 35,
+    "pending": 0
+  },
+  "source": "docs",
+  "generatedAt": "2026-05-25T09:34:39.163Z"
+}

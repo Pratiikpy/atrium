@@ -5,7 +5,9 @@
   "description": "Atrium Verifier Mode — the judge-facing scripted demo surface",
   "scripts": {
     "dev": "next dev --turbo --port 3000",
+    "prebuild": "node scripts/build-audit-findings.mjs",
     "build": "next build",
+    "audit-findings:build": "node scripts/build-audit-findings.mjs",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx --max-warnings=200",
     "type-check": "tsc --noEmit",

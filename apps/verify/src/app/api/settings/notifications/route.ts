@@ -12,8 +12,16 @@ import { NextResponse } from 'next/server';
  * may not have KV until founder provisions; UI shows "preferences
  * pending storage" until then).
  *
- * Auth: GET requires wallet param matching the requester (verified
- * via header binding once wallet-session is wired). POST same.
+ * Auth (Phase theta.2 2026-05-25):
+ * - Pre-fix this route had NO auth. Anyone with a wallet address could
+ *   GET any user's prefs (Telegram chat ID, email, custom webhook URL)
+ *   or POST overwrite them. PII + reputation-damage class.
+ * - Now: both methods require `Authorization: Bearer <NOTIFIER_INTERNAL_KEY>`.
+ *   The notifier service already holds this secret; the verify UI calls
+ *   this route via a server action that injects the header. Direct
+ *   browser-side fetches are out of scope until SIWE session lands —
+ *   see human_left.md `notifier-prefs-siwe` for the deferred follow-up
+ *   that swaps Bearer for wallet-signature auth on the user-facing path.
  */
 
 import type {
@@ -49,7 +57,54 @@ function kvKey(user: string): string {
   return `notifier:prefs:${user.toLowerCase()}`;
 }
 
+/**
+ * Bearer-token gate. Compares the `Authorization` header against
+ * NOTIFIER_INTERNAL_KEY in constant time so a timing-side-channel
+ * cannot leak the secret length. Returns null on success, a 401
+ * NextResponse on failure (caller must early-return).
+ *
+ * Refuses to authenticate at all when NOTIFIER_INTERNAL_KEY is unset —
+ * a missing secret is treated as fail-closed, never fail-open. The
+ * notifier service has the same fail-closed contract on its side.
+ */
+function requireBearer(req: Request): NextResponse | null {
+  // The notifier service reads `ATRIUM_INTERNAL_KEY` per
+  // services/notifier/src/tick.ts:38; honor the same variable name on the
+  // verify-app side so both ends of the wire share a single secret. The
+  // legacy `NOTIFIER_INTERNAL_KEY` is accepted as a fallback for deploys
+  // already configured under that name.
+  const expected =
+    process.env.ATRIUM_INTERNAL_KEY ?? process.env.NOTIFIER_INTERNAL_KEY;
+  if (!expected) {
+    return NextResponse.json(
+      { error: 'auth_not_configured', detail: 'ATRIUM_INTERNAL_KEY not set' },
+      { status: 503 },
+    );
+  }
+  const header = req.headers.get('authorization') ?? '';
+  if (!header.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  const presented = header.slice('Bearer '.length).trim();
+  if (!timingSafeEqual(presented, expected)) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  return null;
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 export async function GET(req: Request) {
+  const authFail = requireBearer(req);
+  if (authFail) return authFail;
+
   const url = new URL(req.url);
   const user = url.searchParams.get('user');
   if (!user || !/^0x[0-9a-fA-F]{40}$/.test(user)) {
@@ -95,6 +150,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const authFail = requireBearer(req);
+  if (authFail) return authFail;
+
   let body: UserPrefsBody;
   try {
     body = (await req.json()) as UserPrefsBody;
