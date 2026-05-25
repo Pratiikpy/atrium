@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface MarginImpact {
   buyingPowerAfterUsd: string | null;
@@ -11,7 +12,7 @@ interface MarginImpact {
   source: 'plinth' | 'pending';
 }
 
-async function fetchImpact(venue: string, size: string): Promise<MarginImpact> {
+async function fetchImpact(venue: string, size: string, wallet: string | null): Promise<MarginImpact> {
   // Audit U-14: venue + size now come from the parent TradeView state.
   // Pre-fix the URL was `?size=1200&venue=hl-hip3` — but `hl-hip3` isn't
   // even a valid venue id (real id is `hyperliquid`), so the request always
@@ -30,7 +31,10 @@ async function fetchImpact(venue: string, size: string): Promise<MarginImpact> {
   }
   try {
     const r = await fetch(
-      `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}`,
+      walletQuery(
+        `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}`,
+        wallet,
+      ),
     );
     if (!r.ok) throw new Error();
     return await r.json();
@@ -47,9 +51,10 @@ async function fetchImpact(venue: string, size: string): Promise<MarginImpact> {
 }
 
 export function MarginImpactPanel({ venue, size }: { venue: string; size: string }) {
+  const wallet = useScopedWallet();
   const { data } = useQuery({
-    queryKey: ['margin-impact', venue, size],
-    queryFn: () => fetchImpact(venue, size),
+    queryKey: ['margin-impact', venue, size, wallet],
+    queryFn: () => fetchImpact(venue, size, wallet),
     refetchInterval: 10_000,
   });
   return (

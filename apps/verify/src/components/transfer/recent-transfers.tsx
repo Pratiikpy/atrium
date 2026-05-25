@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface Transfer {
   id: string;
@@ -15,9 +16,9 @@ interface Transfer {
 }
 interface ListResponse { transfers: Transfer[]; source: 'scribe' | 'pending'; }
 
-async function fetchTransfers(): Promise<ListResponse> {
+async function fetchTransfers(wallet: string | null): Promise<ListResponse> {
   try {
-    const r = await fetch('/api/transfer/recent');
+    const r = await fetch(walletQuery('/api/transfer/recent', wallet));
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
@@ -26,7 +27,12 @@ async function fetchTransfers(): Promise<ListResponse> {
 }
 
 export function RecentTransfers() {
-  const { data, isLoading } = useQuery({ queryKey: ['transfers'], queryFn: fetchTransfers, refetchInterval: 30_000 });
+  const wallet = useScopedWallet();
+  const { data, isLoading } = useQuery({
+    queryKey: ['transfers', wallet],
+    queryFn: () => fetchTransfers(wallet),
+    refetchInterval: 30_000,
+  });
 
   if (isLoading) {
     return <div className="space-y-2">{[0,1,2].map(i => <div key={i} className="skeleton h-12 rounded-md" />)}</div>;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface Wallet {
   address: string;
@@ -13,9 +14,9 @@ interface Wallet {
   source: 'postern' | 'pending';
 }
 
-async function fetchWallet(): Promise<Wallet> {
+async function fetchWallet(wallet: string | null): Promise<Wallet> {
   try {
-    const r = await fetch('/api/settings/wallet');
+    const r = await fetch(walletQuery('/api/settings/wallet', wallet));
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
@@ -33,7 +34,12 @@ async function fetchWallet(): Promise<Wallet> {
 }
 
 export function WalletDetailCard() {
-  const { data } = useQuery({ queryKey: ['settings-wallet'], queryFn: fetchWallet, refetchInterval: 60_000 });
+  const scopedWallet = useScopedWallet();
+  const { data } = useQuery({
+    queryKey: ['settings-wallet', scopedWallet],
+    queryFn: () => fetchWallet(scopedWallet),
+    refetchInterval: 60_000,
+  });
   const ready = data?.erc4337Ready && data?.erc7702Ready;
   return (
     <section className="rounded-md border border-divider bg-parchment p-5">

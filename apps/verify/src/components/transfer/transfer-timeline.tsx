@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 
 interface Step {
@@ -24,9 +25,9 @@ interface LastTransfer {
   source: 'scribe' | 'pending';
 }
 
-async function fetchLast(): Promise<LastTransfer> {
+async function fetchLast(wallet: string | null): Promise<LastTransfer> {
   try {
-    const r = await fetch('/api/transfer/last');
+    const r = await fetch(walletQuery('/api/transfer/last', wallet));
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
@@ -50,7 +51,12 @@ async function fetchLast(): Promise<LastTransfer> {
 }
 
 export function TransferTimeline() {
-  const { data } = useQuery({ queryKey: ['last-transfer'], queryFn: fetchLast, refetchInterval: 5_000 });
+  const wallet = useScopedWallet();
+  const { data } = useQuery({
+    queryKey: ['last-transfer', wallet],
+    queryFn: () => fetchLast(wallet),
+    refetchInterval: 5_000,
+  });
   return (
     <section className="rounded-md border border-divider bg-parchment p-5">
       <header className="flex items-baseline justify-between">

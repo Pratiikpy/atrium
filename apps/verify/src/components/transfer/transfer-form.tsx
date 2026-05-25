@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * Transfer form. Audit P-2 fix: prior version had hardcoded balances
@@ -30,12 +31,13 @@ interface TransferQuote {
   source: 'aqueduct' | 'pending';
 }
 
-async function fetchBalance(chain: string, token: string): Promise<ChainBalance> {
+async function fetchBalance(chain: string, token: string, wallet: string | null): Promise<ChainBalance> {
   try {
     // Audit OO-5 fix: even though chain/token come from closed-enum dropdowns,
     // any state-injected value (DevTools, future codemod) would corrupt the
     // URL. URLSearchParams is the defense-in-depth.
     const params = new URLSearchParams({ chain, token });
+    if (wallet) params.set('wallet', wallet);
     const r = await fetch(`/api/transfer/chain-balance?${params.toString()}`);
     if (!r.ok) throw new Error();
     return await r.json();
@@ -63,14 +65,15 @@ export function TransferForm() {
   const [from, setFrom] = useState('arb-sepolia');
   const [to, setTo] = useState('rh-chain');
 
+  const wallet = useScopedWallet();
   const fromBalance = useQuery({
-    queryKey: ['balance', from, token],
-    queryFn: () => fetchBalance(from, token),
+    queryKey: ['balance', from, token, wallet],
+    queryFn: () => fetchBalance(from, token, wallet),
     refetchInterval: 30_000,
   });
   const toBalance = useQuery({
-    queryKey: ['balance', to, token],
-    queryFn: () => fetchBalance(to, token),
+    queryKey: ['balance', to, token, wallet],
+    queryFn: () => fetchBalance(to, token, wallet),
     refetchInterval: 30_000,
   });
   const quote = useQuery({

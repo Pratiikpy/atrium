@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface VaultStatsResponse {
   vaultTvlUsd: string | null;
@@ -9,9 +10,9 @@ interface VaultStatsResponse {
   source: 'coffer' | 'pending';
 }
 
-async function fetchStats(): Promise<VaultStatsResponse> {
+async function fetchStats(wallet: string | null): Promise<VaultStatsResponse> {
   try {
-    const r = await fetch('/api/vault/stats');
+    const r = await fetch(walletQuery('/api/vault/stats', wallet));
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
@@ -20,7 +21,12 @@ async function fetchStats(): Promise<VaultStatsResponse> {
 }
 
 export function VaultStats() {
-  const { data } = useQuery({ queryKey: ['vault-stats'], queryFn: fetchStats, refetchInterval: 30_000 });
+  const wallet = useScopedWallet();
+  const { data } = useQuery({
+    queryKey: ['vault-stats', wallet],
+    queryFn: () => fetchStats(wallet),
+    refetchInterval: 30_000,
+  });
   const sourceCaption = data?.source === 'coffer' ? 'from Coffer · live RPC' : 'coffer pending · deploy Month 1 W2';
   return (
     <div className="grid gap-3 md:grid-cols-3">
