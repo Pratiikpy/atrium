@@ -5,29 +5,37 @@ import { useAccount, useWriteContract } from 'wagmi';
 import { VENUES } from '@/lib/venues';
 
 /**
- * Close a position via the venue's Portico adapter.
+ * Close a position end-to-end via AtriumRouter.
  *
- * Counterpart to `useOpenPosition`. Resolves the adapter by `adapter-<slug>`
- * (the same lookup pattern open uses) and calls
- * `adapter.close_position(uint256 venue_position_id, bytes venue_payload)`
- * per IPorticoAdapter v1.0.
+ * Phase theta audit follow-up (2026-05-25): pre-fix this hook called
+ * `adapter.close_position` directly from the user's wallet, with the
+ * same Unauthorized-revert class as the open path (the user's EOA is
+ * not on the adapter's is_authorized_caller list — only the Router is).
  *
- * `venuePositionId` is the on-chain Plinth position id surfaced by
- * `/api/portfolio/positions`. It comes in as a string (Scribe encodes
- * U256 as decimal text); we parse it as BigInt at the boundary.
+ * Now: routes through AtriumRouter.close_position_via_adapter. The
+ * Router verifies ownership via plinth.getPosition, dispatches to the
+ * adapter's v1.0 or v1.1 close entry per the version() probe, and
+ * sweeps adapter-held USDC back to Coffer.
  *
- * Honest failure modes:
- *   - Adapter not in registry → 'adapter_not_deployed'
- *   - Position id unparseable → 'invalid_position_id'
- *   - Wallet rejects → wallet's error message
+ * Known shape bug (deferred follow-up): the Router signature takes
+ * BOTH plinth_position_id AND venue_position_id as separate args, but
+ * `/api/portfolio/positions` only surfaces the Plinth id today (the
+ * route docstring acknowledges the conflation at audit U-21). For
+ * sequence-aligned ids (every Router-opened position has matching
+ * Plinth + venue ids by construction in the current setUp), passing
+ * the same id for both works. A proper fix surfaces both ids from a
+ * PositionOpenedViaRouter subgraph handler — tracked in human_left.md
+ * `position-dual-id-surface`.
  */
 
-const ADAPTER_ABI = [
+const ROUTER_ABI = [
   {
     type: 'function',
-    name: 'close_position',
+    name: 'close_position_via_adapter',
     stateMutability: 'nonpayable',
     inputs: [
+      { name: 'venue_id', type: 'uint8' },
+      { name: 'plinth_position_id', type: 'uint256' },
       { name: 'venue_position_id', type: 'uint256' },
       { name: 'venue_payload', type: 'bytes' },
     ],
@@ -41,17 +49,6 @@ export type CloseStatus =
   | { kind: 'submitting'; positionId: string }
   | { kind: 'success'; positionId: string; hash: `0x${string}` }
   | { kind: 'error'; positionId: string; reason: string };
-
-/**
- * Resolve a Plinth venueId integer to its adapter slug. The
- * `/api/portfolio/positions` response carries `venueId: number`; the
- * deployments-address lookup keys on the adapter-contract slug (which
- * differs from the venue id for venues that share an adapter — Hyperliquid
- * HIP-3 and HIP-4 both route through `adapter-hyperliquid`). Audit U-28.
- */
-function adapterSlugForVenueId(venueId: number): string | null {
-  return VENUES.find((v) => v.venueId === venueId)?.adapterSlug ?? null;
-}
 
 export function useClosePosition() {
   const { address: account } = useAccount();
@@ -68,8 +65,8 @@ export function useClosePosition() {
       return;
     }
 
-    const slug = adapterSlugForVenueId(params.venueId);
-    if (!slug) {
+    // The VENUES list mirrors the Plinth/Portico venue id table.
+    if (!VENUES.find((v) => v.venueId === params.venueId)) {
       setStatus({
         kind: 'error',
         positionId: params.venuePositionId,
@@ -91,25 +88,25 @@ export function useClosePosition() {
     }
 
     setStatus({ kind: 'resolving', positionId: params.venuePositionId });
-    let adapter: `0x${string}` | null;
+    let router: `0x${string}` | null;
     try {
-      const r = await fetch(`/api/deployments/address?slug=adapter-${slug}`);
+      const r = await fetch('/api/deployments/address?slug=atrium-router');
       if (!r.ok) throw new Error(`address_${r.status}`);
       const j = await r.json();
-      adapter = j.address ?? null;
+      router = j.address ?? null;
     } catch (e) {
       setStatus({
         kind: 'error',
         positionId: params.venuePositionId,
-        reason: e instanceof Error ? e.message : 'adapter_lookup_failed',
+        reason: e instanceof Error ? e.message : 'router_lookup_failed',
       });
       return;
     }
-    if (!adapter) {
+    if (!router) {
       setStatus({
         kind: 'error',
         positionId: params.venuePositionId,
-        reason: 'adapter_not_deployed',
+        reason: 'router_not_deployed',
       });
       return;
     }
@@ -117,10 +114,13 @@ export function useClosePosition() {
     setStatus({ kind: 'submitting', positionId: params.venuePositionId });
     try {
       const hash = await writeContractAsync({
-        address: adapter,
-        abi: ADAPTER_ABI,
-        functionName: 'close_position',
-        args: [parsedId, '0x'],
+        address: router,
+        abi: ROUTER_ABI,
+        functionName: 'close_position_via_adapter',
+        // Dual-id deferred: same id for both args until the subgraph
+        // surfaces the venue-side id separately. Router-opened positions
+        // have aligned Plinth + venue ids by sequence construction.
+        args: [params.venueId, parsedId, parsedId, '0x'],
       });
       setStatus({ kind: 'success', positionId: params.venuePositionId, hash });
     } catch (e) {

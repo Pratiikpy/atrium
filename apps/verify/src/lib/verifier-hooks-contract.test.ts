@@ -67,18 +67,26 @@ const HOOK_CONTRACTS: HookContract[] = [
     file: 'use-issue-mandate.ts',
     requiredUrls: ['/api/agents/issue-mandate'],
   },
-  // Open-position (Trade form). Reads adapter address from
-  // /api/deployments/address?slug=adapter-<adapterSlug>, then calls
-  // adapter.open_position via wagmi.
+  // Open-position (Trade form). Phase theta audit follow-up
+  // (2026-05-25): routed through AtriumRouter.open_position_via_adapter
+  // — pre-fix the hook called adapter.open_position directly from the
+  // user's wallet, which fails Unauthorized (only the Router is on the
+  // adapter's authorized-caller list) AND bypasses Coffer.adapterPull.
   {
     file: 'use-open-position.ts',
-    requiredUrls: ['/api/deployments/address?slug=adapter-'],
+    requiredUrls: ['/api/deployments/address?slug=atrium-router'],
+    forbiddenUrls: [
+      // The Router resolves the adapter from the registry itself;
+      // the front-end no longer threads adapter addresses through.
+      '/api/deployments/address?slug=adapter-',
+    ],
   },
-  // Close-position (open-positions table row). Same address lookup as
-  // open, then adapter.close_position.
+  // Close-position (open-positions table row). Same Router routing as
+  // open, then AtriumRouter.close_position_via_adapter.
   {
     file: 'use-close-position.ts',
-    requiredUrls: ['/api/deployments/address?slug=adapter-'],
+    requiredUrls: ['/api/deployments/address?slug=atrium-router'],
+    forbiddenUrls: ['/api/deployments/address?slug=adapter-'],
   },
 ];
 
@@ -118,16 +126,22 @@ describe('Verifier hooks ↔ API route URL contract', () => {
     expect(text).toContain("functionName: 'redeem'");
   });
 
-  it('use-open-position.ts calls adapter.open_position() via wagmi writeContract', () => {
+  it('use-open-position.ts calls AtriumRouter.open_position_via_adapter via wagmi', () => {
+    // Phase theta audit follow-up (2026-05-25): Router-routed instead of
+    // direct-adapter. Pin the function name so a regression that calls
+    // adapter.open_position directly from the user's wallet (which
+    // reverts Unauthorized) fails this test loud.
     const text = readFileSync(join(LIB_DIR, 'use-open-position.ts'), 'utf8');
     expect(text).toContain('useWriteContract');
-    expect(text).toContain("functionName: 'open_position'");
+    expect(text).toContain("functionName: 'open_position_via_adapter'");
+    expect(text).not.toContain("functionName: 'open_position'");
   });
 
-  it('use-close-position.ts calls adapter.close_position() via wagmi writeContract', () => {
+  it('use-close-position.ts calls AtriumRouter.close_position_via_adapter via wagmi', () => {
     const text = readFileSync(join(LIB_DIR, 'use-close-position.ts'), 'utf8');
     expect(text).toContain('useWriteContract');
-    expect(text).toContain("functionName: 'close_position'");
+    expect(text).toContain("functionName: 'close_position_via_adapter'");
+    expect(text).not.toContain("functionName: 'close_position'");
   });
 
   it('use-issue-mandate.ts signs EIP-712 via wagmi useSignTypedData', () => {
@@ -139,14 +153,14 @@ describe('Verifier hooks ↔ API route URL contract', () => {
     expect(text).toContain('signTypedDataAsync');
   });
 
-  it('use-open-position.ts looks up adapter by adapterSlug (not venue id)', () => {
-    // Audit U-28: Hyperliquid HIP-3 and HIP-4 share `adapter-hyperliquid`,
-    // so the trade form MUST resolve by adapterSlug. A future refactor
-    // that goes back to `adapter-${params.venue}` would route HIP-4 to a
-    // 404. Pin the lookup pattern.
+  it('use-open-position.ts resolves venueId from the canonical VENUES list', () => {
+    // Phase theta audit follow-up (2026-05-25): after the Router-routing
+    // refactor, the hook no longer needs adapter-slug resolution
+    // (the Router consults PorticoRegistry itself). It still reads the
+    // numeric venueId from VENUES to pass to the Router's first arg.
     const text = readFileSync(join(LIB_DIR, 'use-open-position.ts'), 'utf8');
-    expect(text).toContain('adapterSlug');
     expect(text).toContain('VENUES.find');
+    expect(text).toContain('venue.venueId');
   });
 
   it('every live action kind in verifier-step-config has a corresponding hook import', () => {

@@ -6,19 +6,26 @@ import { keccak256, parseUnits, toBytes } from 'viem';
 import { VENUES } from '@/lib/venues';
 
 /**
- * Open a position on a Portico-whitelisted venue adapter.
+ * Open a position end-to-end via AtriumRouter.
  *
- * Flow:
- *   1. Resolve the adapter address by venue slug from /api/deployments/address
- *   2. Build (instrument_id, notional_signed, venue_payload) per IPorticoAdapter v1.0
- *   3. Send adapter.open_position(...) via wagmi
+ * Phase theta audit follow-up (2026-05-25): pre-fix this hook called
+ * `adapter.open_position` DIRECTLY from the user's wallet. That bypassed:
+ *   1. Plinth margin validation (Plinth.openPosition records the margin row)
+ *   2. Coffer.adapterPull (which moves USDC from Coffer to the adapter so
+ *      the adapter has funds to deploy into the venue)
+ *   3. The Router's IPorticoAdapterV11 dispatch logic (v1.1 adapters like
+ *      AaveHorizonAdapterV11 revert V10NotSupported on direct v1.0 calls)
+ *   4. The adapter's `is_authorized_caller` check (the user's EOA is NOT on
+ *      the adapter's authorized-caller mapping — only the Router is)
  *
- * For Year-1 testnet, `venue_payload` is empty bytes — the venue-specific
- * blob shape is pending the Portico v1.1 ABI freeze (see
- * contracts/portico-registry/src/IPorticoAdapterV11.sol).
+ * Every direct adapter.open_position call from a user wallet would have
+ * reverted Unauthorized. The Trade page's "Open position" button was dead.
+ *
+ * Now: route through AtriumRouter.open_position_via_adapter. The Router
+ * orchestrates Plinth → Coffer → adapter in one tx so the user signs once.
  *
  * Honest failure modes:
- *   - Adapter not in registry → 'adapter_not_deployed' (until Month 1 W2)
+ *   - Router not in registry → 'router_not_deployed'
  *   - Wallet rejects → wallet's actual error string
  *   - User unconnected → 'wallet_not_connected'
  */
@@ -36,17 +43,28 @@ const SYMBOL_BY_VENUE: Record<string, string> = {
   'hl-hip4': 'HSLA2-PERP',
 };
 
-const ADAPTER_ABI = [
+// AtriumRouter.open_position_via_adapter signature per
+// contracts/atrium-router/src/AtriumRouter.sol:149. The action_sigil +
+// intent_sigil bytes are empty until the Sigil mandate path lights up
+// the user-direct-open case (today Plinth accepts empty bytes from the
+// user's own EOA — owner == caller short-circuits the mandate check).
+const ROUTER_ABI = [
   {
     type: 'function',
-    name: 'open_position',
+    name: 'open_position_via_adapter',
     stateMutability: 'nonpayable',
     inputs: [
+      { name: 'venue_id', type: 'uint8' },
       { name: 'instrument_id', type: 'bytes32' },
       { name: 'notional_signed', type: 'int256' },
+      { name: 'action_sigil', type: 'bytes' },
+      { name: 'intent_sigil', type: 'bytes' },
       { name: 'venue_payload', type: 'bytes' },
     ],
-    outputs: [{ name: 'venue_position_id', type: 'uint256' }],
+    outputs: [
+      { name: 'plinth_position_id', type: 'uint256' },
+      { name: 'venue_position_id', type: 'uint256' },
+    ],
   },
 ] as const;
 
@@ -81,32 +99,32 @@ export function useOpenPosition() {
       return;
     }
 
-    setStatus({ kind: 'resolving' });
-    // Audit U-28: lookup uses `adapter-${adapterSlug}`, NOT
-    // `adapter-${venue.id}`. Hyperliquid HIP-3 and HIP-4 share one
-    // adapter contract (both have `adapterSlug: 'hyperliquid'`), so
-    // routing by venue id would 404 on HIP-4. The deploy script writes
-    // each adapter contract under its slug.
-    const adapterSlug = VENUES.find((v) => v.id === params.venue)?.adapterSlug;
-    if (!adapterSlug) {
+    // Resolve the venue's numeric id from the canonical VENUES list.
+    // The Router takes `venue_id` and consults the PorticoRegistry to
+    // resolve the adapter address itself; the front-end no longer
+    // needs to thread the adapter address through.
+    const venue = VENUES.find((v) => v.id === params.venue);
+    if (!venue) {
       setStatus({ kind: 'error', reason: 'unknown_venue_id' });
       return;
     }
-    let adapter: `0x${string}` | null;
+
+    setStatus({ kind: 'resolving' });
+    let router: `0x${string}` | null;
     try {
-      const r = await fetch(`/api/deployments/address?slug=adapter-${adapterSlug}`);
+      const r = await fetch('/api/deployments/address?slug=atrium-router');
       if (!r.ok) throw new Error(`address_${r.status}`);
       const j = await r.json();
-      adapter = j.address ?? null;
+      router = j.address ?? null;
     } catch (e) {
       setStatus({
         kind: 'error',
-        reason: e instanceof Error ? e.message : 'adapter_lookup_failed',
+        reason: e instanceof Error ? e.message : 'router_lookup_failed',
       });
       return;
     }
-    if (!adapter) {
-      setStatus({ kind: 'error', reason: 'adapter_not_deployed' });
+    if (!router) {
+      setStatus({ kind: 'error', reason: 'router_not_deployed' });
       return;
     }
 
@@ -117,10 +135,17 @@ export function useOpenPosition() {
     setStatus({ kind: 'submitting' });
     try {
       const hash = await writeContractAsync({
-        address: adapter,
-        abi: ADAPTER_ABI,
-        functionName: 'open_position',
-        args: [instrumentId, notional, '0x'],
+        address: router,
+        abi: ROUTER_ABI,
+        functionName: 'open_position_via_adapter',
+        args: [
+          venue.venueId,
+          instrumentId,
+          notional,
+          '0x', // action_sigil: empty for owner-direct open
+          '0x', // intent_sigil: empty for owner-direct open
+          '0x', // venue_payload: per-venue specifics land Year-2
+        ],
       });
       setStatus({ kind: 'success', hash, side: params.side, sizeUsd: params.sizeUsd });
     } catch (e) {
