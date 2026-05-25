@@ -323,22 +323,22 @@ export default function BrandPage() {
           reserved by Atrium Labs Ltd.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <ComponentCard title="Wordmark" cap="SVG . PNG">
+          <ComponentCard title="Wordmark" cap="SVG">
             <div className="flex flex-wrap gap-2">
-              {/* Honest pending: SVG / PNG assets to be committed under
-                  apps/verify/public/brand/. Links render with aria-disabled
-                  until the assets land. */}
+              {/* SVGs shipped 2026-05-25 under apps/verify/public/brand/assets/.
+                  PNG rasters pending: need to run a vector outline step
+                  + ImageMagick / Inkscape export (deferred to founder ops). */}
               <DownloadLink href="/brand/assets/atrium-wordmark.svg">atrium-wordmark.svg</DownloadLink>
               <DownloadLink href="/brand/assets/atrium-wordmark-dark.svg">atrium-wordmark-dark.svg</DownloadLink>
-              <DownloadLink href="/brand/assets/atrium-wordmark-2x.png">PNG . 2x 4x</DownloadLink>
+              <DownloadLink pending>PNG 2x . 4x . pending</DownloadLink>
             </div>
           </ComponentCard>
-          <ComponentCard title="App icon" cap="SVG . PNG . ICO">
+          <ComponentCard title="App icon" cap="SVG">
             <div className="flex flex-wrap gap-2">
               <DownloadLink href="/brand/assets/atrium-icon.svg">atrium-icon.svg</DownloadLink>
-              <DownloadLink href="/favicon.ico">favicon.ico</DownloadLink>
-              <DownloadLink href="/brand/assets/apple-touch-icon.png">apple-touch-icon 180x180</DownloadLink>
-              <DownloadLink href="/brand/assets/android-icon-512.png">android 192 / 512</DownloadLink>
+              <DownloadLink pending>favicon.ico . pending</DownloadLink>
+              <DownloadLink pending>apple-touch-icon 180x180 . pending</DownloadLink>
+              <DownloadLink pending>android 192 / 512 . pending</DownloadLink>
             </div>
           </ComponentCard>
           <div className="md:col-span-2">
@@ -541,12 +541,28 @@ function IconWithCaption({ status, caption }: { status: 'testnet' | 'live' | 'ne
 function DownloadLink({
   href,
   external = false,
+  pending = false,
   children,
 }: {
-  href: string;
+  href?: string;
   external?: boolean;
+  pending?: boolean;
   children: React.ReactNode;
 }) {
+  // Pending variant renders as a non-interactive label so the asset surface
+  // stays visually present without serving a 404. Matches the "honest
+  // pending" pattern from .claude/rules/ui.md.
+  if (pending || !href) {
+    return (
+      <span
+        className="inline-flex items-center gap-2 rounded-full border border-line bg-paper/60 px-4 h-[34px] text-xs font-medium text-muted cursor-not-allowed"
+        aria-disabled="true"
+        title="Asset not yet generated"
+      >
+        {children}
+      </span>
+    );
+  }
   return (
     <a
       href={href}

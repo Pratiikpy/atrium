@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Atrium wordmark, dark context. Instrument Serif italic 400, paper #FBFAF7.
+     Transparent background so the mark composites onto any dark surface. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 88" width="280" height="88" role="img" aria-label="Atrium">
+  <text x="140" y="56"
+        text-anchor="middle"
+        font-family="'Instrument Serif', Georgia, 'Times New Roman', serif"
+        font-style="italic" font-weight="400"
+        font-size="64"
+        letter-spacing="-0.9"
+        fill="#FBFAF7">Atrium</text>
+  <line x1="76" y1="68" x2="204" y2="68" stroke="#FBFAF7" stroke-width="2"/>
+</svg>

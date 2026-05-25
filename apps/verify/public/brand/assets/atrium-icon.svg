@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Atrium app icon, canonical 64x64 grid per Brand Kit construction spec:
+       tile  ink #1A1714, radius 14
+       A     Instrument Serif italic 600, 44px, fill paper #FBFAF7, baseline y=38
+       bar   44x6, radius 2, padding 10, y=48, amber #CC8E2D (testnet variant) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Atrium app icon">
+  <rect width="64" height="64" rx="14" fill="#1A1714"/>
+  <text x="32" y="38"
+        text-anchor="middle"
+        font-family="'Instrument Serif', Georgia, 'Times New Roman', serif"
+        font-style="italic" font-weight="600"
+        font-size="44"
+        fill="#FBFAF7">A</text>
+  <rect x="10" y="48" width="44" height="6" rx="2" fill="#CC8E2D" opacity="0.85"/>
+</svg>

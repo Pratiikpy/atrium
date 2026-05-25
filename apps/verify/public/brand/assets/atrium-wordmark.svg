@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Atrium wordmark, light context. Instrument Serif italic 400, ink #1A1714.
+     Tracking -0.014em. Underline 55% of wordmark width per Brand Kit canon. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 88" width="280" height="88" role="img" aria-label="Atrium">
+  <text x="140" y="56"
+        text-anchor="middle"
+        font-family="'Instrument Serif', Georgia, 'Times New Roman', serif"
+        font-style="italic" font-weight="400"
+        font-size="64"
+        letter-spacing="-0.9"
+        fill="#1A1714">Atrium</text>
+  <line x1="76" y1="68" x2="204" y2="68" stroke="#1A1714" stroke-width="2"/>
+</svg>
