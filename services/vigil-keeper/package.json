@@ -1,0 +1,23 @@
+{
+  "name": "@atrium/vigil-keeper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Atrium Vigil keeper bot - polls Plinth for liquidatable accounts and races to execute liquidations",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "tick": "tsx src/tick.ts",
+    "test": "vitest run",
+    "lint": "echo 'eslint flat-config migration tracked in human_left.md' && exit 0"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

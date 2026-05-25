@@ -31,6 +31,43 @@ one-line change in the Vercel dashboard + a re-deploy.
      AaveHorizonAdapter (block ~270918xxx) + the existing v0.0.5
      Stylus address swaps.
 
+### Year-2 protocol change: Vigil.set_keeper_min_stake (Phase zeta.4 blocker)
+
+The Vigil contract hardcodes `keeper_min_stake_wei = 1000 ETH` in
+its `initialize()` function (`contracts/vigil/src/lib.rs:206`) and
+has no setter for the parameter. On Arbitrum Sepolia the testnet
+faucet caps at ~0.1 ETH; no keeper EOA can ever clear the 1000 ETH
+threshold. Staking is impossible, so the keeper bot's
+`Vigil.executeLiquidation` calls would revert KeeperNotActive.
+
+Phase ζ.4 ships the vigil-keeper service infrastructure:
+- `services/vigil-keeper/` (Node 20 + viem + tsx)
+- `.github/workflows/vigil-keeper.yml` (5-min cron)
+- `pnpm-workspace.yaml` updated to include the new member
+
+Each tick polls Scribe for paused MarginAccounts and logs intended
+actions. When the founder lands the Y2 change below, the tick.ts
+"would_execute" log lines flip to real `viem.writeContract` calls
+and Journey 4 of TDD §9 goes live with no further service work.
+
+Y2 change to unblock:
+1. Add `pub fn set_keeper_min_stake_emergency(&mut self, new_stake: U256)
+   -> Result<(), VigilError>` to `contracts/vigil/src/lib.rs`. Guard
+   with `self.assert_praetor()` (multisig direct, no timelock - same
+   pattern as `PorticoRegistry.emergencyDeregister`).
+2. Redeploy Vigil. The `initialize` guard prevents re-init on the
+   existing instance; the new instance is initialised with the same
+   peer wiring. Plinth's `vigil_address` slot is constructor-only,
+   so this requires a Plinth redeploy too.
+3. Praetor multisig calls `Vigil.setKeeperMinStakeEmergency(10_000_000_000_000_000)` (0.01 ETH).
+4. Provision a fresh `KEEPER_PRIVATE_KEY` EOA. Fund with 0.05 ETH
+   (0.01 for stake + 0.04 for gas headroom).
+5. Keeper EOA calls `Vigil.stakeKeeper{value: 0.01 ether}()`.
+6. Add `KEEPER_PRIVATE_KEY` + `SCRIBE_URL` + `ARBITRUM_SEPOLIA_RPC`
+   to GitHub repo secrets.
+7. Trigger the workflow once via `workflow_dispatch` to confirm
+   the tick logs include `event: "tick"` with the staked count.
+
 ### Founder-only: verify project env for Chaos Mode (Phase zeta.5)
 
 - `CHAOS_PRIVATE_KEY` -> a fresh EOA, separate from the deployer
