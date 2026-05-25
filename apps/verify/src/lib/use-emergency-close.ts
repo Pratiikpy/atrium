@@ -21,10 +21,18 @@ import { useAccount, useWriteContract } from 'wagmi';
  * no liquidity)".
  */
 
+// Phase theta audit follow-up (2026-05-25): selector audit — Vigil is a
+// Stylus contract; Stylus 0.10 auto-converts snake_case Rust fn names
+// to camelCase Solidity selectors. The ABI name MUST be the exported
+// camelCase form or the selector hash mismatches and the tx reverts
+// with empty data. Same class as the original Coffer.adapter_pull →
+// adapterPull bug from audit task #333. Pre-fix this hook used the
+// snake form and every emergency-close click reverted at the Vigil
+// dispatch table.
 const VIGIL_EMERGENCY_ABI = [
   {
     type: 'function',
-    name: 'queue_liquidation',
+    name: 'queueLiquidation',
     stateMutability: 'nonpayable',
     inputs: [
       { name: 'user', type: 'address' },
@@ -76,7 +84,7 @@ export function useEmergencyClose() {
       const hash = await writeContractAsync({
         address: vigil,
         abi: VIGIL_EMERGENCY_ABI,
-        functionName: 'queue_liquidation',
+        functionName: 'queueLiquidation',
         args: [account, 0n],
       });
       setStatus({ kind: 'success', hash });
