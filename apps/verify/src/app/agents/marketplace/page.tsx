@@ -59,16 +59,25 @@ export default function AgentsMarketplacePage() {
         <h2 className="font-display text-2xl text-ink">Reference agents</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {REFERENCE.map((a) => (
-            <Card key={a.name}>
-              <header className="flex items-baseline justify-between">
-                <p className="font-display text-2xl text-ink">{a.name}</p>
-                <Tag>{a.tag}</Tag>
-              </header>
-              <p className="mt-2 text-sm font-medium text-ink">{a.strat}</p>
-              <p className="mt-2 text-xs text-muted">Cadence: {a.cadence}</p>
-              <p className="mt-1 text-xs text-muted">{a.instruments}</p>
-              <p className="mt-4 font-mono text-xs text-ink-soft">{a.repo}</p>
-            </Card>
+            <Link
+              key={a.name}
+              href={`/agents/marketplace/${a.name.toLowerCase()}` as any}
+              className="block transition hover:-translate-y-0.5"
+            >
+              <Card>
+                <header className="flex items-baseline justify-between">
+                  <p className="font-display text-2xl text-ink">{a.name}</p>
+                  <Tag>{a.tag}</Tag>
+                </header>
+                <p className="mt-2 text-sm font-medium text-ink">{a.strat}</p>
+                <p className="mt-2 text-xs text-muted">Cadence: {a.cadence}</p>
+                <p className="mt-1 text-xs text-muted">{a.instruments}</p>
+                <p className="mt-4 font-mono text-xs text-ink-soft">{a.repo}</p>
+                <p className="mt-3 text-[10.5px] uppercase tracking-wider text-muted">
+                  View profile →
+                </p>
+              </Card>
+            </Link>
           ))}
         </div>
       </section>

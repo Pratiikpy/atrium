@@ -163,6 +163,12 @@ function Authenticator({ onNext }: { onNext: () => void }) {
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState<boolean | null>(null);
+  // Phase eta.7: second-device warning per FULL_FLOW_DESIGN §172-174.
+  // After the first passkey is created, surface the recovery risk before
+  // letting the user proceed to deposit. They must dismiss "I understand"
+  // to advance to Faucet. The warning is the gate; the second authenticator
+  // setup itself is deferred to /app/settings once they finish onboarding.
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     setSupported(
@@ -207,7 +213,8 @@ function Authenticator({ onNext }: { onNext: () => void }) {
           attestation: 'none',
         },
       });
-      onNext();
+      // Show recovery warning before letting them go to faucet/deposit.
+      setShowWarning(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Authenticator dismissed.';
       setError(msg);
@@ -271,7 +278,74 @@ function Authenticator({ onNext }: { onNext: () => void }) {
           <Check size={11} /> Recoverable
         </span>
       </div>
+
+      {showWarning && <SecondDeviceWarning onContinue={onNext} onCancel={() => setShowWarning(false)} />}
     </>
+  );
+}
+
+/* ----- Modal: Second-device warning (Phase eta.7) ------------------------ */
+
+function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void; onCancel: () => void }) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="second-device-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        className="max-w-md rounded-[14px] border border-divider bg-parchment p-7 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-accent">
+          Important . before you deposit
+        </p>
+        <h2 id="second-device-title" className="mt-2 font-display text-[24px] italic leading-[1.2] text-ink">
+          Set up a second device before deposit.
+        </h2>
+        <p className="mt-3 text-[14px] leading-[1.55] text-ink-soft">
+          A single passkey on a single device is one lost phone away from total loss. Atrium has
+          three recovery paths; pick at least one before you put real value (or testnet value
+          that took time to earn) into the vault.
+        </p>
+        <ul className="mt-4 space-y-2.5 text-[13px] leading-[1.55] text-ink-soft">
+          <li className="flex gap-2.5">
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span><strong className="text-ink">Recovery passkey on a second device</strong>  iPad, second phone, laptop. Add it from /app/settings  Recovery.</span>
+          </li>
+          <li className="flex gap-2.5">
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span><strong className="text-ink">3 recovery guardians</strong>  trusted EOAs that can co-sign a passkey reset. Set up in /app/settings  Recovery.</span>
+          </li>
+          <li className="flex gap-2.5">
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span><strong className="text-ink">Authenticator app</strong>  Authy, 1Password, Bitwarden. Backup TOTP code stored encrypted.</span>
+          </li>
+        </ul>
+        <p className="mt-4 rounded-md border border-testnet/30 bg-testnet/5 px-3 py-2 text-[11.5px] leading-[1.5] text-ink">
+          You can dismiss this for now and use the faucet, but Atrium will surface it again before
+          your first mainnet deposit. Testnet has no real funds at risk.
+        </p>
+        <div className="mt-6 flex justify-end gap-2.5">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex h-[40px] items-center rounded-full border border-divider bg-parchment-light px-4 text-[13px] text-ink hover:border-ink/30"
+          >
+            Back to authenticator
+          </button>
+          <button
+            type="button"
+            onClick={onContinue}
+            className="inline-flex h-[40px] items-center rounded-full bg-ink px-5 text-[13px] font-medium text-parchment hover:bg-ink/90"
+          >
+            I understand . continue
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
