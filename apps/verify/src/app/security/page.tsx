@@ -58,6 +58,16 @@ export default function SecurityPage() {
             <li>• Year 2 mainnet flip: raised on board sign-off; target $250K+ tier.</li>
           </ul>
         </Block>
+
+        <Block heading="Honest disclosures">
+          <p className="text-ink-soft">
+            Three venues (Aave V3, Pyth equity feeds, Hyperliquid) are mocked or relayed on
+            testnet because the real upstream is not on Sepolia. Plus interim states for admin
+            (deployer EOA pending Safe ceremony) and liquidation (monitoring-only pending keeper
+            stake). Each item named explicitly with mechanism + timeline at{' '}
+            <Link href="/docs/honesty" className="text-ink underline-offset-2 hover:underline">/docs/honesty</Link>.
+          </p>
+        </Block>
       </section>
 
       <Link

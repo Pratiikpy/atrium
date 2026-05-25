@@ -92,6 +92,38 @@ export default function DocsPage() {
       </section>
 
       <section className="mt-16">
+        <h2 className="font-display text-2xl text-ink">Honest disclosures</h2>
+        <p className="mt-3 max-w-prose text-sm text-ink-soft">
+          Three venues are mocked or relayed on testnet because the real upstream is not on
+          Sepolia (Aave V3, Pyth equity feeds, Hyperliquid). Plus a handful of interim states
+          (deployer-EOA admin, monitoring-only keeper, empty cohort strip). Every one is named
+          here with the mechanism + timeline to "real".
+        </p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <Link href="/docs/honesty" className="block">
+            <Card className="h-full transition-colors hover:border-accent/40">
+              <p className="font-display text-xl text-ink">Honest disclosures</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Every mock, relay, interim state, and third-party blocker. What it does, why,
+                when it becomes real. Sourced from the tripwires/ folder.
+              </p>
+              <p className="mt-3 text-xs text-muted">8 disclosures . sourced</p>
+            </Card>
+          </Link>
+          <Link href="/docs/api" className="block">
+            <Card className="h-full transition-colors hover:border-accent/40">
+              <p className="font-display text-xl text-ink">Codex API reference</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                x402-payable HTTP API. 8 endpoints, quickstart, auth, rate limits, TypeScript +
+                Python SDK snippets.
+              </p>
+              <p className="mt-3 text-xs text-muted">8 endpoints . x402</p>
+            </Card>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-16">
         <h2 className="font-display text-2xl text-ink">Architecture decision records</h2>
         <p className="mt-3 text-sm text-ink-soft">
           ADR-001 through ADR-012 record every architectural decision taken during the build phase.
