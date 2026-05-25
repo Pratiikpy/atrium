@@ -68,6 +68,10 @@ const VENUES = [
     desc: 'Isolated lending markets with custom risk parameters per market.',
     risk: 'Lend; haircut 2%; correlation class LENDING.',
     instruments: 'wstETH/USDC, WBTC/USDC, plus permissionless markets',
+    // Phase theta-followup (2026-05-25): scaffold open_position now reverts
+    // ScaffoldNotImplemented to prevent funds-strand. Tile renders a
+    // disabled state so the user is not invited to a flow that reverts.
+    scaffold: true,
   },
   {
     name: 'Synthetix V3',
@@ -75,8 +79,9 @@ const VENUES = [
     desc: 'Multi-collateral synth perps with cross-margined account abstraction.',
     risk: 'Perp; haircut 14%; correlation class CRYPTO_PERP.',
     instruments: 'BTC-PERP, ETH-PERP, SOL-PERP, +20 synthetic perps',
+    scaffold: true,
   },
-];
+] as const;
 
 export default function MarketsPage() {
   return (
@@ -92,17 +97,45 @@ export default function MarketsPage() {
       </section>
 
       <section className="mt-10 space-y-4">
-        {VENUES.map((v) => (
-          <article key={v.name} className="rounded-md border border-divider bg-parchment p-6">
-            <header className="flex flex-wrap items-baseline justify-between gap-3">
-              <p className="font-display text-2xl text-ink">{v.name}</p>
-              <span className="rounded-full border border-divider px-3 py-1 text-xs text-muted">live source</span>
-            </header>
-            <p className="mt-2 text-sm text-ink-soft">{v.desc}</p>
-            <p className="mt-3 text-xs text-muted">{v.risk}</p>
-            <p className="mt-1 text-xs text-muted">Instruments: {v.instruments}</p>
-          </article>
-        ))}
+        {VENUES.map((v) => {
+          const isScaffold = 'scaffold' in v && v.scaffold === true;
+          return (
+            <article
+              key={v.name}
+              className={
+                'rounded-md border bg-parchment p-6 ' +
+                (isScaffold ? 'border-divider opacity-60' : 'border-divider')
+              }
+            >
+              <header className="flex flex-wrap items-baseline justify-between gap-3">
+                <p className="font-display text-2xl text-ink">{v.name}</p>
+                {isScaffold ? (
+                  <span className="rounded-full border border-testnet/40 bg-testnet/10 px-3 py-1 text-xs text-testnet">
+                    scaffold · open blocked
+                  </span>
+                ) : (
+                  <span className="rounded-full border border-divider px-3 py-1 text-xs text-muted">
+                    live source
+                  </span>
+                )}
+              </header>
+              <p className="mt-2 text-sm text-ink-soft">{v.desc}</p>
+              <p className="mt-3 text-xs text-muted">{v.risk}</p>
+              <p className="mt-1 text-xs text-muted">Instruments: {v.instruments}</p>
+              {isScaffold && (
+                <p className="mt-3 text-xs text-testnet">
+                  {/* Phase theta-followup: scaffold adapters revert
+                      ScaffoldNotImplemented on open_position to prevent
+                      Coffer.adapterPull from stranding USDC in the adapter.
+                      Real Synthetix V3 + Morpho Blue impls land Year-2. */}
+                  Open is disabled — adapter is a Year-1 scaffold without venue-side
+                  deployment. Listed here for visibility; real implementation lands
+                  Year-2.
+                </p>
+              )}
+            </article>
+          );
+        })}
       </section>
 
       <section className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
