@@ -78,7 +78,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_external_user_id' }, { status: 400 });
   }
 
-  // Call Edict.assignTier(wallet, 2). Tier 2 = KYC-verified retail.
+  // Call Edict.assignTier(wallet, 2, proof). Tier 2 = KYC-verified retail.
+  //
+  // Phase theta audit follow-up (2026-05-25): the contract signature is
+  // `assignTier(address user, UserTier tier, bytes32 proof)` — 3 args.
+  // Pre-fix this route declared the function with only 2 args, which
+  // computed a different keccak256 selector than the deployed contract.
+  // Every Sumsub callback reverted at the EVM dispatch table with
+  // "no matching function" — Year-1 KYC tier upgrades were entirely
+  // broken in silence. Sumsub retries up to 3x then gives up; the
+  // failure mode is "user completes KYC but stays at Tier 0 forever".
+  //
+  // Now: 3-arg ABI, and proof = keccak256(applicantId) so the same
+  // applicantId never replays. Edict's assignTier marks _processed_proofs
+  // on success, so two callbacks for the same applicantId only assign once.
   const praetorKey = process.env.PRAETOR_MULTISIG_KEY;
   const edictAddr = process.env.EDICT_CONTRACT_ADDR;
   const rpc = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
@@ -90,22 +103,30 @@ export async function POST(req: NextRequest) {
     });
   }
   try {
-    const { createWalletClient, http } = await import('viem');
+    const { createWalletClient, http, keccak256, toBytes } = await import('viem');
     const { privateKeyToAccount } = await import('viem/accounts');
     const { arbitrumSepolia } = await import('viem/chains');
     const account = privateKeyToAccount(praetorKey as `0x${string}`);
     const client = createWalletClient({ account, chain: arbitrumSepolia, transport: http(rpc) });
+    // Proof = keccak256(applicantId). Edict's _processed_proofs mapping
+    // ensures a single applicantId yields a single tier assignment even
+    // if Sumsub retries the webhook.
+    const proof = keccak256(toBytes(event.applicantId));
     const tx = await client.writeContract({
       address: edictAddr as `0x${string}`,
       abi: [{
         type: 'function',
         name: 'assignTier',
         stateMutability: 'nonpayable',
-        inputs: [{ name: 'user', type: 'address' }, { name: 'tier', type: 'uint8' }],
+        inputs: [
+          { name: 'user', type: 'address' },
+          { name: 'tier', type: 'uint8' },
+          { name: 'proof', type: 'bytes32' },
+        ],
         outputs: [],
       }] as const,
       functionName: 'assignTier',
-      args: [wallet as `0x${string}`, 2],
+      args: [wallet as `0x${string}`, 2, proof],
     });
     return NextResponse.json({ ok: true, wallet, tx, arbiscan: `https://sepolia.arbiscan.io/tx/${tx}` });
   } catch (err) {
