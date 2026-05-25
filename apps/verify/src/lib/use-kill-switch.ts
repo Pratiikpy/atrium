@@ -56,9 +56,19 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
     // Pull the agent list from Scribe via the same route the agents page
     // uses. Deduplicating here means a user with two mandates to the same
     // agent doesn't pay for two revoke iterations on-chain.
+    //
+    // Phase theta audit follow-up (2026-05-25): pass the connected
+    // wallet through to the API so the kill switch operates on the
+    // CONNECTED user's mandates, not the demo wallet's. Pre-fix any
+    // connected user clicking kill-switch would have revoked the demo
+    // wallet's mandates and left their own intact — the opposite of
+    // the user's intent.
     let agents: `0x${string}`[];
     try {
-      const r = await fetch('/api/agents/my-mandates');
+      const myMandatesUrl = account
+        ? `/api/agents/my-mandates?wallet=${encodeURIComponent(account)}`
+        : '/api/agents/my-mandates';
+      const r = await fetch(myMandatesUrl);
       if (!r.ok) throw new Error(`my-mandates ${r.status}`);
       const j = await r.json();
       const seen = new Set<string>();
