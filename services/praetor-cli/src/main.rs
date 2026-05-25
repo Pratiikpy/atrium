@@ -128,7 +128,17 @@ enum KeeperAction {
 
 #[derive(Subcommand, Debug)]
 enum LanternAction {
-    PublishNow,
+    /// Trigger the Lantern cron one-shot via HTTP. Reads LANTERN_CRON_URL
+    /// + LANTERN_CRON_SECRET from env; falls back to --cron-url + --cron-secret.
+    PublishNow {
+        /// URL of the Vercel-hosted Lantern cron endpoint, e.g.
+        /// https://lantern.atrium.fi/api/cron. Overrides LANTERN_CRON_URL.
+        #[arg(long)]
+        cron_url: Option<String>,
+        /// Bearer secret for the cron endpoint. Overrides LANTERN_CRON_SECRET.
+        #[arg(long)]
+        cron_secret: Option<String>,
+    },
 }
 
 #[derive(Subcommand, Debug)]
