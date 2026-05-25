@@ -113,6 +113,17 @@ const DISCLOSURES: Disclosure[] = [
     whenReal: 'Live as soon as Scribe + Plinth + Coffer return non-zero data after the timelock fires.',
     severity: 'interim',
   },
+  {
+    id: 'scaffold-adapters',
+    surface: 'Synthetix V3 + Morpho Blue adapters',
+    what:
+      'Both adapters are listed on /app/markets for design completeness, but `open_position` reverts with `ScaffoldNotImplemented`. The /app/trade venue list never offered them; the markets tile renders a "scaffold · open blocked" pill explicitly.',
+    why:
+      'Year-1 scope shipped the 7 production venues (Hyperliquid, Aave Horizon, Pendle, Curve, Trade.xyz, Polymarket, GMX). Synthetix V3 + Morpho Blue scaffolds existed as forward-compatible contracts; before the Phase theta-followup lockdown, an open call would have pulled USDC via Coffer.adapterPull but never deployed into the upstream protocol — funds-strand risk.',
+    whenReal:
+      'Year 2. Real Synthetix V3 `commitOrder` + sUSD-vs-USDC bridging, and real Morpho `supplyCollateral` + `borrow` + LLTV math. The contract scaffolds + tests are in place to make those follow-ups mechanical.',
+    severity: 'interim',
+  },
 ];
 
 const SEV_LABELS: Record<Disclosure['severity'], { label: string; color: string }> = {
