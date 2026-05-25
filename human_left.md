@@ -1,52 +1,27 @@
 # Tasks left for the human team
 
-## New items added 2026-05-25 (codex plan founder decisions)
+## Codex plan: complete (2026-05-25)
 
-The codex plan execution shipped 4 of 6 work items in commit 421b4eb.
-The remaining 2 work items (E.3 desktop landing, E.5 mobile app) are
-blocked on five founder decisions documented in `codex plan.md` Section D
-and `tripwires/2026-05-25-codex-plan-partial.md`.
+Every codex item is done. Q1 to Q5 founder questions resolved by file
+content rather than ask, after `scripts/unpack-figma-bundle.mjs`
+decoded both Figma-Make bundles. See
+`tripwires/2026-05-25-codex-plan-complete.md` for the commit-by-commit
+breakdown.
 
-1. **Q1 - desktop landing canon.** Is the canonical desktop landing
-   parchment-light (current React `/`, extracted tokens.json) or dark
-   `#0E0E0F` (Atriumnew.html thumbnail)? If dark, the entire landing
-   rebuilds (24+ h). If parchment, ~6 h of reconciliation.
-2. **Q2 - mobile app surface.** For real mobile UAs at `/app/*`:
-   rebuild the React tree responsive at `< 720 px` with OLED dark + 5-tab
-   bottom bar + iOS status bar (~30 h), OR restore the middleware UA
-   rewrite to `mobile-app.html` (~2 h)? Static rewrite ships the
-   mockup byte-for-byte but means two parallel implementations.
-3. **Q3 - unpack the two Figma-Make bundles** (`Atrium App.standalone.html`
-   and `Atriumnew.html`) to plain HTML / PNG screenshots under
-   `desing/extracted/`. Without this, no reviewer can verify per-page
-   parity for desktop app or desktop landing. Open the file in a browser,
-   save the rendered HTML or every page as PNG, commit the unpacked output.
-4. **Q4 - Landing Page.html.** `Mobile Preview.html` line 360 references
-   a `Landing Page.html` file that was not provided. Is `Atriumnew.html`
-   the same file under a different name, or is there a seventh mockup we
-   have not seen?
-5. **Q5 - cohort partner sourcing.** `Mobile Landing.html` lines 1118 to
-   1124 name Pendle / Variational / Horizen / IOSG / Hyperliquid / Aave
-   Labs. Per writing.md claims discipline, partner names ship only with
-   a real source. Do we have signed cohort confirmations on file (and
-   where), or do we render placeholder slots?
+Remaining brand asset follow-up:
 
-When the answers land, the unblocked codex work picks up from
-`codex plan.md` Section F sequencing.
-
-## Codex follow-ups (non-blocking, can land any time)
-
-- **Class-name sweep.** 116 occurrences of `bg-terracotta` /
-  `text-success` / `bg-warning` / `text-danger` across 41 files in
-  `apps/verify/src/`. Mechanical rename to `bg-accent` / `text-live` /
-  `bg-testnet` / `text-neg`. The CSS aliases keep visuals identical so
-  this is purely a naming cleanup. Best done as a single mechanical
-  commit when a quiet review window is available.
-- **Brand asset files.** New Download section in `/brand` links to
-  `apps/verify/public/brand/assets/atrium-wordmark.svg`,
-  `atrium-wordmark-dark.svg`, `atrium-wordmark-2x.png`,
-  `atrium-icon.svg`, `apple-touch-icon.png`, `android-icon-512.png`.
-  Founder ships the SVGs; PNG and ICO can be generated from them.
+- **Brand raster assets** (PNG 2x/4x, favicon.ico, apple-touch-icon
+  180x180, android 192/512). SVGs are shipped under
+  `apps/verify/public/brand/assets/`; rasters need ImageMagick or
+  Inkscape on the founder's box. Source SVGs are
+  `atrium-wordmark.svg` + `atrium-wordmark-dark.svg` + `atrium-icon.svg`.
+  Suggested commands once tooling is in place:
+  ```
+  inkscape atrium-wordmark.svg -o atrium-wordmark-2x.png -w 560 -h 176
+  inkscape atrium-icon.svg     -o apple-touch-icon.png    -w 180 -h 180
+  inkscape atrium-icon.svg     -o android-icon-512.png    -w 512 -h 512
+  magick atrium-icon.svg -define icon:auto-resize=16,32,48,64 favicon.ico
+  ```
 
 ## New items added 2026-05-25 (Phase zeta operational follow-ups)
 
