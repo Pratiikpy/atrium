@@ -120,10 +120,16 @@ describe('Verifier hooks ↔ API route URL contract', () => {
     expect(text).toContain("functionName: 'activate'");
   });
 
-  it('use-vault-withdraw.ts calls coffer.redeem() via wagmi writeContract', () => {
+  it('use-vault-withdraw.ts calls coffer.withdraw() via wagmi writeContract', () => {
+    // Phase theta audit follow-up (2026-05-25): hook was calling
+    // `redeem` but Coffer Stylus only exports `withdraw(assets, receiver,
+    // owner)`. Every vault withdrawal in the UI reverted at the EVM
+    // dispatch table. Pin the corrected selector + reject the broken one
+    // so a regression fails this test loud.
     const text = readFileSync(join(LIB_DIR, 'use-vault-withdraw.ts'), 'utf8');
     expect(text).toContain('useWriteContract');
-    expect(text).toContain("functionName: 'redeem'");
+    expect(text).toContain("functionName: 'withdraw'");
+    expect(text).not.toContain("functionName: 'redeem'");
   });
 
   it('use-open-position.ts calls AtriumRouter.open_position_via_adapter via wagmi', () => {
