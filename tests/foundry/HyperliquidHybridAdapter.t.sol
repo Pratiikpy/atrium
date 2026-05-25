@@ -754,4 +754,15 @@ contract MockERC20 {
         allowance[msg.sender][sp] = v;
         return true;
     }
+
+    // Phase theta.1 follow-up (2026-05-25): close_position now sweeps the
+    // adapter's USDC balance to atrium_coffer per the funds-stranding fix.
+    // Pre-fix tests pre-dated the sweep so the mock only needed approve;
+    // now transfer must work too or close_position reverts.
+    function transfer(address to, uint256 v) external returns (bool) {
+        require(balanceOf[msg.sender] >= v, "balance");
+        balanceOf[msg.sender] -= v;
+        balanceOf[to] += v;
+        return true;
+    }
 }
