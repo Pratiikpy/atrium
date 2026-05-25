@@ -57,7 +57,27 @@ pub async fn run(network: &str, contract: &str, reason: &str) -> Result<()> {
     println!("Emergency pause is multisig-only with NO timelock (per security.md).");
     println!("Once 3 of 5 signers approve, the contract pauses instantly.");
     println!();
-    println!("Verify after execution: `cast call {target} 'is_paused()(bool)' --rpc-url {rpc}`");
+    // Phase theta audit follow-up (2026-05-25): verify selector by contract.
+    // Stylus auto-camelCases storage-field getters; pre-fix the suggested
+    // verify command used `is_paused()` (snake) which would revert at the
+    // dispatcher for the Stylus contracts.
+    match contract {
+        "coffer" => {
+            println!(
+                "Verify after execution:\n  cast call {target} 'isDepositsPaused()(bool)' --rpc-url {rpc}\n  cast call {target} 'isWithdrawalsPaused()(bool)' --rpc-url {rpc}"
+            );
+        }
+        "plinth" => {
+            println!(
+                "Verify after execution: `cast call {target} 'isGloballyPaused()(bool)' --rpc-url {rpc}`"
+            );
+        }
+        _ => {
+            println!(
+                "Verify after execution: `cast call {target} 'isPaused()(bool)' --rpc-url {rpc}`"
+            );
+        }
+    }
     Ok(())
 }
 
@@ -68,17 +88,24 @@ pub async fn resume(network: &str, contract: &str, action: Option<&str>) -> Resu
 
     // Resume-selector dispatch. Pre-fix this hardcoded `resume()` for every
     // contract; a Safe submission against Coffer with `resume()` calldata
-    // would land but revert on execution because Coffer exposes
-    // `resume_deposits()` and `resume_withdrawals()` — no plain `resume()`.
+    // would land but revert on execution because Coffer exposes split paths
+    // `resumeDeposits()` and `resumeWithdrawals()` — no plain `resume()`.
     // Wrong-calldata Safe txs waste signer attention and burn submission
     // time in incidents. Now: route per-contract.
+    //
+    // Phase theta audit follow-up (2026-05-25): selector names migrated
+    // snake_case → camelCase. Coffer is a Stylus contract; Stylus 0.10
+    // auto-converts `pub fn resume_deposits` to the camelCase Solidity
+    // selector `resumeDeposits()`. Pre-fix the CLI emitted the snake form
+    // and the Safe tx would have reverted at Coffer's dispatcher with
+    // empty data. Same class as audit task #333 (adapter_pull → adapterPull).
     //
     // Source of truth: grep `pub fn resume` / `function resume(` in
     // contracts/. As of 2026-05 the only split-path contract is Coffer.
     let selector = match contract {
         "coffer" => match action {
-            Some("deposits") => "resume_deposits()",
-            Some("withdrawals") => "resume_withdrawals()",
+            Some("deposits") => "resumeDeposits()",
+            Some("withdrawals") => "resumeWithdrawals()",
             Some(other) => anyhow::bail!(
                 "unknown action '{other}' for coffer; use --action deposits or --action withdrawals"
             ),
