@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IPorticoAdapter} from "../../portico-registry/src/IPorticoAdapter.sol";
+import {IPorticoAdapterV11} from "../../portico-registry/src/IPorticoAdapterV11.sol";
 
 /// Plinth (Stylus) is callable from Solidity via standard call ABI.
 /// Stylus 0.10 auto-converts snake_case Rust fn names to camelCase selectors,
@@ -128,6 +129,9 @@ contract AtriumRouter {
     error NotPositionOwner(uint256 plinth_position_id, address caller, address owner);
     /// Audit FIRE78-COF2 fix: defense-in-depth Router-self-assertion.
     error AdapterAlsoApprovedAsOrchestrator(address adapter);
+    /// Phase theta.1 fix: adapter is missing the IPorticoAdapter `version()`
+    /// view, so the Router cannot decide between the v1.0 and v1.1 ABI.
+    error AdapterMissingVersion(address adapter);
 
     constructor(address _plinth, address _coffer, address _registry, address _praetor) {
         // Per DDD-5 / NNNN-1 / MMM-10 / LLL-1 / BBBBB-1 audit-pattern: fail
@@ -218,13 +222,32 @@ contract AtriumRouter {
         coffer.adapterPull(amount, user, adapter_addr);
 
         // Step 4: adapter opens the venue-side position. The originator (the
-        // actual user, not the Router) is the first 20 bytes of venue_payload
-        // per audit G-5. The caller (Router) is on the adapter's authorized
-        // caller list — see CurveAdapter migration.
-        bytes memory full_payload = abi.encodePacked(user, venue_payload);
-        venue_position_id = IPorticoAdapter(adapter_addr).open_position(
-            instrument_id, notional_signed, full_payload
-        );
+        // actual user, not the Router) reaches the adapter via two routes
+        // depending on adapter ABI version:
+        //
+        //   v1.0: the user address is packed as the first 20 bytes of
+        //         venue_payload per audit G-5; adapter unpacks it.
+        //   v1.1: the user address is an explicit `originator` parameter on
+        //         open_position_v11 per IPorticoAdapterV11; venue_payload
+        //         remains opaque end-to-end.
+        //
+        // Phase theta.1 fix: pre-fix the Router unconditionally called the
+        // v1.0 selector, which reverted `V10NotSupported` on every v1.1-only
+        // adapter (AaveHorizonAdapterV11 at 0xe991...). Now we probe
+        // `version()` and dispatch to the right ABI. The probe is a single
+        // pure staticcall (~2.5k gas) and never swallows downstream reverts,
+        // unlike a blind try/catch that would mask real failures (no-margin,
+        // venue paused, etc.) as "fall back to v1.0 and try again".
+        if (_isAdapterV11(adapter_addr)) {
+            venue_position_id = IPorticoAdapterV11(adapter_addr).open_position_v11(
+                user, instrument_id, notional_signed, venue_payload
+            );
+        } else {
+            bytes memory full_payload = abi.encodePacked(user, venue_payload);
+            venue_position_id = IPorticoAdapter(adapter_addr).open_position(
+                instrument_id, notional_signed, full_payload
+            );
+        }
 
         emit PositionOpenedViaRouter(
             user, venue_id, instrument_id, notional_signed, plinth_position_id, venue_position_id
@@ -263,9 +286,19 @@ contract AtriumRouter {
         // The adapter transfers received USDC to Coffer in its own
         // close_position (per audit JJJ-9 + JJJ-12 patterns — the redeemed
         // amount routes back to atrium_coffer, not to the Router).
-        realized_pnl_signed = IPorticoAdapter(adapter_addr).close_position(
-            venue_position_id, venue_payload
-        );
+        //
+        // Phase theta.1 fix: same v1.0 vs v1.1 dispatch as on the open
+        // path. v1.1 takes explicit `originator`; v1.0 looks up the owner
+        // off the venue_position_id internally.
+        if (_isAdapterV11(adapter_addr)) {
+            realized_pnl_signed = IPorticoAdapterV11(adapter_addr).close_position_v11(
+                user, venue_position_id, venue_payload
+            );
+        } else {
+            realized_pnl_signed = IPorticoAdapter(adapter_addr).close_position(
+                venue_position_id, venue_payload
+            );
+        }
 
         // Step 2: Plinth closes the margin-side row.
         plinth.closePosition(plinth_position_id);
@@ -273,5 +306,24 @@ contract AtriumRouter {
         emit PositionClosedViaRouter(
             user, venue_id, plinth_position_id, venue_position_id, realized_pnl_signed
         );
+    }
+
+    /// @notice Probe the adapter's `version()` view and return true when it
+    /// reports v1.1 or higher. Reverts AdapterMissingVersion when the call
+    /// fails (every IPorticoAdapter implementer MUST expose `version()`).
+    /// @dev    Deliberately uses a low-level staticcall + decode rather than
+    ///         a try/catch on the typed selector. Reason: a v1.0 adapter
+    ///         missing the `open_position_v11` selector would also revert
+    ///         in a blind-try design, but with empty-data — indistinguishable
+    ///         from a legitimate downstream revert (e.g. user out of margin).
+    ///         The version() probe is single-source-of-truth and lets real
+    ///         reverts propagate untouched.
+    function _isAdapterV11(address adapter_addr) internal view returns (bool) {
+        (bool ok, bytes memory data) = adapter_addr.staticcall(
+            abi.encodeWithSelector(IPorticoAdapter.version.selector)
+        );
+        if (!ok || data.length < 96) revert AdapterMissingVersion(adapter_addr);
+        (uint256 major, uint256 minor,) = abi.decode(data, (uint256, uint256, uint256));
+        return major == 1 && minor >= 1;
     }
 }

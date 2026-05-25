@@ -118,7 +118,7 @@ contract Aqueduct {
     /// race (ack-then-claim); this catches claim-then-ack.
     error ExpiresAtTooSoon(uint256 attempted, uint256 minimum);
 
-    event EmergencyPaused(address indexed by);
+    event EmergencyPaused(address indexed by, bytes32 reason);
     event Resumed(address indexed by);
     // Audit FIRE76-7 fix (sub-agent HIGH): rolling-30-day LINK usage
     // accumulator. Pre-fix, `LinkBalanceLow` compared against the current
@@ -165,15 +165,17 @@ contract Aqueduct {
         praetor_timelock = _praetor_timelock;
     }
 
-    /// Audit G-6 fix: uniform `pause(string)` ABI so PraetorTimelock.emergencyPause
-    /// (which calls `IPausable(target).pause(reason)`) reaches this contract.
-    /// Accepts caller in {multisig, timelock} — multisig for instant action,
+    /// Audit theta.1 fix (2026-05-25): align the pause ABI with PraetorTimelock's
+    /// `IPausable.pause(bytes32)` selector. Pre-fix this declared `pause(string)`,
+    /// which has a different selector, so every emergency pause routed through
+    /// the timelock helper silently reverted at the target. Off-chain callers
+    /// should `keccak256(bytes(reason))` before invoking.
+    /// Accepts caller in {multisig, timelock}: multisig for instant action,
     /// timelock for the multisig-via-PraetorTimelock-helper path.
-    function pause(string calldata reason) external {
+    function pause(bytes32 reason) external {
         if (msg.sender != praetor_multisig && msg.sender != praetor_timelock) revert Unauthorized();
         is_paused = true;
-        emit EmergencyPaused(msg.sender);
-        reason; // reason is in the event from caller; suppress unused warning
+        emit EmergencyPaused(msg.sender, reason);
     }
 
     function resume() external onlyPraetor {

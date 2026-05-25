@@ -57,20 +57,20 @@ contract AqueductTest is Test {
 
     function test_pause_acceptsMultisig() public {
         vm.prank(praetor);
-        aqueduct.pause("emergency drill");
+        aqueduct.pause(keccak256(bytes("emergency drill")));
         assertTrue(aqueduct.is_paused());
     }
 
     function test_pause_acceptsTimelock() public {
         vm.prank(timelock);
-        aqueduct.pause("scheduled");
+        aqueduct.pause(keccak256(bytes("scheduled")));
         assertTrue(aqueduct.is_paused());
     }
 
     function test_pause_rejectsRandomCaller() public {
         vm.prank(hostile);
         vm.expectRevert(Aqueduct.Unauthorized.selector);
-        aqueduct.pause("hostile");
+        aqueduct.pause(keccak256(bytes("hostile")));
     }
 
     function test_send_collateral_revertsWhenPaused() public {
@@ -79,7 +79,7 @@ contract AqueductTest is Test {
         router.setChainSupported(1, true);
 
         vm.prank(praetor);
-        aqueduct.pause("test");
+        aqueduct.pause(keccak256(bytes("test")));
 
         vm.startPrank(user);
         usdc.approve(address(aqueduct), 1_000_000);
@@ -90,7 +90,7 @@ contract AqueductTest is Test {
 
     function test_resume_onlyPraetor() public {
         vm.prank(praetor);
-        aqueduct.pause("p");
+        aqueduct.pause(keccak256(bytes("p")));
 
         vm.prank(timelock);
         vm.expectRevert(Aqueduct.Unauthorized.selector);
@@ -467,7 +467,7 @@ contract AqueductTest is Test {
         uint256 amount_wei,
         uint256 expires_at
     );
-    event EmergencyPaused(address indexed by);
+    event EmergencyPaused(address indexed by, bytes32 reason);
     event Resumed(address indexed by);
     event AqueductOnDestSet(uint64 indexed chain_selector, address dest);
 
@@ -492,15 +492,18 @@ contract AqueductTest is Test {
     }
 
     function test_pause_emitsEmergencyPaused_iter89() public {
-        vm.expectEmit(true, false, false, false, address(aqueduct));
-        emit EmergencyPaused(praetor);
+        bytes32 reason = keccak256(bytes("test"));
+        // Check indexed `by` topic and the bytes32 data payload now that
+        // Phase theta.1 migrated the reason field from off-event to indexed-data.
+        vm.expectEmit(true, false, false, true, address(aqueduct));
+        emit EmergencyPaused(praetor, reason);
         vm.prank(praetor);
-        aqueduct.pause("test");
+        aqueduct.pause(reason);
     }
 
     function test_resume_emitsResumed_iter89() public {
         vm.prank(praetor);
-        aqueduct.pause("test");
+        aqueduct.pause(keccak256(bytes("test")));
 
         vm.expectEmit(true, false, false, false, address(aqueduct));
         emit Resumed(praetor);

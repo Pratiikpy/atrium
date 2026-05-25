@@ -109,6 +109,13 @@ pub const ERR_ORACLE_NEGATIVE_PRICE: u16 = 12;
 pub const ERR_COFFER_UNREACHABLE: u16 = 13;
 pub const ERR_CORRELATION_CLASS_OOR: u16 = 14;
 pub const ERR_PYTH_NEGATIVE_PRICE: u16 = 15;
+/// Phase theta.1 fix (2026-05-25): pre-fix the required-margin call to the
+/// PlinthMath helper used `.unwrap_or(U256::ZERO)`, silently treating a
+/// reverting math contract as "no margin required". Under-collateralised
+/// accounts then looked healthy and the next update_margin tick would not
+/// auto-pause them, opening a Vigil-bypass path. New behavior: surface the
+/// failure as a distinct error code so the calling tx reverts loud.
+pub const ERR_MATH_UNREACHABLE: u16 = 16;
 
 #[derive(SolidityError)]
 pub enum PlinthError {
@@ -805,7 +812,7 @@ impl Plinth {
                 min_initial,
                 maint_buffer,
             )
-            .unwrap_or(U256::ZERO);
+            .map_err(|_| PlinthError::code(ERR_MATH_UNREACHABLE))?;
 
         // Read Coffer balance.
         //

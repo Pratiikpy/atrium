@@ -66,6 +66,7 @@ export function handleEmergencyPaused(event: EmergencyPausedEvent): void {
   const state = loadOrCreatePauseState();
   state.isPaused = true;
   state.lastPausedBy = event.params.by;
+  state.lastPausedReason = event.params.reason;
   state.lastPausedAtBlock = event.block.number;
   state.save();
 }

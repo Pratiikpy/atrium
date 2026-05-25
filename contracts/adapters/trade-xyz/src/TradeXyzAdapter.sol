@@ -23,6 +23,7 @@ interface ITradeXyzClearinghouse {
 
 interface IERC20 {
     function approve(address spender, uint256 value) external returns (bool);
+    function transfer(address to, uint256 value) external returns (bool);
 }
 
 /// @title TradeXyzAdapter
@@ -58,6 +59,8 @@ contract TradeXyzAdapter is IPorticoAdapter, ReentrancyGuard {
     error PositionNotFound();
     error VenueOffline();
     error BadVenuePayload();
+    error WithdrawShortfall(uint256 expected, uint256 actual);
+    error UsdcTransferFailed(address to, uint256 amount);
 
     // Audit EEEE-1 fix (`human_left.md` #31): orchestrator-list pattern.
     mapping(address => bool) public is_authorized_caller;
@@ -140,14 +143,27 @@ contract TradeXyzAdapter is IPorticoAdapter, ReentrancyGuard {
         // Audit JJJ-12 fix: pre-fix withdrew exactly `abs(notional)` and
         // discarded pnl. If pnl > 0 the user's profit stayed stranded in the
         // clearinghouse forever; if pnl < 0 the withdraw asked for more than
-        // the clearinghouse held → revert → position state half-closed
+        // the clearinghouse held  revert  position state half-closed
         // (closePosition ran but no settlement). Withdraw (supplied + pnl),
         // clamped at 0 if user lost more than their stake.
         uint256 supplied = uint256(pos.notional_signed > 0 ? pos.notional_signed : -pos.notional_signed);
         int256 settle_signed = int256(supplied) + pnl;
         uint256 to_withdraw = settle_signed > 0 ? uint256(settle_signed) : 0;
         if (to_withdraw > 0) {
-            clearinghouse.withdrawCollateral(pos.owner, to_withdraw);
+            // Phase theta.1 fix: pre-fix the return value of withdrawCollateral
+            // was discarded (audit Round 1). Capture it; if the clearinghouse
+            // returns less than requested (partial settlement, e.g. insurance-
+            // pool shortfall), revert loudly with the gap so Coffer accounting
+            // does not silently disagree with on-chain reality. msg.sender
+            // (this adapter) receives the USDC; forward to atrium_coffer so
+            // share accounting can resolve. Previously the recipient was
+            // pos.owner directly, which bypassed Coffer's share ledger.
+            uint256 actual = clearinghouse.withdrawCollateral(pos.owner, to_withdraw);
+            if (actual < to_withdraw) revert WithdrawShortfall(to_withdraw, actual);
+            if (actual > 0) {
+                bool ok = IERC20(usdc).transfer(atrium_coffer, actual);
+                if (!ok) revert UsdcTransferFailed(atrium_coffer, actual);
+            }
         }
         emit PositionClosed(venue_position_id, pnl);
         delete positions[venue_position_id];

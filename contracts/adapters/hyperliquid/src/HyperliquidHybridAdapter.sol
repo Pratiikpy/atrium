@@ -33,6 +33,7 @@ interface IHyperliquidBridge {
 interface IERC20 {
     function approve(address spender, uint256 value) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 value) external returns (bool);
 }
 
 contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
@@ -88,6 +89,7 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
     error BadVenuePayload();
     error InsufficientSignatures(uint16 got, uint16 need);
     error DuplicateAttestation(bytes32 attestation_hash);
+    error UsdcTransferFailed(address to, uint256 amount);
 
     // Audit DDDDD-4 fix: validator-set rotation must be observable. Pre-fix
     // the rotation flipped storage silently — subgraph + ops dashboards
@@ -208,10 +210,28 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
 
         // Realized PnL = last attested unrealized PnL at the time of close.
         // Bridge withdrawal happens in a follow-up tx after validators sign
-        // the withdrawal — Atrium tracks the withdrawal id off-chain and the
+        // the withdrawal  Atrium tracks the withdrawal id off-chain and the
         // Aqueduct claim-back mechanism handles disputes.
         realized_pnl_signed = pos.last_attested_unrealized_pnl;
         pos.is_open = false;
+
+        // Phase theta.1 funds-stranding fix: pre-fix the adapter held the
+        // user's collateral indefinitely after close. The Hyperliquid bridge
+        // settles withdrawals asynchronously (validator-signed quorum); once
+        // settled the USDC lands in the adapter's balance. This sweep
+        // forwards any adapter-held USDC to Coffer on close, so Coffer's
+        // share accounting can resolve. Race against subsequent settlement
+        // is handled by the bridge withdrawal queue: late USDC sits in the
+        // adapter and will be swept by the next close call (or an explicit
+        // sweep helper, Y2). For testnet scaffold the bridge stub settles 0
+        // and this is a no-op  realized_pnl_signed return is still the
+        // authoritative PnL.
+        uint256 settled = IERC20(usdc).balanceOf(address(this));
+        if (settled > 0) {
+            bool ok = IERC20(usdc).transfer(atrium_coffer, settled);
+            if (!ok) revert UsdcTransferFailed(atrium_coffer, settled);
+        }
+
         emit PositionClosed(venue_position_id, realized_pnl_signed);
         venue_payload;
     }

@@ -127,6 +127,10 @@ type AqueductPauseState @entity {
   id: ID!
   isPaused: Boolean!
   lastPausedBy: Bytes
+  # Phase theta.1: Aqueduct.pause signature is now `pause(bytes32 reason)`
+  # to match the PraetorTimelock IPausable selector. The reason payload is
+  # surfaced to the UI for the pause-banner copy.
+  lastPausedReason: Bytes
   lastPausedAtBlock: BigInt
   lastResumedBy: Bytes
   lastResumedAtBlock: BigInt

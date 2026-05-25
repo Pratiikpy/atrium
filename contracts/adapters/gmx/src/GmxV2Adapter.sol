@@ -154,7 +154,26 @@ contract GmxV2Adapter is IPorticoAdapter, ReentrancyGuard {
     {
         VenuePosition storage pos = positions[venue_position_id];
         if (pos.owner == address(0)) revert PositionNotFound();
+
+        // Phase theta.1 funds-stranding fix: pre-fix the realized PnL was
+        // returned to Coffer but the underlying USDC collateral stayed in
+        // the adapter forever (per audit Round-1). Pattern: snapshot the
+        // adapter's USDC balance, call the venue close, then forward any
+        // net inflow to Coffer. Real GMX V2 settles closePosition into the
+        // adapter's balance synchronously (or asynchronously via a separate
+        // withdrawal queue when wired); the scaffold gmx_router stub
+        // settles 0. Both cases handled correctly  scaffold transfers 0,
+        // real GMX transfers the settled amount (collateral + signed PnL).
+        // PnL accounting still flows via the realized_pnl_signed return.
+        uint256 balanceBefore = IERC20(usdc).balanceOf(address(this));
         realized_pnl_signed = gmx_router.closePosition(pos.gmx_position_key);
+        uint256 balanceAfter = IERC20(usdc).balanceOf(address(this));
+        if (balanceAfter > balanceBefore) {
+            uint256 settled = balanceAfter - balanceBefore;
+            bool ok = IERC20(usdc).transfer(atrium_coffer, settled);
+            if (!ok) revert UsdcTransferFailed(atrium_coffer, settled);
+        }
+
         emit PositionClosed(venue_position_id, realized_pnl_signed);
         delete positions[venue_position_id];
     }

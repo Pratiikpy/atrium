@@ -76,6 +76,12 @@ sol! {
     // pattern; this error fires when the prologue sees the flag already
     // set.
     error CofferReentrant();
+    // Phase theta.1 fix (2026-05-25): USDC `paused()` view returned an error
+    // (e.g. underlying contract upgraded behind a bad proxy, RPC stub broken).
+    // Pre-fix `.unwrap_or(false)` silently treated USDC as live and let the
+    // deposit proceed against a paused asset. New behavior: refuse to operate
+    // when USDC state is unreadable.
+    error UsdcStateUnreadable();
 }
 
 #[derive(SolidityError)]
@@ -90,6 +96,8 @@ pub enum CofferError {
     ZeroAssets(ZeroAssets),
     InsufficientShares(InsufficientShares),
     UsdcPaused(UsdcPaused),
+    // Phase theta.1 (2026-05-25): paired with UsdcStateUnreadable error.
+    UsdcStateUnreadable(UsdcStateUnreadable),
     // Audit ZZ-5 + ZZ-6: critical money-loss fix variant.
     TransferFailed(TransferFailed),
     // Audit KKK-3: fail-loud on Plinth call failure during adapter_pull
@@ -235,9 +243,15 @@ impl Coffer {
 
     pub fn total_assets(&self) -> U256 {
         let usdc = IUsdc::new(self.asset.get());
-        // Stylus 0.10: interface calls take the contract context (&self / &mut self)
-        // directly as the first arg, no separate Call::new() wrapper.
-        usdc.balance_of(self.vm(), Call::new(), self.vm().contract_address()).unwrap_or(U256::ZERO)
+        // Phase theta.1 fix (2026-05-25): pre-fix `.unwrap_or(U256::ZERO)`
+        // silently returned 0 when USDC.balanceOf reverted (proxy upgrade
+        // mid-flight, RPC eclipse, hostile asset). ERC-4626 readers then
+        // computed share price = total_supply / 0 = ∞, the classic first-
+        // depositor inflation attack vector. Reverting on the view is the
+        // safe answer: clients see the call fail, never get a wrong number.
+        // ERC-4626 spec MAY revert on totalAssets() per the EIP-4626 text.
+        usdc.balance_of(self.vm(), Call::new(), self.vm().contract_address())
+            .expect("Coffer.total_assets: USDC balanceOf unreadable")
     }
 
     pub fn total_supply(&self) -> U256 {
@@ -331,9 +345,17 @@ impl Coffer {
             }));
         }
 
-        // Check USDC isn't paused (M7 fix from TDD audit)
+        // Check USDC isn't paused (M7 fix from TDD audit).
+        // Phase theta.1 fix (2026-05-25): pre-fix `.unwrap_or(false)` silently
+        // treated USDC as live when `paused()` reverted. A paused-USDC deposit
+        // would then attempt transferFrom which also reverts — but only AFTER
+        // share-issuance math ran on stale state. New behavior: bubble the
+        // RPC failure up as UsdcStateUnreadable, refuse to proceed.
         let usdc = IUsdc::new(self.asset.get());
-        if usdc.paused(self.vm(), Call::new()).unwrap_or(false) {
+        let is_usdc_paused = usdc
+            .paused(self.vm(), Call::new())
+            .map_err(|_| CofferError::UsdcStateUnreadable(UsdcStateUnreadable {}))?;
+        if is_usdc_paused {
             self.vm().log(UsdcPausedDetected {});
             return Err(CofferError::UsdcPaused(UsdcPaused {}));
         }

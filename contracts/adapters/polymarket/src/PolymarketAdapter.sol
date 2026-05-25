@@ -23,6 +23,7 @@ interface IAqueduct {
 interface IERC20 {
     function approve(address spender, uint256 value) external returns (bool);
     function transfer(address to, uint256 value) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
 }
 
 contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
@@ -88,6 +89,7 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     error InsufficientSignatures(uint16 got, uint16 need);
     error DuplicateAttestation(bytes32);
     error BadVenuePayload();
+    error UsdcTransferFailed(address to, uint256 amount);
 
     // Audit DDDDD-2 + DDDDD-3 fix: emit rotation events on validator-set
     // and destination changes so observers (subgraph, ops dashboards) can
@@ -198,8 +200,23 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
         VenuePosition storage pos = positions[venue_position_id];
         if (!pos.is_open) revert PositionNotFound();
         pos.is_open = false;
-        emit PositionClosed(venue_position_id, pos.last_attested_pnl);
-        return pos.last_attested_pnl;
+        int256 realized = pos.last_attested_pnl;
+
+        // Phase theta.1 funds-stranding fix: pre-fix the adapter held the
+        // user's collateral indefinitely after close. Polymarket payout
+        // returns to the adapter via Aqueduct CCIP from Polygon Amoy; once
+        // settled it lands in the adapter's USDC balance. Sweep any
+        // adapter-held USDC to Coffer on close so Coffer's share accounting
+        // can resolve. For testnet scaffold the CCIP receiver stub settles
+        // 0 and this is a no-op; realized PnL return is still authoritative.
+        uint256 settled = IERC20(usdc).balanceOf(address(this));
+        if (settled > 0) {
+            bool ok = IERC20(usdc).transfer(atrium_coffer, settled);
+            if (!ok) revert UsdcTransferFailed(atrium_coffer, settled);
+        }
+
+        emit PositionClosed(venue_position_id, realized);
+        return realized;
     }
 
     function modify_position(uint256, int256, bytes calldata) external pure returns (int256) {

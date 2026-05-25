@@ -159,7 +159,10 @@ dataSources:
           handler: handleCrossChainCreditSettled
         - event: CrossChainCreditClaimedBack(indexed bytes32,indexed address,uint256)
           handler: handleCrossChainCreditClaimedBack
-        - event: EmergencyPaused(indexed address)
+        # Phase theta.1 (2026-05-25): Aqueduct.pause migrated string→bytes32
+        # to match PraetorTimelock.IPausable selector. Event topic now includes
+        # the bytes32 reason payload.
+        - event: EmergencyPaused(indexed address,bytes32)
           handler: handleEmergencyPaused
         - event: Resumed(indexed address)
           handler: handleResumed
