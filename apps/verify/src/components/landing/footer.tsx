@@ -129,14 +129,51 @@ export function LandingFooter() {
         ))}
       </div>
       <div className="border-t border-divider">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-6 py-4 text-xs text-muted md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-6 py-4 text-xs text-muted md:flex-row md:items-center">
           <span>© 2026 Atrium · testnet on Arbitrum Sepolia · no real funds at risk</span>
-          <span className="inline-flex items-center gap-1.5 font-mono">
-            <span className="size-1.5 rounded-full bg-[var(--color-status-amber)]" />
-            testnet · contracts pending
-          </span>
+          <div className="flex items-center gap-3">
+            <SocialLink href="https://github.com/Pratiikpy/atrium" label="GitHub">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M8 0a8 8 0 00-2.5 15.6c.4 0 .55-.18.55-.4v-1.4c-2.23.48-2.7-1.08-2.7-1.08-.36-.93-.9-1.18-.9-1.18-.72-.5.06-.48.06-.48.8.05 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.5-1.08-1.78-.2-3.65-.9-3.65-3.97 0-.88.31-1.6.83-2.16-.08-.2-.36-1.02.08-2.13 0 0 .67-.22 2.2.82A7.6 7.6 0 018 4.06c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.16 0 3.08-1.87 3.76-3.65 3.96.29.25.54.74.54 1.49v2.21c0 .22.15.48.55.4A8 8 0 008 0z" />
+              </svg>
+            </SocialLink>
+            <SocialLink href="https://atrium.fi/discord" label="Discord">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M13.55 3a13 13 0 00-3.2-1l-.16.32a12 12 0 00-3.4 0L6.65 2A13 13 0 003.45 3 13.5 13.5 0 001 11a13.2 13.2 0 004 2 9.5 9.5 0 00.84-1.36 8.5 8.5 0 01-1.32-.64l.33-.24a9.4 9.4 0 008.3 0l.33.24a8.4 8.4 0 01-1.33.64A9.5 9.5 0 0011 13a13.2 13.2 0 004-2A13.5 13.5 0 0013.55 3zM5.85 9.4c-.78 0-1.42-.72-1.42-1.6s.62-1.6 1.42-1.6c.79 0 1.43.73 1.42 1.6 0 .88-.63 1.6-1.42 1.6zm4.3 0c-.79 0-1.43-.72-1.43-1.6s.63-1.6 1.42-1.6c.79 0 1.42.73 1.42 1.6 0 .88-.63 1.6-1.42 1.6z" />
+              </svg>
+            </SocialLink>
+            <SocialLink href="https://twitter.com/atrium_fi" label="Twitter">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M12.6 2H14.7L10.2 7.1 15.5 14H11.4L8.1 9.7 4.4 14H2.3L7.1 8.6 2 2h4.2l3 4 3.4-4zm-.7 10.7h1.2L5.1 3.2H3.8l8.1 9.5z" />
+              </svg>
+            </SocialLink>
+            <SocialLink href="https://warpcast.com/atrium" label="Farcaster">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M2 2v12h2.5V8.6L8 14l3.5-5.4V14H14V2h-2.5l-3.5 5L4.5 2H2z" />
+              </svg>
+            </SocialLink>
+            <span className="inline-flex items-center gap-1.5 font-mono">
+              <span className="size-1.5 rounded-full bg-[var(--color-status-amber)]" />
+              testnet · contracts pending
+            </span>
+          </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      title={label}
+      aria-label={label}
+      className="grid size-7 place-items-center rounded-full border border-divider text-muted transition hover:border-ink/30 hover:text-ink"
+    >
+      {children}
+    </a>
   );
 }
