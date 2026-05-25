@@ -864,6 +864,21 @@
   </style>
 </head>
 <body>
+  <!--
+    Phase theta (2026-05-25 audit follow-up): /mobile-app.html is a
+    static design preview, not the live React app. The dollar amounts
+    + percentages on this page are prototype placeholders left in place
+    so the layout reads as intended. The live app lives at /app on the
+    same domain. Per /docs/honesty the placeholder numbers MUST NOT
+    appear without context, so a top-of-page banner names the surface
+    explicitly. Mobile UAs are no longer rewritten here by middleware
+    (Audit B C-4 Path B fix); only direct /mobile-app.html visits land.
+  -->
+  <div role="alert" style="position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;justify-content:center;padding:10px 14px;background:#1A1714;color:#FBFAF7;font:13px/1.4 system-ui,sans-serif;border-bottom:1px solid rgba(251,250,247,.2);">
+    <strong style="font-weight:600;">Design preview only.</strong>
+    <span style="opacity:.85;">Numbers on this page are placeholder, not live state.</span>
+    <a href="/app" style="margin-left:auto;color:#FBFAF7;text-decoration:underline;font-weight:500;">Open the live app →</a>
+  </div>
   <div class="showcase">
     <div class="showcase-stage">
 

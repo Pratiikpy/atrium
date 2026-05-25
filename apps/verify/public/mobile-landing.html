@@ -975,23 +975,33 @@
                     the card visual rhythm; ui.md tolerates illustration
                     when the surrounding label is honest about it.
                   -->
+                  <!-- Phase theta (2026-05-25 audit follow-up): pre-fix this
+                       static mobile-landing.html shipped concrete numbers
+                       ($12,374,820 buying power, $4.13M collateral, 3.0x
+                       margin ratio, 38.4% utilisation) inside a "preview"
+                       pill, but the headline number rendered at 64px above
+                       the pill so users perceived it as live state. Per
+                       /docs/honesty (no fake numbers shipped as truth), the
+                       numbers now read "pending" until the live data path
+                       wires up. The mock chrome stays so the prototype
+                       layout fidelity isn't lost. -->
                   <div class="mock">
                     <div class="mock-head">
                       <span class="l">Buying power</span>
-                      <span class="pill" style="background: color-mix(in oklch, var(--testnet) 14%, transparent); color: var(--testnet); border-color: color-mix(in oklch, var(--testnet) 30%, transparent);">preview</span>
+                      <span class="pill" style="background: color-mix(in oklch, var(--testnet) 14%, transparent); color: var(--testnet); border-color: color-mix(in oklch, var(--testnet) 30%, transparent);">pending</span>
                     </div>
-                    <div class="big">$12,374,820</div>
+                    <div class="big">pending</div>
                     <div class="mock-row">
                       <span class="l">Collateral</span>
-                      <span class="v">$4.13M</span>
+                      <span class="v">—</span>
                     </div>
                     <div class="mock-row">
                       <span class="l">Margin · ratio</span>
-                      <span class="v">3.0×</span>
+                      <span class="v">—</span>
                     </div>
                     <div class="mock-row">
                       <span class="l">Utilisation</span>
-                      <span class="v">38.4%</span>
+                      <span class="v">—</span>
                     </div>
                   </div>
 
