@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 
 export const metadata = {
   title: 'Atrium — security',
@@ -35,8 +36,12 @@ export default function SecurityPage() {
             Cross-cutting audit was run on 2026-05-18 by six parallel sub-agents covering contracts,
             adapters, services, UI, honesty, and security. Findings are tracked in{' '}
             <code className="font-mono text-ink">docs/AUDIT_FINDINGS.md</code>. Each row has a file
-            reference, an owner, and a target month.
+            reference, an owner, and a target month. Live status below pulls from the markdown
+            register on every refresh.
           </p>
+          <div className="mt-5">
+            <AuditFindingsTable />
+          </div>
         </Block>
 
         <Block heading="Disclose a vulnerability">
