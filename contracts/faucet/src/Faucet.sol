@@ -33,6 +33,9 @@ contract Faucet {
     error TransferFailed();
     error Unauthorized();
     error EthDropFailed();
+    // Audit 2026-05-25 LOW-1: drain* recipient must not be zero. Cheap
+    // guard against a praetor fat-finger that would burn the funds.
+    error ZeroRecipient();
 
     event Claimed(address indexed user, uint256 usdcAmount, uint256 ethAmount);
     event Stocked(address indexed who, uint256 usdcAmount, uint256 ethAmount);
@@ -82,12 +85,14 @@ contract Faucet {
     /// Praetor-only escape hatch for unused testnet funds.
     function drainUsdc(address to, uint256 amount) external {
         if (msg.sender != praetor) revert Unauthorized();
+        if (to == address(0)) revert ZeroRecipient();
         bool ok = IERC20(usdc).transfer(to, amount);
         if (!ok) revert TransferFailed();
     }
 
     function drainEth(address payable to, uint256 amount) external {
         if (msg.sender != praetor) revert Unauthorized();
+        if (to == address(0)) revert ZeroRecipient();
         (bool sent,) = to.call{value: amount}("");
         if (!sent) revert EthDropFailed();
     }
