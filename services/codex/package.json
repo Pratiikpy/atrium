@@ -14,7 +14,7 @@
     "deploy:no-migrate": "wrangler deploy",
     "build": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "echo 'eslint flat-config migration tracked in human_left.md (2026-05-24)' && exit 0",
+    "lint": "eslint src --ext .ts --max-warnings=100",
     "clean": "rm -rf .wrangler dist"
   },
   "dependencies": {

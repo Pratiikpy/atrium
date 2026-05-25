@@ -10,7 +10,7 @@
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
-    "lint": "echo 'eslint flat-config migration tracked in human_left.md (2026-05-24)' && exit 0",
+    "lint": "eslint src --ext .ts --max-warnings=100",
     "clean": "rm -rf dist node_modules/.cache"
   },
   "dependencies": {

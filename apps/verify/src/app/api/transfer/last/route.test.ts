@@ -54,7 +54,7 @@ describe('GET /api/transfer/last — empty / pending', () => {
 });
 
 describe('GET /api/transfer/last — lifecycle status', () => {
-  function makeCredit(overrides: Partial<{ id: string; isSettled: boolean; isClaimedBack: boolean; amountWei: string }> = {}) {
+  function makeCredit(overrides: Partial<{ id: string; isSettled: boolean; isClaimedBack: boolean; amountWei: string; createdAtBlock: string; settledAtBlock: string | null }> = {}) {
     return {
       id: '0xtxhash',
       amountWei: '5000000', // 5 USDC
