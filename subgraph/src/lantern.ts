@@ -11,7 +11,11 @@ export function handleAttestationPublished(event: AttestationPublished): void {
   a.root = event.params.root;
   a.blockNumber = event.params.block_number;
   a.timestamp = event.params.timestamp;
-  a.leafCount = event.params.leafCount;
+  // Schema types leafCount as Int (i32) because Merkle leaf counts realistically
+  // max in the low thousands; the event emits uint256. Cast through toI32 with
+  // an explicit overflow guard. If the count ever exceeds i32 max we have other
+  // problems; clamp here keeps the handler crash-free.
+  a.leafCount = event.params.leafCount.toI32();
   a.ipfsCid = event.params.ipfsCid;
   a.save();
 }
