@@ -84,8 +84,8 @@ export function VerifierStepRunner({ step }: { step: number }) {
   // Permission state: wrong chain
   if (chain?.id !== 421614) {
     return (
-      <div className="mt-8 rounded-md border border-warning/30 bg-warning/5 p-6">
-        <p className="text-sm font-medium text-warning">Switch to Arbitrum Sepolia</p>
+      <div className="mt-8 rounded-md border border-testnet/30 bg-testnet/5 p-6">
+        <p className="text-sm font-medium text-testnet">Switch to Arbitrum Sepolia</p>
         <p className="mt-2 text-sm text-ink-soft">
           Verifier Mode runs on testnet only. Your wallet is on {chain?.name ?? 'an unknown chain'}.
         </p>
@@ -221,8 +221,8 @@ export function VerifierStepRunner({ step }: { step: number }) {
       </p>
 
       {deploymentReady === false && (
-        <div className="rounded-md border border-warning/30 bg-warning/5 p-4">
-          <p className="flex items-center gap-2 text-sm font-medium text-warning">
+        <div className="rounded-md border border-testnet/30 bg-testnet/5 p-4">
+          <p className="flex items-center gap-2 text-sm font-medium text-testnet">
             <Info className="size-4" aria-hidden /> Step not wired yet
           </p>
           <p className="mt-1 text-sm text-ink-soft">
@@ -257,7 +257,7 @@ export function VerifierStepRunner({ step }: { step: number }) {
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-success hover:underline"
+            className="inline-flex items-center gap-2 text-sm text-live hover:underline"
           >
             <Check className="size-4" aria-hidden />
             View on Arbiscan
@@ -267,8 +267,8 @@ export function VerifierStepRunner({ step }: { step: number }) {
       })()}
 
       {run.status === 'error' && (
-        <div className="rounded-md border border-danger/40 bg-danger/5 p-4">
-          <p className="flex items-center gap-2 text-sm font-medium text-danger">
+        <div className="rounded-md border border-neg/40 bg-neg/5 p-4">
+          <p className="flex items-center gap-2 text-sm font-medium text-neg">
             <Triangle className="size-4" aria-hidden /> Did not complete
           </p>
           <p className="mt-1 text-sm text-ink-soft">{run.errorMessage}</p>

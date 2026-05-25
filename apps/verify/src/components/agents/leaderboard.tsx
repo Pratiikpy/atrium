@@ -100,13 +100,13 @@ export function AgentLeaderboard() {
                       className={
                         'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] uppercase tracking-wider ' +
                         (a.status === 'running'
-                          ? 'text-success'
+                          ? 'text-live'
                           : a.status === 'paused'
-                          ? 'text-warning'
+                          ? 'text-testnet'
                           : 'text-muted')
                       }
                     >
-                      <span className={'size-1.5 rounded-full ' + (a.status === 'running' ? 'bg-success' : a.status === 'paused' ? 'bg-warning' : 'bg-muted')} />
+                      <span className={'size-1.5 rounded-full ' + (a.status === 'running' ? 'bg-live' : a.status === 'paused' ? 'bg-testnet' : 'bg-muted')} />
                       {a.status}
                     </span>
                   </div>
@@ -117,7 +117,7 @@ export function AgentLeaderboard() {
                 </td>
                 <td className={
                   'px-4 py-3 font-mono ' +
-                  (a.pnl7dDirection === 'up' ? 'text-success' : a.pnl7dDirection === 'down' ? 'text-danger' : 'text-ink')
+                  (a.pnl7dDirection === 'up' ? 'text-live' : a.pnl7dDirection === 'down' ? 'text-neg' : 'text-ink')
                 }>
                   {a.pnl7dDirection === 'up' && '+'}
                   {(a.pnl7dBps / 100).toFixed(2)}%
@@ -215,7 +215,7 @@ function Sparkline({ series, direction }: { series: number[]; direction: 'up' | 
         strokeWidth="0.8"
         stroke="currentColor"
         className={
-          direction === 'up' ? 'text-success' : direction === 'down' ? 'text-danger' : 'text-muted'
+          direction === 'up' ? 'text-live' : direction === 'down' ? 'text-neg' : 'text-muted'
         }
       />
     </svg>

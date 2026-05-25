@@ -118,7 +118,7 @@ function DepositStatusLine({
   }
   if (status.kind === 'success') {
     return (
-      <p className="text-xs text-success">
+      <p className="text-xs text-live">
         Deposited. <ArbiscanLink hash={status.depositHash} /> ·{' '}
         <button type="button" onClick={onReset} className="underline">
           deposit more
@@ -128,7 +128,7 @@ function DepositStatusLine({
   }
   if (status.kind === 'error') {
     return (
-      <p className="text-xs text-danger">
+      <p className="text-xs text-neg">
         Failed: {humanizeReason(status.reason)} ·{' '}
         <button type="button" onClick={onReset} className="underline">
           retry

@@ -74,7 +74,7 @@ export function TaxEventsTable({
               <td className="px-4 py-3 font-mono text-ink-soft">{e.costBasisUsd}</td>
               <td className={
                 'px-4 py-3 font-mono ' +
-                (e.gainDirection === 'up' ? 'text-success' : e.gainDirection === 'down' ? 'text-danger' : 'text-ink')
+                (e.gainDirection === 'up' ? 'text-live' : e.gainDirection === 'down' ? 'text-neg' : 'text-ink')
               }>
                 {e.gainDirection === 'up' && '+'}
                 {e.gainUsd}

@@ -38,8 +38,8 @@ export function ActivityFeedFull() {
 
   if (error) {
     return (
-      <div className="rounded-md border border-danger/40 bg-danger/5 p-6 text-sm">
-        <p className="font-medium text-danger">Could not load activity</p>
+      <div className="rounded-md border border-neg/40 bg-neg/5 p-6 text-sm">
+        <p className="font-medium text-neg">Could not load activity</p>
         <p className="mt-1 text-ink-soft">Scribe is unreachable.</p>
       </div>
     );
@@ -92,9 +92,9 @@ export function ActivityFeedFull() {
 function KindPill({ kind }: { kind: Activity['kind'] }) {
   const styles: Record<Activity['kind'], string> = {
     tx: 'border-divider text-muted',
-    attestation: 'border-success/30 text-success',
-    mandate: 'border-warning/30 text-warning',
-    liquidation: 'border-danger/30 text-danger',
+    attestation: 'border-live/30 text-live',
+    mandate: 'border-testnet/30 text-testnet',
+    liquidation: 'border-neg/30 text-neg',
   };
   return (
     <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-wider ${styles[kind]}`}>

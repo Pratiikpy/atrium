@@ -156,13 +156,13 @@ function computeBufferPreview(sizeUsd: number, leverage: number): BufferRow[] {
     let healthyClass: string;
     if (bufferUsd >= healthyBuffer * 0.6) {
       label = '(healthy)';
-      healthyClass = 'text-success';
+      healthyClass = 'text-live';
     } else if (bufferUsd > 0) {
       label = '(close to liquidation)';
-      healthyClass = 'text-warning';
+      healthyClass = 'text-testnet';
     } else {
       label = '(liquidated)';
-      healthyClass = 'text-danger';
+      healthyClass = 'text-neg';
     }
     rows.push({ shockBps, bufferUsd: Math.max(0, bufferUsd), label, healthyClass });
   }

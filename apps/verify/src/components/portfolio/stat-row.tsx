@@ -69,7 +69,7 @@ function StatTile({
   direction?: 'up' | 'down' | 'flat' | null;
 }) {
   const colorClass =
-    direction === 'up' ? 'text-success' : direction === 'down' ? 'text-danger' : 'text-ink';
+    direction === 'up' ? 'text-live' : direction === 'down' ? 'text-neg' : 'text-ink';
   const display = loading ? null : value ?? '—';
   return (
     <div className="rounded-md border border-divider bg-parchment p-4">

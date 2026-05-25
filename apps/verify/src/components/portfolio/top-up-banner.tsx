@@ -55,10 +55,10 @@ export function TopUpBanner() {
 
   return (
     <>
-      <div className="rounded-md border border-warning/40 bg-warning/5 px-4 py-3">
+      <div className="rounded-md border border-testnet/40 bg-testnet/5 px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="font-medium text-warning">
+            <p className="font-medium text-testnet">
               Buffer at {bufferPct}%. Top up to avoid liquidation.
             </p>
             <p className="mt-0.5 text-xs text-ink-soft">
@@ -69,7 +69,7 @@ export function TopUpBanner() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="shrink-0 rounded-md bg-warning px-4 py-2 text-sm font-medium text-parchment hover:opacity-90"
+            className="shrink-0 rounded-md bg-testnet px-4 py-2 text-sm font-medium text-parchment hover:opacity-90"
           >
             Top up
           </button>
@@ -150,7 +150,7 @@ function TopUpModal({
       )}
 
       {status.kind === 'success' && (
-        <div className="mt-3 rounded-md border border-success/40 bg-success-soft p-3 text-xs text-success">
+        <div className="mt-3 rounded-md border border-live/40 bg-live-soft p-3 text-xs text-live">
           <p>
             Deposited.{' '}
             <a
@@ -169,7 +169,7 @@ function TopUpModal({
       )}
 
       {status.kind === 'error' && (
-        <div className="mt-3 rounded-md border border-danger/40 bg-danger/5 p-3 text-xs text-danger">
+        <div className="mt-3 rounded-md border border-neg/40 bg-neg/5 p-3 text-xs text-neg">
           <p>{humanizeTopUpReason(status.reason)}</p>
           <button type="button" onClick={reset} className="mt-1 underline">
             retry

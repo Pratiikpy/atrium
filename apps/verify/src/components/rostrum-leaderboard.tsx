@@ -49,8 +49,8 @@ export function RostrumLeaderboard() {
 
   if (error) {
     return (
-      <div className="mt-12 rounded-md border border-danger/30 bg-danger/5 p-6">
-        <p className="text-sm text-danger">Source unavailable</p>
+      <div className="mt-12 rounded-md border border-neg/30 bg-neg/5 p-6">
+        <p className="text-sm text-neg">Source unavailable</p>
       </div>
     );
   }

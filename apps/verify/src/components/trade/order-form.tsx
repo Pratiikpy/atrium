@@ -124,8 +124,8 @@ export function OrderForm({
           className={
             'rounded-md border p-3 text-sm font-medium transition-colors ' +
             (side === 'long'
-              ? 'border-success bg-success-soft text-success'
-              : 'border-divider bg-parchment text-ink-soft hover:border-success/40')
+              ? 'border-live bg-live-soft text-live'
+              : 'border-divider bg-parchment text-ink-soft hover:border-live/40')
           }
         >
           Long
@@ -136,8 +136,8 @@ export function OrderForm({
           className={
             'rounded-md border p-3 text-sm font-medium transition-colors ' +
             (side === 'short'
-              ? 'border-danger bg-danger/5 text-danger'
-              : 'border-divider bg-parchment text-ink-soft hover:border-danger/40')
+              ? 'border-neg bg-neg/5 text-neg'
+              : 'border-divider bg-parchment text-ink-soft hover:border-neg/40')
           }
         >
           Short
@@ -236,7 +236,7 @@ function OpenStatusLine({
   }
   if (status.kind === 'success') {
     return (
-      <p className="mt-2 text-xs text-success">
+      <p className="mt-2 text-xs text-live">
         Position opened ·{' '}
         <a
           href={`https://sepolia.arbiscan.io/tx/${status.hash}`}
@@ -254,7 +254,7 @@ function OpenStatusLine({
     );
   }
   return (
-    <p className="mt-2 text-xs text-danger">
+    <p className="mt-2 text-xs text-neg">
       Failed: {humanizeOpenReason(status.reason)} ·{' '}
       <button type="button" onClick={onReset} className="underline">
         retry

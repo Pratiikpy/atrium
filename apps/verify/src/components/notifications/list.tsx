@@ -70,7 +70,7 @@ export function NotificationsList() {
 }
 
 function severityClass(s: Notification['severity']): string {
-  if (s === 'warning') return 'border-warning/30';
-  if (s === 'danger') return 'border-danger/40';
+  if (s === 'warning') return 'border-testnet/30';
+  if (s === 'danger') return 'border-neg/40';
   return 'border-divider';
 }

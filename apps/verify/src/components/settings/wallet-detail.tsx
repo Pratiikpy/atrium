@@ -41,9 +41,9 @@ export function WalletDetailCard() {
         <p className="font-display text-xl italic text-ink">Smart wallet</p>
         <span className={
           'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] uppercase tracking-wider ' +
-          (ready ? 'border-success/30 bg-success-soft text-success' : 'border-divider bg-parchment-soft/60 text-muted')
+          (ready ? 'border-live/30 bg-live-soft text-live' : 'border-divider bg-parchment-soft/60 text-muted')
         }>
-          <span className={'size-1.5 rounded-full ' + (ready ? 'bg-success' : 'bg-muted')} />
+          <span className={'size-1.5 rounded-full ' + (ready ? 'bg-live' : 'bg-muted')} />
           {ready ? 'ERC-4337 · 7702 ready' : 'Postern pending'}
         </span>
       </header>

@@ -82,8 +82,8 @@ export default async function CohortPartnerPage({ params }: Params) {
         </Card>
       </section>
 
-      <section className="mt-16 rounded-md border border-warning/30 bg-warning/5 p-6">
-        <p className="text-sm font-medium text-warning">Honest empty state</p>
+      <section className="mt-16 rounded-md border border-testnet/30 bg-testnet/5 p-6">
+        <p className="text-sm font-medium text-testnet">Honest empty state</p>
         <p className="mt-2 text-sm text-ink-soft">
           Per CLAUDE.md "no inflated numbers" rule, every field on this page reads from
           Scribe / live RPC. When a partner has not signed and deposited, the page renders

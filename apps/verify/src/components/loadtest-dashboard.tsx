@@ -79,7 +79,7 @@ export function LoadtestDashboard() {
                 <td className="py-3 pr-6 text-ink">{m.p95}</td>
                 <td className="py-3 pr-6 text-ink">{m.p99}</td>
                 <td className="py-3 pr-6 text-ink-soft">{m.budget}</td>
-                <td className={`py-3 pr-6 ${over ? 'text-danger' : 'text-success'}`}>
+                <td className={`py-3 pr-6 ${over ? 'text-neg' : 'text-live'}`}>
                   {over ? 'over' : 'within'}
                 </td>
               </tr>

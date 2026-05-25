@@ -43,13 +43,13 @@ export function RecessedCard({ children, className = '' }: { children: ReactNode
 
 export function WarningCard({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-md border border-warning/30 bg-warning/5 p-6 ${className}`}>{children}</div>
+    <div className={`rounded-md border border-testnet/30 bg-testnet/5 p-6 ${className}`}>{children}</div>
   );
 }
 
 export function DangerCard({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-md border border-danger/40 bg-danger/5 p-6 ${className}`}>{children}</div>
+    <div className={`rounded-md border border-neg/40 bg-neg/5 p-6 ${className}`}>{children}</div>
   );
 }
 
@@ -231,7 +231,7 @@ export function DangerButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${BTN_BASE} bg-danger text-parchment hover:bg-danger/90 ${className}`}
+      className={`${BTN_BASE} bg-neg text-parchment hover:bg-neg/90 ${className}`}
     >
       {children}
     </button>

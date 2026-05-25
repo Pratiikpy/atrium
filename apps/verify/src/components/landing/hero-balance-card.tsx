@@ -82,7 +82,7 @@ export function HeroBalanceCard() {
       <div className="flex items-center justify-between">
         <p className="text-[11px] uppercase tracking-wider text-muted">Wallet · live</p>
         <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
-          <span className="size-1.5 rounded-full bg-success" />
+          <span className="size-1.5 rounded-full bg-live" />
           arb-sepolia
         </span>
       </div>

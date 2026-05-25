@@ -78,15 +78,15 @@ function Tile({
     <div
       className={
         warn
-          ? 'rounded-md border border-warning/40 bg-warning/5 p-4'
+          ? 'rounded-md border border-testnet/40 bg-testnet/5 p-4'
           : 'rounded-md border border-divider bg-parchment p-4'
       }
     >
       <p className="text-[10px] uppercase tracking-wider text-label">{label}</p>
-      <p className={'mt-2 font-mono text-2xl ' + (warn ? 'text-warning' : 'text-ink')}>{value}</p>
+      <p className={'mt-2 font-mono text-2xl ' + (warn ? 'text-testnet' : 'text-ink')}>{value}</p>
       <p
         className={
-          'mt-1 text-[10px] uppercase tracking-wider ' + (warn ? 'text-warning' : 'text-muted')
+          'mt-1 text-[10px] uppercase tracking-wider ' + (warn ? 'text-testnet' : 'text-muted')
         }
       >
         {sub}

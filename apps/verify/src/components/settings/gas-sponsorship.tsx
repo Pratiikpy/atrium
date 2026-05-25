@@ -39,9 +39,9 @@ export function GasSponsorshipCard() {
         </div>
         <span className={
           'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] uppercase tracking-wider ' +
-          (data?.active ? 'border-success/30 bg-success-soft text-success' : 'border-divider bg-parchment-soft/60 text-muted')
+          (data?.active ? 'border-live/30 bg-live-soft text-live' : 'border-divider bg-parchment-soft/60 text-muted')
         }>
-          <span className={'size-1.5 rounded-full ' + (data?.active ? 'bg-success' : 'bg-muted')} />
+          <span className={'size-1.5 rounded-full ' + (data?.active ? 'bg-live' : 'bg-muted')} />
           {data?.active ? 'active' : 'pending'}
         </span>
       </header>

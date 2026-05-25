@@ -76,8 +76,8 @@ export function LanternDashboard() {
   // Error state — fetch threw or the API responded non-2xx
   if (error) {
     return (
-      <div className="mt-12 rounded-md border border-danger/40 bg-danger/5 p-6">
-        <p className="text-sm font-medium text-danger">Lantern source unavailable</p>
+      <div className="mt-12 rounded-md border border-neg/40 bg-neg/5 p-6">
+        <p className="text-sm font-medium text-neg">Lantern source unavailable</p>
         <p className="mt-2 text-sm text-ink-soft">
           The /api/lantern/latest endpoint failed. If the Lantern attestor service is down,
           check Praetor status. Subgraph fallback also unavailable.
@@ -96,8 +96,8 @@ export function LanternDashboard() {
   // Permission state — wallet on the wrong chain
   if (isConnected && chainId && chainId !== 421614) {
     return (
-      <div className="mt-12 rounded-md border border-warning/30 bg-warning/5 p-6">
-        <p className="text-sm font-medium text-warning">Wrong network</p>
+      <div className="mt-12 rounded-md border border-testnet/30 bg-testnet/5 p-6">
+        <p className="text-sm font-medium text-testnet">Wrong network</p>
         <p className="mt-2 text-sm text-ink-soft">
           Lantern attestations are published on Arbitrum Sepolia (chain id 421614).
           Switch your wallet network to continue.
@@ -154,13 +154,13 @@ export function LanternDashboard() {
             Verify my inclusion
           </button>
           {proofResult === 'verified' && (
-            <p className="mt-3 text-sm text-success">Your balance is included in the attested tree.</p>
+            <p className="mt-3 text-sm text-live">Your balance is included in the attested tree.</p>
           )}
           {proofResult === 'absent' && (
-            <p className="mt-3 text-sm text-warning">No balance found for your wallet in this attestation.</p>
+            <p className="mt-3 text-sm text-testnet">No balance found for your wallet in this attestation.</p>
           )}
           {proofResult === 'error' && (
-            <p className="mt-3 text-sm text-danger">IPFS fetch failed. Retry in a moment.</p>
+            <p className="mt-3 text-sm text-neg">IPFS fetch failed. Retry in a moment.</p>
           )}
         </div>
       ) : (

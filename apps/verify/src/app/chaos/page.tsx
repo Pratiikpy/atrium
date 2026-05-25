@@ -124,7 +124,7 @@ export default function ChaosPage() {
             key={fault}
             type="button"
             onClick={() => inject(fault)}
-            className="rounded-md border border-divider bg-parchment p-5 text-left hover:border-terracotta/40"
+            className="rounded-md border border-divider bg-parchment p-5 text-left hover:border-accent/40"
           >
             <p className="font-medium text-ink">{FAULT_LABELS[fault].label}</p>
             <p className="mt-2 text-sm text-ink-soft">{FAULT_LABELS[fault].describe}</p>
@@ -142,10 +142,10 @@ export default function ChaosPage() {
               isError(r) ? (
                 <li
                   key={i}
-                  className="rounded-md border border-danger/40 bg-danger/5 p-4 text-sm"
+                  className="rounded-md border border-neg/40 bg-neg/5 p-4 text-sm"
                 >
                   <p className="font-mono text-ink">{r.fault}</p>
-                  <p className="mt-1 font-medium text-danger">{r.error}</p>
+                  <p className="mt-1 font-medium text-neg">{r.error}</p>
                   {r.detail && <p className="mt-1 text-ink-soft">{r.detail}</p>}
                   <p className="mt-1 text-muted">{new Date(r.injectedAt).toLocaleString()}</p>
                 </li>

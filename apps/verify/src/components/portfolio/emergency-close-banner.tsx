@@ -30,8 +30,8 @@ export function EmergencyCloseBanner({
 
   return (
     <>
-      <div className="mt-2 rounded-md border border-warning/40 bg-warning/5 px-4 py-3 text-xs">
-        <p className="font-medium text-warning">
+      <div className="mt-2 rounded-md border border-testnet/40 bg-testnet/5 px-4 py-3 text-xs">
+        <p className="font-medium text-testnet">
           Normal close failed for {instrument} — venue likely has no liquidity for the full size.
         </p>
         <p className="mt-1 text-ink-soft">
@@ -42,7 +42,7 @@ export function EmergencyCloseBanner({
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="rounded-md bg-warning px-3 py-1.5 text-xs font-medium text-parchment hover:opacity-90"
+            className="rounded-md bg-testnet px-3 py-1.5 text-xs font-medium text-parchment hover:opacity-90"
           >
             Use emergency partial close
           </button>
@@ -93,14 +93,14 @@ export function EmergencyCloseBanner({
               emergencyClose();
             }}
             disabled={busy}
-            className="rounded-md bg-warning px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
+            className="rounded-md bg-testnet px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
           >
             {emergencyButtonLabel(status)}
           </button>
         </div>
 
         {status.kind === 'success' && (
-          <div className="mt-3 rounded-md border border-success/40 bg-success-soft p-3 text-xs text-success">
+          <div className="mt-3 rounded-md border border-live/40 bg-live-soft p-3 text-xs text-live">
             Emergency close queued.{' '}
             <a
               href={`https://sepolia.arbiscan.io/tx/${status.hash}`}
@@ -114,7 +114,7 @@ export function EmergencyCloseBanner({
         )}
 
         {status.kind === 'error' && (
-          <div className="mt-3 rounded-md border border-danger/40 bg-danger/5 p-3 text-xs text-danger">
+          <div className="mt-3 rounded-md border border-neg/40 bg-neg/5 p-3 text-xs text-neg">
             <p>{humanizeEmergencyReason(status.reason)}</p>
             <button type="button" onClick={reset} className="mt-1 underline">retry</button>
           </div>

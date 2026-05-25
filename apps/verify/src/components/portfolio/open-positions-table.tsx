@@ -61,8 +61,8 @@ export function OpenPositionsTable({ filterVenueId }: { filterVenueId?: number |
 
   if (error) {
     return (
-      <div className="rounded-md border border-danger/40 bg-danger/5 p-6 text-sm">
-        <p className="font-medium text-danger">Could not load positions</p>
+      <div className="rounded-md border border-neg/40 bg-neg/5 p-6 text-sm">
+        <p className="font-medium text-neg">Could not load positions</p>
         <p className="mt-1 text-ink-soft">Scribe is unreachable. Falling back to direct Plinth read failed too.</p>
       </div>
     );
@@ -160,9 +160,9 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                     (p.pnlUsd == null
                       ? 'text-muted'
                       : p.pnlDirection === 'up'
-                      ? 'text-success'
+                      ? 'text-live'
                       : p.pnlDirection === 'down'
-                      ? 'text-danger'
+                      ? 'text-neg'
                       : 'text-ink')
                   }
                   title={p.pnlUsd == null ? 'PnL pending mark-oracle wiring' : undefined}
@@ -178,7 +178,7 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                         href={`https://sepolia.arbiscan.io/tx/${status.hash}`}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="font-mono text-xs text-success underline"
+                        className="font-mono text-xs text-live underline"
                       >
                         closed ↗
                       </a>
@@ -186,7 +186,7 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                       <button
                         type="button"
                         onClick={reset}
-                        className="text-xs text-danger underline"
+                        className="text-xs text-neg underline"
                         title={status.reason}
                       >
                         retry

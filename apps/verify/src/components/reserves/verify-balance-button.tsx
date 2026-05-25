@@ -151,8 +151,8 @@ function VerifyModal({
           className={
             'mt-4 rounded-md border p-3 text-sm ' +
             (result.ok
-              ? 'border-success/40 bg-success-soft text-success'
-              : 'border-danger/40 bg-danger/5 text-danger')
+              ? 'border-live/40 bg-live-soft text-live'
+              : 'border-neg/40 bg-neg/5 text-neg')
           }
         >
           <p className="font-medium">{result.ok ? 'Verified ✓' : 'Verification failed'}</p>

@@ -87,8 +87,8 @@ export function TransferForm() {
     <section className="rounded-md border border-divider bg-parchment p-5">
       <header className="flex items-baseline justify-between">
         <p className="font-display text-xl italic text-ink">New transfer</p>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/5 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-success">
-          <span className="size-1.5 rounded-full bg-success" /> CCIP testnet
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-live/30 bg-live/5 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-live">
+          <span className="size-1.5 rounded-full bg-live" /> CCIP testnet
         </span>
       </header>
 

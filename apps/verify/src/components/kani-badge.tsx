@@ -54,7 +54,7 @@ export function KaniBadge() {
         className="fixed right-4 top-4 z-50 inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
         title="Kani status fetch failed"
       >
-        <span className="size-2 rounded-full bg-warning" aria-hidden />
+        <span className="size-2 rounded-full bg-testnet" aria-hidden />
         Kani CI · status unavailable
       </Link>
     );
@@ -73,10 +73,10 @@ export function KaniBadge() {
 
   const dotColor =
     status.state === 'pass'
-      ? 'bg-success'
+      ? 'bg-live'
       : status.state === 'fail'
-      ? 'bg-danger'
-      : 'bg-warning';
+      ? 'bg-neg'
+      : 'bg-testnet';
   const linkHref = status.proof_run_url ?? '/security#audit-findings-register';
   // Iteration 38 audit fix: pre-fix the visible text was always
   // `${passed} of ${total}` even when state was 'unknown' (no measurement).

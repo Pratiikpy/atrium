@@ -16,8 +16,8 @@ export function AppShellActions() {
   const qc = useQueryClient();
   return (
     <div className="flex items-center gap-2">
-      <span className="hidden items-center gap-1.5 rounded-full border border-success/30 bg-success/5 px-2.5 py-0.5 text-[11px] uppercase tracking-wider text-success sm:inline-flex">
-        <span className="size-1.5 rounded-full bg-success" />
+      <span className="hidden items-center gap-1.5 rounded-full border border-live/30 bg-live/5 px-2.5 py-0.5 text-[11px] uppercase tracking-wider text-live sm:inline-flex">
+        <span className="size-1.5 rounded-full bg-live" />
         live · arb-sepolia
       </span>
       <Link

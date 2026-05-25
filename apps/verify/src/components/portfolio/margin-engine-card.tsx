@@ -45,8 +45,8 @@ export function MarginEngineCard() {
         // collateral think their margin account was empty. Error must be
         // explicit; null bars + "pending" sub copy keeps the UI shape
         // without lying about the underlying state.
-        <div className="mt-5 rounded-md border border-warning/30 bg-warning/5 p-4 text-sm">
-          <p className="font-medium text-warning">Could not load margin health</p>
+        <div className="mt-5 rounded-md border border-testnet/30 bg-testnet/5 p-4 text-sm">
+          <p className="font-medium text-testnet">Could not load margin health</p>
           <p className="mt-1 text-ink-soft">
             Plinth read failed. The previous breakdown is not necessarily current; reload
             after the next refetch (30s) for fresh state.

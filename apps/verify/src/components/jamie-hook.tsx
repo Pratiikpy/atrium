@@ -31,8 +31,8 @@ export function JamieHook() {
             Posted twice because the venues do not see each other.
           </p>
         </div>
-        <div className="rounded-md border border-divider bg-parchment p-6 ring-1 ring-terracotta/20">
-          <p className="text-xs uppercase tracking-wider text-terracotta">With Atrium</p>
+        <div className="rounded-md border border-divider bg-parchment p-6 ring-1 ring-accent/20">
+          <p className="text-xs uppercase tracking-wider text-accent">With Atrium</p>
           <p className="mt-3 font-display text-5xl text-ink">
             <LiveQuote sourceLabel="ResearchAttestation: backtest result" placeholder="pending backtest" mode="atrium" />
           </p>

@@ -85,7 +85,7 @@ function allowanceSub(j: TaxJurisdiction): string {
 }
 
 function Tile({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: 'success' | 'danger' | 'ink' }) {
-  const color = accent === 'success' ? 'text-success' : accent === 'danger' ? 'text-danger' : 'text-ink';
+  const color = accent === 'success' ? 'text-live' : accent === 'danger' ? 'text-neg' : 'text-ink';
   return (
     <div className="rounded-md border border-divider bg-parchment p-4">
       <p className="text-[10px] uppercase tracking-wider text-label">{label}</p>

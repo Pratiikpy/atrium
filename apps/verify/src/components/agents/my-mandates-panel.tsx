@@ -114,7 +114,7 @@ function MandatesTableWithRevoke({ mandates }: { mandates: Mandate[] }) {
                       href={`https://sepolia.arbiscan.io/tx/${status.hash}`}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="font-mono text-xs text-success underline"
+                      className="font-mono text-xs text-live underline"
                     >
                       revoked ↗
                     </a>
@@ -122,7 +122,7 @@ function MandatesTableWithRevoke({ mandates }: { mandates: Mandate[] }) {
                     <button
                       type="button"
                       onClick={reset}
-                      className="text-xs text-danger underline"
+                      className="text-xs text-neg underline"
                       title={status.reason}
                     >
                       retry
@@ -132,7 +132,7 @@ function MandatesTableWithRevoke({ mandates }: { mandates: Mandate[] }) {
                       type="button"
                       onClick={() => setConfirmFor(m)}
                       disabled={isRowBusy}
-                      className="rounded-md border border-divider px-2.5 py-1 text-xs text-ink-soft hover:border-danger/40 hover:text-danger disabled:opacity-50"
+                      className="rounded-md border border-divider px-2.5 py-1 text-xs text-ink-soft hover:border-neg/40 hover:text-neg disabled:opacity-50"
                     >
                       {isRowBusy ? '…' : 'Revoke'}
                     </button>
@@ -205,7 +205,7 @@ function RevokeConfirmModal({
             <button
               type="button"
               onClick={() => onConfirm(mandate)}
-              className="rounded-md bg-danger px-4 py-3 text-sm font-medium text-parchment hover:opacity-90"
+              className="rounded-md bg-neg px-4 py-3 text-sm font-medium text-parchment hover:opacity-90"
             >
               Revoke
             </button>

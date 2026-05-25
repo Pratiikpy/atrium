@@ -89,7 +89,7 @@ function WithdrawStatusLine({
   if (status.kind === 'idle' || status.kind === 'submitting') return null;
   if (status.kind === 'pending' || status.kind === 'success') {
     return (
-      <p className={'text-xs ' + (status.kind === 'success' ? 'text-success' : 'text-ink-soft')}>
+      <p className={'text-xs ' + (status.kind === 'success' ? 'text-live' : 'text-ink-soft')}>
         {status.kind === 'success' ? 'Withdrew. ' : 'Withdraw tx submitted · '}
         <ArbiscanLink hash={status.hash} />
         {' '}·{' '}
@@ -101,7 +101,7 @@ function WithdrawStatusLine({
   }
   if (status.kind === 'error') {
     return (
-      <p className="text-xs text-danger">
+      <p className="text-xs text-neg">
         Failed: {humanizeReason(status.reason)} ·{' '}
         <button type="button" onClick={onReset} className="underline">
           retry

@@ -193,12 +193,12 @@ function MandateModal({ open, onClose }: { open: boolean; onClose: () => void })
           {buttonLabel(status, busy)}
         </button>
         {validationError && (
-          <div className="mt-3 rounded-md border border-danger/40 bg-danger/5 p-3 text-xs text-danger">
+          <div className="mt-3 rounded-md border border-neg/40 bg-neg/5 p-3 text-xs text-neg">
             {validationError}
           </div>
         )}
         {status.kind === 'success' && (
-          <div className="mt-3 rounded-md border border-success/40 bg-success-soft p-3 text-xs text-success">
+          <div className="mt-3 rounded-md border border-live/40 bg-live-soft p-3 text-xs text-live">
             <p>
               Mandate signed. Intent hash:{' '}
               <span className="font-mono">
@@ -212,7 +212,7 @@ function MandateModal({ open, onClose }: { open: boolean; onClose: () => void })
           </div>
         )}
         {status.kind === 'error' && (
-          <div className="mt-3 rounded-md border border-danger/40 bg-danger/5 p-3 text-xs text-danger">
+          <div className="mt-3 rounded-md border border-neg/40 bg-neg/5 p-3 text-xs text-neg">
             <p>{humanizeIssueError(status.reason)}</p>
           </div>
         )}

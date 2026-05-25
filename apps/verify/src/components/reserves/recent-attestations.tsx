@@ -68,7 +68,7 @@ export function RecentAttestationsTable({
               <td className="px-4 py-3">
                 <span className={
                   'rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider ' +
-                  (a.status === 'PASS' ? 'bg-success-soft text-success' : 'bg-warning/10 text-warning')
+                  (a.status === 'PASS' ? 'bg-live-soft text-live' : 'bg-testnet/10 text-testnet')
                 }>
                   {a.status}
                 </span>

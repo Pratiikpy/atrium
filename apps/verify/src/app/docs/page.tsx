@@ -82,7 +82,7 @@ export default function DocsPage() {
       <section className="mt-12 grid gap-4 md:grid-cols-2">
         {DOCS.map((d) => (
           <a key={d.title} href={d.href} target="_blank" rel="noreferrer" className="block">
-            <Card className="h-full transition-colors hover:border-terracotta/40">
+            <Card className="h-full transition-colors hover:border-accent/40">
               <p className="font-display text-xl text-ink">{d.title}</p>
               <p className="mt-2 text-sm text-ink-soft">{d.sub}</p>
               <p className="mt-3 text-xs text-muted">{d.pages}</p>

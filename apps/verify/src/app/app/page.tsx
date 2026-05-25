@@ -155,7 +155,7 @@ function Tile({ href, title, body }: { href: string; title: string; body: string
   return (
     <Link
       href={href as any}
-      className="block rounded-md border border-divider bg-parchment p-6 transition-colors hover:border-terracotta/40"
+      className="block rounded-md border border-divider bg-parchment p-6 transition-colors hover:border-accent/40"
     >
       <p className="font-display text-2xl text-ink">{title}</p>
       <p className="mt-3 text-sm text-ink-soft">{body}</p>

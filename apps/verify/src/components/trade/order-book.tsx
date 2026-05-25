@@ -83,9 +83,9 @@ export function OrderBook({ venue }: { venue: string }) {
             className={
               'text-[10px] uppercase tracking-wider ' +
               (data?.midDeltaDirection === 'up'
-                ? 'text-success'
+                ? 'text-live'
                 : data?.midDeltaDirection === 'down'
-                ? 'text-danger'
+                ? 'text-neg'
                 : 'text-muted')
             }
           >
@@ -127,7 +127,7 @@ function Side({ title, levels, side }: { title: string; levels: OrderBookLevel[]
       <ol className="space-y-0.5">
         {levels.slice(0, 12).map((l, i) => (
           <li key={i} className="flex justify-between rounded px-1.5 py-0.5 font-mono hover:bg-parchment-soft/60">
-            <span className={side === 'bid' ? 'text-success' : 'text-danger'}>{l.price}</span>
+            <span className={side === 'bid' ? 'text-live' : 'text-neg'}>{l.price}</span>
             <span className="text-ink-soft">{l.size}</span>
           </li>
         ))}

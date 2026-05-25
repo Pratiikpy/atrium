@@ -57,7 +57,7 @@ export function ConnectedSitesCard() {
               <button
                 type="button"
                 onClick={() => { setConfirmRevoke(false); revokeMut.mutate(); }}
-                className="rounded-md bg-danger px-3 py-1.5 font-medium text-parchment hover:opacity-90"
+                className="rounded-md bg-neg px-3 py-1.5 font-medium text-parchment hover:opacity-90"
               >
                 Confirm revoke
               </button>
@@ -85,8 +85,8 @@ export function ConnectedSitesCard() {
           persistence lands when PosternKeyRegistry deploys). Until then a
           user could add a session, see it once, and lose it on the next
           isolate. Surface the caveat once. */}
-      <p className="mt-3 rounded-md border border-warning/30 bg-warning/5 px-3 py-2 text-[11px] text-ink-soft">
-        <span className="font-medium text-warning">Heads up:</span> until Postern lands Month 1 W2, session state lives in the API's local memory and may reset on cold starts. Real on-chain revocation runs through PosternKeyRegistry.
+      <p className="mt-3 rounded-md border border-testnet/30 bg-testnet/5 px-3 py-2 text-[11px] text-ink-soft">
+        <span className="font-medium text-testnet">Heads up:</span> until Postern lands Month 1 W2, session state lives in the API's local memory and may reset on cold starts. Real on-chain revocation runs through PosternKeyRegistry.
       </p>
 
       {!data?.sites.length ? (

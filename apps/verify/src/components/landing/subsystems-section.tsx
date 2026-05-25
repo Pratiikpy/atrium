@@ -99,7 +99,7 @@ export function SubsystemsSection() {
                 return (
                   <li key={p.slug} className="flex items-baseline gap-2">
                     <span
-                      className={'size-1.5 shrink-0 rounded-full ' + (isLive ? 'bg-success' : 'bg-divider')}
+                      className={'size-1.5 shrink-0 rounded-full ' + (isLive ? 'bg-live' : 'bg-divider')}
                       aria-label={isLive ? 'live' : 'pending'}
                     />
                     <span className="font-mono text-xs">{p.name}</span>

@@ -66,8 +66,8 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
       <TAB_CONTEXT.Provider value={{ active }}>
         <div className="space-y-4">
           {tabMeta?.readyMonth && active !== 'wallet' && (
-            <div className="rounded-md border border-warning/30 bg-warning/5 p-5 text-sm">
-              <p className="font-medium text-warning">{tabMeta.label} — coming {tabMeta.readyMonth}</p>
+            <div className="rounded-md border border-testnet/30 bg-testnet/5 p-5 text-sm">
+              <p className="font-medium text-testnet">{tabMeta.label} — coming {tabMeta.readyMonth}</p>
               <p className="mt-1 text-ink-soft">
                 The {tabMeta.label.toLowerCase()} tab is scaffolded but not yet wired.
                 See <code className="font-mono">docs/ROADMAP.md</code> for the exact ship date.
