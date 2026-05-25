@@ -54,7 +54,11 @@ const STEP_CONFIG = {
   },
   '6': {
     title: 'Verify proof of reserves',
-    body: 'Lantern publishes hourly Merkle roots. The page shows your balance as a Merkle leaf with a verifiable inclusion proof.',
+    // Phase theta-followup (2026-05-25): cadence updated. Pre-fix said
+    // "hourly Merkle roots" but Phase θ.3 moved Lantern from Vercel
+    // daily cron to a GHA cron running every 10 minutes — 6× the
+    // resolution.
+    body: 'Lantern publishes a fresh Merkle root every 10 minutes via GHA cron. The page shows your balance as a Merkle leaf with a verifiable inclusion proof against the latest root.',
     contract: 'Lantern.AttestationPublished',
     nextStep: 7,
   },
