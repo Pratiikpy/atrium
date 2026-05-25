@@ -1,0 +1,11 @@
+# Atrium security disclosure metadata (RFC 9116).
+# Phase eta.13 / eta.14 (2026-05-25).
+
+Contact: mailto:security@atrium.fi
+Contact: https://github.com/Pratiikpy/atrium/security/advisories/new
+Expires: 2027-12-31T23:59:59Z
+Encryption: https://atrium.fi/security/pgp.asc
+Preferred-Languages: en
+Canonical: https://atrium.fi/.well-known/security.txt
+Policy: https://atrium.fi/security
+Hiring: https://atrium.fi/team
