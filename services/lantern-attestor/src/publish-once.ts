@@ -29,6 +29,16 @@ function requireEnv(name: string, validate?: (v: string) => boolean): string {
 const isAddress = (v: string) => /^0x[0-9a-fA-F]{40}$/.test(v);
 const isUrl = (v: string) => /^https?:\/\/[a-z0-9.\-:]+(\/.*)?$/i.test(v);
 
+// Phase theta audit follow-up (2026-05-25): Phase ζ.1 (task #354)
+// extended LanternAttestor.publish to take 5 args (added leafCount +
+// ipfsCid) but the off-chain service ABI here was left at the 3-arg
+// shape. Every Lantern tick would build the Merkle tree, compute the
+// IPFS CID, call publish() — and the tx would revert at the EVM
+// dispatch table with 'no matching function' because the selector
+// computed from this 3-arg ABI does not match the deployed 5-arg
+// selector. Same selector-mismatch class as Sumsub assignTier(2-arg vs
+// 3-arg) and vault-withdraw redeem-vs-withdraw. Aligned with
+// contracts/lantern-attestor/src/LanternAttestor.sol:60.
 const LANTERN_ABI = [
   {
     type: 'function',
@@ -36,6 +46,8 @@ const LANTERN_ABI = [
     inputs: [
       { name: 'root', type: 'bytes32' },
       { name: 'block_number', type: 'uint256' },
+      { name: 'leafCount', type: 'uint256' },
+      { name: 'ipfsCid', type: 'string' },
       { name: 'signature', type: 'bytes' },
     ],
     outputs: [],
@@ -87,11 +99,18 @@ export async function publishOnce(): Promise<void> {
     message: { raw: root },
   });
 
+  // When IPFS pin failed, pass empty string — the contract stores it
+  // verbatim and the event consumer renders "ipfs:none" downstream.
+  // The contract has no constraint on this field; null-as-empty keeps
+  // the publish path alive even when the pinning service is degraded.
+  const ipfsCidArg = ipfsCid ?? '';
+  const leafCountArg = BigInt(balances.length);
+
   const hash = await walletClient.writeContract({
     address: LANTERN_ATTESTOR_ADDRESS,
     abi: LANTERN_ABI,
     functionName: 'publish',
-    args: [root, blockNumber, signature as `0x${string}`],
+    args: [root, blockNumber, leafCountArg, ipfsCidArg, signature as `0x${string}`],
   } as never);
 
   console.log(
