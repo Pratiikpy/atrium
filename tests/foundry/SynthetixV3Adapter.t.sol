@@ -153,31 +153,35 @@ contract SynthetixV3AdapterTest is Test {
 
     // ── Lifecycle ────────────────────────────────────────────────────
 
-    function test_openPosition_revertsOnUnsupportedInstrument() public {
+    // Phase theta-followup (2026-05-25): Synthetix open_position now reverts
+    // ScaffoldNotImplemented before any other validation. Pre-fix a call
+    // would silently accept USDC pulled by Coffer.adapterPull, record
+    // position metadata, never deploy into Synthetix → fund-strand. The
+    // tests below previously asserted on UnsupportedInstrument /
+    // BadVenuePayload / event-emit; they now assert on the lockdown revert.
+    // The downstream argument-validation paths remain in the source as
+    // unreachable code so the eventual real impl can reactivate them.
+
+    function test_openPosition_revertsScaffoldNotImplemented() public {
+        _registerInstrument();
+        vm.expectRevert(SynthetixV3Adapter.ScaffoldNotImplemented.selector);
+        vm.prank(coffer);
+        adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
+    }
+
+    function test_openPosition_revertsScaffold_evenOnUnsupportedInstrument() public {
+        // Lockdown fires BEFORE the unsupported-instrument check (front guard).
         bytes32 bad = keccak256("NOT-REGISTERED");
-        vm.expectRevert(abi.encodeWithSelector(SynthetixV3Adapter.UnsupportedInstrument.selector, bad));
+        vm.expectRevert(SynthetixV3Adapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(bad, 1 ether, abi.encodePacked(user));
     }
 
-    function test_openPosition_revertsOnBadVenuePayload() public {
+    function test_openPosition_revertsScaffold_evenOnBadPayload() public {
         _registerInstrument();
-        vm.expectRevert(SynthetixV3Adapter.BadVenuePayload.selector);
+        vm.expectRevert(SynthetixV3Adapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(INSTRUMENT, 1 ether, hex"00");
-    }
-
-    function test_openPosition_extractsOriginator_G5() public {
-        _registerInstrument();
-        vm.expectEmit(true, true, true, true);
-        emit PositionOpened(1, user, INSTRUMENT, 1_000 ether);
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
-        assertEq(venue_pos_id, 1);
-        IPorticoAdapter.PositionView memory pos = adapter.get_position(venue_pos_id);
-        assertEq(pos.owner, user);
-        assertEq(pos.instrument_id, INSTRUMENT);
-        assertEq(pos.notional_signed, 1_000 ether);
     }
 
     function test_closePosition_revertsOnNotFound() public {
@@ -186,15 +190,10 @@ contract SynthetixV3AdapterTest is Test {
         adapter.close_position(999, "");
     }
 
-    function test_closePosition_emitsEvent() public {
-        _registerInstrument();
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
-        vm.expectEmit(true, false, false, true);
-        emit PositionClosed(venue_pos_id, 0);
-        vm.prank(coffer);
-        adapter.close_position(venue_pos_id, "");
-    }
+    // The close_position path is still callable for legacy pre-lockdown
+    // positions (none exist on mainnet/testnet; this is defensive). With
+    // open_position now blocked, exercising close requires direct storage
+    // manipulation. Skipping the emit test until real impl lands.
 
     function test_modifyPosition_revertsV1Locked() public {
         vm.expectRevert(bytes("v1"));

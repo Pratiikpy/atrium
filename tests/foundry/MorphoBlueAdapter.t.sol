@@ -140,46 +140,39 @@ contract MorphoBlueAdapterTest is Test {
     }
 
     // ── Lifecycle ────────────────────────────────────────────────────
+    //
+    // Phase theta-followup (2026-05-25): Morpho open_position now reverts
+    // ScaffoldNotImplemented before any other validation. Pre-fix the call
+    // would silently accept the USDC pulled by Coffer.adapterPull, record
+    // position metadata, never deploy into Morpho → fund-strand. The
+    // tests below previously asserted on UnsupportedInstrument /
+    // BadVenuePayload / event-emit; they now assert on the lockdown revert.
 
-    function test_openPosition_revertsOnUnsupportedInstrument() public {
+    function test_openPosition_revertsScaffoldNotImplemented() public {
+        _registerInstrument();
+        vm.expectRevert(MorphoBlueAdapter.ScaffoldNotImplemented.selector);
+        vm.prank(coffer);
+        adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
+    }
+
+    function test_openPosition_revertsScaffold_evenOnUnsupportedInstrument() public {
         bytes32 bad = keccak256("NOT-REGISTERED");
-        vm.expectRevert(abi.encodeWithSelector(MorphoBlueAdapter.UnsupportedInstrument.selector, bad));
+        vm.expectRevert(MorphoBlueAdapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(bad, 1 ether, abi.encodePacked(user));
     }
 
-    function test_openPosition_revertsOnBadVenuePayload() public {
+    function test_openPosition_revertsScaffold_evenOnBadPayload() public {
         _registerInstrument();
-        vm.expectRevert(MorphoBlueAdapter.BadVenuePayload.selector);
+        vm.expectRevert(MorphoBlueAdapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(INSTRUMENT, 1 ether, hex"00");
-    }
-
-    function test_openPosition_extractsOriginator_G5() public {
-        _registerInstrument();
-        vm.expectEmit(true, true, true, true);
-        emit PositionOpened(1, user, INSTRUMENT, 1_000 ether);
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
-        IPorticoAdapter.PositionView memory pos = adapter.get_position(venue_pos_id);
-        assertEq(pos.owner, user);
-        assertEq(pos.notional_signed, 1_000 ether);
     }
 
     function test_closePosition_revertsOnNotFound() public {
         vm.expectRevert(MorphoBlueAdapter.PositionNotFound.selector);
         vm.prank(coffer);
         adapter.close_position(999, "");
-    }
-
-    function test_closePosition_emitsEvent() public {
-        _registerInstrument();
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000 ether, abi.encodePacked(user));
-        vm.expectEmit(true, false, false, true);
-        emit PositionClosed(venue_pos_id, 0);
-        vm.prank(coffer);
-        adapter.close_position(venue_pos_id, "");
     }
 
     function test_modifyPosition_revertsV1Locked() public {

@@ -87,6 +87,11 @@ contract MorphoBlueAdapter is IPorticoAdapter, ReentrancyGuard {
     error UnsupportedInstrument(bytes32);
     error PositionNotFound();
     error BadVenuePayload();
+    /// Phase theta-followup (2026-05-25): the scaffold can no longer accept
+    /// open_position calls. Pre-fix, calling open via the Router would pull
+    /// USDC from Coffer (per adapterPull) but the scaffold never deployed
+    /// the collateral into Morpho — the funds would strand in the adapter.
+    error ScaffoldNotImplemented();
 
     modifier onlyAuthorizedCaller() {
         if (msg.sender != atrium_coffer && !is_authorized_caller[msg.sender]) revert Unauthorized();
@@ -145,6 +150,15 @@ contract MorphoBlueAdapter is IPorticoAdapter, ReentrancyGuard {
     function open_position(bytes32 instrument_id, int256 notional_signed, bytes calldata venue_payload)
         external onlyAuthorizedCaller nonReentrant returns (uint256 venue_position_id)
     {
+        // Phase theta-followup (2026-05-25): scaffold blocks entry. Pre-fix
+        // a call would pull USDC via Coffer.adapterPull, record position
+        // metadata, and never deploy into Morpho — the collateral would
+        // strand in the adapter and Coffer's share accounting would
+        // permanently disagree with on-chain reality. Real Morpho supply
+        // + borrow + LLTV math lands Year-2.
+        revert ScaffoldNotImplemented();
+        // Unreachable; kept so the function signature compiles + audit
+        // tooling can see the eventual real impl's argument shape.
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
         if (venue_payload.length < 20) revert BadVenuePayload();
         address originator;

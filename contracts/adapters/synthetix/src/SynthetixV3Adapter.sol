@@ -74,6 +74,12 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     error UnsupportedInstrument(bytes32);
     error PositionNotFound();
     error BadVenuePayload();
+    /// Phase theta-followup (2026-05-25): the scaffold can no longer accept
+    /// open_position calls. Pre-fix, calling open via the Router would pull
+    /// USDC from Coffer (per adapterPull) but the scaffold never deployed
+    /// the USDC into Synthetix V3 — the funds would strand in the adapter.
+    /// Block the entry until the real Synthetix open lands (Year-2).
+    error ScaffoldNotImplemented();
 
     modifier onlyAuthorizedCaller() {
         if (msg.sender != atrium_coffer && !is_authorized_caller[msg.sender]) revert Unauthorized();
@@ -135,6 +141,15 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     function open_position(bytes32 instrument_id, int256 notional_signed, bytes calldata venue_payload)
         external onlyAuthorizedCaller nonReentrant returns (uint256 venue_position_id)
     {
+        // Phase theta-followup (2026-05-25): scaffold blocks entry. Pre-fix
+        // a call would pull USDC via Coffer.adapterPull, record position
+        // metadata, and never deploy into Synthetix V3 — the USDC would
+        // strand in the adapter and Coffer's share accounting would
+        // permanently disagree with on-chain reality. Real Synthetix V3
+        // commitOrder + sUSD-vs-USDC bridging lands Year-2.
+        revert ScaffoldNotImplemented();
+        // Unreachable; kept so the function signature compiles + audit
+        // tooling can see what the eventual real impl will need.
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
         if (venue_payload.length < 20) revert BadVenuePayload();
         address originator;
@@ -165,7 +180,10 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     {
         VenuePosition storage pos = positions[venue_position_id];
         if (pos.owner == address(0)) revert PositionNotFound();
-        // Scaffold: real impl will call commitOrder with -position_size then settle.
+        // Scaffold pre-fix never returned USDC to Coffer; the matching
+        // open_position fix below makes it impossible to enter this state
+        // for new positions. Existing pre-fix positions can still close —
+        // the venue side is a no-op (Synthetix never recorded them).
         realized_pnl_signed = 0;
         emit PositionClosed(venue_position_id, realized_pnl_signed);
         delete positions[venue_position_id];
