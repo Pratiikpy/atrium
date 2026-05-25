@@ -87,7 +87,7 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-parchment text-ink">
       {/* ── Sidebar ────────────────────────────────────────────── */}
-      <aside className="hidden w-[240px] shrink-0 flex-col border-r border-divider md:flex">
+      <aside className="hidden w-[248px] shrink-0 flex-col border-r border-divider md:flex">
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/app" className="font-display text-2xl italic text-ink">
             Atrium

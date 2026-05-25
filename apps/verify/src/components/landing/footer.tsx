@@ -84,7 +84,12 @@ export function LandingFooter() {
             Unified margin prime brokerage for the EVM.
             <br />
             <span className="text-muted">
-              Live on Arbitrum Sepolia and Robinhood Chain testnet.
+              {/* Honesty fix: prior copy claimed "Live on Robinhood Chain
+                 testnet". The RH SDK is not public yet, so the adapter
+                 cannot ship. The honest statement is the single-chain one
+                 with the RH adapter named as pending. */}
+              Live on Arbitrum Sepolia. Robinhood Chain adapter ships
+              within 14 days of the RH SDK going public.
             </span>
           </p>
         </div>

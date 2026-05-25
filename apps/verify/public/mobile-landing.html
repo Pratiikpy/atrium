@@ -890,8 +890,11 @@
 
                 <div class="pool">
                   <div class="l">Pool · unified margin</div>
-                  <div class="v">$12.37M</div>
-                  <div class="s">Buying power · 3.0× · LIVE</div>
+                  <!-- Initial value is "pending" so first paint never lies.
+                       The bootloader at bottom overwrites .pool .v with
+                       /api/protocol/metrics testnetTvlUsd on hydrate. -->
+                  <div class="v">pending</div>
+                  <div class="s">Buying power · live wire pending</div>
                 </div>
 
                 <div class="venues">
@@ -965,10 +968,17 @@
                     That is why no other onchain product has shipped cross-product margin.
                   </div>
 
+                  <!--
+                    Plinth illustration card. "preview" pill makes it
+                    visually clear this is an example layout, not a live
+                    reading. Numbers are intentionally specific to give
+                    the card visual rhythm; ui.md tolerates illustration
+                    when the surrounding label is honest about it.
+                  -->
                   <div class="mock">
                     <div class="mock-head">
                       <span class="l">Buying power</span>
-                      <span class="pill">live</span>
+                      <span class="pill" style="background: color-mix(in oklch, var(--testnet) 14%, transparent); color: var(--testnet); border-color: color-mix(in oklch, var(--testnet) 30%, transparent);">preview</span>
                     </div>
                     <div class="big">$12,374,820</div>
                     <div class="mock-row">
@@ -1073,29 +1083,32 @@
                 </div>
               </section>
 
-              <!-- Stats -->
+              <!-- Stats: every .v starts as "pending" so first paint never
+                   shows a fake number. Bootloader overwrites from real
+                   /api/protocol/metrics on hydrate; on fetch fail values
+                   stay as pending (honest empty state). -->
               <section class="stats-band">
-                <div class="head">Testnet · live</div>
+                <div class="head">Testnet</div>
                 <div class="stats-grid">
                   <div class="stat">
                     <div class="l">Live TVL</div>
-                    <div class="v">$4.13M</div>
-                    <div class="s">+ 41.2% · 30d</div>
+                    <div class="v">pending</div>
+                    <div class="s">testnet . arb-sepolia</div>
                   </div>
                   <div class="stat">
                     <div class="l">Registered agents</div>
-                    <div class="v">37</div>
-                    <div class="s">8 with open positions</div>
+                    <div class="v">pending</div>
+                    <div class="s">erc-8004 registry pending</div>
                   </div>
                   <div class="stat">
-                    <div class="l">Codex queries · 24h</div>
-                    <div class="v">42K</div>
-                    <div class="s">x402 · onchain</div>
+                    <div class="l">Codex queries . 24h</div>
+                    <div class="v">pending</div>
+                    <div class="s">x402 . onchain</div>
                   </div>
                   <div class="stat">
-                    <div class="l">Venues live</div>
-                    <div class="v">7 / 8</div>
-                    <div class="s">RH-Chain · pending</div>
+                    <div class="l">Venues deployed</div>
+                    <div class="v">pending</div>
+                    <div class="s">RH-Chain . SDK pending</div>
                   </div>
                 </div>
               </section>
