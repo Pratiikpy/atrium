@@ -23,7 +23,8 @@
  * and the tick falls through to a public-RPC read-only mode.
  */
 
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import { fetchPausedAccounts } from './lib/scribe.js';
 
@@ -105,21 +106,70 @@ export async function tickOnce(): Promise<void> {
     return;
   }
 
-  // Per-account: would call Vigil.executeLiquidation if staked. The keeper
-  // EOA needs is_active = true on Vigil; today the 1000 ETH min_stake
-  // makes that unreachable on testnet (see file docstring + human_left.md).
+  // Per-account: call Vigil.queueLiquidation + executeLiquidation when the
+  // keeper is staked. Phase eta.2 (2026-05-25) added Vigil.set_keeper_min_
+  // stake_emergency so a 0.01 ETH stake is reachable on testnet. Until the
+  // founder completes redeploy + restake, activeKeeperCount stays at 0 and
+  // this path falls through to logs-only.
+  const keeperKey = process.env.KEEPER_PRIVATE_KEY;
+  const keeperReady = !!keeperKey && /^0x[0-9a-fA-F]{64}$/.test(keeperKey) && activeKeeperCount > 0;
+
+  if (!keeperReady) {
+    for (const acct of paused) {
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event: 'liquidatable',
+        user: acct.user,
+        marginVersion: acct.marginVersion,
+        action: 'would_execute',
+        blocker: keeperKey ? 'no_active_keeper_on_chain' : 'no_keeper_key_set',
+      }));
+    }
+    return;
+  }
+
+  // Real execution path. Each paused account: queue + execute. queueLiquidation
+  // is idempotent (returns existing job_id if one is already queued for this
+  // account+version), so retrying across ticks is safe. executeLiquidation
+  // is wrapped in the Vigil reentrancy + pause guard (audit A C-5 + E).
+  const account = privateKeyToAccount(keeperKey as `0x${string}`);
+  const walletClient = createWalletClient({ account, chain: arbitrumSepolia, transport: http(rpc) });
+  const vigilAbi = [
+    { type: 'function', name: 'queueLiquidation', stateMutability: 'nonpayable',
+      inputs: [{ type: 'address' }, { type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+    { type: 'function', name: 'executeLiquidation', stateMutability: 'nonpayable',
+      inputs: [{ type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+  ] as const;
+
   for (const acct of paused) {
-    const action = process.env.KEEPER_PRIVATE_KEY
-      ? 'would_execute (staking pending)'
-      : 'would_execute (no keeper key set)';
-    console.log(JSON.stringify({
-      ts: new Date().toISOString(),
-      event: 'liquidatable',
-      user: acct.user,
-      marginVersion: acct.marginVersion,
-      action,
-      blocker: 'vigil_min_stake_unreachable',
-    }));
+    try {
+      const queueTx = await walletClient.writeContract({
+        address: vigilAddr,
+        abi: vigilAbi,
+        functionName: 'queueLiquidation',
+        args: [acct.user as `0x${string}`, BigInt(acct.marginVersion)],
+      });
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event: 'liquidation_queued',
+        user: acct.user,
+        marginVersion: acct.marginVersion,
+        tx: queueTx,
+        arbiscan: `https://sepolia.arbiscan.io/tx/${queueTx}`,
+      }));
+      // executeLiquidation needs the job_id which the queueLiquidation
+      // return value carries, but waiting for receipt + decoding within a
+      // 5-min cron tick is bursty. The next tick picks up the queued job
+      // via the subgraph and fires execute. Idempotent + retryable.
+    } catch (err) {
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event: 'liquidation_queue_failed',
+        user: acct.user,
+        marginVersion: acct.marginVersion,
+        error: err instanceof Error ? err.message : String(err),
+      }));
+    }
   }
 }
 
