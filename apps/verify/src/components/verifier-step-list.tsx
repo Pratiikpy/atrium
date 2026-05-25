@@ -11,7 +11,7 @@ import { ArrowRight } from 'lucide-react';
  */
 const STEPS = [
   { n: 1, title: 'Deposit USDC into Coffer', detail: 'Postern passkey → ERC-4626 deposit' },
-  { n: 2, title: 'Open hedged position', detail: 'HIP-3 perp + Aave Horizon T-bill, atomic' },
+  { n: 2, title: 'Open a position', detail: 'Single-leg open via AtriumRouter — hedged batch in a follow-up' },
   { n: 3, title: 'See the margin saving', detail: 'Plinth recomputes; SPAN nets the hedge' },
   { n: 4, title: 'Trigger Chaos Mode', detail: 'Random fault: oracle drift, keeper offline, partial fill' },
   { n: 5, title: 'Run liquidation drill', detail: 'Vigil keeper executes partial liquidation' },

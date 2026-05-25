@@ -24,9 +24,14 @@ const STEP_CONFIG = {
     nextStep: 2,
   },
   '2': {
-    title: 'Open hedged position',
-    body: 'Two parallel transactions: one long HIP-3 perp via the Hyperliquid hybrid adapter, one matching Aave Horizon T-bill exposure. Plinth recomputes margin atomically.',
-    contract: 'Plinth.open_position',
+    // Phase theta (2026-05-25 audit follow-up): pre-fix this body
+    // described "two parallel transactions" but the Verifier UI only
+    // exposes a single-leg open today. Hedged-flow ships in a follow-up
+    // (paired with the AtriumRouter batch-open helper). Until then the
+    // copy describes the single-leg path the user actually runs.
+    title: 'Open a position',
+    body: 'Open a position through AtriumRouter — Plinth records the margin row, Coffer routes USDC to the selected venue adapter, the adapter opens the venue side. Hedged batch flow lands in a follow-up release.',
+    contract: 'AtriumRouter.open_position_via_adapter',
     nextStep: 3,
   },
   '3': {

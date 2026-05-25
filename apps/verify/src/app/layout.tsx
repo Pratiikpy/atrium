@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   // template ("Atrium · App"), not an em-dash. Em-dash was a Wave-J carryover.
   title: 'Atrium · verify',
   description:
-    'Atrium Verifier Mode. Watch a hedged position open, a margin calculation run, a chaos drill, and a kill-switch revoke in 90 seconds. Every claim verifiable on-chain.',
+    'Atrium Verifier Mode. Watch a position open, a margin calculation run, a chaos drill, and a kill-switch revoke in 90 seconds. Every claim verifiable on-chain.',
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Atrium' },
   openGraph: {
