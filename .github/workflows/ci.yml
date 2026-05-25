@@ -91,6 +91,22 @@ jobs:
         run: |
           cargo install --force --locked kani-verifier
           cargo kani setup
+      # Phase theta.5 fix (2026-05-25): pin the proof-harness count. Pre-fix
+      # a future PR could silently delete a `#[kani::proof]` annotation and
+      # the Plinth/Sigil runs would still report SUCCESS (the deleted harness
+      # is simply not in the run). The count gate compares the current
+      # `grep -c '#\[kani::proof\]'` count against a baseline pinned in
+      # docs/kani-baseline.txt; CI fails on regression.
+      - name: Kani harness-count regression gate
+        run: |
+          set -euo pipefail
+          ACTUAL=$(grep -rE "^[[:space:]]*#\[kani::proof\]" contracts/ --include="*.rs" | wc -l | tr -d ' ')
+          BASELINE=$(cat docs/kani-baseline.txt | tr -d '[:space:]')
+          echo "kani proofs: actual=$ACTUAL baseline=$BASELINE"
+          if [ "$ACTUAL" -lt "$BASELINE" ]; then
+            echo "::error::Kani proof count regressed: $ACTUAL < $BASELINE. Either restore the deleted harness or update docs/kani-baseline.txt with a written reason."
+            exit 1
+          fi
       - name: Run Plinth proofs
         id: plinth
         run: cd contracts/plinth && cargo kani 2>&1 | tee /tmp/plinth-kani.log
