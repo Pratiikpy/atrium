@@ -1,7 +1,15 @@
 # Atrium, Launch Ready
 
-Last updated: 2026-05-25 (post Phase zeta - gap-audit close-out)
-Current score: **6 of 15 user flows WORK end-to-end today. 7 more are WIRED-PENDING-TIMELOCK (executable 2026-05-26T15:43Z + 2026-05-27T19:30Z aave swap). 3 are HUMAN-BLOCKED (Safe ceremony, cohort outreach, domain). 1 is Y2-DEFERRED (vigil-keeper liquidation execute - blocked on Vigil setKeeperMinStake).**
+Last updated: 2026-05-25 (post Phase eta - testnet completeness push)
+Current score: **Every testnet-buildable item shipped on master. 12 of
+12 Phase eta code-side items closed (commits f93583d through 9c8904b).
+Only founder ops + on-chain ceremonies remain: 3-of-5 Safe migration,
+domain + email + PGP, demo rehearsals, cohort outreach, Vercel + GHA
+env wiring. After those, 5 of 5 user journeys work end-to-end on
+Sepolia.**
+
+See `tripwires/2026-05-25-phase-eta-complete.md` for the per-phase
+breakdown + the founder ops checklist.
 
 CI: all 8 GitHub Actions jobs on master are GREEN as of 2026-05-25:
 Lint+format, Frontend build+Lighthouse, Frontend unit tests (vitest 586/586),
