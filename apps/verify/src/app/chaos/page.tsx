@@ -93,6 +93,19 @@ export default function ChaosPage() {
     }
     const result = (await r.json()) as InjectionResult;
     setLog((prev) => [result, ...prev]);
+
+    // Phase zeta.5 (2026-05-25): auto-restore after 5 s so the demo
+    // self-heals during the Verifier Step 4 walk. Restore is idempotent;
+    // failing restores log but don't block.
+    setTimeout(() => {
+      void fetch('/api/chaos/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fault }),
+      }).catch(() => {
+        // restore-failure is non-blocking; the inject already logged
+      });
+    }, 5000);
   }
 
   return (

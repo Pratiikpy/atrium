@@ -31,6 +31,18 @@ one-line change in the Vercel dashboard + a re-deploy.
      AaveHorizonAdapter (block ~270918xxx) + the existing v0.0.5
      Stylus address swaps.
 
+### Founder-only: verify project env for Chaos Mode (Phase zeta.5)
+
+- `CHAOS_PRIVATE_KEY` -> a fresh EOA, separate from the deployer
+  (per the 2026-05-24 key-leak incident). Stake the EOA on Praetor
+  multisig privileges for Plinth + Coffer + Vigil so it can call
+  emergencyPause / pauseDeposits / resumeDeposits /
+  markKeeperMissedWindow. Without this env, /api/chaos/inject
+  returns 503 honestly.
+- Test from the deployed `/chaos` page after env set: click "Oracle
+  drift", confirm the Arbiscan link shows a real emergencyPause tx
+  on Plinth. Auto-restore fires 5s later via /api/chaos/restore.
+
 ## New items added 2026-05-24
 
 ### Rotate deployer EOA before mainnet (incident-driven)
