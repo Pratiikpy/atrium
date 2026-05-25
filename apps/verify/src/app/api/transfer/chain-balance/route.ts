@@ -16,7 +16,12 @@ export async function GET(req: NextRequest) {
   const params = new URL(req.url).searchParams;
   const chain = params.get('chain') ?? 'arb-sepolia';
   const token = params.get('token') ?? 'USDC';
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Phase theta audit follow-up: ?wallet= multi-tenant support.
+  const walletParam = params.get('wallet');
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
   if (!wallet) {
     return NextResponse.json({ tokenSymbol: token, balanceFormatted: null, source: 'pending' });
   }

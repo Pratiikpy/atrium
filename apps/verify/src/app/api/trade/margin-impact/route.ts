@@ -24,7 +24,12 @@ function parseSizeUsdOrNull(s: string | null): number | null {
 }
 
 export async function GET(req: NextRequest) {
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Phase theta audit follow-up: ?wallet= multi-tenant support.
+  const walletParam = req.nextUrl.searchParams.get('wallet');
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
   const plinth = await tryGetPlinth();
   const sizeUsd = parseSizeUsdOrNull(req.nextUrl.searchParams.get('size'));
   const venue = req.nextUrl.searchParams.get('venue') ?? 'hl-hip3';
