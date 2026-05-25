@@ -1,0 +1,6 @@
+{
+  "generatedAt": "2026-05-25T20:30:00.000Z",
+  "k6_base_url": null,
+  "metrics": [],
+  "note": "No run yet. The nightly GHA workflow at .github/workflows/loadtest-nightly.yml fires k6 + contract-gas.mjs and overwrites this file. Until the first run completes, the loadtest dashboard renders the empty state."
+}

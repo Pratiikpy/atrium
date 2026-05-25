@@ -13,8 +13,11 @@ interface Metric {
 }
 
 async function fetchMetrics(): Promise<Metric[]> {
-  const url = process.env.NEXT_PUBLIC_LOADTEST_METRICS_URL;
-  if (!url) return [];
+  // Phase zeta.7 default: same-origin /api/loadtest/metrics serves the
+  // nightly k6 + gas report from public/loadtest/latest.json. Operators
+  // can still point NEXT_PUBLIC_LOADTEST_METRICS_URL at an external
+  // dashboard endpoint to override.
+  const url = process.env.NEXT_PUBLIC_LOADTEST_METRICS_URL ?? '/api/loadtest/metrics';
   try {
     const r = await fetch(url);
     if (!r.ok) return [];

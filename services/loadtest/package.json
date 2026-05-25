@@ -1,0 +1,17 @@
+{
+  "name": "@atrium/loadtest",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Atrium synthetic load generator + gas measurement scripts",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "k6": "k6 run scripts/api-load.k6.js",
+    "gas": "node scripts/contract-gas.mjs",
+    "build-report": "node scripts/build-report.mjs",
+    "lint": "echo 'no lint here' && exit 0"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  }
+}

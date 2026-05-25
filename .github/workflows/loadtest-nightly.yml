@@ -1,0 +1,69 @@
+name: Atrium loadtest — nightly k6 + gas
+
+# Runs nightly at 02:00 UTC. Fires k6 against the deployed verify-app
+# + viem gas estimation against Arbitrum Sepolia, then commits the
+# resulting JSON to apps/verify/public/loadtest/latest.json so the
+# loadtest page renders fresh numbers within the next page load.
+#
+# Mirrors the kani-status commit-back pattern from ci.yml so the
+# dashboard's data lives in git as an auditable artifact.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  loadtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://verify.atrium.fi' }}
+      FORK_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC || 'https://arbitrum-sepolia.publicnode.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 || true
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+      - run: pnpm install --frozen-lockfile --filter @atrium/loadtest
+      - name: k6 latency probe
+        working-directory: services/loadtest
+        run: k6 run scripts/api-load.k6.js
+      - name: contract gas estimation
+        working-directory: services/loadtest
+        run: node scripts/contract-gas.mjs
+      - name: build report
+        working-directory: services/loadtest
+        run: node scripts/build-report.mjs
+      - name: commit latest.json back to master
+        if: github.ref == 'refs/heads/master'
+        run: |
+          git config user.name "atrium-loadtest[bot]"
+          git config user.email "loadtest@atrium.fi"
+          git add apps/verify/public/loadtest/latest.json
+          if ! git diff --staged --quiet; then
+            git commit -m "loadtest: refresh latest.json ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            git push
+          else
+            echo "no metric changes; skipping commit"
+          fi
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loadtest-${{ github.run_id }}
+          path: |
+            services/loadtest/summary.export.json
+            services/loadtest/gas-report.json
+            apps/verify/public/loadtest/latest.json

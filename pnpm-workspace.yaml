@@ -5,6 +5,8 @@ packages:
   # `services/archive/package.json` not found. List the Node services explicitly.
   - "services/codex"
   - "services/lantern-attestor"
+  - "services/vigil-keeper"
+  - "services/loadtest"
   - "subgraph"
   # Audit XX-2: tests/e2e was an empty directory dangling in the workspace.
   # Playwright specs live in apps/verify/tests/e2e/ (inside the verify package);
