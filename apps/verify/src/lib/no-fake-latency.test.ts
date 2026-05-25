@@ -11,15 +11,27 @@ import { fileURLToPath } from 'node:url';
  * latency and Math.random for synthetic mandate caps. Pre-iter-53 the
  * onboarding-flow lifted these mocks into the real app; the U-9 round
  * caught it. This invariant locks the pattern across the whole src/ tree
- * — a new component can't smuggle in "fake 2s wait" or "rand() %  100"
+ * a new component can't smuggle in "fake 2s wait" or "rand() %  100"
  * without the test tripping.
  *
  * Legitimate uses (intentionally allowed via per-file allowlist):
- *   - none currently. crypto.getRandomValues is fine and not in scope
- *     here — only Math.random + setTimeout/setInterval are flagged.
+ *   - apps/verify/src/app/chaos/page.tsx (Phase zeta.5 2026-05-25):
+ *     setTimeout schedules the /api/chaos/restore call 5 s after inject
+ *     so the Verifier walk Step 4 self-heals. It is real scheduling
+ *     against a real endpoint (not a fake spinner). Removing it breaks
+ *     the auto-restore demo. A server-side delayed worker is overkill
+ *     for a 5-second timer.
  */
 
 const SRC_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+const ALLOWLIST: { file: string; allowed: RegExp[]; reason: string }[] = [
+  {
+    file: 'app/chaos/page.tsx',
+    allowed: [/\bsetTimeout\s*\(/],
+    reason: 'Phase zeta.5 chaos auto-restore (real /api/chaos/restore call 5s after inject)',
+  },
+];
 
 function walkTs(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
@@ -56,11 +68,16 @@ describe('no fake-latency or fake-data patterns in production code', () => {
     const failures: string[] = [];
     for (const file of files) {
       const text = stripComments(readFileSync(file, 'utf8'));
+      // Per-file allowlist: a pattern matched in an allowlisted file is
+      // skipped only when it appears in the allowed-patterns set for that
+      // file. Other patterns still raise.
+      const allowlistEntry = ALLOWLIST.find((a) => file.replace(/\\/g, '/').endsWith(a.file));
       for (const { pattern, reason } of BANNED) {
         const match = text.match(pattern);
-        if (match) {
-          failures.push(`${file}: ${reason} → matched '${match[0]}'`);
-        }
+        if (!match) continue;
+        const isAllowed = allowlistEntry?.allowed.some((p) => p.source === pattern.source);
+        if (isAllowed) continue;
+        failures.push(`${file}: ${reason} matched '${match[0]}'`);
       }
     }
     expect(failures).toEqual([]);

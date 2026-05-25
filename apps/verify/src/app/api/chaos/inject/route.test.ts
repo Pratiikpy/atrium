@@ -1,36 +1,71 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { NextRequest } from 'next/server';
-import { POST } from './route';
 
 /**
- * The /api/chaos/inject route powers PRD §22.5 Chaos Mode — the judge-facing
- * fault-injection button in Verifier step 4. The route MUST refuse anything
- * outside the whitelisted fault enum so a hostile caller can't pivot the
- * agent into running arbitrary scripts.
+ * The /api/chaos/inject route powers PRD section 22.5 Chaos Mode  the
+ * judge-facing fault-injection button in Verifier step 4. Phase zeta.5
+ * (2026-05-25) refactored this route from the agent-proxy shape to direct
+ * Praetor-signed on-chain action. The current contract:
  *
- * Validation rules locked here:
- *   1. Body must be valid JSON
- *   2. fault must be one of the 5 enum values
- *   3. When PRAETOR_CHAOS_URL is unset, 503 with a clear "not deployed" message
- *      (NOT a fake success — audit J-H3 discipline)
- *   4. When the agent is reachable, the route forwards and surfaces the
- *      agent's response. Upstream errors → 502, network errors → 503.
+ *   1. Body must be valid JSON.
+ *   2. fault must be one of the 5 canonical enum values.
+ *   3. CHAOS_PRIVATE_KEY env (hex 0x + 64) gates signing. Without it the
+ *      route returns 503 chaos_key_not_configured.
+ *   4. The deployments registry must be loadable; otherwise 503
+ *      registry_unreachable.
+ *   5. gas_spike and indexer_stall always return 200 with simulated:true
+ *      because gas price and Scribe ingestion are not on-chain levers.
+ *   6. oracle_drift, keeper_offline, partial_fill send real viem
+ *      writeContract calls (mocked here) and return tx + arbiscan URL.
  *
- * Mocks `fetch` so tests don't depend on a real chaos agent.
+ * viem is dynamically imported in route.ts. We mock the same module path
+ * so the route reads the mocked exports.
  */
 
-const originalFetch = global.fetch;
-const originalChaosUrl = process.env.PRAETOR_CHAOS_URL;
+const originalChaosKey = process.env.CHAOS_PRIVATE_KEY;
+const TEST_KEY = '0x' + '11'.repeat(32);
+const TEST_TX = '0xabc' + '0'.repeat(61);
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-  delete process.env.PRAETOR_CHAOS_URL;
+// viem mock state. Reset per test.
+let writeContractMock: ReturnType<typeof vi.fn>;
+let mockRegistry: { contracts: Record<string, { address: string }> } | null;
+
+vi.mock('viem', () => ({
+  createWalletClient: vi.fn(() => ({
+    writeContract: (...args: unknown[]) => writeContractMock(...args),
+  })),
+  http: vi.fn(() => ({})),
+  keccak256: vi.fn((x: unknown) => `0xkeccak_${String(x)}`),
+  toHex: vi.fn((s: unknown) => `0xhex_${String(s)}`),
+}));
+vi.mock('viem/chains', () => ({ arbitrumSepolia: { id: 421614 } }));
+vi.mock('viem/accounts', () => ({
+  privateKeyToAccount: vi.fn(() => ({ address: '0xdead' + 'beef'.repeat(9) })),
+}));
+vi.mock('@/lib/deployments-registry', () => ({
+  loadDeploymentRegistry: () => Promise.resolve(mockRegistry),
+}));
+
+let POST: (req: NextRequest) => Promise<Response>;
+
+beforeEach(async () => {
+  writeContractMock = vi.fn().mockResolvedValue(TEST_TX);
+  mockRegistry = {
+    contracts: {
+      'praetor-timelock': { address: '0x1111111111111111111111111111111111111111' },
+      plinth: { address: '0x2222222222222222222222222222222222222222' },
+      vigil: { address: '0x3333333333333333333333333333333333333333' },
+      coffer: { address: '0x4444444444444444444444444444444444444444' },
+    },
+  };
+  process.env.CHAOS_PRIVATE_KEY = TEST_KEY;
+  vi.resetModules();
+  ({ POST } = await import('./route'));
 });
 
 afterEach(() => {
-  global.fetch = originalFetch;
-  if (originalChaosUrl === undefined) delete process.env.PRAETOR_CHAOS_URL;
-  else process.env.PRAETOR_CHAOS_URL = originalChaosUrl;
+  if (originalChaosKey === undefined) delete process.env.CHAOS_PRIVATE_KEY;
+  else process.env.CHAOS_PRIVATE_KEY = originalChaosKey;
   vi.restoreAllMocks();
 });
 
@@ -38,17 +73,39 @@ function makeReq(body: unknown): NextRequest {
   return new Request('http://localhost/api/chaos/inject', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: typeof body === 'string' ? body : JSON.stringify(body),
   }) as unknown as NextRequest;
 }
 
-describe('POST /api/chaos/inject — validation', () => {
+/* ============ Auth gate ============ */
+
+describe('POST /api/chaos/inject - auth gate', () => {
+  it('returns 503 chaos_key_not_configured when CHAOS_PRIVATE_KEY is missing', async () => {
+    delete process.env.CHAOS_PRIVATE_KEY;
+    vi.resetModules();
+    ({ POST } = await import('./route'));
+    const res = await POST(makeReq({ fault: 'oracle_drift' }));
+    expect(res.status).toBe(503);
+    const json = await res.json();
+    expect(json.error).toBe('chaos_key_not_configured');
+    expect(json.detail).toMatch(/CHAOS_PRIVATE_KEY/);
+  });
+
+  it('returns 503 chaos_key_not_configured when CHAOS_PRIVATE_KEY is malformed', async () => {
+    process.env.CHAOS_PRIVATE_KEY = 'not-a-real-key';
+    vi.resetModules();
+    ({ POST } = await import('./route'));
+    const res = await POST(makeReq({ fault: 'gas_spike' }));
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe('chaos_key_not_configured');
+  });
+});
+
+/* ============ Validation ============ */
+
+describe('POST /api/chaos/inject - validation', () => {
   it('rejects non-JSON body with 400 invalid_json', async () => {
-    const req = new Request('http://localhost/api/chaos/inject', {
-      method: 'POST',
-      body: 'not-json',
-    }) as unknown as NextRequest;
-    const res = await POST(req);
+    const res = await POST(makeReq('not-json'));
     expect(res.status).toBe(400);
     expect((await res.json()).error).toBe('invalid_json');
   });
@@ -60,8 +117,6 @@ describe('POST /api/chaos/inject — validation', () => {
   });
 
   it('rejects unknown fault enum value', async () => {
-    // The closed enum is the security gate — a fault like "rm_rf_tmp" must
-    // never make it to the agent.
     const res = await POST(makeReq({ fault: 'rm_rf_tmp' }));
     expect(res.status).toBe(400);
     const json = await res.json();
@@ -75,97 +130,105 @@ describe('POST /api/chaos/inject — validation', () => {
     const res = await POST(makeReq({ fault: "oracle_drift; DROP TABLE positions;" }));
     expect(res.status).toBe(400);
   });
-
-  it('accepts all 5 canonical fault values when agent URL is set', async () => {
-    process.env.PRAETOR_CHAOS_URL = 'https://chaos.atrium.fi';
-    // Response bodies are one-shot streams — the second `await r.json()` on
-    // the same Response throws "body used already." `mockImplementation`
-    // returns a fresh Response per call so all 5 iterations succeed.
-    (global.fetch as any).mockImplementation(() =>
-      Promise.resolve(
-        new Response(JSON.stringify({ ok: true, recoveredIn: 800 }), { status: 200 }),
-      ),
-    );
-    const allFaults = ['oracle_drift', 'keeper_offline', 'partial_fill', 'gas_spike', 'indexer_stall'];
-    for (const f of allFaults) {
-      const res = await POST(makeReq({ fault: f }));
-      expect(res.status).toBe(200);
-    }
-  });
 });
 
-describe('POST /api/chaos/inject — honest 503 when undeployed', () => {
-  it('returns 503 chaos_agent_not_deployed when PRAETOR_CHAOS_URL is unset', async () => {
-    // Audit J-H3 discipline: prior code returned a fake `{ ok: true }`.
-    // Now the route must surface the honest "not deployed" state with the
-    // ROADMAP reference.
+/* ============ Registry guard ============ */
+
+describe('POST /api/chaos/inject - registry guard', () => {
+  it('returns 503 registry_unreachable when registry load fails', async () => {
+    mockRegistry = null;
     const res = await POST(makeReq({ fault: 'oracle_drift' }));
     expect(res.status).toBe(503);
-    const json = await res.json();
-    expect(json.error).toBe('chaos_agent_not_deployed');
-    expect(json.detail).toMatch(/Month 9/);
-    expect(json.detail).toMatch(/PRAETOR_CHAOS_URL/);
-  });
-
-  it('honest-503 fires BEFORE any network call', async () => {
-    // Make fetch throw — if the route were calling it, we'd see the error.
-    // Confirms the env-var check short-circuits.
-    (global.fetch as any).mockRejectedValue(new Error('fetch should not be called'));
-    const res = await POST(makeReq({ fault: 'gas_spike' }));
-    expect(res.status).toBe(503);
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect((await res.json()).error).toBe('registry_unreachable');
   });
 });
 
-describe('POST /api/chaos/inject — agent proxy', () => {
-  beforeEach(() => {
-    process.env.PRAETOR_CHAOS_URL = 'https://chaos.atrium.fi';
-  });
+/* ============ On-chain faults (real writeContract) ============ */
 
-  it('forwards the fault to the agent and returns its response', async () => {
-    const agentResponse = { ok: true, fault: 'oracle_drift', recoveredIn: 1240, paused: true };
-    (global.fetch as any).mockResolvedValue(
-      new Response(JSON.stringify(agentResponse), { status: 200 }),
-    );
-
+describe('POST /api/chaos/inject - oracle_drift', () => {
+  it('calls PraetorTimelock.emergencyPause(Plinth) and returns tx + arbiscan URL', async () => {
     const res = await POST(makeReq({ fault: 'oracle_drift' }));
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toEqual(agentResponse);
-
-    // Verify the proxy call shape.
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    const [url, init] = (global.fetch as any).mock.calls[0];
-    expect(url).toBe('https://chaos.atrium.fi/inject');
-    expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body)).toEqual({ fault: 'oracle_drift' });
+    expect(json.fault).toBe('oracle_drift');
+    expect(json.action).toContain('emergencyPause');
+    expect(json.tx).toBe(TEST_TX);
+    expect(json.arbiscan).toBe(`https://sepolia.arbiscan.io/tx/${TEST_TX}`);
+    expect(writeContractMock).toHaveBeenCalledTimes(1);
+    const call = writeContractMock.mock.calls[0][0];
+    expect(call.address).toBe('0x1111111111111111111111111111111111111111');
+    expect(call.functionName).toBe('emergencyPause');
+    expect(call.args[0]).toBe('0x2222222222222222222222222222222222222222');
   });
 
-  it('returns 502 agent_error when the agent responds non-2xx', async () => {
-    (global.fetch as any).mockResolvedValue(new Response('', { status: 500 }));
-    const res = await POST(makeReq({ fault: 'gas_spike' }));
-    expect(res.status).toBe(502);
-    const json = await res.json();
-    expect(json.error).toBe('agent_error');
-    expect(json.status).toBe(500);
-  });
-
-  it('returns 503 agent_unreachable on network error', async () => {
-    (global.fetch as any).mockRejectedValue(new Error('ENOTFOUND chaos.atrium.fi'));
-    const res = await POST(makeReq({ fault: 'indexer_stall' }));
+  it('returns 503 missing_contract if Plinth address is absent', async () => {
+    mockRegistry!.contracts = {
+      'praetor-timelock': { address: '0x1111111111111111111111111111111111111111' },
+    };
+    const res = await POST(makeReq({ fault: 'oracle_drift' }));
     expect(res.status).toBe(503);
-    const json = await res.json();
-    expect(json.error).toBe('agent_unreachable');
-    expect(json.detail).toMatch(/ENOTFOUND/);
+    expect((await res.json()).error).toBe('missing_contract');
   });
+});
 
-  it('returns 503 on timeout (10s AbortSignal)', async () => {
-    // Simulate a timeout by rejecting with an AbortError.
-    const abortErr = new Error('The operation was aborted');
-    abortErr.name = 'AbortError';
-    (global.fetch as any).mockRejectedValue(abortErr);
+describe('POST /api/chaos/inject - keeper_offline', () => {
+  it('calls Vigil.markKeeperMissedWindow', async () => {
+    const res = await POST(makeReq({ fault: 'keeper_offline' }));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.fault).toBe('keeper_offline');
+    expect(json.tx).toBe(TEST_TX);
+    expect(writeContractMock).toHaveBeenCalledTimes(1);
+    expect(writeContractMock.mock.calls[0][0].functionName).toBe('markKeeperMissedWindow');
+  });
+});
+
+describe('POST /api/chaos/inject - partial_fill', () => {
+  it('calls Coffer.pauseDeposits with keccak256(reason)', async () => {
     const res = await POST(makeReq({ fault: 'partial_fill' }));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.fault).toBe('partial_fill');
+    expect(json.tx).toBe(TEST_TX);
+    expect(writeContractMock).toHaveBeenCalledTimes(1);
+    const call = writeContractMock.mock.calls[0][0];
+    expect(call.address).toBe('0x4444444444444444444444444444444444444444');
+    expect(call.functionName).toBe('pauseDeposits');
+  });
+});
+
+/* ============ Simulated faults (no on-chain action) ============ */
+
+describe('POST /api/chaos/inject - simulated faults', () => {
+  it('returns 200 simulated:true for gas_spike without calling writeContract', async () => {
+    const res = await POST(makeReq({ fault: 'gas_spike' }));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.fault).toBe('gas_spike');
+    expect(json.simulated).toBe(true);
+    expect(json.tx).toBeNull();
+    expect(writeContractMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 200 for indexer_stall without calling writeContract', async () => {
+    const res = await POST(makeReq({ fault: 'indexer_stall' }));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.fault).toBe('indexer_stall');
+    expect(json.tx).toBeNull();
+    expect(writeContractMock).not.toHaveBeenCalled();
+  });
+});
+
+/* ============ Failure surface ============ */
+
+describe('POST /api/chaos/inject - failure surface', () => {
+  it('returns 503 inject_failed with safe detail when writeContract throws', async () => {
+    writeContractMock.mockRejectedValueOnce(new Error('rpc rejected: insufficient funds'));
+    const res = await POST(makeReq({ fault: 'oracle_drift' }));
     expect(res.status).toBe(503);
-    expect((await res.json()).error).toBe('agent_unreachable');
+    const json = await res.json();
+    expect(json.error).toBe('inject_failed');
+    expect(json.detail).toBeTruthy();
   });
 });

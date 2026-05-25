@@ -29,12 +29,38 @@
   --color-parchment:         oklch(0.984 0.004 85);
   --color-parchment-light:   oklch(0.996 0.003 85);
 
-  /* ── Accent (sparingly) ──────────────────────────────────────────── */
-  --color-success:      oklch(0.58 0.13 145);
-  --color-success-soft: oklch(0.58 0.13 145 / 0.12);
-  --color-warning:      oklch(0.7 0.13 70);
-  --color-terracotta:   rgb(126, 42, 32);
-  --color-danger:       rgb(126, 42, 32);
+  /* ── Brand Kit canon (desing/Brand Kit.html Section III) ─────────────
+   * Eight tokens. New code uses these names. Legacy names below are
+   * aliases that resolve to the same OKLCH values, kept for one cycle
+   * so the 41-file class-name sweep (bg-terracotta → bg-accent, etc.)
+   * can land as a separate mechanical commit.
+   * Canon order: paper, ink (already above), accent, live, testnet,
+   * neg, line, muted (already above).
+   */
+  --color-accent:        oklch(0.48 0.13 28);    /* #7E2A20 oxblood */
+  --color-accent-soft:   oklch(0.48 0.13 28 / 0.10);
+  --color-live:          oklch(0.58 0.13 145);   /* #43864F moss */
+  --color-live-soft:     oklch(0.58 0.13 145 / 0.12);
+  --color-testnet:       oklch(0.7  0.13 70);    /* #CC8E2D amber */
+  --color-testnet-soft:  oklch(0.7  0.13 70 / 0.12);
+  --color-neg:           oklch(0.56 0.16 28);    /* #A1352A clay */
+  --color-neg-soft:      oklch(0.56 0.16 28 / 0.10);
+  --color-paper:         oklch(0.984 0.004 85);  /* #FBFAF7, alias of --color-parchment */
+  --color-line:          oklch(0.88 0.004 60);   /* #DBD8D2, alias of --color-divider */
+
+  /* ── Legacy aliases (pre-Brand-Kit) ──────────────────────────────────
+   * Keep stable so the 41-file class-name sweep can be one mechanical
+   * commit later. Each legacy name resolves to its canonical counterpart.
+   * Fix at the token layer: --color-danger was rgb(126,42,32) oxblood
+   * by accident, which made every Kill Switch / chaos-trip CTA render
+   * the wrong red. Now correctly resolves to neg/clay #A1352A.
+   * Same fix for --color-status-red (favicon failure state).
+   */
+  --color-success:      var(--color-live);
+  --color-success-soft: var(--color-live-soft);
+  --color-warning:      var(--color-testnet);
+  --color-terracotta:   var(--color-accent);
+  --color-danger:       var(--color-neg);
 
   /* ── Dark-section variant (Sigil section in marketing) ───────────── */
   --color-dark-bg:        rgb(16, 16, 16);
@@ -45,9 +71,9 @@
   --color-dark-white-55:  oklch(1 0 0 / 0.55);
 
   /* ── Status (favicon + on-page pills) ────────────────────────────── */
-  --color-status-amber: oklch(0.7 0.13 70);
-  --color-status-green: oklch(0.58 0.13 145);
-  --color-status-red:   rgb(126, 42, 32);
+  --color-status-amber: var(--color-testnet);
+  --color-status-green: var(--color-live);
+  --color-status-red:   var(--color-neg);
 
   /* ── Typography ──────────────────────────────────────────────────── */
   --font-display: "Instrument Serif", "Times New Roman", serif;

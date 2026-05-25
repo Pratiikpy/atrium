@@ -33,7 +33,7 @@ export function AppShellWalletCard() {
       <span
         className={`size-7 shrink-0 rounded-full ${
           isConnected
-            ? 'bg-gradient-to-br from-[var(--color-terracotta)] to-[var(--color-ink-soft)]'
+            ? 'bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-ink-soft)]'
             : 'bg-divider'
         }`}
       />

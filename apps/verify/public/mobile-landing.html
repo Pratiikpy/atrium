@@ -895,19 +895,22 @@
                 </div>
 
                 <div class="venues">
-                  <div class="venue">
+                  <!--
+                    Audit 2026-05-24 (Auditor E + B) + codex E.6 2026-05-25:
+                    per-venue dollar amounts were hardcoded fake numbers per
+                    writing.md. HL-HIP3 was the last hold-out at $1.25M;
+                    converted to pending. Until a /api/protocol/venues
+                    endpoint hydrates real Coffer adapter pulls, every chip
+                    shows "pending" and a zero-width bar. The bootloader
+                    below flips chips to "deployed" when the adapter has a
+                    non-zero address in the deployment registry.
+                  -->
+                  <div class="venue" data-venue-slug="adapter-hyperliquid-hip3">
                     <div class="name">HL-HIP3</div>
                     <div class="sub">Tokenized perps</div>
-                    <div class="amt">$1.25M</div>
-                    <div class="bar"><span style="width: 100%; background: var(--accent);"></span></div>
+                    <div class="amt">pending</div>
+                    <div class="bar"><span style="width: 0%;"></span></div>
                   </div>
-                  <!--
-                    Audit 2026-05-24 (Auditor E + B): per-venue dollar
-                    amounts ($892K / $401K / $320K / $483K / $186K) were
-                    hardcoded fake numbers per writing.md. Until a
-                    /api/protocol/venues endpoint hydrates real Coffer
-                    adapter pulls, the amount + bar default to "pending".
-                  -->
                   <div class="venue" data-venue-slug="adapter-aave-horizon">
                     <div class="name">AAVE-V3</div>
                     <div class="sub">RWA · USTB</div>
@@ -1202,10 +1205,15 @@
 
   <!--
     Live-data hydration (audit honesty per .claude/rules/ui.md).
-    The design ships with sample numbers ($12.37M TVL, 37 agents, 42K queries,
-    7/8 venues). Per "Never display a placeholder number that looks real",
-    fetch the real numbers from the verify-app API and overwrite the labels.
-    On error / missing data we drop to honest "pending" / "0".
+    Codex E.6 (2026-05-25): the prior version read m.tvlUsd / agentCount /
+    queriesPerDay / venuesLive which do not exist on /api/protocol/metrics.
+    Every fetch silently fell through to the catch branch and rendered
+    "$0". Now reads the real shape: testnetTvlUsd (string already formatted
+    by formatUsd), registeredAgents (nullable), codex24hQueries (nullable),
+    venuesDeployed.{count,total}. Null fields render the em-dash glyph
+    rather than 0, so a missing metric is visually distinct from a measured
+    zero. Venue chips poll /api/deployments/status to flip from "pending"
+    to "deployed" per adapter, when the adapter contract address is non-zero.
   -->
   <script>
     (async () => {
@@ -1213,31 +1221,68 @@
         const el = document.querySelector(sel);
         if (el && txt != null) el.textContent = txt;
       };
-      const fmt = (n, currency = '$') => {
-        if (n == null || Number.isNaN(n)) return 'pending';
+      // Honest-pending glyph for missing data. "pending" reads as a state
+      // word (matches the venue-chip pattern below) rather than punctuation.
+      const PENDING = 'pending';
+      const intOrPending = (n) =>
+        n == null || Number.isNaN(Number(n)) ? PENDING : String(n);
+      // testnetTvlUsd ships as "$12,374,820.00" from formatUsd. Mockup uses
+      // a compact "$12.37M" form. Reparse to a Number, then re-emit compact.
+      const compactUsd = (formatted) => {
+        if (formatted == null) return PENDING;
+        const n = Number(String(formatted).replace(/[^0-9.\-]/g, ''));
+        if (!Number.isFinite(n)) return PENDING;
         const abs = Math.abs(n);
-        if (abs >= 1e6) return currency + (n / 1e6).toFixed(2) + 'M';
-        if (abs >= 1e3) return currency + (n / 1e3).toFixed(1) + 'K';
-        return currency + n.toFixed(0);
+        if (abs >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+        if (abs >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+        return '$' + n.toFixed(0);
       };
+
+      // Metrics fetch
       try {
         const r = await fetch('/api/protocol/metrics', { cache: 'no-store' });
         if (!r.ok) throw new Error('metrics ' + r.status);
         const m = await r.json();
-        if (m.tvlUsd != null) {
-          setTxt('.pool .v', fmt(Number(m.tvlUsd)));
-          setTxt('.stats-grid .stat:nth-child(1) .v', fmt(Number(m.tvlUsd)));
-        }
-        if (m.agentCount != null) setTxt('.stats-grid .stat:nth-child(2) .v', String(m.agentCount));
-        if (m.queriesPerDay != null) setTxt('.stats-grid .stat:nth-child(3) .v', fmt(Number(m.queriesPerDay), ''));
-        if (m.venuesLiveDenominator != null) {
-          setTxt('.stats-grid .stat:nth-child(4) .v', `${m.venuesLive ?? 0} / ${m.venuesLiveDenominator}`);
+        const tvl = compactUsd(m.testnetTvlUsd);
+        setTxt('.pool .v', tvl);
+        setTxt('.stats-grid .stat:nth-child(1) .v', tvl);
+        setTxt('.stats-grid .stat:nth-child(2) .v', intOrPending(m.registeredAgents));
+        setTxt('.stats-grid .stat:nth-child(3) .v', intOrPending(m.codex24hQueries));
+        const vd = m.venuesDeployed;
+        if (vd && vd.total != null) {
+          setTxt(
+            '.stats-grid .stat:nth-child(4) .v',
+            (vd.count == null ? PENDING : String(vd.count)) + ' / ' + String(vd.total),
+          );
         }
       } catch (e) {
-        setTxt('.pool .v', '$0');
-        setTxt('.stats-grid .stat:nth-child(1) .v', '$0');
-        setTxt('.stats-grid .stat:nth-child(2) .v', '0');
-        setTxt('.stats-grid .stat:nth-child(3) .v', '0');
+        setTxt('.pool .v', PENDING);
+        setTxt('.stats-grid .stat:nth-child(1) .v', PENDING);
+        setTxt('.stats-grid .stat:nth-child(2) .v', PENDING);
+        setTxt('.stats-grid .stat:nth-child(3) .v', PENDING);
+      }
+
+      // Venue chip deployment status. Flip "pending" to "deployed" per
+      // adapter when the deployments registry shows a non-zero address.
+      // Per-venue dollar amounts stay pending; no API exposes per-adapter
+      // Coffer pulls yet (tracked in indexing-todo.md).
+      try {
+        const r = await fetch('/api/deployments/status', { cache: 'no-store' });
+        if (!r.ok) throw new Error('deployments ' + r.status);
+        const d = await r.json();
+        const contracts = d?.contracts || {};
+        document.querySelectorAll('.venue[data-venue-slug]').forEach((el) => {
+          const slug = el.getAttribute('data-venue-slug');
+          const entry = contracts[slug];
+          const live = entry && entry.address && /^0x[0-9a-fA-F]{40}$/.test(entry.address)
+            && entry.address !== '0x0000000000000000000000000000000000000000';
+          if (live) {
+            const amt = el.querySelector('.amt');
+            if (amt) amt.textContent = 'deployed';
+          }
+        });
+      } catch (e) {
+        // honest no-op: chips stay "pending" if registry is unreachable
       }
     })();
   </script>

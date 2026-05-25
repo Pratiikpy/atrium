@@ -50,7 +50,10 @@ const NAV_GROUPS = [
   },
   {
     heading: 'Agents',
-    items: [{ href: '/app/agents', label: 'Agents', icon: 'agent', badge: '0' }],
+    // Badge intentionally omitted: ui.md says badges render real counts only.
+    // A hardcoded '0' fakes a live indicator. Wire from Sigil
+    // mandates count when that endpoint exists.
+    items: [{ href: '/app/agents', label: 'Agents', icon: 'agent' }],
   },
   {
     heading: 'Trust',
@@ -84,7 +87,7 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-parchment text-ink">
       {/* ── Sidebar ────────────────────────────────────────────── */}
-      <aside className="hidden w-[220px] shrink-0 flex-col border-r border-divider md:flex">
+      <aside className="hidden w-[240px] shrink-0 flex-col border-r border-divider md:flex">
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/app" className="font-display text-2xl italic text-ink">
             Atrium
@@ -228,6 +231,8 @@ function NavIcon({ kind, active }: { kind: string; active?: boolean }) {
       return (<svg {...common}><path d="M4 2h6l3 3v9H4z" /><path d="M10 2v3h3" /></svg>);
     case 'gear':
       return (<svg {...common}><circle cx="8" cy="8" r="2.5" /><path d="M8 1v1.5M8 13.5V15M3.5 3.5l1 1M11.5 11.5l1 1M1 8h1.5M13.5 8H15M3.5 12.5l1-1M11.5 4.5l1-1" /></svg>);
+    case 'bell':
+      return (<svg {...common}><path d="M8 2v1M4 6a4 4 0 1 1 8 0c0 2.5 1 4 1 5H3c0-1 1-2.5 1-5zM6.5 13a1.5 1.5 0 0 0 3 0" /></svg>);
     default:
       return null;
   }
