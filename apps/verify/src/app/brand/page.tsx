@@ -323,22 +323,24 @@ export default function BrandPage() {
           reserved by Atrium Labs Ltd.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <ComponentCard title="Wordmark" cap="SVG">
+          <ComponentCard title="Wordmark" cap="SVG . PNG">
             <div className="flex flex-wrap gap-2">
-              {/* SVGs shipped 2026-05-25 under apps/verify/public/brand/assets/.
-                  PNG rasters pending: need to run a vector outline step
-                  + ImageMagick / Inkscape export (deferred to founder ops). */}
+              {/* Phase eta.10 (2026-05-25): rasters generated via
+                  scripts/generate-brand-rasters.mjs using sharp. Run on
+                  any SVG change; CI regenerates on PR. */}
               <DownloadLink href="/brand/assets/atrium-wordmark.svg">atrium-wordmark.svg</DownloadLink>
               <DownloadLink href="/brand/assets/atrium-wordmark-dark.svg">atrium-wordmark-dark.svg</DownloadLink>
-              <DownloadLink pending>PNG 2x . 4x . pending</DownloadLink>
+              <DownloadLink href="/brand/assets/atrium-wordmark-2x.png">PNG 2x</DownloadLink>
+              <DownloadLink href="/brand/assets/atrium-wordmark-4x.png">PNG 4x</DownloadLink>
             </div>
           </ComponentCard>
-          <ComponentCard title="App icon" cap="SVG">
+          <ComponentCard title="App icon" cap="SVG . PNG . ICO">
             <div className="flex flex-wrap gap-2">
               <DownloadLink href="/brand/assets/atrium-icon.svg">atrium-icon.svg</DownloadLink>
-              <DownloadLink pending>favicon.ico . pending</DownloadLink>
-              <DownloadLink pending>apple-touch-icon 180x180 . pending</DownloadLink>
-              <DownloadLink pending>android 192 / 512 . pending</DownloadLink>
+              <DownloadLink href="/favicon.ico">favicon.ico</DownloadLink>
+              <DownloadLink href="/brand/assets/apple-touch-icon.png">apple-touch-icon 180</DownloadLink>
+              <DownloadLink href="/brand/assets/android-icon-192.png">android 192</DownloadLink>
+              <DownloadLink href="/brand/assets/android-icon-512.png">android 512</DownloadLink>
             </div>
           </ComponentCard>
           <div className="md:col-span-2">

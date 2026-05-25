@@ -1,0 +1,42 @@
+name: brand-assets
+
+# Phase eta.10: regenerate brand raster assets whenever the canonical
+# SVGs change. Commits the rasters back so the /brand Download links
+# stay live without manual founder action.
+
+on:
+  push:
+    paths:
+      - 'apps/verify/public/brand/assets/*.svg'
+      - 'scripts/generate-brand-rasters.mjs'
+  pull_request:
+    paths:
+      - 'apps/verify/public/brand/assets/*.svg'
+      - 'scripts/generate-brand-rasters.mjs'
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/generate-brand-rasters.mjs
+      - name: Commit regenerated rasters
+        # Only commits if the SVG change actually produced a raster diff.
+        # The git-auto-commit action is read-only when there are no changes.
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(brand): regenerate raster assets from SVG canon'
+          file_pattern: 'apps/verify/public/brand/assets/*.png apps/verify/public/favicon.ico'
