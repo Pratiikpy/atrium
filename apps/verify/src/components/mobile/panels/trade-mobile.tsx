@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useOpenPosition } from '@/lib/use-open-position';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
  * Source: desing/Mobile App.html:1064-1132. Pair head + sparkline chart +
  * timeframe pills + Long/Short toggle + amount input + leverage slider +
- * order summary + primary CTA. Local state only for this session; the
- * actual order flow lives in the desktop trade page and a follow-up
- * wires this through to wagmi writeContract via the same hook.
+ * order summary + primary CTA. Wires through the same useOpenPosition
+ * wagmi hook the desktop trade page uses (Phase eta.6 2026-05-25), so
+ * the mobile CTA is a real trade not a mockup.
  *
  * Real-time price + chart data require the Plinth oracle path which is
  * pending; chart renders a static SVG line as a layout placeholder with
@@ -18,8 +19,14 @@ export function TradeMobile() {
   const [side, setSide] = useState<'long' | 'short'>('long');
   const [amount, setAmount] = useState('1820');
   const [leverage, setLeverage] = useState(4);
+  const { status, open, reset } = useOpenPosition();
 
   const notional = (Number(amount || '0') * leverage).toFixed(2);
+  const isSubmitting = status.kind === 'submitting' || status.kind === 'resolving';
+
+  const submit = () => {
+    void open({ venue: 'trade-xyz', side, sizeUsd: notional });
+  };
 
   return (
     <div className="md:hidden flex flex-col gap-4">
@@ -120,10 +127,31 @@ export function TradeMobile() {
 
       <button
         type="button"
-        className={`rounded-full py-3.5 text-center font-medium ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
+        onClick={submit}
+        disabled={isSubmitting}
+        className={`rounded-full py-3.5 text-center font-medium transition disabled:opacity-60 ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
       >
-        {side === 'long' ? 'Open long' : 'Open short'} . rTSLA-PERP
+        {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . rTSLA-PERP`}
       </button>
+      {status.kind === 'error' && (
+        <p className="text-center font-mono text-[11px] text-mob-neg">
+          {status.reason}
+          <button type="button" onClick={reset} className="ml-2 underline">retry</button>
+        </p>
+      )}
+      {status.kind === 'success' && (
+        <p className="text-center font-mono text-[11px] text-mob-live">
+          tx{' '}
+          <a
+            href={`https://sepolia.arbiscan.io/tx/${status.hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            {status.hash.slice(0, 10)}...
+          </a>
+        </p>
+      )}
     </div>
   );
 }
