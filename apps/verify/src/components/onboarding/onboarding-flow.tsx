@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * Five-step onboarding flow, pixel-matched to
@@ -352,15 +353,20 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
 /* ----- Step 3: Faucet (real /api/faucet/status) -------------------------- */
 
 function Faucet({ onNext }: { onNext: () => void }) {
+  const wallet = useScopedWallet();
   const [status, setStatus] = useState<FaucetStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/faucet/status')
+    // Phase theta audit follow-up: scope to the connected wallet so the
+    // cooldown + dropped-already check reads the user's history, not the
+    // demo wallet's. Faucet route already supported ?wallet= since audit
+    // U-28; this wires the connected-wallet through.
+    fetch(walletQuery('/api/faucet/status', wallet))
       .then((r) => r.json())
       .then((d: FaucetStatus) => setStatus(d))
       .catch((e) => setError(e instanceof Error ? e.message : 'Faucet status unavailable'));
-  }, []);
+  }, [wallet]);
 
   const drops = status?.drops ?? [
     { token: 'USDC', amount: 10000, chain: 'arb-sepolia' as const },
@@ -445,13 +451,19 @@ function Faucet({ onNext }: { onNext: () => void }) {
 /* ----- Step 4: Margin Posted (real /api/portfolio/buying-power) ---------- */
 
 function MarginPosted({ onNext }: { onNext: () => void }) {
+  const wallet = useScopedWallet();
   const [bp, setBp] = useState<BuyingPower | null>(null);
   useEffect(() => {
-    fetch('/api/portfolio/buying-power')
+    // Phase theta audit follow-up: read buying power for the CONNECTED
+    // user — Step 4 of onboarding shows "you just deposited X, your
+    // buying power is now Y". Pre-fix it would have shown the demo
+    // wallet's buying power as the success-confirmation number, which
+    // is meaningless to the user who just funded their own wallet.
+    fetch(walletQuery('/api/portfolio/buying-power', wallet))
       .then((r) => r.json())
       .then((d: BuyingPower) => setBp(d))
       .catch(() => setBp({ currentUsd: null, source: 'pending' }));
-  }, []);
+  }, [wallet]);
 
   const isLive = bp?.source === 'plinth' && bp.currentUsd != null;
   const buyingPower = isLive ? `$${bp!.currentUsd}` : 'pending';
