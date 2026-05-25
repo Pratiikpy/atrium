@@ -8,7 +8,12 @@ import { EmergencyCloseBanner, isLiquidityError } from '@/components/portfolio/e
 
 interface Position {
   id: string;
-  /** On-chain Plinth position id surfaced for the Close action (audit U-21). */
+  /** Plinth-side position id (margin row). Surfaced separately from
+   * the venue-side id after the Phase theta audit follow-up. */
+  plinthPositionId?: string;
+  /** Venue-side position id (adapter row). Joined from RouterPositionEvent
+   * in /api/portfolio/positions; falls back to plinthPositionId when the
+   * subgraph hasn't indexed the open event yet. */
   venuePositionId?: string;
   instrument: string;
   venue: string;
@@ -198,6 +203,13 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                         onClick={() =>
                           close({
                             venueId: p.venueId!,
+                            // Phase theta audit follow-up (2026-05-25):
+                            // pass both Plinth + venue ids. Fall back to
+                            // venuePositionId for plinthPositionId only
+                            // when the API hasn't surfaced the join yet —
+                            // matches the API's own fallback shape.
+                            plinthPositionId:
+                              p.plinthPositionId ?? p.venuePositionId!,
                             venuePositionId: p.venuePositionId!,
                           })
                         }

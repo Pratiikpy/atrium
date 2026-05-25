@@ -17,15 +17,13 @@ import { VENUES } from '@/lib/venues';
  * adapter's v1.0 or v1.1 close entry per the version() probe, and
  * sweeps adapter-held USDC back to Coffer.
  *
- * Known shape bug (deferred follow-up): the Router signature takes
- * BOTH plinth_position_id AND venue_position_id as separate args, but
- * `/api/portfolio/positions` only surfaces the Plinth id today (the
- * route docstring acknowledges the conflation at audit U-21). For
- * sequence-aligned ids (every Router-opened position has matching
- * Plinth + venue ids by construction in the current setUp), passing
- * the same id for both works. A proper fix surfaces both ids from a
- * PositionOpenedViaRouter subgraph handler — tracked in human_left.md
- * `position-dual-id-surface`.
+ * Phase theta audit follow-up resolved (2026-05-25): /api/portfolio/
+ * positions now joins the Plinth view with the RouterPositionEvent
+ * indexer (already in subgraph/src/atrium_router.ts) so each row
+ * carries both plinthPositionId AND venuePositionId. The hook signature
+ * accepts both ids separately. When the venue side hasn't been indexed
+ * yet (e.g. fresh open + cold subgraph), the route returns the Plinth
+ * id for both fields — the same fallback the pre-fix shape had.
  */
 
 const ROUTER_ABI = [
@@ -55,7 +53,11 @@ export function useClosePosition() {
   const [status, setStatus] = useState<CloseStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
 
-  async function close(params: { venueId: number; venuePositionId: string }) {
+  async function close(params: {
+    venueId: number;
+    plinthPositionId: string;
+    venuePositionId: string;
+  }) {
     if (!account) {
       setStatus({
         kind: 'error',
@@ -75,9 +77,11 @@ export function useClosePosition() {
       return;
     }
 
-    let parsedId: bigint;
+    let parsedPlinthId: bigint;
+    let parsedVenueId: bigint;
     try {
-      parsedId = BigInt(params.venuePositionId);
+      parsedPlinthId = BigInt(params.plinthPositionId);
+      parsedVenueId = BigInt(params.venuePositionId);
     } catch {
       setStatus({
         kind: 'error',
@@ -117,10 +121,7 @@ export function useClosePosition() {
         address: router,
         abi: ROUTER_ABI,
         functionName: 'close_position_via_adapter',
-        // Dual-id deferred: same id for both args until the subgraph
-        // surfaces the venue-side id separately. Router-opened positions
-        // have aligned Plinth + venue ids by sequence construction.
-        args: [params.venueId, parsedId, parsedId, '0x'],
+        args: [params.venueId, parsedPlinthId, parsedVenueId, '0x'],
       });
       setStatus({ kind: 'success', positionId: params.venuePositionId, hash });
     } catch (e) {

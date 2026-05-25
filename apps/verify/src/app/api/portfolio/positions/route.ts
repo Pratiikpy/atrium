@@ -35,6 +35,39 @@ export async function GET() {
       }`,
       { u: wallet.toLowerCase() }
     );
+
+    // Phase theta audit follow-up (2026-05-25): surface the
+    // venue-side position id alongside the Plinth-side id. Pre-fix the
+    // route aliased the Plinth id as `venuePositionId` (audit U-21
+    // comment acknowledges the conflation); now we read the real venue
+    // id from RouterPositionEvent, indexed by plinthPositionId. This
+    // unblocks the deferred close-path dual-id-surface noted in
+    // use-close-position.ts.
+    let venueIdByPlinthId = new Map<string, string>();
+    if (data.positions && data.positions.length > 0) {
+      try {
+        const linkData = await gql<{
+          routerPositionEvents: Array<{ plinthPositionId: string; venuePositionId: string }>;
+        }>(
+          `query RouterLinks($u: Bytes!, $ids: [BigInt!]!) {
+            routerPositionEvents(
+              where: { user: $u, action: "open", plinthPositionId_in: $ids }
+              first: 50
+            ) { plinthPositionId venuePositionId }
+          }`,
+          {
+            u: wallet.toLowerCase(),
+            ids: data.positions.map((p) => p.id),
+          },
+        );
+        for (const link of linkData.routerPositionEvents ?? []) {
+          venueIdByPlinthId.set(link.plinthPositionId, link.venuePositionId);
+        }
+      } catch {
+        // RouterPositionEvent join is best-effort; if the subgraph hiccups
+        // we fall back to the Plinth id as before (matches pre-fix shape).
+      }
+    }
     // Audit KK-5 + KK-6 + KK-7 fix: route was doing `Number(big) / 1e6` in
     // three places — formatAbs() (size column), notionalUsd, entryPrice/
     // markPrice. All lose precision past Number.MAX_SAFE_INTEGER on large
@@ -58,13 +91,17 @@ export async function GET() {
       // shows "—" instead of an honest-looking zero entry.
       const entryPriceMeasured = entryPriceInt > 0n;
       const sizeFormatted = formatShares(abs, USDC_DECIMALS);
+      // Phase theta audit follow-up: surface the real venue id when the
+      // RouterPositionEvent join succeeded; fall back to the Plinth id
+      // when the subgraph hasn't indexed the open event yet (matches
+      // pre-fix behavior for backward compatibility).
+      const venueSidePositionId = venueIdByPlinthId.get(p.id) ?? p.id;
       return {
         id: p.id,
-        // Audit U-21: `id` from Scribe is the on-chain Plinth position id.
-        // Expose it explicitly as `venuePositionId` so the client's close
-        // action passes it back to the adapter's close_position(uint256,...)
-        // without relying on schema-knowledge.
-        venuePositionId: p.id,
+        plinthPositionId: p.id,
+        // Audit U-21 (resolved 2026-05-25): now distinct from `id`. The
+        // close action passes both to AtriumRouter.close_position_via_adapter.
+        venuePositionId: venueSidePositionId,
         instrument: p.instrumentId.slice(0, 8) + '…',
         venueId: p.venueId,
         venue: venueLabel(p.venueId) ?? `venue-${p.venueId}`,
