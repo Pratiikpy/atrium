@@ -1,0 +1,35 @@
+name: notifier-cron
+
+# Phase eta.5: notifier service polls Scribe every minute for new
+# alert-class events and fans them out via Telegram / Discord /
+# email / custom webhook per per-user preferences.
+
+on:
+  schedule:
+    # 1-minute cadence is GHA's tightest. Notifier is idempotent
+    # via the Vercel KV last-block cursor, so over-runs are safe.
+    - cron: '* * * * *'
+  workflow_dispatch:
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @atrium/notifier tick
+        env:
+          SCRIBE_URL:               ${{ secrets.SCRIBE_URL }}
+          PREFS_API_URL:            ${{ secrets.NOTIFIER_PREFS_API_URL }}
+          ATRIUM_INTERNAL_KEY:      ${{ secrets.NOTIFIER_INTERNAL_KEY }}
+          ATRIUM_KV_REST_URL:       ${{ secrets.ATRIUM_KV_REST_URL }}
+          ATRIUM_KV_REST_TOKEN:     ${{ secrets.ATRIUM_KV_REST_TOKEN }}
+          TELEGRAM_BOT_TOKEN:       ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          RESEND_API_KEY:           ${{ secrets.RESEND_API_KEY }}
