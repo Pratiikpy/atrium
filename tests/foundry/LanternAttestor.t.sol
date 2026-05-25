@@ -18,8 +18,20 @@ contract LanternAttestorTest is Test {
     address internal timelock;
     address internal hostile;
 
-    event AttestationPublished(bytes32 indexed root, uint256 block_number, uint256 timestamp);
+    event AttestationPublished(
+        bytes32 indexed root,
+        uint256 block_number,
+        uint256 timestamp,
+        uint256 indexed leafCount,
+        string ipfsCid
+    );
     event SigningKeyRotated(address indexed previous, address indexed next);
+
+    // Convenience defaults for tests that don't care about leafCount / ipfsCid
+    // semantics. Real cron calls always pass meaningful values; these match
+    // the on-chain ABI but stay terse at the call site.
+    uint256 internal constant TEST_LEAF_COUNT = 0;
+    string internal constant TEST_IPFS_CID = "QmTestIpfsCidPlaceholderForUnitTestsOnly0000";
 
     function setUp() public {
         signingKey = makeAddr("lantern-signing-key");
@@ -34,42 +46,45 @@ contract LanternAttestorTest is Test {
     function test_publish_onlyBySigningKey() public {
         vm.prank(hostile);
         vm.expectRevert(LanternAttestor.Unauthorized.selector);
-        lantern.publish(keccak256("root"), 1_000_000, hex"");
+        lantern.publish(keccak256("root"), 1_000_000, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
     }
 
     function test_publish_rejectsBlockEqualToLatest() public {
         vm.prank(signingKey);
-        lantern.publish(keccak256("root-1"), 1_000_000, hex"");
+        lantern.publish(keccak256("root-1"), 1_000_000, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         // Same block number must revert — strict-greater required.
         vm.prank(signingKey);
         vm.expectRevert(
             abi.encodeWithSelector(LanternAttestor.StaleAttestation.selector, uint64(1_000_000), uint64(1_000_000))
         );
-        lantern.publish(keccak256("root-2"), 1_000_000, hex"");
+        lantern.publish(keccak256("root-2"), 1_000_000, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
     }
 
     function test_publish_rejectsOlderBlock() public {
         vm.prank(signingKey);
-        lantern.publish(keccak256("root-newer"), 2_000_000, hex"");
+        lantern.publish(keccak256("root-newer"), 2_000_000, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         vm.prank(signingKey);
         vm.expectRevert(
             abi.encodeWithSelector(LanternAttestor.StaleAttestation.selector, uint64(2_000_000), uint64(1_999_999))
         );
-        lantern.publish(keccak256("root-older"), 1_999_999, hex"");
+        lantern.publish(keccak256("root-older"), 1_999_999, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
     }
 
     function test_publish_happyPath_emitsEvent() public {
         bytes32 root = keccak256("first-real-root");
         uint256 blk = 5_000_000;
+        uint256 leafCount = 42;
+        string memory cid = "QmRealCidEmittedByTheCronInThisTest012345678";
 
         vm.warp(1_700_000_000); // pin block.timestamp so the event payload is deterministic
-        vm.expectEmit(true, false, false, true, address(lantern));
-        emit AttestationPublished(root, blk, 1_700_000_000);
+        // checkTopic1 + checkTopic2 (root + leafCount), checkData (timestamp + ipfsCid)
+        vm.expectEmit(true, true, false, true, address(lantern));
+        emit AttestationPublished(root, blk, 1_700_000_000, leafCount, cid);
 
         vm.prank(signingKey);
-        lantern.publish(root, blk, hex"");
+        lantern.publish(root, blk, leafCount, cid, hex"");
 
         assertEq(lantern.latest_root(), root, "root not stored");
         assertEq(uint256(lantern.latest_block()), blk, "block not stored");
@@ -77,13 +92,30 @@ contract LanternAttestorTest is Test {
 
     function test_publish_overwritesRootOnNewerBlock() public {
         vm.prank(signingKey);
-        lantern.publish(keccak256("first"), 100, hex"");
+        lantern.publish(keccak256("first"), 100, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         vm.prank(signingKey);
-        lantern.publish(keccak256("second"), 200, hex"");
+        lantern.publish(keccak256("second"), 200, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         assertEq(lantern.latest_root(), keccak256("second"), "newer root must win");
         assertEq(uint256(lantern.latest_block()), 200);
+    }
+
+    /// Phase zeta.1 fix: the event must carry leafCount + ipfsCid so the
+    /// verify-app's inclusion-proof flow + the dashboard can lookup the
+    /// pinned tree without a second on-chain read. Tests the event payload
+    /// shape so a future refactor that drops the new fields fails CI loudly
+    /// instead of silently bricking /verify/6.
+    function test_publish_carries_leafCount_and_ipfsCid_in_event() public {
+        bytes32 root = keccak256("payload-shape-pin");
+        uint256 blk = 7_000_000;
+        uint256 leafCount = 12345;
+        string memory cid = "bafybeicGdRzNoneIndexedRealCidThatTheRouteParses";
+        vm.warp(1_750_000_000);
+        vm.expectEmit(true, true, false, true, address(lantern));
+        emit AttestationPublished(root, blk, 1_750_000_000, leafCount, cid);
+        vm.prank(signingKey);
+        lantern.publish(root, blk, leafCount, cid, hex"");
     }
 
     // ── rotateSigningKey() gating ───────────────────────────────────────
@@ -114,11 +146,11 @@ contract LanternAttestorTest is Test {
         // The previous key can no longer publish.
         vm.prank(signingKey);
         vm.expectRevert(LanternAttestor.Unauthorized.selector);
-        lantern.publish(keccak256("post-rotation"), 1, hex"");
+        lantern.publish(keccak256("post-rotation"), 1, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         // The new key can.
         vm.prank(next);
-        lantern.publish(keccak256("post-rotation"), 1, hex"");
+        lantern.publish(keccak256("post-rotation"), 1, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
         assertEq(lantern.latest_root(), keccak256("post-rotation"));
     }
 
@@ -131,7 +163,7 @@ contract LanternAttestorTest is Test {
         bytes32 leaf = keccak256(abi.encodePacked(address(0xAB), uint256(100e6)));
         bytes32 leafHashed = keccak256(bytes.concat(leaf));
         vm.prank(signingKey);
-        lantern.publish(leafHashed, 1, hex"");
+        lantern.publish(leafHashed, 1, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         assertTrue(lantern.verifyInclusion(leaf, new bytes32[](0)), "single-leaf proof must verify");
     }
@@ -149,7 +181,7 @@ contract LanternAttestorTest is Test {
             : keccak256(abi.encodePacked(nodeB, nodeA));
 
         vm.prank(signingKey);
-        lantern.publish(root, 10, hex"");
+        lantern.publish(root, 10, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         bytes32[] memory proofForA = new bytes32[](1);
         proofForA[0] = nodeB;
@@ -171,7 +203,7 @@ contract LanternAttestorTest is Test {
             : keccak256(abi.encodePacked(nodeB, nodeA));
 
         vm.prank(signingKey);
-        lantern.publish(root, 10, hex"");
+        lantern.publish(root, 10, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         // Attacker submits `nodeA` (an interior node) AS the leaf, with an
         // empty proof and the root being itself. Pre-fix, this would verify
@@ -194,7 +226,7 @@ contract LanternAttestorTest is Test {
             : keccak256(abi.encodePacked(nodeB, nodeA));
 
         vm.prank(signingKey);
-        lantern.publish(root, 10, hex"");
+        lantern.publish(root, 10, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
         // Hostile leaf with the same sibling must not verify — the judge demo
         // hinges on this being unforgeable.
@@ -285,7 +317,7 @@ contract LanternAttestorTest is Test {
         // (the double-hash of the leaf at the tree boundary).
         bytes32 root = keccak256(bytes.concat(realLeaf));
         vm.prank(signingKey);
-        lantern.publish(root, 1, "");
+        lantern.publish(root, 1, TEST_LEAF_COUNT, TEST_IPFS_CID, "");
 
         // Real leaf with empty proof verifies.
         assertTrue(lantern.verifyInclusion(realLeaf, new bytes32[](0)),

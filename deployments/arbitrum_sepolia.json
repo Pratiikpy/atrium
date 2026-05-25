@@ -13,9 +13,19 @@
       "block": 270408449
     },
     "lantern-attestor": {
+      "address": "0xF0B90b94C0B8a52c545768bFf06a3932c67d5888",
+      "tx": "0x9ddd82d326fae6210b04146efaca45c333e8c5d46906f784ce0956a19a0f7ef4",
+      "deployed_at": "2026-05-25T20:00:00.000Z",
+      "kind": "solidity",
+      "version": "v2",
+      "signing_key": "0x8ab93A583eD711A6ecDb9776F171578AFe4bc97b",
+      "note": "Redeployed 2026-05-25 (Phase zeta.1, audit TT-17 fix). AttestationPublished event now carries (root, block_number, timestamp, leafCount, ipfsCid) so /api/lantern/verify-inclusion (Verifier Step 6) can look up the pinned Merkle tree without an extra on-chain read. publish() signature extended to match. Constructor signing_key = 0x8ab93A... (dedicated Lantern key, not deployer EOA); founder must update Vercel env LANTERN_KEY_ENVELOPE_JSON to wrap lantern-key.json instead of lantern-key-deployer.json + LANTERN_ATTESTOR_ADDRESS to this address. Subgraph manifest also needs the new event signature - re-deploy as v0.0.6."
+    },
+    "lantern-attestor-v1-pre-event-extension": {
       "address": "0x900a9fb4bab7576fc11e4bb3c002d89dbe261168",
       "tx": "0x2343d14a743cef74768ec818de86d9154409d13ef3c97c987a8b79d1ca56a53c",
-      "block": 270408455
+      "block": 270408455,
+      "note": "DEPRECATED v1 (3-field event). Replaced by v2 above on 2026-05-25. Kept for tx history."
     },
     "curator": {
       "address": "0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d",

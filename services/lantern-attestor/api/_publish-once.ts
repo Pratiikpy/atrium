@@ -36,6 +36,8 @@ const LANTERN_ABI = [
     inputs: [
       { name: 'root', type: 'bytes32' },
       { name: 'block_number', type: 'uint256' },
+      { name: 'leafCount', type: 'uint256' },
+      { name: 'ipfsCid', type: 'string' },
       { name: 'signature', type: 'bytes' },
     ],
     outputs: [],
@@ -87,14 +89,23 @@ export async function publishOnce(): Promise<void> {
     message: { raw: root },
   });
 
+  // Phase zeta.1: emit leafCount + ipfsCid in the on-chain event so the
+  // subgraph indexes them and the verify-app's /api/lantern/verify-inclusion
+  // route can look up the right Merkle tree without an extra round trip.
+  // ipfsCid is "" when the pin failed (network blip, gateway down); the
+  // verify-app's CID regex rejects the empty string so the dashboard
+  // surfaces "tree not pinned yet" rather than silently using the wrong CID.
+  const ipfsCidForEvent = ipfsCid ?? '';
+  const leafCountForEvent = BigInt(balances.length);
+
   const hash = await walletClient.writeContract({
     address: LANTERN_ATTESTOR_ADDRESS,
     abi: LANTERN_ABI,
     functionName: 'publish',
-    args: [root, blockNumber, signature as `0x${string}`],
+    args: [root, blockNumber, leafCountForEvent, ipfsCidForEvent, signature as `0x${string}`],
   } as never);
 
   console.log(
-    `[lantern] published root=${root} tx=${hash} ipfs=${ipfsCid ?? 'none'} balances=${balances.length}`,
+    `[lantern] published root=${root} tx=${hash} ipfs=${ipfsCidForEvent || 'none'} leaves=${balances.length}`,
   );
 }

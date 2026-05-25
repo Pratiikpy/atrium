@@ -87,6 +87,16 @@
         "internalType": "uint256"
       },
       {
+        "name": "leafCount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "ipfsCid",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
         "name": "",
         "type": "bytes",
         "internalType": "bytes"
@@ -166,6 +176,18 @@
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
+      },
+      {
+        "name": "leafCount",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "ipfsCid",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
       }
     ],
     "anonymous": false

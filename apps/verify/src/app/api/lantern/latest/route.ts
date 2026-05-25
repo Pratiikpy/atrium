@@ -75,13 +75,14 @@ export async function GET() {
     if (!/^0x[0-9a-fA-F]{64}$/.test(latest.root)) {
       return NextResponse.json({ exists: false, reason: 'corrupt_root' }, { status: 404 });
     }
-    // Audit TT-17 fix: LanternAttestor.publish() does NOT carry ipfsCid in
-    // its on-chain event — only (root, block_number, signature). The
-    // subgraph mapping leaves ipfsCid unset; this route would otherwise
-    // ship undefined to the dashboard, which then calls
-    // /api/lantern/verify-inclusion with `ipfsCid: undefined` → 400.
-    // Treat missing ipfsCid as corrupt-row → empty state. The real fix
-    // needs a contract event extension (see human_left.md #25).
+    // Phase zeta.1 (2026-05-25): LanternAttestor v2 emits ipfsCid +
+    // leafCount in the AttestationPublished event, so the subgraph now
+    // indexes both. This route now passes through whatever the subgraph
+    // gives. The guard below stays in place for the transition window
+    // while the OLD contract's events still index with empty ipfsCid -
+    // once the verify-app's LANTERN_ATTESTOR_ADDRESS env points at the
+    // v2 deploy and Coffer-balance > 0 triggers the first v2 publish,
+    // every row carries a real CID.
     if (!latest.ipfsCid || typeof latest.ipfsCid !== 'string' || latest.ipfsCid.length < 10) {
       return NextResponse.json(
         { exists: false, reason: 'missing_ipfs_cid' },

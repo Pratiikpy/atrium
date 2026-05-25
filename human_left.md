@@ -1,5 +1,36 @@
 # Tasks left for the human team
 
+## New items added 2026-05-25 (Phase zeta operational follow-ups)
+
+### Founder-only: Vercel env updates after Phase zeta.1 redeploys
+
+The Phase ζ.1 + ζ.3 redeploys land on-chain but the Vercel-hosted
+services need env updates to point at the new addresses. Each is a
+one-line change in the Vercel dashboard + a re-deploy.
+
+1. **lantern-attestor project (Vercel):**
+   - `LANTERN_ATTESTOR_ADDRESS` -> `0xF0B90b94C0B8a52c545768bFf06a3932c67d5888`
+   - `LANTERN_KEY_ENVELOPE_JSON` -> contents of `~/.atrium/lantern-key.json`
+     (the dedicated 0x8ab93A... signing key; replaces the deployer
+     envelope `lantern-key-deployer.json` per the rotation plan in
+     `~/.atrium/README.md`)
+   - Re-deploy lantern-attestor on Vercel.
+   - Confirm next cron tick publishes a v2 event with leafCount + ipfsCid.
+
+2. **verify project (Vercel):**
+   - No env update needed (verify-app reads address from the
+     `deployments/arbitrum_sepolia.json` mirror committed in this push).
+   - Re-deploy verify-app on Vercel so the bundled deployments JSON
+     ships the new address.
+
+3. **subgraph re-deploy (Graph Studio):**
+   - `cd subgraph && npx graph codegen && npx graph build && \
+     npx graph deploy atrium-arbitrum-sepolia --studio --version-label v0.0.6 \
+     --deploy-key $GRAPH_STUDIO_DEPLOY_KEY`
+   - Reindexes the new LanternAttestor (block 270918668) + the new
+     AaveHorizonAdapter (block ~270918xxx) + the existing v0.0.5
+     Stylus address swaps.
+
 ## New items added 2026-05-24
 
 ### Rotate deployer EOA before mainnet (incident-driven)

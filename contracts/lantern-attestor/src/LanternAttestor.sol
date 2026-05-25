@@ -12,7 +12,22 @@ contract LanternAttestor {
     uint64 public latest_block;
     bytes32 public latest_root;
 
-    event AttestationPublished(bytes32 indexed root, uint256 block_number, uint256 timestamp);
+    /// @dev Audit TT-17 fix (Phase zeta.1, 2026-05-25): the prior event
+    /// shape was (root, block_number, timestamp) only. The verify-app's
+    /// inclusion-proof flow at /api/lantern/verify-inclusion needs to
+    /// know which IPFS CID pins the corresponding Merkle tree, and the
+    /// /api/lantern/latest dashboard needs the leaf count. Both fields
+    /// are now carried in the event so the subgraph can index them
+    /// without an extra Lantern-side service. Indexed root + leafCount;
+    /// ipfsCid is not indexed (variable-length string would only store
+    /// the keccak hash if indexed).
+    event AttestationPublished(
+        bytes32 indexed root,
+        uint256 block_number,
+        uint256 timestamp,
+        uint256 indexed leafCount,
+        string ipfsCid
+    );
     event SigningKeyRotated(address indexed previous, address indexed next);
 
     error Unauthorized();
@@ -42,12 +57,18 @@ contract LanternAttestor {
     ///         Lantern attestor service. The signature is verified off-chain
     ///         by validators reading the same root from the underlying
     ///         Scribe-indexed data.
-    function publish(bytes32 root, uint256 block_number, bytes calldata /*signature*/) external {
+    function publish(
+        bytes32 root,
+        uint256 block_number,
+        uint256 leafCount,
+        string calldata ipfsCid,
+        bytes calldata /*signature*/
+    ) external {
         if (msg.sender != signing_key) revert Unauthorized();
         if (uint64(block_number) <= latest_block) revert StaleAttestation(latest_block, uint64(block_number));
         latest_root = root;
         latest_block = uint64(block_number);
-        emit AttestationPublished(root, block_number, block.timestamp);
+        emit AttestationPublished(root, block_number, block.timestamp, leafCount, ipfsCid);
     }
 
     /// @notice Rotate the signing key. Audit F-32 fix: key rotation is a
