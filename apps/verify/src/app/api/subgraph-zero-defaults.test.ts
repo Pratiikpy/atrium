@@ -55,7 +55,11 @@ describe('U-34: subgraph zero-defaults stay null in wire responses', () => {
       ],
     });
     const { GET } = await import('./portfolio/positions/route');
-    const json = await (await GET()).json();
+    // Phase theta audit follow-up: route GET signature now requires a
+    // Request to support the ?wallet= multi-tenant param. Pass a stub
+    // request; the env-fallback path still applies because the URL has
+    // no `wallet` query param.
+    const json = await (await GET(new Request('http://localhost/api/portfolio/positions'))).json();
     expect(json.positions[0].entryPrice).toBeNull();
     // Sanity: a non-zero entryPriceQ64 should still produce a real value.
     (gql as any).mockResolvedValue({
@@ -71,7 +75,7 @@ describe('U-34: subgraph zero-defaults stay null in wire responses', () => {
       ],
     });
     const { GET: GET2 } = await import('./portfolio/positions/route');
-    const json2 = await (await GET2()).json();
+    const json2 = await (await GET2(new Request('http://localhost/api/portfolio/positions'))).json();
     expect(json2.positions[0].entryPrice).toBe('$100');
   });
 
@@ -92,7 +96,11 @@ describe('U-34: subgraph zero-defaults stay null in wire responses', () => {
       ],
     });
     const { GET } = await import('./portfolio/positions/route');
-    const json = await (await GET()).json();
+    // Phase theta audit follow-up: route GET signature now requires a
+    // Request to support the ?wallet= multi-tenant param. Pass a stub
+    // request; the env-fallback path still applies because the URL has
+    // no `wallet` query param.
+    const json = await (await GET(new Request('http://localhost/api/portfolio/positions'))).json();
     expect(json.positions[0].markPrice).toBeNull();
     expect(json.positions[0].pnlUsd).toBeNull();
     expect(json.positions[0].pnlDirection).toBeNull();

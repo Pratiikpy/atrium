@@ -27,8 +27,13 @@ interface ScribeMandate {
  *   - Lantern attestations affecting their balance (info)
  *   - Withdrawal SLA hits (warning)
  */
-export async function GET() {
-  const wallet = process.env.DEMO_WALLET_ADDRESS?.toLowerCase() ?? null;
+export async function GET(req?: Request) {
+  // Phase theta audit follow-up: ?wallet= multi-tenant support.
+  const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam.toLowerCase()
+      : process.env.DEMO_WALLET_ADDRESS?.toLowerCase() ?? null;
   if (!wallet) return NextResponse.json({ notifications: [], source: 'pending' });
   try {
     const data = await gql<{

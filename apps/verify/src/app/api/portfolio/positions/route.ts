@@ -16,8 +16,15 @@ interface ScribePosition {
   closedAtBlock: string | null;
 }
 
-export async function GET() {
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+export async function GET(req?: Request) {
+  // Phase theta audit follow-up: accept ?wallet= per the multi-tenant
+  // pattern. See /api/portfolio/buying-power/route.ts for the same shape.
+  // `req?` keeps existing vitest GET() callers compatible.
+  const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
   if (!wallet) {
     return NextResponse.json({ positions: [], source: 'pending' });
   }

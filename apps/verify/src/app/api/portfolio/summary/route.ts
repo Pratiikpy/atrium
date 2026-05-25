@@ -6,8 +6,13 @@ export const dynamic = 'force-dynamic';
 
 const USDC_DECIMALS = 6;
 
-export async function GET() {
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+export async function GET(req?: Request) {
+  // Phase theta audit follow-up: accept ?wallet= for multi-tenant support.
+  const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
   const plinth = await tryGetPlinth();
   if (!plinth || !wallet) {
     return NextResponse.json({

@@ -2,8 +2,13 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+export async function GET(req?: Request) {
+  // Phase theta audit follow-up: ?wallet= multi-tenant support.
+  const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
   // Iteration 37 audit fix: same partial-coverage pattern as iter 36 and
   // agents/summary above. Audit TTT-4 fixed the client-side catch in
   // gas-sponsorship.tsx (→ sponsored: null) but the SERVER returned 0 in

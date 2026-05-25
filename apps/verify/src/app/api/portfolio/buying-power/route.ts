@@ -14,8 +14,20 @@ interface ScribeMarginUpdate {
   requiredMarginWei: string;
 }
 
-export async function GET() {
-  const wallet = process.env.DEMO_WALLET_ADDRESS ?? null;
+export async function GET(req?: Request) {
+  // Phase theta audit follow-up (2026-05-25): accept ?wallet= query
+  // param so users who connect their own wallet see THEIR portfolio,
+  // not the demo wallet's. Pre-fix every request read DEMO_WALLET_ADDRESS
+  // unconditionally — Year-1 single-tenant artifact that hid the real
+  // user's data behind the demo wallet's. `req?` keeps the existing
+  // vitest GET() calls compatible (they get the env-fallback path).
+  const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;
+  const wallet =
+    walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
+      ? walletParam
+      : process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Note: the stale `url`/`walletParam` block below is fully replaced
+  // by the single-line walletParam above; tsc sees no dangling refs.
   if (!wallet) {
     return NextResponse.json({ currentUsd: null, series: [], windowDays: 30, source: 'pending' });
   }
