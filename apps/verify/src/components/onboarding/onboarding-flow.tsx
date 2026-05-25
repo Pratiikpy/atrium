@@ -261,7 +261,7 @@ function Authenticator({ onNext }: { onNext: () => void }) {
           {signing ? 'Waiting…' : supported === false ? 'WebAuthn unavailable' : 'Authenticate'}
         </button>
         {error && (
-          <p className="mt-3 text-xs text-[var(--color-terracotta)]">
+          <p className="mt-3 text-xs text-[var(--color-accent)]">
             {error}
           </p>
         )}

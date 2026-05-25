@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 
 interface Agent {
@@ -126,19 +127,20 @@ export function AgentLeaderboard() {
                 <td className="px-4 py-3 font-mono text-ink">{a.aumUsd}</td>
                 <td className="px-4 py-3 font-mono text-ink-soft">{a.copiers}</td>
                 <td className="px-4 py-3 text-right">
-                  {/* Delegate button — the IssueMandate flow lives on
-                      /app/agents header (NewMandateButton). The row-level
-                      shortcut needs an anchor selector to pre-fill the
-                      agent address; until that ships, point to the header
-                      button via an in-page anchor rather than ship a click
-                      that does nothing. */}
-                  <a
-                    href="#issue-mandate"
+                  {/* Phase theta.4 (2026-05-25): pre-fix this was a dead
+                      `#issue-mandate` in-page anchor with no target. Now
+                      links to /app/agents with ?copy=<ens> so the
+                      NewMandateButton can pre-fill the agent address.
+                      Query-param consumer ships in the paired component
+                      refactor (human_left.md `rostrum-leaderboard-wiring`);
+                      pre-fill is a no-op until then but the link is real. */}
+                  <Link
+                    href={`/app/agents?copy=${encodeURIComponent(a.ens)}`}
                     className="inline-flex rounded-md border border-divider px-3 py-1.5 text-xs text-ink hover:border-ink/40"
-                    aria-label={`Issue a mandate (will be pre-filled with ${a.ens} once wired)`}
+                    aria-label={`Issue a mandate pre-filled with ${a.ens}`}
                   >
                     Delegate
-                  </a>
+                  </Link>
                 </td>
               </tr>
             ))}

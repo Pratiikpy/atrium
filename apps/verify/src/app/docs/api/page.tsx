@@ -31,7 +31,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/margin/:user',
     summary: 'Plinth margin number for a wallet. Returns collateral, required margin, buying power, paused state.',
     pricing: '$0.001 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/margin/0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/margin/0xYourWallet`,
     status: 'live',
   },
   {
@@ -39,7 +39,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/positions/:user',
     summary: 'Open positions across every Portico-whitelisted venue. Includes notional, entry, mark (when oracle live), unrealised PnL.',
     pricing: '$0.001 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/positions/0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/positions/0xYourWallet`,
     status: 'live',
   },
   {
@@ -47,7 +47,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/risk/:user',
     summary: 'Per-venue risk decomposition. Maps each venue to its share of total required margin + haircut applied.',
     pricing: '$0.002 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/risk/0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/risk/0xYourWallet`,
     status: 'live',
   },
   {
@@ -79,7 +79,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/attestation/:wallet',
     summary: 'Lantern proof-of-reserves Merkle proof for a wallet. Returns latest root + the inclusion path.',
     pricing: '$0.0005 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/attestation/0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.atrium.fi/attestation/0xYourWallet`,
     status: 'live',
   },
   {

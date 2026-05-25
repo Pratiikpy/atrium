@@ -108,7 +108,13 @@ export function AgentProfileLive({ id, venues }: { id: string; venues: string[] 
             <div className="text-right">
               <p className="text-[11px] uppercase tracking-wider text-muted">Deboost events</p>
               <p className="mt-1 font-mono text-[20px] text-ink">
-                {profile ? profile.deboostEvents.length : '-'}
+                {/* Phase theta.4 (2026-05-25): render an em-dash when source is
+                    'pending' so a "0" deboost count is not interpreted as a
+                    measured clean record. A real zero only appears once the
+                    Scribe-backed source returns. */}
+                {profile?.source === 'scribe'
+                  ? profile.deboostEvents.length
+                  : '—'}
               </p>
             </div>
           </div>

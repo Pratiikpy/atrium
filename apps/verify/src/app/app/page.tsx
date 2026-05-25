@@ -55,13 +55,33 @@ function statusLabel(state: string, address: string | null): string {
   }
 }
 
+/**
+ * Phase theta.4 (2026-05-25): count Portico adapters from the deployments
+ * registry so the /app live-status panel renders the real number instead
+ * of the hardcoded "Adapters (9): All shipped" string.
+ */
+async function countAdapters(): Promise<{ deployed: number; total: number }> {
+  const registry = await loadDeploymentRegistry();
+  const adapters = Object.entries(registry?.contracts ?? {}).filter(([k]) =>
+    k.startsWith('adapter-'),
+  );
+  const total = adapters.length;
+  const deployed = adapters.filter(
+    ([, v]) => v.address && v.address !== '0x' + '0'.repeat(40),
+  ).length;
+  return { deployed, total };
+}
+
 export default async function AppHome() {
-  const [coffer, plinth, sigil, vigil] = await Promise.all([
+  const [coffer, plinth, sigil, vigil, adapterCount] = await Promise.all([
     probeInit('coffer', 'asset'),
     probeInit('plinth', 'praetorMultisig'),
     probeInit('sigil', 'praetorMultisig'),
     probeInit('vigil', 'praetorMultisig'),
+    countAdapters(),
   ]);
+  // Lantern cron migrated to GHA every 10 min in Phase theta.3.
+  const lanternCronLabel = 'Cron live (GHA every 10 min)';
   return (
     <AppShell>
       <section className="grid gap-8 lg:grid-cols-3">
@@ -108,8 +128,8 @@ export default async function AppHome() {
             <Row label="Coffer (vault)" status={statusLabel(coffer.state, coffer.address)} />
             <Row label="Sigil (agents)" status={statusLabel(sigil.state, sigil.address)} />
             <Row label="Vigil (liquidator)" status={statusLabel(vigil.state, vigil.address)} />
-            <Row label="Adapters (9)" status="All shipped" />
-            <Row label="Lantern attestor" status="Cron live (daily 12:00 UTC)" />
+            <Row label="Adapters" status={`${adapterCount.deployed}/${adapterCount.total} deployed`} />
+            <Row label="Lantern attestor" status={lanternCronLabel} />
           </dl>
           <p className="mt-4 text-xs text-muted">
             Live state from <code className="font-mono text-ink">/api/deployments/status</code>.

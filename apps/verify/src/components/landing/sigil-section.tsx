@@ -32,7 +32,15 @@ function MandateCard() {
       style={{ background: 'var(--color-dark-bg)' }}
     >
       <header className="flex items-baseline justify-between text-dark-white-55">
-        <p className="text-[10px] uppercase tracking-wider">Intent Sigil · EIP-712</p>
+        <p className="text-[10px] uppercase tracking-wider">
+          Intent Sigil · EIP-712
+          {/* Phase theta.4 (2026-05-25): mandate shown is illustrative, not the
+              viewer's actual mandate. Pre-fix, users could mistake the static
+              `0xdelphi.eth` row for their own session. */}
+          <span className="ml-2 rounded-sm bg-parchment/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-parchment/80">
+            example
+          </span>
+        </p>
         <p className="font-mono text-[10px]">0xdelphi.eth</p>
       </header>
       <ul className="mt-5 space-y-2 font-mono text-[12px]">
