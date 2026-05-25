@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { venueLabel } from '@/lib/venues';
 import { useClosePosition } from '@/lib/use-close-position';
 import { EmergencyCloseBanner, isLiquidityError } from '@/components/portfolio/emergency-close-banner';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface Position {
   id: string;
@@ -37,8 +38,9 @@ interface PositionsResponse {
   source: 'scribe' | 'pending';
 }
 
-async function fetchPositions(): Promise<PositionsResponse> {
-  const r = await fetch('/api/portfolio/positions');
+async function fetchPositions(wallet: string | null): Promise<PositionsResponse> {
+  // Phase theta audit follow-up: pass the connected wallet through.
+  const r = await fetch(walletQuery('/api/portfolio/positions', wallet));
   if (!r.ok) throw new Error(`positions_${r.status}`);
   return r.json();
 }
@@ -48,9 +50,10 @@ async function fetchPositions(): Promise<PositionsResponse> {
  * can filter without re-fetching. `null` (or undefined) shows all venues.
  */
 export function OpenPositionsTable({ filterVenueId }: { filterVenueId?: number | null } = {}) {
+  const wallet = useScopedWallet();
   const { data, isLoading, error } = useQuery({
-    queryKey: ['open-positions'],
-    queryFn: fetchPositions,
+    queryKey: ['open-positions', wallet],
+    queryFn: () => fetchPositions(wallet),
     refetchInterval: 30_000,
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface MarginHealth {
   marginHealthBps: number | null;
@@ -9,16 +10,17 @@ interface MarginHealth {
   source: 'plinth' | 'pending';
 }
 
-async function fetchHealth(): Promise<MarginHealth> {
-  const r = await fetch('/api/portfolio/margin-health');
+async function fetchHealth(wallet: string | null): Promise<MarginHealth> {
+  const r = await fetch(walletQuery('/api/portfolio/margin-health', wallet));
   if (!r.ok) throw new Error(`health_${r.status}`);
   return r.json();
 }
 
 export function MarginEngineCard() {
+  const wallet = useScopedWallet();
   const { data, isLoading, error } = useQuery({
-    queryKey: ['margin-health'],
-    queryFn: fetchHealth,
+    queryKey: ['margin-health', wallet],
+    queryFn: () => fetchHealth(wallet),
     refetchInterval: 30_000,
   });
 

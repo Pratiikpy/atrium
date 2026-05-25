@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { Mandate } from '@/app/api/agents/my-mandates/route';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useRevokeMandate } from '@/lib/use-revoke-mandate';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * My mandates tab — lists active Sigils issued by the connected wallet.
@@ -26,15 +27,17 @@ type ApiShape = {
 };
 
 export function MyMandatesPanel() {
+  const wallet = useScopedWallet();
   const [data, setData] = useState<ApiShape | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/agents/my-mandates')
+    // Phase theta audit follow-up: scope to the connected wallet.
+    fetch(walletQuery('/api/agents/my-mandates', wallet))
       .then((r) => r.json())
       .then((d: ApiShape) => setData(d))
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load mandates'));
-  }, []);
+  }, [wallet]);
 
   if (error) {
     return (

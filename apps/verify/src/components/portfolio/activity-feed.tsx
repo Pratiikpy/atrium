@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface Activity {
   id: string;
@@ -17,16 +18,17 @@ interface ActivityResponse {
   source: 'scribe' | 'pending';
 }
 
-async function fetchActivity(): Promise<ActivityResponse> {
-  const r = await fetch('/api/portfolio/activity');
+async function fetchActivity(wallet: string | null): Promise<ActivityResponse> {
+  const r = await fetch(walletQuery('/api/portfolio/activity', wallet));
   if (!r.ok) throw new Error(`activity_${r.status}`);
   return r.json();
 }
 
 export function ActivityFeed() {
+  const wallet = useScopedWallet();
   const { data, isLoading } = useQuery({
-    queryKey: ['activity'],
-    queryFn: fetchActivity,
+    queryKey: ['activity', wallet],
+    queryFn: () => fetchActivity(wallet),
     refetchInterval: 30_000,
   });
 

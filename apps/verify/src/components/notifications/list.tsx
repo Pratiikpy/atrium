@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface Notification {
   id: string;
@@ -13,9 +14,9 @@ interface Notification {
 }
 interface Resp { notifications: Notification[]; source: 'scribe' | 'pending'; }
 
-async function fetchN(): Promise<Resp> {
+async function fetchN(wallet: string | null): Promise<Resp> {
   try {
-    const r = await fetch('/api/notifications');
+    const r = await fetch(walletQuery('/api/notifications', wallet));
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
@@ -24,7 +25,12 @@ async function fetchN(): Promise<Resp> {
 }
 
 export function NotificationsList() {
-  const { data, isLoading } = useQuery({ queryKey: ['notifications'], queryFn: fetchN, refetchInterval: 30_000 });
+  const wallet = useScopedWallet();
+  const { data, isLoading } = useQuery({
+    queryKey: ['notifications', wallet],
+    queryFn: () => fetchN(wallet),
+    refetchInterval: 30_000,
+  });
   if (isLoading) {
     return <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-16 rounded-md" />)}</div>;
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface BuyingPower {
   currentUsd: string | null;
@@ -9,16 +10,20 @@ interface BuyingPower {
   source: 'plinth' | 'pending';
 }
 
-async function fetchBP(): Promise<BuyingPower> {
-  const r = await fetch('/api/portfolio/buying-power?window=30d');
+async function fetchBP(wallet: string | null): Promise<BuyingPower> {
+  // Phase theta audit follow-up (2026-05-25): wire the connected wallet
+  // through to the API. Pre-fix every render fetched the demo wallet's
+  // buying power even when the user had their own wallet connected.
+  const r = await fetch(walletQuery('/api/portfolio/buying-power?window=30d', wallet));
   if (!r.ok) throw new Error(`bp_${r.status}`);
   return r.json();
 }
 
 export function BuyingPowerCard() {
+  const wallet = useScopedWallet();
   const { data, isLoading } = useQuery({
-    queryKey: ['buying-power-30d'],
-    queryFn: fetchBP,
+    queryKey: ['buying-power-30d', wallet],
+    queryFn: () => fetchBP(wallet),
     refetchInterval: 60_000,
   });
 

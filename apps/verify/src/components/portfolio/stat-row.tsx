@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface SummaryResponse {
   totalAccountValueUsd: string | null;
@@ -11,16 +12,17 @@ interface SummaryResponse {
   source: 'plinth' | 'pending';
 }
 
-async function fetchSummary(): Promise<SummaryResponse> {
-  const r = await fetch('/api/portfolio/summary');
+async function fetchSummary(wallet: string | null): Promise<SummaryResponse> {
+  const r = await fetch(walletQuery('/api/portfolio/summary', wallet));
   if (!r.ok) throw new Error(`summary_${r.status}`);
   return r.json();
 }
 
 export function PortfolioStatRow() {
+  const wallet = useScopedWallet();
   const { data, isLoading } = useQuery({
-    queryKey: ['portfolio-summary'],
-    queryFn: fetchSummary,
+    queryKey: ['portfolio-summary', wallet],
+    queryFn: () => fetchSummary(wallet),
     refetchInterval: 30_000,
   });
 

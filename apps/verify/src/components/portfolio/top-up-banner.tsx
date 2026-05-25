@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * Top-up banner — appears on the Portfolio when the liquidation buffer
@@ -30,16 +31,17 @@ interface MarginHealth {
 const WARNING_THRESHOLD_BPS = 2_000; // 20%
 const SUGGESTED_TOP_UP_USDC = 100;
 
-async function fetchMarginHealth(): Promise<MarginHealth> {
-  const r = await fetch('/api/portfolio/margin-health');
+async function fetchMarginHealth(wallet: string | null): Promise<MarginHealth> {
+  const r = await fetch(walletQuery('/api/portfolio/margin-health', wallet));
   if (!r.ok) throw new Error('failed to fetch margin health');
   return r.json();
 }
 
 export function TopUpBanner() {
+  const wallet = useScopedWallet();
   const { data: health } = useQuery({
-    queryKey: ['margin-health-banner'],
-    queryFn: fetchMarginHealth,
+    queryKey: ['margin-health-banner', wallet],
+    queryFn: () => fetchMarginHealth(wallet),
     refetchInterval: 15_000,
   });
   const [open, setOpen] = useState(false);
