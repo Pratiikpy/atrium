@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
+import { MobileShell } from './mobile/mobile-shell';
 
 /**
  * AppShell — left-sidebar chrome wrapping every `/app/*` page.
@@ -85,9 +86,16 @@ export function AppShell({
   breadcrumb?: TopbarProps['breadcrumb'];
 }) {
   return (
-    <div className="flex min-h-screen bg-parchment text-ink">
+    <>
+    {/* Mobile chrome: dark OLED shell + iOS status bar + 5-tab bottom nav.
+        Source: desing/Mobile App.html. Renders only at < md; the desktop
+        sidebar below is the md+ surface. Per-route children render twice
+        (once in each chrome), CSS keeps only one visible. */}
+    <MobileShell>{children}</MobileShell>
+
+    <div className="hidden md:flex min-h-screen bg-parchment text-ink">
       {/* ── Sidebar ────────────────────────────────────────────── */}
-      <aside className="hidden w-[248px] shrink-0 flex-col border-r border-divider md:flex">
+      <aside className="w-[248px] shrink-0 flex-col border-r border-divider flex">
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/app" className="font-display text-2xl italic text-ink">
             Atrium
@@ -177,35 +185,15 @@ export function AppShell({
           <AppShellActions />
         </header>
 
-        {/* Mobile nav strip (no sidebar on small screens) */}
-        <nav className="border-b border-divider md:hidden">
-          <div className="flex gap-1 overflow-x-auto px-4 py-2">
-            {NAV_GROUPS.flatMap(
-              (g) =>
-                g.items as readonly {
-                  href: string;
-                  label: string;
-                  icon: string;
-                  badge?: string;
-                }[],
-            ).map((item) => (
-              <Link
-                key={item.href}
-                href={item.href as any}
-                className={
-                  'shrink-0 rounded-md px-3 py-2 text-sm min-h-[44px] inline-flex items-center ' +
-                  (active === item.href ? 'bg-ink text-parchment' : 'text-ink-soft')
-                }
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        {/* Mobile nav strip removed: the dark MobileShell (rendered
+           above this desktop branch) carries the mobile chrome with the
+           canon 5-tab glass bottom bar. The old horizontal nav strip
+           was a half-measure that violated the OLED dark canon. */}
 
         <main className="flex-1 px-6 py-6 md:px-10 md:py-8">{children}</main>
       </div>
     </div>
+    </>
   );
 }
 
