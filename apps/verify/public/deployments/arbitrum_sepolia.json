@@ -100,19 +100,34 @@
       "kind": "solidity"
     },
     "adapter-aave-horizon": {
+      "address": "0x826dc4FE429d0Df6454E11dAeA10f2975b551042",
+      "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
+      "deployed_at": "2026-05-25T19:25:00.000Z",
+      "kind": "solidity",
+      "version": "v1.1.1",
+      "note": "Redeployed 2026-05-25 (Phase zeta.3). Same AaveHorizonAdapterV11 bytecode, but pool address now points at MockAavePool (0x2e1360fa...) so Step 2 of the demo actually moves USDC. PorticoRegistry deregister(2) + register(2, this) scheduled on PraetorTimelock, executable 2026-05-27T19:30Z. Until then registry still points at v1.1 0xa68361... (pool=deployer placeholder)."
+    },
+    "mock-aave-pool": {
+      "address": "0x2e1360faE80c7937e684067450202D921F72555B",
+      "tx": "0x3dd459b7fca1838e20ba85bed173d7d538bc3bb46057b29406ca55aa03ce52c9",
+      "deployed_at": "2026-05-25T19:20:00.000Z",
+      "kind": "solidity",
+      "note": "Testnet stub for Aave V3 Pool. Round-trips USDC 1:1 with a 5-bps-per-call drifting liquidity index. No real Aave V3 on Arb Sepolia. See tripwires/2026-05-25-mock-aave-pool.md."
+    },
+    "adapter-aave-horizon-v1.1-pool-placeholder": {
       "address": "0xa68361cCBd819F4A38a31501D399888F9187d0b9",
       "tx": "0xe15ce5928dc27fc6e4906c86125548d6db094344d7492b18db447790b4b71583",
       "deployed_at": "2026-05-24T15:36:00.000Z",
       "kind": "solidity",
       "version": "v1.1",
-      "note": "Redeployed 2026-05-24 (Audit C-6 fix). Was AaveHorizonAdapter v1.0 at 0xe991...; v1.1 swaps tx.origin for an explicit originator param + adds ReentrancyGuard. Aave Pool placeholder = deployer (no Aave testnet on Arb Sepolia). Constructor wired to new Coffer 0xd169..."
+      "note": "v1.1 with deployer-EOA pool placeholder. Superseded by the MockAavePool-backed v1.1.1 above on 2026-05-25. Kept in registry for tx history. PorticoRegistry will deregister this address on 2026-05-27."
     },
     "adapter-aave-horizon-v1.0-deprecated": {
       "address": "0xe991ec988a62bcc38740f8b8c549e5400ded8d5d",
       "tx": "0xdff7722214573f3a27dc832875b6d30b456df0e88173944feb9edc086f64c8e8",
       "block": 270727659,
       "kind": "solidity",
-      "note": "DEPRECATED v1.0 (uses tx.origin, no ReentrancyGuard). Kept for reference; PorticoRegistry registerAdapter call goes to v1.1 above."
+      "note": "DEPRECATED v1.0 (uses tx.origin, no ReentrancyGuard). Kept for reference; was never live on Coffer or PorticoRegistry."
     },
     "adapter-curve": {
       "address": "0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682",
