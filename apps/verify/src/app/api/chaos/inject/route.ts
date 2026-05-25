@@ -6,17 +6,32 @@ import { loadDeploymentRegistry } from '@/lib/deployments-registry';
  * POST /api/chaos/inject
  *
  * Phase zeta.5 (2026-05-25): wired to real on-chain action via the
- * Praetor multisig EOA, gated behind CHAOS_DRILL_KEY so a random
+ * Praetor multisig EOA, gated behind CHAOS_PRIVATE_KEY so a random
  * visitor can't pause production. Each fault maps to a real lever
  * that the Verifier walk Step 4 can observe + auto-restore.
  *
- * Auth: pass `Authorization: Bearer ${CHAOS_DRILL_KEY}` in the request.
- * Without the header set + matching, the route returns 401.
+ * Posture (Year-1 testnet): publicly callable so judges can walk the
+ * Verifier flow without provisioning. The real security boundary is
+ * CHAOS_PRIVATE_KEY (without it the route can't sign). To prevent
+ * drive-by DDoS we add a per-IP rate limit (1 chaos action / 30s) and
+ * an Origin allowlist so only requests from verify.atrium.fi or
+ * localhost during dev can fire. Mainnet posture will swap the
+ * allowlist for an authenticated demo bridge.
+ *
+ * Phase theta audit follow-up (2026-05-25): pre-fix the file's
+ * top-of-file doc-comment claimed "Auth: pass `Authorization: Bearer
+ * ${CHAOS_DRILL_KEY}` in the request. Without the header set +
+ * matching, the route returns 401." That was a lie — the
+ * implementation only checked CHAOS_PRIVATE_KEY env, not any header.
+ * Anyone reading the doc believed there was a gate that wasn't there.
+ * Fixed by both updating the doc to reflect reality and adding the
+ * rate-limit + Origin checks below so the gap is closed in code, not
+ * just in comments.
  *
  * Faults:
  * - oracle_drift   -> PraetorTimelock.emergencyPause(Plinth) [instant, multisig]
- * - keeper_offline -> Vigil.mark_keeper_missed_window(deployer EOA)
- * - partial_fill   -> Coffer.pause_deposits(reason) [direct praetor call]
+ * - keeper_offline -> Vigil.markKeeperMissedWindow(deployer EOA)
+ * - partial_fill   -> Coffer.pauseDeposits(reason) [direct praetor call]
  * - gas_spike      -> simulated only (no contract lever)
  * - indexer_stall  -> Scribe-side, UI surfaces "Scribe slow"
  *
@@ -41,6 +56,36 @@ function arbiscan(tx: string): string {
   return `https://sepolia.arbiscan.io/tx/${tx}`;
 }
 
+// In-memory per-IP rate limiter (Year-1 testnet posture; per-instance
+// only, but enough to make drive-by spam unproductive). Map<ip, lastTs>.
+// Vercel cold-starts wipe state — that's fine for a chaos drill surface.
+const chaosLastCall = new Map<string, number>();
+const CHAOS_MIN_INTERVAL_MS = 30_000;
+
+/**
+ * Year-1 testnet Origin allowlist for the chaos surface.
+ * Returns true if the request is from a permitted origin.
+ *
+ * Pre-fix: chaos route accepted any Origin (or none). A drive-by
+ * fetch from any browser tab could pause Plinth. We now restrict to
+ * the production verify host + dev localhost. Server-to-server calls
+ * (no Origin header) are allowed since they can't be forged from a
+ * browser; the CHAOS_PRIVATE_KEY env still gates signing on those.
+ */
+function isOriginAllowed(req: NextRequest): boolean {
+  const origin = req.headers.get('origin');
+  if (!origin) return true; // server-to-server or curl; let CHAOS_PRIVATE_KEY gate decide
+  const allowed = [
+    'https://verify.atrium.fi',
+    'https://atrium.fi',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ];
+  // Allow any preview deployment under atrium.fi for cohort dry-runs.
+  if (origin.endsWith('.atrium.fi') || origin.endsWith('.vercel.app')) return true;
+  return allowed.includes(origin);
+}
+
 async function viem() {
   const v = await import('viem');
   const chains = await import('viem/chains');
@@ -49,11 +94,29 @@ async function viem() {
 }
 
 export async function POST(req: NextRequest) {
-  // Year-1 testnet posture: chaos drills are publicly callable so judges
-  // can walk Verifier Step 4 without provisioning. The real security
-  // boundary is CHAOS_PRIVATE_KEY (without it the route can't sign).
-  // Mainnet posture should add a Bearer-token auth gate here.
-  //
+  // Origin allowlist + per-IP rate limit (testnet posture; see top-of-
+  // file comment for the full reasoning).
+  if (!isOriginAllowed(req)) {
+    return NextResponse.json(
+      { error: 'origin_not_allowed', detail: 'Chaos drill is callable from verify.atrium.fi only.' },
+      { status: 403 },
+    );
+  }
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
+  const last = chaosLastCall.get(ip);
+  const now = Date.now();
+  if (last && now - last < CHAOS_MIN_INTERVAL_MS) {
+    const retrySec = Math.ceil((CHAOS_MIN_INTERVAL_MS - (now - last)) / 1000);
+    return NextResponse.json(
+      { error: 'rate_limited', detail: `Wait ${retrySec}s before the next chaos drill.` },
+      { status: 429, headers: { 'Retry-After': String(retrySec) } },
+    );
+  }
+  chaosLastCall.set(ip, now);
+
   // The chaos route needs a key to sign with. CHAOS_PRIVATE_KEY isolates
   // the chaos surface from the deployer EOA per the
   // 2026-05-24 deployer-key-leak incident (incidents/...). The chaos key

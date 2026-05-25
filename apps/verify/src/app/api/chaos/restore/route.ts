@@ -10,7 +10,11 @@ import { loadDeploymentRegistry } from '@/lib/deployments-registry';
  * Verifier walk Step 4 self-heals within ~30 s. Idempotent: calling
  * restore on a non-paused contract is a no-op rather than a revert.
  *
- * Same Bearer-token gate as /inject.
+ * Same posture + same gates as /inject — Origin allowlist + per-IP
+ * rate limit. Phase theta audit follow-up (2026-05-25): pre-fix this
+ * comment claimed "Same Bearer-token gate as /inject" but neither
+ * route enforced a Bearer header. Aligned both files with what they
+ * actually do and added the rate-limit code to match.
  */
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +27,26 @@ function arbiscan(tx: string): string {
   return `https://sepolia.arbiscan.io/tx/${tx}`;
 }
 
+// Per-IP rate limit + Origin allowlist; same testnet posture as
+// /api/chaos/inject. See that file's top-of-file comment for the
+// security reasoning. Restore is idempotent so re-firing is benign;
+// the limit is mostly to keep gas usage bounded.
+const chaosRestoreLastCall = new Map<string, number>();
+const CHAOS_MIN_INTERVAL_MS = 30_000;
+
+function isOriginAllowed(req: NextRequest): boolean {
+  const origin = req.headers.get('origin');
+  if (!origin) return true;
+  const allowed = [
+    'https://verify.atrium.fi',
+    'https://atrium.fi',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ];
+  if (origin.endsWith('.atrium.fi') || origin.endsWith('.vercel.app')) return true;
+  return allowed.includes(origin);
+}
+
 async function viem() {
   const v = await import('viem');
   const chains = await import('viem/chains');
@@ -31,9 +55,23 @@ async function viem() {
 }
 
 export async function POST(req: NextRequest) {
-  // Year-1 testnet posture: publicly callable; CHAOS_PRIVATE_KEY is the
-  // real gate (without it the route can't sign anything). Mainnet
-  // posture should add an auth header here.
+  if (!isOriginAllowed(req)) {
+    return NextResponse.json({ error: 'origin_not_allowed' }, { status: 403 });
+  }
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
+  const last = chaosRestoreLastCall.get(ip);
+  const now = Date.now();
+  if (last && now - last < CHAOS_MIN_INTERVAL_MS) {
+    const retrySec = Math.ceil((CHAOS_MIN_INTERVAL_MS - (now - last)) / 1000);
+    return NextResponse.json(
+      { error: 'rate_limited', detail: `Wait ${retrySec}s before the next chaos restore.` },
+      { status: 429, headers: { 'Retry-After': String(retrySec) } },
+    );
+  }
+  chaosRestoreLastCall.set(ip, now);
 
   const chaosKey = process.env.CHAOS_PRIVATE_KEY;
   if (!chaosKey || !/^0x[0-9a-fA-F]{64}$/.test(chaosKey)) {
