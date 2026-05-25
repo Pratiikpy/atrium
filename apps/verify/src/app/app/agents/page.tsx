@@ -2,6 +2,7 @@ import { AppShell } from '@/components/app-shell';
 import { AgentsStatRow } from '@/components/agents/stat-row';
 import { AgentsView } from '@/components/agents/agents-view';
 import { NewMandateButton } from '@/components/agents/new-mandate-button';
+import { AgentsMobile } from '@/components/mobile/panels/agents-mobile';
 
 export const metadata = {
   title: 'Atrium · Agents',
@@ -23,6 +24,8 @@ export default function AgentsPage() {
         { label: 'Sigil & Rostrum' },
       ]}
     >
+      <AgentsMobile />
+      <div className="hidden md:block">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <p className="eyebrow">Agents · Sigil & Rostrum</p>
@@ -46,6 +49,7 @@ export default function AgentsPage() {
       <section className="mt-6">
         <AgentsView />
       </section>
+      </div>
     </AppShell>
   );
 }

@@ -3,6 +3,7 @@ import { SettingsTabs, SettingsTabPanel } from '@/components/settings/subnav';
 import { WalletDetailCard } from '@/components/settings/wallet-detail';
 import { GasSponsorshipCard } from '@/components/settings/gas-sponsorship';
 import { ConnectedSitesCard } from '@/components/settings/connected-sites';
+import { SettingsMobile } from '@/components/mobile/panels/settings-mobile';
 
 export const metadata = {
   title: 'Atrium · Settings',
@@ -18,6 +19,8 @@ export default function SettingsPage() {
         { label: 'Postern · wallet' },
       ]}
     >
+      <SettingsMobile />
+      <div className="hidden md:block">
       <header>
         <p className="eyebrow">Settings · Postern</p>
         <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
@@ -41,6 +44,7 @@ export default function SettingsPage() {
               roadmap. Audit P-6 fix. */}
         </SettingsTabs>
       </section>
+      </div>
     </AppShell>
   );
 }

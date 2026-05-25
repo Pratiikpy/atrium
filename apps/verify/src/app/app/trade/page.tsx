@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/app-shell';
 import { TradeView } from '@/components/trade/trade-view';
+import { TradeMobile } from '@/components/mobile/panels/trade-mobile';
 
 export const metadata = {
   title: 'Atrium · Trade',
@@ -21,6 +22,8 @@ export default function TradePage() {
         { label: 'Portico · venue execution' },
       ]}
     >
+      <TradeMobile />
+      <div className="hidden md:block">
       <header className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow">Trade · Portico</p>
@@ -34,6 +37,7 @@ export default function TradePage() {
       </header>
 
       <TradeView />
+      </div>
     </AppShell>
   );
 }

@@ -2,6 +2,7 @@ import { AppShell } from '@/components/app-shell';
 import { TransferForm } from '@/components/transfer/transfer-form';
 import { TransferTimeline } from '@/components/transfer/transfer-timeline';
 import { RecentTransfers } from '@/components/transfer/recent-transfers';
+import { TransferMobile } from '@/components/mobile/panels/transfer-mobile';
 
 export const metadata = {
   title: 'Atrium · Transfer',
@@ -17,6 +18,8 @@ export default function TransferPage() {
         { label: 'Aqueduct · Chainlink CCIP' },
       ]}
     >
+      <TransferMobile />
+      <div className="hidden md:block">
       <header>
         <p className="eyebrow">Transfer · Aqueduct</p>
         <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
@@ -41,6 +44,7 @@ export default function TransferPage() {
         </header>
         <RecentTransfers />
       </section>
+      </div>
     </AppShell>
   );
 }

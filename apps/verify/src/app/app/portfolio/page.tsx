@@ -6,6 +6,7 @@ import { BuyingPowerCard } from '@/components/portfolio/buying-power-card';
 import { PositionsFilter } from '@/components/portfolio/positions-filter';
 import { ActivityFeed } from '@/components/portfolio/activity-feed';
 import { TopUpBanner } from '@/components/portfolio/top-up-banner';
+import { PortfolioMobile } from '@/components/mobile/panels/portfolio-mobile';
 
 /**
  * /app/portfolio — Atrium "Unified margin" view.
@@ -43,6 +44,13 @@ export default function PortfolioPage() {
         { label: 'Plinth · unified margin' },
       ]}
     >
+      {/* Mobile (< md): canonical Mobile App Home panel (hero buying-power
+          card + 4-action grid + positions + activity), all reading the same
+          /api/portfolio/* endpoints as the desktop layout below. */}
+      <PortfolioMobile />
+
+      {/* Desktop (md+): existing dense layout. */}
+      <div className="hidden md:block">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Portfolio</p>
@@ -109,6 +117,7 @@ export default function PortfolioPage() {
           <ActivityFeed />
         </aside>
       </section>
+      </div>
     </AppShell>
   );
 }
