@@ -188,10 +188,15 @@ export async function POST(req: NextRequest) {
         if (!vigil) {
           return NextResponse.json({ error: 'missing_contract' }, { status: 503 });
         }
-        // Use the deployer EOA as the keeper to mark; in production this is
-        // the real keeper's address. For the demo, a missed window on the
-        // deployer-keeper is a no-op the audit trail still shows.
-        const keeper = '0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42' as `0x${string}`;
+        // Phase theta audit follow-up (2026-05-25): pre-fix this hardcoded
+        // the leaked deployer EOA (rotated in Phase η.4) as the demo keeper
+        // to mark. Now: read from CHAOS_DEMO_KEEPER env (set to the actual
+        // current keeper EOA on the Vercel project) and fall back to the
+        // chaos signer's own address — marking-yourself-missed is a no-op
+        // but produces a real on-chain tx the audit trail can show.
+        const keeper =
+          (process.env.CHAOS_DEMO_KEEPER as `0x${string}` | undefined) ??
+          account.address;
         const tx = await client.writeContract({
           address: vigil,
           abi: [{ type: 'function', name: 'markKeeperMissedWindow', stateMutability: 'nonpayable',
@@ -201,7 +206,7 @@ export async function POST(req: NextRequest) {
         });
         return NextResponse.json({
           fault: 'keeper_offline',
-          action: 'Vigil.markKeeperMissedWindow(deployer)',
+          action: `Vigil.markKeeperMissedWindow(${keeper.slice(0, 8)}…${keeper.slice(-4)})`,
           tx,
           arbiscan: arbiscan(tx),
           restore: 'Not needed; auto-deboost trips at N misses and auto-resets on next successful tick.',
