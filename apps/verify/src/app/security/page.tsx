@@ -54,8 +54,8 @@ export default function SecurityPage() {
 
         <Block heading="Bug bounty">
           <ul className="space-y-2 text-ink-soft">
-            <li>• Year 1 testnet: Immunefi standard tier, $25K ceiling.</li>
-            <li>• Year 2 mainnet flip: raised on board sign-off; target $250K+ tier.</li>
+            <li>• Year 1 testnet: bug bounty program standup pending. Interim disclosure via <a className="text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a> — same-day triage.</li>
+            <li>• Year 2 mainnet flip: formal Immunefi-style program live before the flip. Tier target set on board sign-off.</li>
           </ul>
         </Block>
 

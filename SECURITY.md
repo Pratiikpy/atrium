@@ -39,8 +39,8 @@ Where live code differs from this posture, the gap is honestly logged in `docs/A
 
 ## Bug bounty
 
-- Year 1 testnet: Immunefi standard tier, $25K ceiling
-- Year 2 mainnet flip: raised to $250K+
+- Year 1 testnet: bug bounty program standup pending. Interim disclosure: email security@atrium.fi for same-day triage. A formal Immunefi-style program lands ahead of mainnet flip.
+- Year 2 mainnet flip: formal program live before the flip. Tier target set on board sign-off.
 
 ## Hall of fame
 

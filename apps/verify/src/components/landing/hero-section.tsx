@@ -28,7 +28,7 @@ export function HeroSection() {
                 "Supported" stays accurate pre- AND post-deploy; the live
                 count comes from the numbers section's RPC read. */}
             Atrium is a unified margin prime brokerage for the EVM. Post collateral once on
-            Arbitrum. Trade across the seven onchain venues Atrium supports with one
+            Arbitrum. Trade across every Portico-whitelisted venue with one
             buying-power figure, recomputed in real time by a Stylus margin engine.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">

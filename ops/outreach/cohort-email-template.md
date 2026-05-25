@@ -15,7 +15,7 @@ Hi [name],
 
 I'm [F1's name] from Atrium — we're shipping cross-venue portfolio margin on Arbitrum, Stylus-native. The wedge is straightforward: collateral nets across Hyperliquid HIP-3 + Aave Horizon + Pendle + Trade.xyz + Polymarket via CCIP. One wallet, one margin number, math you can verify on chain.
 
-[Personalize: 1-2 sentences on what THIS firm is solving that overlaps with us. E.g. for Wintermute: "Your HIP-3 market-making book ends up over-collateralized whenever you hedge directional risk on Aave. We collapse that into one number." For Selini: "Your Polymarket+Pendle pairs trade requires posting collateral twice. We make it once."]
+[Personalize: 1-2 sentences on what THIS firm is solving that overlaps with us. E.g. for a HIP-3 market maker: "Your market-making book ends up over-collateralized whenever you hedge directional risk on Aave. We collapse that into one number." For a prediction-market shop: "Your Polymarket+Pendle pairs trade requires posting collateral twice. We make it once."]
 
 We're forming a 5–8 partner Cohort to ship Year-1 testnet. The asks:
 

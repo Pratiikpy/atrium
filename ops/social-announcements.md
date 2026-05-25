@@ -68,7 +68,7 @@ Mobile PWA installable from the verifier page. Add to home screen, passkey log i
 **1/**
 Cohort design partner program is open.
 
-5–8 firms. We want trading firms with cross-venue books. Wintermute. Selini. Auros. Galaxy. Plus 1–4 we haven't named yet — DM if you want a seat.
+5–8 firms. We want trading firms with cross-venue books. DM if you want a seat — we'll share the shortlist after a 15-min call.
 
 **2/**
 What we ask: 15 min/month check-in, real testnet usage, honest feedback.

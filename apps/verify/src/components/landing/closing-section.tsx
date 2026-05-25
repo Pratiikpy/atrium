@@ -19,7 +19,7 @@ export function ClosingSection() {
         </h2>
         <p className="mx-auto mt-6 max-w-prose text-lg text-dark-white-55">
           The testnet faucet hands new wallets onboarding USDC and rAAPL once the contracts deploy
-          to Sepolia. Three minutes from passkey login to first cross-margin trade.
+          to Sepolia. Onboard with a passkey — no seed phrase.
         </p>
         <p className="mx-auto mt-3 inline-flex items-center gap-1.5 rounded-full border border-testnet/40 bg-testnet/10 px-3 py-1 text-[10px] uppercase tracking-wider text-testnet">
           {/* Audit P-12 fix: the specific drop amounts (10K USDC, 5K rAAPL)
