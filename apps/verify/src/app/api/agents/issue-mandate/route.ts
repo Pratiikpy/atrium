@@ -101,23 +101,33 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    // Codex storage call slot — kept honest until Codex's mandate registry
-    // ships. The client already has the signature locally, so even when
-    // storage is pending the user gets a usable mandate they can hand to
-    // their agent directly.
+    // Phase theta audit follow-up (2026-05-25): IntentSigil mandates are
+    // off-chain by design — the Sigil contract has no `validateIntent` or
+    // `issueIntent` function; only `validateAction` runs on-chain at
+    // execution time (when the agent takes an action that consumes the
+    // mandate). So the correct semantic for a server-side mandate
+    // creation flow is: "envelope built, signature validated, you hold
+    // the envelope". No on-chain tx is needed for issuance.
+    //
+    // Pre-fix this returned `ok: false` with a confusing "Codex storage
+    // lights up Month 1 W2" message — implying the flow was incomplete.
+    // The flow IS complete for Year-1: the client now has a signed
+    // envelope it can hand to its agent directly. Codex's optional
+    // mandate registry is a discoverability layer, not a prerequisite.
     return NextResponse.json({
-      ok: false,
-      error:
-        'Envelope validated and signature parsed. Codex storage lights up Month 1 W2 — keep the local signature for now.',
-      accepted: {
+      ok: true,
+      mandate: {
+        agent: body.agent,
         perActionCapUsdc: body.perActionCapUsdc,
         totalOpenCapUsdc: body.totalOpenCapUsdc,
         actionsPerDay: body.actionsPerDay,
         expiresDays: body.expiresDays,
-        venueCount: body.venueAllowlist!.length,
-        agentDigest: body.agent!.slice(0, 10) + '…' + body.agent!.slice(-4),
-        intentHashDigest: body.intentHash.slice(0, 10) + '…' + body.intentHash.slice(-4),
+        venueAllowlist: body.venueAllowlist,
+        intentHash: body.intentHash,
+        signature: body.signature,
       },
+      detail:
+        'Mandate signed. IntentSigil envelopes are off-chain in Year-1; hand the signed envelope to your agent so it can attach the signature to its first action on chain (Sigil.validateAction will verify it then).',
     });
   }
 
@@ -127,10 +137,15 @@ export async function POST(req: NextRequest) {
   // the agent address. Probes would have their inputs preserved in server
   // logs + response body. We now echo only the request shape (counts),
   // not the user-supplied values.
+  //
+  // Phase theta audit follow-up (2026-05-25): pre-fix the message said
+  // "Sigil contract not deployed yet" — but Sigil IS deployed. The
+  // correct framing: the envelope is valid; the client needs to sign it
+  // via wagmi to complete issuance. Updated copy below.
   return NextResponse.json({
     ok: false,
     error:
-      'Sigil contract not deployed yet. Postern signing path lights up Month 1 W2; the mandate envelope is validated server-side now.',
+      'Envelope shape validated. Sign with your wallet to complete issuance (wagmi EIP-712 path); the IntentSigil mandate is stored locally and only hits chain on first agent action.',
     accepted: {
       perActionCapUsdc: body.perActionCapUsdc,
       totalOpenCapUsdc: body.totalOpenCapUsdc,
