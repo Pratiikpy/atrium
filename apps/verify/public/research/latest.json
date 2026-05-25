@@ -1,0 +1,15 @@
+{
+  "strategy": null,
+  "period_start": null,
+  "period_end": null,
+  "trades_count": 0,
+  "baseline_collateral_usd": 0,
+  "atrium_collateral_usd": 0,
+  "delta_bps": null,
+  "notebook_url": null,
+  "ipfs_cid": null,
+  "publish_tx": null,
+  "generated_at": null,
+  "source": "pending",
+  "note": "Weekly archive backtest cron has not yet run. Set RESEARCH_SIGNER_KEY + WEB3_STORAGE_TOKEN + RESEARCH_CONTRACT_ADDR in GHA repo secrets, then trigger .github/workflows/archive-weekly.yml via workflow_dispatch."
+}

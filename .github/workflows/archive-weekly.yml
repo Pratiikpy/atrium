@@ -1,0 +1,52 @@
+name: archive-weekly
+
+# Phase eta.3: weekly research backtest for each registered strategy.
+# Writes apps/verify/public/research/latest.json + commits it back so
+# the landing Jamie hook + /api/research-attestation/latest serve the
+# fresh delta. Pins notebook to IPFS via web3.storage; publishes the
+# attestation on chain via ResearchAttestation.publish().
+
+on:
+  schedule:
+    # Sundays 03:00 UTC. Backtest window covers the prior week.
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      strategy:
+        description: 'Strategy id to backtest (defaults to mean-reversion-v1)'
+        required: false
+        default: 'mean-reversion-v1'
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install archive deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e services/archive
+      - name: Run weekly backtest
+        env:
+          SCRIBE_URL:               ${{ secrets.SCRIBE_URL }}
+          ARBITRUM_SEPOLIA_RPC:     ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
+          RESEARCH_SIGNER_KEY:      ${{ secrets.RESEARCH_SIGNER_KEY }}
+          WEB3_STORAGE_TOKEN:       ${{ secrets.WEB3_STORAGE_TOKEN }}
+          RESEARCH_CONTRACT_ADDR:   ${{ secrets.RESEARCH_CONTRACT_ADDR }}
+        run: |
+          python -m services.archive.src.research_loop \
+            --strategy "${{ github.event.inputs.strategy || 'mean-reversion-v1' }}"
+      - name: Commit attestation back
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(archive): weekly backtest attestation'
+          file_pattern: 'apps/verify/public/research/latest.json services/archive/notebooks/*.ipynb'
