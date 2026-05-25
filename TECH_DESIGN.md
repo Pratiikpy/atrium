@@ -613,13 +613,25 @@ sol! {
 ```rust
 #[public]
 impl Coffer {
-    pub fn withdraw(&mut self, shares: U256) -> Result<U256, CofferError> {
-        // SLA: pass-through to base if no circuit-breaker tripped
+    /// Final shape (see contracts/coffer/src/lib.rs:405): the user passes
+    /// the USDC amount they want back; Coffer round-up converts to shares
+    /// (audit FIRE78-COF1) and burns them. Both `receiver` and `owner`
+    /// are explicit per ERC-4626; `msg.sender` is the authoriser.
+    pub fn withdraw(
+        &mut self,
+        assets: U256,
+        receiver: Address,
+        owner: Address,
+    ) -> Result<U256, CofferError> {
         require!(!self.is_withdrawals_paused, CofferError::WithdrawalsPaused);
-        let sender = self.vm().msg_sender();  // M3 fix: verified Stylus host-call API
-        require!(!self.plinth().is_user_pending_liquidation(sender), CofferError::PendingLiquidation);
-        // Otherwise standard ERC-4626 redeem
-        self.base.redeem(shares, sender, sender)
+        require!(
+            !self.plinth().is_user_pending_liquidation(owner),
+            CofferError::PendingLiquidation
+        );
+        // ERC-4626 round-up: burn at least as many shares as the assets cost.
+        let shares = self.convert_to_shares_ceil(assets);
+        // ... burn shares from `owner`, transfer assets to `receiver` ...
+        Ok(shares)
     }
 }
 ```
