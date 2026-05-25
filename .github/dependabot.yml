@@ -1,0 +1,57 @@
+# Phase theta.6 (2026-05-25): weekly dependency bumps for npm, cargo,
+# and GitHub Actions. Without this, transitive CVEs accumulate silently.
+# Each ecosystem opens at most 5 PRs to bound review load.
+
+version: 2
+updates:
+  # npm — covers apps/verify + every service/* with a package.json. The
+  # monorepo lives under pnpm-workspace.yaml; dependabot supports it
+  # natively via the `npm` ecosystem.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:13"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "npm"
+    groups:
+      sentry:
+        patterns: ["@sentry/*"]
+      viem-wagmi:
+        patterns: ["viem", "wagmi", "@wagmi/*"]
+      tanstack:
+        patterns: ["@tanstack/*"]
+      next-react:
+        patterns: ["next", "react", "react-dom", "@types/react*"]
+
+  # cargo — Stylus + Solidity-helper crates.
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:17"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "cargo"
+    groups:
+      stylus:
+        patterns: ["stylus-sdk", "stylus-proc", "stylus-core"]
+      alloy:
+        patterns: ["alloy*"]
+
+  # GitHub Actions — keep our own CI fresh.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:21"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"

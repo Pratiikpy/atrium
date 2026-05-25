@@ -1,0 +1,41 @@
+# CODEOWNERS — review-required surface map. Phase theta.6 (2026-05-25).
+#
+# Pre-fix: every PR could merge with a single founder approval. Sensitive
+# surfaces (contract code, payment middleware, API routes, CI workflows,
+# runbooks, security policy) had no enforced second-review check.
+#
+# Now: GitHub enforces at least one owner review on the listed paths. F1
+# is the contract + Stylus owner; F2 owns off-chain services + frontend;
+# F3 owns ops, runbooks, security policy. Update once GitHub usernames
+# are assigned per docs/team-page.md.
+
+# Contracts — F1 (chain + Stylus owner).
+/contracts/                @atrium-f1
+/script/                   @atrium-f1
+/foundry.toml              @atrium-f1
+/Cargo.toml                @atrium-f1
+/Cargo.lock                @atrium-f1
+
+# Payment-critical middleware — F1 + F2 (any one of the two).
+/services/codex/middleware/ @atrium-f1 @atrium-f2
+
+# Off-chain services + API surface — F2.
+/services/                 @atrium-f2
+/apps/                     @atrium-f2
+/apps/verify/src/app/api/  @atrium-f2
+
+# Subgraph manifest + handlers — F2 (data-source ownership).
+/subgraph/                 @atrium-f2
+
+# CI + workflows — F3 owns the ops side; F2 reviews when frontend gates
+# move; F1 reviews when contract gates move.
+/.github/workflows/        @atrium-f3 @atrium-f2
+
+# Runbooks + security policy + key rotation — F3.
+/runbooks/                 @atrium-f3
+/SECURITY.md               @atrium-f3
+/.claude/rules/security.md @atrium-f3
+
+# CLAUDE.md + .claude/rules/ — every founder reviews behavioral changes.
+/CLAUDE.md                 @atrium-f1 @atrium-f2 @atrium-f3
+/.claude/rules/            @atrium-f1 @atrium-f2 @atrium-f3

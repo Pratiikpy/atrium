@@ -1,0 +1,16 @@
+# Phase theta.6 (2026-05-25). gitleaks --log-opts="--all" sweeps every
+# commit including .env.example. The Hardhat default-account private key
+# ships as a known public test fixture (it appears verbatim in the
+# Hardhat docs + every tutorial), so flagging it as a secret is a false
+# positive. Carved out here so the gitleaks job stays green and a real
+# secret leak is not buried in noise.
+#
+# Format: one fingerprint per line. Generate with:
+#   gitleaks detect --report-format=csv --report-path=- --no-banner
+# then copy the colon-prefixed fingerprint of any confirmed false
+# positive.
+
+# .env.example:13 — Hardhat account #0 default private key (public).
+# Used as the deployer EOA when --network hardhat is selected; never
+# touches mainnet, never holds funds.
+.env.example:generic-api-key:13
