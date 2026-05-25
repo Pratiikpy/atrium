@@ -1,23 +1,30 @@
 # Atrium, Launch Ready
 
-Last updated: 2026-05-25 (post-redeploy + Phase beta.3 schedule + 8/8 CI green)
-Current score: **6 of 15 user flows WORK end-to-end today. 6 more are WIRED-PENDING-TIMELOCK (executable 2026-05-26T15:43Z). 3 are HUMAN-BLOCKED (Safe ceremony, cohort outreach, domain).**
+Last updated: 2026-05-25 (post Phase zeta - gap-audit close-out)
+Current score: **6 of 15 user flows WORK end-to-end today. 7 more are WIRED-PENDING-TIMELOCK (executable 2026-05-26T15:43Z + 2026-05-27T19:30Z aave swap). 3 are HUMAN-BLOCKED (Safe ceremony, cohort outreach, domain). 1 is Y2-DEFERRED (vigil-keeper liquidation execute - blocked on Vigil setKeeperMinStake).**
 
 CI: all 8 GitHub Actions jobs on master are GREEN as of 2026-05-25:
 Lint+format, Frontend build+Lighthouse, Frontend unit tests (vitest 586/586),
-Solidity tests (Foundry), Rust+Stylus tests, Kani formal verification,
-Subgraph build, Secrets scan (gitleaks).
+Solidity tests (Foundry, including 7/7 MockAavePool + 20/20 LanternAttestor),
+Rust+Stylus tests, Kani formal verification, Subgraph build, Secrets scan (gitleaks).
 
-(Prior reading said 3/15 works. After the 2026-05-24 redeploy + initialize()
-+ corrected timelock batch, the wired-uninit count drops to 0; the new
-gating is the 48h timelock window.)
+Phase zeta close-out (2026-05-25):
+- ζ.1: LanternAttestor v2 (event extended with leafCount + ipfsCid) deployed at 0xF0B90b94...5888
+- ζ.2: Hyperliquid + Polymarket validators set to 1-of-1 deployer EOA
+- ζ.3: MockAavePool 0x2e1360fa... deployed + AaveHorizonAdapterV11 v1.1.1 at 0x826dc4FE... (Aave Horizon now actually moves USDC, not deployer-stub)
+- ζ.4: services/vigil-keeper skeleton + GHA cron (logs intent; real execute pending Vigil setKeeperMinStake Y2)
+- ζ.5: Chaos Mode wired to real on-chain pause/restore via Praetor multisig
+- ζ.6: praetor-cli lantern publish-now HTTP triggered + seed pre-flight against Coffer.isAdapterApproved
+- ζ.7: services/loadtest k6 + gas + nightly workflow committing latest.json
+- ζ.8: ESLint flat-config migration deferred (stub scripts ship; full migration in human_left.md)
+- ζ.9: this reconcile
 
 Headline state as of this update:
 - Coffer / Plinth / Sigil / Vigil REDEPLOYED with new bytecode and INITIALIZED
   (init probes confirmed via cast call on praetorMultisig, plinthAddress,
   cofferAddress, asset).
-- AaveHorizonAdapter v1.1 deployed at 0xa68361..d0b9; v1.0 deprecated in the
-  registry under adapter-aave-horizon-v1.0-deprecated.
+- AaveHorizonAdapter v1.1.1 deployed at 0x826dc4FE...1042; backed by
+  MockAavePool 0x2e1360fa...555B. Old v1.1 + v1.0 archived in registry.
 - 33 corrected timelock actions scheduled via PraetorTimelock; executable
   2026-05-26T15:43:52.646Z. Manifest at .forge-cache/phase-b3-schedule-corrected.json.
 - Subgraph manifest repointed to the new Stylus addresses + Rostrum + Router.
