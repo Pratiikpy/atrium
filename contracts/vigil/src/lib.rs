@@ -37,6 +37,13 @@ sol! {
     /// Audit 2026-05-24 (Auditor A C-5): pause + resume lifecycle events.
     event VigilPausedEvent(bytes32 reason, uint64 block_number);
     event VigilResumedEvent(uint64 block_number);
+    // Phase eta.2 (2026-05-25): emergency setter for keeper_min_stake_wei.
+    // Initialize hardcoded 1000 ETH which made the keeper path unstakeable
+    // on Arbitrum Sepolia (faucet caps ~0.1 ETH). Praetor-multisig-only,
+    // no timelock since this is the emergency unblock path  same pattern
+    // as PorticoRegistry.emergencyDeregister. Off-chain audits should
+    // watch for this event and flag if it ever lowers stake on mainnet.
+    event KeeperMinStakeUpdated(uint256 previous_wei, uint256 new_wei, bytes32 reason);
 }
 
 sol! {
@@ -475,6 +482,36 @@ impl Vigil {
         self.vm().log(KeeperSlashed {
             keeper,
             slashed_amount_wei: slash_amount,
+            reason,
+        });
+        Ok(())
+    }
+
+    /// Emergency setter for keeper_min_stake_wei. Praetor-multisig-only,
+    /// no timelock  same pattern as `PorticoRegistry.emergencyDeregister`.
+    ///
+    /// Phase eta.2 (2026-05-25) rationale: `initialize()` hardcodes
+    /// `keeper_min_stake_wei = 1000 ETH`. On Arbitrum Sepolia the faucet
+    /// caps at ~0.1 ETH so no keeper EOA can ever stake. Vigil keeper
+    /// service ships as logs-only; real `executeLiquidation` calls revert
+    /// KeeperNotActive. This setter brings the Year-2 unblock path to Y1
+    /// at zero capital cost. Multisig calls `set_keeper_min_stake_emergency(
+    /// 0.01 ether, keccak256("phase-eta.2 testnet unblock"))` once.
+    ///
+    /// Audit guard: emits `KeeperMinStakeUpdated` so any off-chain watcher
+    /// can flag a mainnet lower-bound regression. Pre/post values are in
+    /// the event payload; multisig review can compare against historical.
+    pub fn set_keeper_min_stake_emergency(&mut self, new_stake_wei: U256, reason: B256) -> Result<(), VigilError> {
+        if self.vm().msg_sender() != self.praetor_multisig.get() {
+            return Err(VigilError::Unauthorized(UnauthorizedCaller {
+                caller: self.vm().msg_sender(),
+            }));
+        }
+        let prev = self.params.keeper_min_stake_wei.get();
+        self.params.keeper_min_stake_wei.set(new_stake_wei);
+        self.vm().log(KeeperMinStakeUpdated {
+            previous_wei: prev,
+            new_wei: new_stake_wei,
             reason,
         });
         Ok(())
