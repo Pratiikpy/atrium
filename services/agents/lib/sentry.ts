@@ -19,8 +19,10 @@ export async function initSentry(): Promise<void> {
   if (!dsn) return;
   try {
     // Browser SDK works under Vercel Edge runtime; @sentry/node has
-    // perf_hooks that fail there.
-    const mod = await import('@sentry/browser');
+    // perf_hooks that fail there. Optional dep — see same pattern in
+    // services/codex/src/lib/sentry.ts.
+    const sentryPackage: string = '@sentry/browser';
+    const mod = await import(/* @vite-ignore */ sentryPackage);
     mod.init({
       dsn,
       environment: process.env.NODE_ENV ?? 'production',

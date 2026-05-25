@@ -27,8 +27,13 @@ export async function initSentry(env: Record<string, string | undefined>): Promi
   try {
     // Edge-compatible @sentry/browser is used because @sentry/node has
     // dependencies (perf_hooks, etc.) that fail under Cloudflare Workers
-    // + Vercel Edge runtime. The Browser SDK works in both.
-    const mod = await import('@sentry/browser');
+    // + Vercel Edge runtime. The Browser SDK works in both. The package
+    // is an OPTIONAL dep — the deploy can choose whether to ship Sentry
+    // by installing @sentry/browser; without it, this module is a no-op.
+    // String-based dynamic import bypasses tsc's import-resolution check
+    // so the codex package does not need @sentry/browser in its types.
+    const sentryPackage: string = '@sentry/browser';
+    const mod = await import(/* @vite-ignore */ sentryPackage);
     mod.init({
       dsn,
       environment: env.NODE_ENV ?? 'production',

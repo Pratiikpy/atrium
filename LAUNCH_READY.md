@@ -1,15 +1,18 @@
 # Atrium, Launch Ready
 
-Last updated: 2026-05-25 (post Phase eta - testnet completeness push)
-Current score: **Every testnet-buildable item shipped on master. 12 of
-12 Phase eta code-side items closed (commits f93583d through 9c8904b).
-Only founder ops + on-chain ceremonies remain: 3-of-5 Safe migration,
-domain + email + PGP, demo rehearsals, cohort outreach, Vercel + GHA
-env wiring. After those, 5 of 5 user journeys work end-to-end on
-Sepolia.**
+Last updated: 2026-05-25 (post Phase theta - audit-closure push)
+Current score: **All 35 audit gaps from the 2026-05-25 post-eta sweep
+are closed within their code-doable surface. 8 of 8 Phase theta
+sub-phases shipped (commits e705a00 through this reconcile). The
+remaining items are founder-only ops: 3-of-5 Safe migration, contract
+Arbiscan verification, demo rehearsals (η.11), domain + DNS + PGP
+(η.13), bug-bounty program standup, social handle registration,
+Better Stack monitor account, legal review. After those, the testnet
+is production-ready for the buildathon submission window.**
 
-See `tripwires/2026-05-25-phase-eta-complete.md` for the per-phase
-breakdown + the founder ops checklist.
+See `tripwires/2026-05-25-phase-theta-complete.md` for the per-phase
+breakdown + the founder ops checklist; `tripwires/2026-05-25-phase-
+eta-complete.md` for the prior eta push (5 user journeys live).
 
 CI: all 8 GitHub Actions jobs on master are GREEN as of 2026-05-25:
 Lint+format, Frontend build+Lighthouse, Frontend unit tests (vitest 586/586),
