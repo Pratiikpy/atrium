@@ -3,12 +3,6 @@
   "buildCommand": "echo 'no build'",
   "outputDirectory": "api",
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "crons": [
-    {
-      "path": "/api/cron",
-      "schedule": "0 12 * * *"
-    }
-  ],
   "functions": {
     "api/cron.ts": {
       "maxDuration": 60

@@ -1,0 +1,61 @@
+name: lantern-cron
+
+# Phase theta.3 fix (2026-05-25). Pre-fix Lantern attestation publishing
+# ran via Vercel Cron on `0 12 * * *` (daily 12:00 UTC). The verify-app's
+# /lantern dashboard renders `isStale: true` once the latest attestation
+# is older than 130 minutes, so a once-a-day cron flagged Lantern stale
+# for ~22.8h out of every 24h — silently shipping "stale" while the
+# attestation service was healthy.
+#
+# Vercel Hobby caps cron at daily granularity. GHA supports per-minute
+# scheduling, so the cron moves here. The Vercel cron entry in
+# services/lantern-attestor/vercel.json is removed in the same commit
+# to avoid double-publishing.
+#
+# Cadence: every 10 minutes. The 130-min staleness threshold gives us
+# 13 successful cron ticks of headroom before the dashboard alerts —
+# enough buffer that a single GHA runner queue delay does not page.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Trigger Lantern publish
+        run: pnpm --filter @atrium/lantern-attestor publish-now
+        env:
+          # The lantern-attestor service reads these from its own env at
+          # runtime. Vercel deploy carried them too; the GHA cron now
+          # owns the trigger and inherits the same secret names.
+          SCRIBE_URL:                 ${{ secrets.SCRIBE_URL }}
+          ARBITRUM_SEPOLIA_RPC:       ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
+          LANTERN_SIGNER_KEY:         ${{ secrets.LANTERN_SIGNER_KEY }}
+          LANTERN_CONTRACT_ADDR:      ${{ secrets.LANTERN_CONTRACT_ADDR }}
+          WEB3_STORAGE_TOKEN:         ${{ secrets.WEB3_STORAGE_TOKEN }}
+          COFFER_ADDR:                ${{ secrets.COFFER_ADDR }}
+          USDC_ADDR:                  ${{ secrets.USDC_ADDR }}
+
+      # Single shared failure-fanout step. Posts to the ops Discord webhook
+      # when publish fails so a stuck cron paginates within one tick rather
+      # than waiting for the /lantern dashboard staleness banner.
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -fsS -X POST "$DISCORD_OPS_WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -d "{\"content\":\"🚨 lantern-cron FAILED (run ${GITHUB_RUN_ID}). See ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

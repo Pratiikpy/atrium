@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
+    "publish-now": "tsx src/publish-now.ts",
     "test": "vitest run",
     "lint": "eslint src --ext .ts --max-warnings=100",
     "clean": "rm -rf dist node_modules/.cache"

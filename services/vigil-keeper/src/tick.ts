@@ -23,10 +23,17 @@
  * and the tick falls through to a public-RPC read-only mode.
  */
 
-import { createPublicClient, createWalletClient, http } from 'viem';
+import { createPublicClient, createWalletClient, http, keccak256, toBytes } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import { fetchPausedAccounts } from './lib/scribe.js';
+
+// Phase theta.3: precomputed topic0 for the Vigil LiquidationTriggered
+// event. Used to decode job_id from the queueLiquidation receipt and fire
+// executeLiquidation in the same tick.
+const LIQUIDATION_TRIGGERED_TOPIC = keccak256(
+  toBytes('LiquidationTriggered(uint256,uint256,uint64,uint8)'),
+);
 
 interface DeploymentRegistry {
   contracts: {
@@ -128,20 +135,52 @@ export async function tickOnce(): Promise<void> {
     return;
   }
 
-  // Real execution path. Each paused account: queue + execute. queueLiquidation
-  // is idempotent (returns existing job_id if one is already queued for this
+  // Real execution path. Each paused account: queue + wait for receipt +
+  // decode job_id from LiquidationTriggered + execute. queueLiquidation is
+  // idempotent (returns existing job_id if one is already queued for this
   // account+version), so retrying across ticks is safe. executeLiquidation
   // is wrapped in the Vigil reentrancy + pause guard (audit A C-5 + E).
+  //
+  // Phase theta.3 fix (2026-05-25): pre-fix the keeper queued the job and
+  // returned without firing executeLiquidation. The comment claimed "next
+  // tick picks up the queued job via the subgraph" but the subgraph has no
+  // PendingLiquidationJob entity and the next-tick logic was never wired.
+  // Result: queued positions accumulated forever, no liquidation ever fired,
+  // /vigil dashboard reported zero recovered collateral.
+  // Now: wait one receipt per account, decode the LiquidationTriggered event
+  // for job_id, fire executeLiquidation in the same tick. ~6-10s per account
+  // on Sepolia; the cron's 5-min budget covers ~25 liquidations comfortably.
   const account = privateKeyToAccount(keeperKey as `0x${string}`);
   const walletClient = createWalletClient({ account, chain: arbitrumSepolia, transport: http(rpc) });
+  const publicReadClient = createPublicClient({ chain: arbitrumSepolia, transport: http(rpc) });
   const vigilAbi = [
     { type: 'function', name: 'queueLiquidation', stateMutability: 'nonpayable',
       inputs: [{ type: 'address' }, { type: 'uint256' }], outputs: [{ type: 'uint256' }] },
     { type: 'function', name: 'executeLiquidation', stateMutability: 'nonpayable',
       inputs: [{ type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+    { type: 'event', name: 'LiquidationTriggered', inputs: [
+        { type: 'uint256', name: 'job_id', indexed: true },
+        { type: 'uint256', name: 'position_id', indexed: true },
+        { type: 'uint64',  name: 'deadline_block' },
+        { type: 'uint8',   name: 'priority' },
+      ] },
   ] as const;
 
+  // Cap per-tick liquidation throughput so a runaway pause-sweep cannot
+  // burn the keeper's gas budget in one shot. Logged + skipped after the cap.
+  const PER_TICK_CAP = 25;
+  let executed = 0;
+
   for (const acct of paused) {
+    if (executed >= PER_TICK_CAP) {
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event: 'liquidation_skipped_cap_reached',
+        capped_at: PER_TICK_CAP,
+        remaining_accounts: paused.length - executed,
+      }));
+      break;
+    }
     try {
       const queueTx = await walletClient.writeContract({
         address: vigilAddr,
@@ -157,14 +196,49 @@ export async function tickOnce(): Promise<void> {
         tx: queueTx,
         arbiscan: `https://sepolia.arbiscan.io/tx/${queueTx}`,
       }));
-      // executeLiquidation needs the job_id which the queueLiquidation
-      // return value carries, but waiting for receipt + decoding within a
-      // 5-min cron tick is bursty. The next tick picks up the queued job
-      // via the subgraph and fires execute. Idempotent + retryable.
+
+      // Wait for the receipt + decode job_id from the LiquidationTriggered log.
+      const receipt = await publicReadClient.waitForTransactionReceipt({
+        hash: queueTx,
+        timeout: 60_000,
+      });
+      const triggeredLog = receipt.logs.find(
+        (l) =>
+          l.address.toLowerCase() === vigilAddr.toLowerCase() &&
+          l.topics[0] === LIQUIDATION_TRIGGERED_TOPIC,
+      );
+      if (!triggeredLog || !triggeredLog.topics[1]) {
+        console.log(JSON.stringify({
+          ts: new Date().toISOString(),
+          event: 'liquidation_jobid_missing',
+          user: acct.user,
+          marginVersion: acct.marginVersion,
+          detail: 'queueLiquidation receipt had no LiquidationTriggered log; skipping execute.',
+        }));
+        continue;
+      }
+      const jobId = BigInt(triggeredLog.topics[1]);
+
+      const execTx = await walletClient.writeContract({
+        address: vigilAddr,
+        abi: vigilAbi,
+        functionName: 'executeLiquidation',
+        args: [jobId],
+      });
+      executed++;
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event: 'liquidation_executed',
+        user: acct.user,
+        marginVersion: acct.marginVersion,
+        jobId: jobId.toString(),
+        tx: execTx,
+        arbiscan: `https://sepolia.arbiscan.io/tx/${execTx}`,
+      }));
     } catch (err) {
       console.log(JSON.stringify({
         ts: new Date().toISOString(),
-        event: 'liquidation_queue_failed',
+        event: 'liquidation_failed',
         user: acct.user,
         marginVersion: acct.marginVersion,
         error: err instanceof Error ? err.message : String(err),
