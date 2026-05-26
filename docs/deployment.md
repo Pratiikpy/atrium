@@ -1,6 +1,6 @@
 # Atrium Deploy Plan — Arbitrum Sepolia
 
-Deployer: `0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42` · funded 0.19 ETH
+Deployer: `<set per deploy via DEPLOYER_PRIVATE_KEY env>` · the 2026-05-24 incident rotated the bootstrap EOA; the address in use today is read from the funded keystore at deploy time, never hardcoded.
 Generated: 2026-05-23 · last updated 2026-05-23 (post launch session 2)
 
 ## Live URLs (production)

@@ -20,7 +20,7 @@ Out of scope:
 
 - Cloned dependencies under `resources/` (report to those upstream)
 - Third-party adapters listed in PorticoRegistry that we did not author (the IPorticoAdapter v1.0 interface itself is in scope; specific adapter implementations are owned by their authors)
-- Theoretical risks already documented in `TECH_DESIGN.md §17` and `ATRIUM_PRD.md §21`
+- Theoretical risks already documented in `docs/architecture.md §17` and `docs/prd.md §21`
 
 ## Year-1 posture
 
@@ -50,4 +50,4 @@ Researchers who responsibly disclose appear here with their permission.
 
 ## Threat model
 
-The full STRIDE matrix per subsystem is in `ATRIUM_PRD.md §21`. Architecture-level mitigations in `TECH_DESIGN.md §13` and `.claude/rules/security.md`.
+The full STRIDE matrix per subsystem is in `docs/prd.md §21`. Architecture-level mitigations in `docs/architecture.md §13` and `.claude/rules/security.md`.

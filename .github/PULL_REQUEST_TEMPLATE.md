@@ -19,7 +19,7 @@ audit finding, or the upstream incident. -->
 ## Risk + follow-up
 
 <!-- Any known risk this PR ships with. Any follow-up needed. Link to
-human_left.md or the relevant tripwires entry if applicable. -->
+the relevant tripwires entry if applicable. -->
 
 ## Screenshots / video
 

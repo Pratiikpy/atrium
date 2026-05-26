@@ -99,6 +99,20 @@ resources/
 # readiness" + writing.md "Claims discipline".
 human_left.md
 codex plan.md
+# Internal team conventions for the AI-assisted dev workflow.
+# Kept LOCAL; the agent reads it via the working directory but it
+# doesn't belong on the public github surface (named after the AI
+# assistant + contains internal-only directives).
+CLAUDE.md
+# Buildathon-specific framing files. The product exists past Day 17;
+# these are scaffolding for the one event and shouldn't read as
+# permanent product collateral.
+JUDGE_ONE_PAGER.md
+LAUNCH_READY.md
+# Self-judging audit files — internal, signed off, no longer useful
+# as public-facing. The current audit lives under audits/ which is
+# tracked and dated. Old root-level AUDIT_*.md are scratch.
+AUDIT_*.md
 
 # Founder personal notes + buildathon TOS PDFs, keep off-repo
 my convo with one ai agent.txt
