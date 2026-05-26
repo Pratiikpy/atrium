@@ -12,7 +12,7 @@ import { safeErrorDetail } from '../lib/error-safe';
  * surfaces the scaffold state honestly via the `module_status` field on every
  * response so the verifier UI and any agent caller can detect-and-degrade.
  *
- * Per `.claude/rules/writing.md` honesty pattern: we do NOT publish a fake
+ * Per `docs/conventions/writing.md` honesty pattern: we do NOT publish a fake
  * "0.00 USD" as a live option price. The response always includes
  * `module_status: "phase-2-scaffold"` plus a `live: false` flag until the
  * real BSM math is wired up.

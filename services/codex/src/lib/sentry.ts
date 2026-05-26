@@ -7,7 +7,7 @@
  * Sentry account never blocks the service from running. Wallet
  * addresses pass through (public on-chain identifiers needed for
  * triage); request bodies and runtime context are scrubbed before
- * send per .claude/rules/security.md.
+ * send per docs/conventions/security.md.
  */
 
 let sentryInitialised = false;

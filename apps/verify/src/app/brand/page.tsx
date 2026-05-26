@@ -14,7 +14,7 @@ import { Wordmark } from '@/components/wordmark';
  *   VI.  Trademark and usage  (You may / You may not)
  *   VII. Download  (SVG, PNG, ICO assets, typefaces)
  *
- * Per `.claude/rules/ui.md`: "Do not invent a parallel system." This page
+ * Per `docs/conventions/ui.md`: "Do not invent a parallel system." This page
  * surfaces the same 8 canonical tokens (paper, ink, accent oxblood, live
  * moss, testnet amber, neg clay, line, muted) that every component pulls
  * from `globals.css`.
@@ -553,7 +553,7 @@ function DownloadLink({
 }) {
   // Pending variant renders as a non-interactive label so the asset surface
   // stays visually present without serving a 404. Matches the "honest
-  // pending" pattern from .claude/rules/ui.md.
+  // pending" pattern from docs/conventions/ui.md.
   if (pending || !href) {
     return (
       <span

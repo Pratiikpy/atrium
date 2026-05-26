@@ -4,7 +4,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Audit U-42: `.claude/rules/writing.md` declares a list of banned words
+ * Audit U-42: `docs/conventions/writing.md` declares a list of banned words
  * that must never appear in user-facing copy ("delve", "unlock",
  * "unleash", "robust", "empower", "seamless", "streamline",
  * "cutting-edge", "state-of-the-art", "revolutionize").
@@ -73,7 +73,7 @@ function stripCommentsAndJsxAttributes(source: string): string {
 }
 
 describe('U-42 + U-43: no banned writing-rule words or phrases in user-facing components', () => {
-  it('no .claude/rules/writing.md banned word appears in any *.tsx', () => {
+  it('no docs/conventions/writing.md banned word appears in any *.tsx', () => {
     const files = walkUserFacing(SRC_ROOT);
     expect(files.length).toBeGreaterThan(0);
     const failures: string[] = [];

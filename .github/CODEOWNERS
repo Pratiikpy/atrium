@@ -34,8 +34,8 @@
 # Runbooks + security policy + key rotation — F3.
 /runbooks/                 @atrium-f3
 /SECURITY.md               @atrium-f3
-/.claude/rules/security.md @atrium-f3
+/docs/conventions/security.md @atrium-f3
 
-# CLAUDE.md + .claude/rules/ — every founder reviews behavioral changes.
+# CLAUDE.md + docs/conventions/ — every founder reviews behavioral changes.
 /CLAUDE.md                 @atrium-f1 @atrium-f2 @atrium-f3
-/.claude/rules/            @atrium-f1 @atrium-f2 @atrium-f3
+/docs/conventions/            @atrium-f1 @atrium-f2 @atrium-f3

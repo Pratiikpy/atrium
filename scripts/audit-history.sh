@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Phase eta.14 (2026-05-25): one-shot full-history secret scan for the
-# pre-public-flip audit. Per .claude/rules/git.md and the
+# pre-public-flip audit. Per docs/conventions/git.md and the
 # 2026-05-24 deployer key leak incident, every commit must be clean
 # before the repo flips public.
 #

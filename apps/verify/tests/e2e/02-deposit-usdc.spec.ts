@@ -43,7 +43,7 @@ test.describe('Journey 2 — Deposit USDC', () => {
   test('Vault stats render real zeros, not placeholder TVL @critical', async ({ page }) => {
     await page.goto('/app/vault');
 
-    // .claude/rules/ui.md "Live data discipline": numbers either come from
+    // docs/conventions/ui.md "Live data discipline": numbers either come from
     // Scribe/Plinth or render zero/pending. NEVER `$4.20M TVL` etc.
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toMatch(/\$4\.20M/i);

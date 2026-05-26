@@ -61,7 +61,7 @@ describe('readinessMessage()', () => {
       missing: ['Coffer'],
     };
     const msg = readinessMessage(notReady, 'Deposit')!;
-    // .claude/rules/writing.md bans these. Lock the helper copy against
+    // docs/conventions/writing.md bans these. Lock the helper copy against
     // accidental drift.
     expect(msg).not.toMatch(/seamless|robust|unleash|leverage|empower/i);
   });

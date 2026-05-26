@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * shipped `source: 'postern'` with hardcoded `authenticator: 'ATRIUM ·
  * Yubikey 5C · Touch ID'` whenever a `DEMO_WALLET_ADDRESS` was set. This
  * implied real hardware-authenticator state that didn't exist (Postern
- * isn't deployed). Real-data discipline violation per `.claude/rules/ui.md`
+ * isn't deployed). Real-data discipline violation per `docs/conventions/ui.md`
  * "Live data discipline" — "Never display a placeholder number that looks
  * real."
  *

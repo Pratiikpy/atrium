@@ -24,7 +24,7 @@ test.describe('Journey 4 — Lantern attestation', () => {
   test('Page surfaces an honest pre-attestation state @critical', async ({ page }) => {
     await page.goto('/lantern');
 
-    // Per .claude/rules/ui.md "Live data discipline": no placeholder roots.
+    // Per docs/conventions/ui.md "Live data discipline": no placeholder roots.
     // The page must surface one of these honest states (each shipped in
     // lantern-dashboard.tsx as a distinct branch):
     //   1. zero root (0x000...0)

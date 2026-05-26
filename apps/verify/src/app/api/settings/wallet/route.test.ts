@@ -14,7 +14,7 @@ import { loadContractAddress } from '@/lib/deployments-registry';
  *   `authenticator: 'ATRIUM · Yubikey 5C · Touch ID'` whenever a
  *   DEMO_WALLET_ADDRESS was set. This advertised real hardware-
  *   authenticator state that didn't exist (Postern undeployed).
- *   Real-data discipline violation per .claude/rules/ui.md.
+ *   Real-data discipline violation per docs/conventions/ui.md.
  *
  *   Now: `source: 'postern'` only when PosternKeyRegistry is in the
  *   deployments registry. Until then `source: 'pending'` with every

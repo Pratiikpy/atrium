@@ -29,7 +29,7 @@ test.describe('Journey 1 — Connect wallet', () => {
   });
 
   test('Connect CTA is keyboard-reachable @critical', async ({ page }) => {
-    // Per .claude/rules/ui.md accessibility: every interactive element must
+    // Per docs/conventions/ui.md accessibility: every interactive element must
     // have a focus ring and be reachable without a mouse. Tab through the
     // page until we land on the Connect button.
     await page.goto('/verify/1');

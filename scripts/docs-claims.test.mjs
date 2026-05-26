@@ -141,11 +141,11 @@ describe('CLAUDE.md — desing prototype HTML files exist', () => {
 });
 
 describe('CLAUDE.md — rules files exist', () => {
-  it('every .claude/rules/*.md file referenced exists', () => {
+  it('every docs/conventions/*.md file referenced exists', () => {
     // CLAUDE.md "Detailed rules" table names 5 rule files. Each must exist.
     const rules = ['ui.md', 'testing.md', 'security.md', 'git.md', 'writing.md'];
     for (const rule of rules) {
-      const p = `.claude/rules/${rule}`;
+      const p = `docs/conventions/${rule}`;
       assert.ok(
         existsSync(resolve(REPO_ROOT, p)),
         `CLAUDE.md references ${p} which doesn't exist`,

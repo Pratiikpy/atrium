@@ -12,7 +12,7 @@ import { gql } from '@/lib/scribe-helpers';
 /**
  * Locks the honest empty-state pattern for the cohort partners endpoint.
  *
- * Per .claude/rules/ui.md "Live data discipline": never fake numbers, never
+ * Per docs/conventions/ui.md "Live data discipline": never fake numbers, never
  * silently swallow failures. The route returns one of two shapes:
  *   - `{ partners: [...], source: 'scribe' }` on a successful gql response
  *   - `{ partners: [], source: 'pending' }` on ANY failure (network, timeout, etc.)

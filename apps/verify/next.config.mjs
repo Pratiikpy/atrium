@@ -26,7 +26,7 @@ const nextConfig = {
     afterFiles: [],
     fallback: [],
   }),
-  // PWA + mobile-first per .claude/rules/ui.md
+  // PWA + mobile-first per docs/conventions/ui.md
   headers: async () => [
     {
       source: '/(.*)',

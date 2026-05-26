@@ -19,7 +19,7 @@ import { VENUE_COUNT } from '@/lib/venues';
  * /api/protocol/metrics that had zero tests pinning them. The route
  * powers the landing-page "numbers" section; the audit-fix shape is
  * the canonical "live data discipline" enforcement for that surface
- * per .claude/rules/ui.md.
+ * per docs/conventions/ui.md.
  *
  * Pre-iter-62 a refactor reverting any of these would slip past CI:
  *

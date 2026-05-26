@@ -35,9 +35,9 @@ Target: 3 community adapters by Day 180; 5 community agents by Day 180.
 
 - Stylus (Rust) contracts follow patterns in `contracts/plinth/src/lib.rs`
 - Solidity contracts use OpenZeppelin where possible (see `resources/openzeppelin-contracts/`)
-- All public-facing copy follows `.claude/rules/writing.md`
-- All UI follows `.claude/rules/ui.md` and the visual language in `desing/`
-- All tests follow `.claude/rules/testing.md`
+- All public-facing copy follows `docs/conventions/writing.md`
+- All UI follows `docs/conventions/ui.md` and the visual language in `desing/`
+- All tests follow `docs/conventions/testing.md`
 
 ## Pull request flow
 
@@ -51,7 +51,7 @@ Target: 3 community adapters by Day 180; 5 community agents by Day 180.
 
 ## No AI coauthor lines
 
-Never add `Co-authored-by: Claude` or similar to commits. See `.claude/rules/git.md`.
+Never add `Co-authored-by: Claude` or similar to commits. See `docs/conventions/git.md`.
 
 ## License
 

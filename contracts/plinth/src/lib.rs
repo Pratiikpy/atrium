@@ -435,7 +435,7 @@ impl Plinth {
 
         // Audit FIRE78-PLINTH-H1 fix (sub-agent HIGH): arm the is_updating
         // reentrancy guard BEFORE any external call (get_safe_price reads
-        // Chainlink + Pyth via cross-contract). `.claude/rules/security.md`
+        // Chainlink + Pyth via cross-contract). `docs/conventions/security.md`
         // requires every state-changing function on Plinth+Coffer to use
         // this pattern; close_position was the one outlier. open_position
         // arms it; close_position now does too. Released on the happy and

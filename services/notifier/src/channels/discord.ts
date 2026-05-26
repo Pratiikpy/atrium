@@ -4,7 +4,7 @@ import type { Alert, ChannelConfig } from '../types.js';
  * Discord webhook delivery. User creates a webhook in their own
  * Discord server (or accepts the Atrium-hosted one) and pastes the
  * URL into /app/settings/notifications. The URL is a bearer secret;
- * we store it encrypted in Vercel KV per .claude/rules/security.md.
+ * we store it encrypted in Vercel KV per docs/conventions/security.md.
  */
 export async function deliverDiscord(alert: Alert, config: ChannelConfig): Promise<void> {
   if (!config.discordWebhookUrl) throw new Error('discordWebhookUrl missing');

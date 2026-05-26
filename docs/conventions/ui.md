@@ -71,7 +71,7 @@ A feature without these is not done. Surface what is missing instead of hiding i
 
 ## Copy on screen
 
-Apply `.claude/rules/writing.md` to every label, button, tooltip, error. No banned words. No marketing fluff in product chrome.
+Apply `docs/conventions/writing.md` to every label, button, tooltip, error. No banned words. No marketing fluff in product chrome.
 
 ## Accessibility
 

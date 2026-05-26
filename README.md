@@ -26,6 +26,7 @@ make demo-frontend   # frontend only, works on Windows MSVC
 | [`docs/deployment.md`](./docs/deployment.md) | Live URLs and deployed contract addresses. |
 | [`docs/development.md`](./docs/development.md) | Local development setup + cloned reference repos. |
 | [`docs/resources.md`](./docs/resources.md) | The reference repos under `resources/` and what each is for. |
+| [`docs/conventions/`](./docs/conventions/) | Project coding + writing conventions (security, testing, UI, writing, git). |
 | [`audits/`](./audits/) | Code audit reports. |
 | [`incidents/`](./incidents/) | Incident post-mortems. |
 | [`runbooks/`](./runbooks/) | Operational runbooks for each service. |
@@ -62,15 +63,14 @@ atrium/
 ├── tests/                     # Cross-package integration tests
 ├── runbooks/                  # Ops procedures
 ├── incidents/                 # Post-mortems
-├── docs/                      # Specs, architecture, deployment
-├── audits/                    # Code + integration audit reports
-├── desing/                    # Visual language reference (HTML)
+├── docs/                      # Architecture, deployment, conventions
+├── audits/                    # Code audit reports
 └── resources/                 # Cloned reference repos (see docs/resources.md)
 ```
 
 ## Status
 
-Contracts and core services build green on `master`. Deployment to Arbitrum Sepolia is live for the verify-app; remaining contract activations are tracked in `docs/12-month-roadmap.md`. Audit history lives under `audits/`; incidents under `incidents/`.
+Contracts and core services build green on `master`. The verify-app is deployed to Arbitrum Sepolia at [verify.atrium.fi](https://verify.atrium.fi). Live contract addresses are in [`docs/deployment.md`](./docs/deployment.md). Audit history lives under [`audits/`](./audits/); incident post-mortems under [`incidents/`](./incidents/).
 
 ## Build commands
 

@@ -29,8 +29,8 @@ fine for component-level work. -->
 ## Checklist
 
 - [ ] No fake numbers / no AI-coauthor lines / no banned words
-      (.claude/rules/writing.md)
+      (docs/conventions/writing.md)
 - [ ] Empty + loading + error + success states implemented
-      (.claude/rules/ui.md, if UI changes)
+      (docs/conventions/ui.md, if UI changes)
 - [ ] No new dependency without justification
 - [ ] Commit body explains the "why", not the "what"

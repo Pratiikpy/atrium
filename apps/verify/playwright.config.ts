@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  *                              UI transitions. Only flips green once Stylus contracts
  *                              are deployed (gated on human_left.md #11).
  *
- * Per .claude/rules/testing.md §"End to end on Sepolia": each test cleans up
+ * Per docs/conventions/testing.md §"End to end on Sepolia": each test cleans up
  * state at the end and asserts on Arbiscan tx receipt (not just UI text) when
  * running in sepolia mode.
  */
@@ -42,7 +42,7 @@ export default defineConfig({
     {
       name: 'mobile-safari',
       use: { ...devices['iPhone 14'] },
-      // Mobile PWA path per PRD §22.8 + .claude/rules/ui.md "Mobile path".
+      // Mobile PWA path per PRD §22.8 + docs/conventions/ui.md "Mobile path".
       // Only critical journeys run on mobile to keep CI under 90s.
       grep: /@mobile/,
     },

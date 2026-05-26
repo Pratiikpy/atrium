@@ -4,7 +4,7 @@
  *
  * Steps per cron firing:
  *   1. Probe Codex /health → if down, log and bail (no decisions on
- *      stale data per .claude/rules/security.md).
+ *      stale data per docs/conventions/security.md).
  *   2. Pull new mandates from Scribe (SigilValidation events).
  *   3. Run the agent-specific decision function (`strategy`).
  *   4. Record the tick into in-memory history for /api/status to expose.

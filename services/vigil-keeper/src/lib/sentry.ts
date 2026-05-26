@@ -43,7 +43,7 @@ export async function initSentry(): Promise<void> {
       environment: process.env.NODE_ENV ?? 'production',
       tracesSampleRate: 0.1,
       // PII guard. Wallet addresses are public; everything else is
-      // scrubbed before send. Per .claude/rules/security.md disclosure
+      // scrubbed before send. Per docs/conventions/security.md disclosure
       // posture, the goal is "the error is debuggable, the request
       // body is not leaked".
       beforeSend(event) {

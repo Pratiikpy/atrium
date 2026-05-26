@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
  * Audit U-44: humanize-error functions across components share one
  * voice convention — lowercase opener (except for contract names like
  * "Sigil", "Coffer"), no trailing period. Matches the founder-voice
- * guideline in `.claude/rules/writing.md`: plain, conversational
+ * guideline in `docs/conventions/writing.md`: plain, conversational
  * fragments rather than full sentences.
  *
  * Pre-fix, `components/agents/new-mandate-button.tsx`'s

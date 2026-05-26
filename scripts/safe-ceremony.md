@@ -13,7 +13,7 @@ This ceremony hands admin to a 3-of-5 Gnosis Safe.
 3. Each signer has 0.05 ETH on Arbitrum Sepolia for ceremony gas.
 4. Foundry installed (`forge`).
 5. Deployer EOA private key in `.forge-cache/deployer-pk.txt`
-   (wiped after the ceremony per `.claude/rules/security.md`).
+   (wiped after the ceremony per `docs/conventions/security.md`).
 
 ## Steps
 

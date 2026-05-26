@@ -13,7 +13,7 @@ import { WagmiProviders } from '@/components/wagmi-providers';
  * result panel. Tx links open Arbiscan.
  *
  * If JS fails or the user has no wallet, the page still renders with a
- * clear empty state — per .claude/rules/ui.md (empty + error + loading + permission states required).
+ * clear empty state — per docs/conventions/ui.md (empty + error + loading + permission states required).
  */
 
 const STEP_CONFIG = {

@@ -6,7 +6,7 @@ import { Wordmark } from '@/components/wordmark';
  * a stub, a relay, or otherwise diverges from the "real production" path
  * on Arbitrum Sepolia testnet. Sourced from tripwires/ + human_left.md.
  *
- * Per .claude/rules/writing.md "Honesty patterns" + ui.md "Live data
+ * Per docs/conventions/writing.md "Honesty patterns" + ui.md "Live data
  * discipline": these are the items where what looks like live integration
  * is actually a testnet workaround. We say so out loud, on the public
  * docs site, so judges + cohort partners + users can read it cold.
@@ -98,7 +98,7 @@ const DISCLOSURES: Disclosure[] = [
     what:
       'No partner logos render on the cohort strip. The landing has an honest empty state: "No partners signed yet. cohort opens Month 2."',
     why:
-      'Per `.claude/rules/writing.md`: partner names ship only with a signed source on file. None of the candidate partners (Pendle, Aave, Hyperliquid, IOSG, Variational, Horizen, Chainlink Labs, Pyth) have signed yet.',
+      'Per `docs/conventions/writing.md`: partner names ship only with a signed source on file. None of the candidate partners (Pendle, Aave, Hyperliquid, IOSG, Variational, Horizen, Chainlink Labs, Pyth) have signed yet.',
     whenReal:
       'As each signs, we drop a `data/cohort/<partner>.json` file + logo SVG; the landing reads it and renders. No pre-announcement.',
     severity: 'interim',
@@ -109,7 +109,7 @@ const DISCLOSURES: Disclosure[] = [
     what:
       'TVL, agent count, query count, venue chip amounts, partner logos all render "pending" on first paint. The bootloader fetches `/api/protocol/metrics` and replaces only with real Scribe data.',
     why:
-      'Per `.claude/rules/ui.md`: never show a placeholder number that looks real. Per the 2026-05-25 audit, the mobile-landing was previously flashing `$12.37M` / `$4.13M` etc. before hydration; that has been removed.',
+      'Per `docs/conventions/ui.md`: never show a placeholder number that looks real. Per the 2026-05-25 audit, the mobile-landing was previously flashing `$12.37M` / `$4.13M` etc. before hydration; that has been removed.',
     whenReal: 'Live as soon as Scribe + Plinth + Coffer return non-zero data after the timelock fires.',
     severity: 'interim',
   },

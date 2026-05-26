@@ -20,7 +20,7 @@ interface RunState {
 /**
  * Client-side runner for a single Verifier step.
  *
- * Required states (per .claude/rules/ui.md):
+ * Required states (per docs/conventions/ui.md):
  *   - empty (no wallet connected → Connect button)
  *   - loading (tx pending → spinner with message)
  *   - error (tx failed → clear cause + retry)

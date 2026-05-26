@@ -7,7 +7,7 @@ import type { Alert, ChannelConfig } from '../types.js';
  * Founder ops: create Resend account, verify atrium.fi domain, generate
  * API key, set RESEND_API_KEY env on the notifier deploy.
  *
- * Templates: per .claude/rules/writing.md, plain prose, no marketing
+ * Templates: per docs/conventions/writing.md, plain prose, no marketing
  * fluff. Brand-kit canon palette in inline CSS for color signals.
  */
 export async function deliverEmail(alert: Alert, config: ChannelConfig): Promise<void> {

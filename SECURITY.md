@@ -50,4 +50,4 @@ Researchers who responsibly disclose appear here with their permission.
 
 ## Threat model
 
-The full STRIDE matrix per subsystem is in `docs/prd.md §21`. Architecture-level mitigations in `docs/architecture.md §13` and `.claude/rules/security.md`.
+The full STRIDE matrix per subsystem is in `docs/prd.md §21`. Architecture-level mitigations in `docs/architecture.md §13` and `docs/conventions/security.md`.

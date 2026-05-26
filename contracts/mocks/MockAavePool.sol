@@ -17,7 +17,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 ///      cosmetic so the adapter's view fns return believable values.
 ///      Real Aave V3 lending lands at the mainnet flip (Year-2).
 ///
-/// Per `.claude/rules/security.md`: testnet posture only; never deploy
+/// Per `docs/conventions/security.md`: testnet posture only; never deploy
 /// to a network where real funds depend on the mock's behavior.
 contract MockAavePool {
     /// Internal accounting: how much each `onBehalfOf` has supplied per asset.
