@@ -33,11 +33,11 @@ export default function SecurityPage() {
 
         <Block heading="Audit-findings register" id="audit-findings-register">
           <p className="text-ink-soft">
-            Cross-cutting audit was run on 2026-05-18 by six parallel sub-agents covering contracts,
-            adapters, services, UI, honesty, and security. Findings are tracked in{' '}
-            <code className="font-mono text-ink">docs/AUDIT_FINDINGS.md</code>. Each row has a file
-            reference, an owner, and a target month. Live status below pulls from the markdown
-            register on every refresh.
+            A cross-cutting code review covering contracts, adapters,
+            off-chain services, frontend, and honesty disclosures runs on
+            every release cycle. Each row below names the file, the
+            finding, and the resolution status. The table refreshes on
+            every page load against the latest published audit register.
           </p>
           <div className="mt-5">
             <AuditFindingsTable />

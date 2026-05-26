@@ -57,16 +57,13 @@ export default function ManifestoPage() {
           <li>· Let agents trade for you under bounded mandates. One-tap revocation of every delegation in a single tx.</li>
         </ul>
 
-        <h2 className="font-display text-3xl text-ink">The asks</h2>
+        <h2 className="font-display text-3xl text-ink">What we are building toward</h2>
         <p>
-          Top-3 at the Arbitrum Open House London Buildathon. Founder House invitation.
-          Warm intros to the Arbitrum + Robinhood ecosystem teams. We built Atrium
-          to be the substrate they need.
-        </p>
-
-        <p className="mt-12 text-sm italic text-muted">
-          Written before the contracts deployed. Read again after they do. The
-          claims should still hold.
+          A prime-brokerage layer that the EVM has not had: collateral
+          posted once, priced as a portfolio, accessible to every venue
+          that meets the Portico adapter standard. Open-sourced. Formally
+          verified where the math matters most. Honest about every
+          remaining mock, relay, and stub until the production paths land.
         </p>
       </article>
     </main>
