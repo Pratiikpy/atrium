@@ -86,6 +86,20 @@ resources/
 .forge-cache/
 .playwright-mcp/
 
+# Claude Code runtime state — settings + cron locks never go public.
+# Project-wide team rules under .claude/rules/ DO ship (they define the
+# team's coding standards). Only the runtime cruft is excluded.
+.claude/scheduled_tasks*
+.claude/settings*
+.claude/projects/
+
+# Internal ops scratch — kept local for the founder team, not on
+# public github. Re-add to tracking only after stripping internal
+# paths / outreach names per .claude/rules/git.md "Public repo
+# readiness" + writing.md "Claims discipline".
+human_left.md
+codex plan.md
+
 # Founder personal notes + buildathon TOS PDFs, keep off-repo
 my convo with one ai agent.txt
 read this.txt
