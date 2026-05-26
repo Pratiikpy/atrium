@@ -26,18 +26,15 @@ export default function BenchmarksPage() {
             <Row dim="Open adapter standard" a="IPorticoAdapter v1.0 (MIT)" c="Closed" b="Closed" />
             <Row dim="Agent integration" a="Sigil EIP-712 + Postern session keys + ERC-8004" c="Limited" b="None" />
             <Row dim="Formal verification" a="5 Kani+proptest invariants in CI" c="Audit only" b="Audit only" />
-            <Row dim="Year-1 budget" a="$0 founder capital" c="$15M raised" b="$10M raised" />
-            <Row dim="UX polish today" a="Foundation only — see ROADMAP" c="Stronger (more mature)" b="Stronger" />
-            <Row dim="Mainnet live" a="No (Year-2 gate)" c="Yes" b="Yes" />
+            <Row dim="UX polish today" a="Foundation — Verifier Mode complete, app surfaces in progress" c="More mature" b="More mature" />
+            <Row dim="Mainnet live" a="No — testnet build phase" c="Yes" b="Yes" />
           </tbody>
         </table>
       </section>
 
       <section className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
         <p className="text-sm text-ink-soft">
-          Honest read: Cascade and August have UX polish and mainnet liveness we do not yet match.
-          Atrium leads on chain choice (EVM is bigger), open standards, agent layer depth, and formal
-          verification. By Year-2 mainnet flip our gap on polish closes; their gap on standards stays.
+          Honest read: the Solana-native comparables have UX polish and mainnet liveness Atrium does not yet match. Atrium leads on chain choice (EVM is larger), open standards, agent-layer depth, and formal verification. The polish gap closes as the app surfaces complete; the standards gap holds.
         </p>
       </section>
     </main>

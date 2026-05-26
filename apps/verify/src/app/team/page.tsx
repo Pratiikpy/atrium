@@ -3,7 +3,7 @@ import { Wordmark } from '@/components/wordmark';
 
 export const metadata = {
   title: 'Atrium · Team',
-  description: 'Three founders. Year-1 testnet on $0 founder capital.',
+  description: 'How Atrium builds and the principles the team works to.',
 };
 
 export default function TeamPage() {
@@ -21,74 +21,58 @@ export default function TeamPage() {
       <section className="mt-16">
         <h1 className="font-display text-5xl text-ink">Team</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
-          Three founders. Open GitHub histories. Year-1 testnet on $0 founder capital.
-          Year 2 raises with the Year-1 testnet track record as the credential.
+          Atrium is built by a small team of founders shipping in public on Arbitrum Sepolia. Code, commits, audits, and incident post-mortems all live in the open GitHub repository — the work is the credential.
         </p>
       </section>
 
       <section className="mt-12 grid gap-6 md:grid-cols-3">
-        <Card
-          codename="F1"
-          role="Contracts + protocol"
-          surface="Plinth · Vigil · Sigil · Coffer · Praetor CLI · Kani proofs"
-          githubHint="Open-source history visible on GitHub"
+        <RoleCard
+          area="Contracts &amp; protocol"
+          surface="Plinth margin engine · Vigil liquidations · Sigil mandates · Coffer vault · Praetor CLI · Kani proofs"
         />
-        <Card
-          codename="F2"
-          role="Frontend + product"
-          surface="apps/verify · Verifier Mode · Lantern dashboard · brand kit"
-          githubHint="Open-source history visible on GitHub"
+        <RoleCard
+          area="Frontend &amp; product"
+          surface="apps/verify · Verifier Mode · Lantern dashboard · brand and design system"
         />
-        <Card
-          codename="F3"
-          role="Ops + GTM"
-          surface="Cohort outreach · runbooks · ResearchAttestation · audit gating"
-          githubHint="Open-source history visible on GitHub"
+        <RoleCard
+          area="Operations &amp; partnerships"
+          surface="Cohort programme · runbooks · ResearchAttestation · audit cadence"
         />
       </section>
 
       <section className="mt-16 rounded-md border border-divider bg-parchment-soft/40 p-8">
         <h2 className="font-display text-2xl text-ink">How we work</h2>
         <ul className="mt-4 space-y-3 text-sm text-ink-soft">
-          <li><strong className="text-ink">Honesty over hype.</strong> Every claim sourced from a doc, a tx hash, or a live dashboard.</li>
-          <li><strong className="text-ink">Best product option, no compromise.</strong> Money is the only blocker; effort is not.</li>
-          <li><strong className="text-ink">Live dashboards never inflate.</strong> 2 of 3 keepers shows 2 of 3.</li>
-          <li><strong className="text-ink">Tripwires beat silent slips.</strong> Scope cuts announced same day.</li>
-          <li><strong className="text-ink">No fake immutability.</strong> Year-1 contracts are upgradeable; we say so out loud.</li>
+          <li><strong className="text-ink">Honesty over hype.</strong> Every claim is sourced from a document, a transaction hash, or a live dashboard.</li>
+          <li><strong className="text-ink">Best product option, no compromise.</strong> When two paths fork, take the one that makes the product more correct, trustworthy, and defensible.</li>
+          <li><strong className="text-ink">Live dashboards never inflate.</strong> If two of three keepers are up, the page shows two of three.</li>
+          <li><strong className="text-ink">Tripwires beat silent slips.</strong> Scope cuts get announced the same day they happen.</li>
+          <li><strong className="text-ink">No fake immutability.</strong> Contracts are upgradeable today behind a multisig and a 48-hour timelock — we say so out loud.</li>
         </ul>
-        <Link href="/manifesto" className="mt-4 inline-block text-sm text-ink underline-offset-2 hover:underline">
-          Read the manifesto
+        <Link href="/manifesto" className="mt-6 inline-block text-sm text-ink underline-offset-2 hover:underline">
+          Read the manifesto →
         </Link>
       </section>
 
       <section className="mt-16">
         <h2 className="font-display text-2xl text-ink">Contact</h2>
         <p className="mt-3 text-sm text-ink-soft">
-          Security disclosure: <code className="font-mono text-ink">security@atrium.fi</code> (PGP in <Link href="/security" className="underline">SECURITY.md</Link>).
-          Partnership: emails routed through warm intros, not cold inbound.
+          Security disclosure: <code className="font-mono text-ink">security@atrium.fi</code> (PGP key linked from <Link href="/security" className="underline">/security</Link>).
+        </p>
+        <p className="mt-2 text-sm text-ink-soft">
+          Partnerships and integrations are scoped through the Cohort programme — see <Link href="/cohort" className="underline">/cohort</Link>.
         </p>
       </section>
     </main>
   );
 }
 
-function Card({
-  codename,
-  role,
-  surface,
-  githubHint,
-}: {
-  codename: string;
-  role: string;
-  surface: string;
-  githubHint: string;
-}) {
+function RoleCard({ area, surface }: { area: string; surface: string }) {
   return (
     <article className="rounded-md border border-divider bg-parchment p-6">
-      <p className="font-display text-3xl text-ink">{codename}</p>
-      <p className="mt-2 text-sm font-medium text-ink">{role}</p>
-      <p className="mt-3 text-sm text-ink-soft">{surface}</p>
-      <p className="mt-4 text-xs text-muted">{githubHint}</p>
+      <p className="text-[11px] uppercase tracking-wider text-muted">Focus area</p>
+      <p className="mt-2 font-display text-xl text-ink">{area}</p>
+      <p className="mt-4 text-sm text-ink-soft">{surface}</p>
     </article>
   );
 }
