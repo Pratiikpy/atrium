@@ -114,6 +114,49 @@ LAUNCH_READY.md
 # tracked and dated. Old root-level AUDIT_*.md are scratch.
 AUDIT_*.md
 
+# Long-form internal product + engineering docs. Serious product repos
+# don't publish their PRD, full architecture spec, or roadmap — these
+# are kept off-github (Notion / Drive). Local copies remain at the
+# names below for the team to reference; the public docs/ folder
+# keeps only what a real product publishes.
+docs/architecture-internal.md
+docs/prd-internal.md
+docs/full-flow-design-internal.md
+docs/12-month-roadmap-internal.md
+docs/stylus-migration-internal.md
+docs/AUDIT_FINDINGS.md
+docs/LAUNCH_READINESS.md
+docs/MONTHS_2_TO_12_BLUEPRINT.md
+docs/MONTH_01_AUDIT.md
+docs/ROADMAP.md
+docs/kani-baseline.txt
+
+# Internal audit scratch — Auditor A through H letter-coded reviews,
+# month-N half-baked sweeps. Kept off-github; current public audit is
+# audits/2026-05-25-contract-quality-audit.md.
+audits/MONTH12_AUDIT_PLAN.md
+audits/month-*.md
+
+# Internal release notes with phase letters (alpha/beta/zeta/eta/theta)
+# in filenames. Vocabulary outsiders don't have; kept local for team
+# reference but not public.
+tripwires/
+
+# Demo rehearsal package — judge runbook, fault checklist, Loom
+# outline. Operationally useful for the team but reads as buildathon
+# scaffolding to an outsider.
+rehearsals/
+
+# Internal ops scripts — outreach templates, social announcement
+# drafts, code4rena submission pack, legal-consult questions, launch
+# runbook. All team-internal.
+ops/LAUNCH_RUNBOOK.md
+ops/code4rena-submission-pack.md
+ops/legal-consult-questions.md
+ops/social-announcements.md
+ops/rehearsal-script.md
+ops/outreach/
+
 # Founder personal notes + buildathon TOS PDFs, keep off-repo
 my convo with one ai agent.txt
 read this.txt

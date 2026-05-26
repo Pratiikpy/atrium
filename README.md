@@ -22,12 +22,13 @@ make demo-frontend   # frontend only, works on Windows MSVC
 
 | Doc | What it answers |
 |---|---|
-| [`docs/prd.md`](./docs/prd.md) | Product spec — what we are building and why. |
-| [`docs/architecture.md`](./docs/architecture.md) | Technical design — how the system fits together. |
-| [`docs/deployment.md`](./docs/deployment.md) | Live URLs, deployment addresses, ops procedure. |
+| [`docs/architecture.md`](./docs/architecture.md) | High-level system architecture and security model. |
+| [`docs/deployment.md`](./docs/deployment.md) | Live URLs and deployed contract addresses. |
 | [`docs/development.md`](./docs/development.md) | Local development setup + cloned reference repos. |
-| [`docs/12-month-roadmap.md`](./docs/12-month-roadmap.md) | Planned work calendar. |
 | [`docs/resources.md`](./docs/resources.md) | The reference repos under `resources/` and what each is for. |
+| [`audits/`](./audits/) | Code audit reports. |
+| [`incidents/`](./incidents/) | Incident post-mortems. |
+| [`runbooks/`](./runbooks/) | Operational runbooks for each service. |
 
 ## Repo layout
 

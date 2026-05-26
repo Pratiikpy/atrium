@@ -1,8 +1,10 @@
-# Developer Documentation
+# Local development
 
-Hey Open House London builders. This workspace includes local copies of the core Arbitrum, Stylus, and OpenZeppelin repositories under `resources/`. Start with the links below; most common setup and build questions should be covered here.
+Atrium's workspace includes shallow clones of the core Arbitrum, Stylus, OpenZeppelin, Chainlink, Pyth, and venue-specific repositories under [`../resources/`](../resources/). The table below maps each upstream doc to its local mirror so reference lookups don't need network access.
 
-## Start Here
+For a list of every cloned dependency and what it's for, see [`./resources.md`](./resources.md).
+
+## Reference index
 
 | Topic | Public docs | Local reference |
 | --- | --- | --- |
