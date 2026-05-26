@@ -26,7 +26,7 @@ export default [
       '**/target/**',
       'apps/verify/public/mobile-app.html',
       'apps/verify/public/mobile-landing.html',
-      'desing/**',
+      'design/**',
       'resources/**',
     ],
   },

@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 
 /**
  * SettingsMobile  the More panel for /app/settings at < md.
- * Source: desing/Mobile App.html:1262-1316. Wallet card + Trust list
+ * Source: design/Mobile App.html:1262-1316. Wallet card + Trust list
  * (Reserves / Tax / Session keys) + Account list (Settings / Recovery /
  * Notifications). Wallet displays the live wagmi address.
  */

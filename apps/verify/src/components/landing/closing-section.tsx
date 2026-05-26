@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * Closing CTA. Canon `.closing` in desing/extracted/Atriumnew/index.html:1396-1424
+ * Closing CTA. Canon `.closing` in design/extracted/Atriumnew/index.html:1396-1424
  * sets `background: var(--dark-bg)` (oklch(11% 0.008 60), near-black). Previous
  * implementation rendered on bg-parchment-light which inverted the landing's
  * intended chrome  the closing slab is supposed to be the dark anchor that

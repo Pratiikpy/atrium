@@ -5,7 +5,7 @@ import { useOpenPosition } from '@/lib/use-open-position';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
- * Source: desing/Mobile App.html:1064-1132. Pair head + sparkline chart +
+ * Source: design/Mobile App.html:1064-1132. Pair head + sparkline chart +
  * timeframe pills + Long/Short toggle + amount input + leverage slider +
  * order summary + primary CTA. Wires through the same useOpenPosition
  * wagmi hook the desktop trade page uses (Phase eta.6 2026-05-25), so

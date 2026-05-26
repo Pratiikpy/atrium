@@ -11,7 +11,7 @@ import { PortfolioMobile } from '@/components/mobile/panels/portfolio-mobile';
 /**
  * /app/portfolio — Atrium "Unified margin" view.
  *
- * Layout matches `desing/Atrium App.standalone.html#portfolio` exactly:
+ * Layout matches `design/Atrium App.standalone.html#portfolio` exactly:
  *  - 4-stat row across the top (TVL · req margin · notional · 24h PnL)
  *  - 2-col below: margin engine bar chart (left) + buying-power sparkline (right)
  *  - Liquidation buffer indicator

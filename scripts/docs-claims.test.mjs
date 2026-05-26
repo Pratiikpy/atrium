@@ -127,16 +127,16 @@ describe('README.md — repo layout ASCII tree directories all exist', () => {
 
 describe('CLAUDE.md — desing prototype HTML files exist', () => {
   it('both prototype HTML files exist (Prototype UI contract)', () => {
-    // CLAUDE.md says "Study every HTML file in desing/". The two specific
+    // CLAUDE.md says "Study every HTML file in design/". The two specific
     // files referenced by name MUST exist or the UI scaffolding has no
     // source of truth.
-    assert.ok(existsSync(resolve(REPO_ROOT, 'desing/Atrium.html')));
-    assert.ok(existsSync(resolve(REPO_ROOT, 'desing/Atrium App.standalone.html')));
+    assert.ok(existsSync(resolve(REPO_ROOT, 'design/Atrium.html')));
+    assert.ok(existsSync(resolve(REPO_ROOT, 'design/Atrium App.standalone.html')));
   });
 
   it('extracted tokens files exist (referenced by UI scaffolding)', () => {
-    assert.ok(existsSync(resolve(REPO_ROOT, 'desing/extracted/tokens.json')));
-    assert.ok(existsSync(resolve(REPO_ROOT, 'desing/extracted/full-render-tokens.json')));
+    assert.ok(existsSync(resolve(REPO_ROOT, 'design/extracted/tokens.json')));
+    assert.ok(existsSync(resolve(REPO_ROOT, 'design/extracted/full-render-tokens.json')));
   });
 });
 

@@ -4,7 +4,7 @@ import { HeroBalanceCard } from './hero-balance-card';
 /**
  * Hero — "One wallet. Every venue. One number."
  *
- * 1:1 with desing/Atrium.html#hero. Large display serif with negative
+ * 1:1 with design/Atrium.html#hero. Large display serif with negative
  * letter-spacing per extracted tokens. Right side: live balance card.
  */
 export function HeroSection() {

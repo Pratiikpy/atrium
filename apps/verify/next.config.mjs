@@ -15,7 +15,7 @@ const nextConfig = {
   rewrites: async () => ({
     beforeFiles: [
       // Mobile landing: the OLED-dark mobile-native page from
-      // `desing/Mobile Landing.html`. Anyone can hit /mobile directly to
+      // `design/Mobile Landing.html`. Anyone can hit /mobile directly to
       // preview the mobile experience.
       { source: '/mobile', destination: '/mobile-landing.html' },
       // Mobile app shell (5-tab Home/Trade/Move/Agents/More): design

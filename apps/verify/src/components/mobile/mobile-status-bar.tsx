@@ -1,6 +1,6 @@
 /**
  * Mobile status bar  faux iOS chrome that pins to the top of the screen.
- * Source: desing/Mobile App.html:144-157. Three SVG icons (signal /
+ * Source: design/Mobile App.html:144-157. Three SVG icons (signal /
  * wifi / battery) + 9:41 time. Renders only on small screens; the
  * desktop shell never shows this.
  *

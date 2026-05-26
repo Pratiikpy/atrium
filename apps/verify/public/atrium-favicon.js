@@ -1,6 +1,6 @@
 // Atrium live favicon — black tile + italic "A" + breathing status bar
 //
-// Lifted verbatim from `desing/Atrium.html` (asset uuid
+// Lifted verbatim from `design/Atrium.html` (asset uuid
 // fe2d3138-93f8-493d-83aa-9a56015475fb) via the Wave-N audit. The design
 // canon embeds this as the live favicon; matching the design 1:1 means the
 // browser tab pulses amber by default and exposes a status-API so demo

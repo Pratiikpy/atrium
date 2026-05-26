@@ -7,11 +7,11 @@
  *   - <script type="__bundler/ext_resources">  external resource list
  *
  * Output:
- *   desing/extracted/<basename>/index.html  the rendered template (uuids replaced with relative asset paths)
- *   desing/extracted/<basename>/assets/<uuid>.<ext>  each decoded asset
+ *   design/extracted/<basename>/index.html  the rendered template (uuids replaced with relative asset paths)
+ *   design/extracted/<basename>/assets/<uuid>.<ext>  each decoded asset
  *
  * Usage:
- *   node scripts/unpack-figma-bundle.mjs "desing/Atriumnew.html"
+ *   node scripts/unpack-figma-bundle.mjs "design/Atriumnew.html"
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, basename, extname, resolve, join } from 'node:path';

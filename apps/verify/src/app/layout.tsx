@@ -4,7 +4,7 @@ import { Providers } from '@/components/providers';
 import { KaniBadge } from '@/components/kani-badge';
 
 export const metadata: Metadata = {
-  // Audit N: title separator is a middot (·) per desing/Atrium App.standalone.html
+  // Audit N: title separator is a middot (·) per design/Atrium App.standalone.html
   // template ("Atrium · App"), not an em-dash. Em-dash was a Wave-J carryover.
   title: 'Atrium · verify',
   description:
@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Audit N: Geist 300 + Instrument Serif both ship in desing/Atrium.html.
+        {/* Audit N: Geist 300 + Instrument Serif both ship in design/Atrium.html.
             Geist is the body sans; Instrument Serif italic is the wordmark/display. */}
         <link
           rel="stylesheet"
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <KaniBadge />
           {children}
         </Providers>
-        {/* Audit N: live breathing favicon from desing/. window.setAtriumFavicon
+        {/* Audit N: live breathing favicon from design/. window.setAtriumFavicon
             (status, breathe) lets demo surfaces flip it green on tx-success,
             red on chaos-trip. Defers until after hydration; doesn't block TTI. */}
         <script src="/atrium-favicon.js" defer />

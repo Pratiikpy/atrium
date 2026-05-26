@@ -42,7 +42,7 @@ async function fetchMetrics(): Promise<ProtocolMetrics> {
 
 /**
  * Hero balance card — visual centerpiece of the landing hero. Matches the
- * `$12.3M` wallet preview in desing/Atrium.html but renders live data from
+ * `$12.3M` wallet preview in design/Atrium.html but renders live data from
  * Plinth via /api/portfolio/summary. When no data is available, shows
  * "pending Month 1 W2" honestly — never a placeholder number.
  *

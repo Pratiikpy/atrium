@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 /**
  * TransferMobile  the Move panel for /app/transfer at < md.
- * Source: desing/Mobile App.html:1135-1182. CCIP from/to chain stack
+ * Source: design/Mobile App.html:1135-1182. CCIP from/to chain stack
  * with swap button + estimated-time + fee + plinth-credit summary.
  *
  * Live data: balances + CCIP route fee are not yet exposed by an API,

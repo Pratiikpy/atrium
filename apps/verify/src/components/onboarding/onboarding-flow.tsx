@@ -6,7 +6,7 @@ import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * Five-step onboarding flow, pixel-matched to
- * `desing/Atrium App.standalone.html` file5.js (`Onboarding`).
+ * `design/Atrium App.standalone.html` file5.js (`Onboarding`).
  *
  * Step rail: Welcome · Authenticator · Faucet · Margin posted · Done.
  *

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SectionShell } from './section-shell';
 
 /**
- * Subsystems section. Canon at desing/extracted/Atriumnew/index.html:1245-1322:
+ * Subsystems section. Canon at design/extracted/Atriumnew/index.html:1245-1322:
  * vertical stack of architectural blocks; each block has a sticky 280px
  * head on the left (title + sub) and an auto-fill 190px card grid on the
  * right; each card is one named subsystem with a live/pending dot.

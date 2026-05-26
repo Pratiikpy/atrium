@@ -9,7 +9,7 @@ export const metadata = {
 /**
  * /app/onboarding — first-visit flow.
  *
- * Surface matches `desing/Atrium App.standalone.html` (file5.js Onboarding):
+ * Surface matches `design/Atrium App.standalone.html` (file5.js Onboarding):
  * Welcome → Authenticator → Faucet → Margin posted → Done.
  *
  * The stepper carries local state, so the entire flow lives in a single

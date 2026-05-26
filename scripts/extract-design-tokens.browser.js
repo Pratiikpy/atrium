@@ -1,12 +1,12 @@
 // Browser-side design token extractor for Atrium.html / Atrium App.standalone.html
 //
 // HOW TO USE
-//   1. Open desing/Atrium.html in Chrome.
+//   1. Open design/Atrium.html in Chrome.
 //   2. Wait for the loading message to disappear (the React bundle unpacks).
 //   3. Open DevTools → Console.
 //   4. Paste this entire file into the console and press Enter.
 //   5. The script prints a JSON blob with every computed style token.
-//   6. Save the printed JSON to desing/extracted/full-render-tokens.json.
+//   6. Save the printed JSON to design/extracted/full-render-tokens.json.
 //
 // What it captures:
 //   - Every distinct color used in computed styles
@@ -72,7 +72,7 @@
   console.log('--- ATRIUM DESIGN TOKENS ---');
   console.log(JSON.stringify(serializable, null, 2));
   console.log('--- END ---');
-  console.log('Copy everything between the two markers and save to desing/extracted/full-render-tokens.json');
+  console.log('Copy everything between the two markers and save to design/extracted/full-render-tokens.json');
 
   return serializable;
 })();

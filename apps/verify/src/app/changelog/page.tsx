@@ -27,7 +27,7 @@ const WAVES: Wave[] = [
   {
     id: 'N',
     date: '2026-05-18',
-    scope: 'UI · desing/ fidelity',
+    scope: 'UI · design/ fidelity',
     highlight: 'Live breathing favicon, Geist body font, middot title separator, brand-kit page, full app shell (Trade / Portfolio / Vault / Agents / Markets / Settings), Team page, Manifesto page',
     count: 14,
   },

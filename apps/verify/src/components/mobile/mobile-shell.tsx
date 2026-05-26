@@ -3,7 +3,7 @@ import { MobileBottomNav } from './mobile-bottom-nav';
 
 /**
  * MobileShell  the dark OLED chrome that wraps every /app/* route on
- * narrow viewports. Source: desing/Mobile App.html structure (status bar
+ * narrow viewports. Source: design/Mobile App.html structure (status bar
  * + wordmark header + content + bottom-tab-bar).
  *
  * Rendered only at < md (Tailwind 768px). At md+ the desktop AppShell

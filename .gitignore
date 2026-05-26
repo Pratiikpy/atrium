@@ -164,8 +164,13 @@ think_data.md
 *.png
 !apps/verify/public/**/*.png
 !apps/verify/public/**/*.jpg
-!desing/**/*.png
-!desing/**/*.jpg
+
+# Design source folder — Figma-Make HTML exports + extracted fonts and
+# JS assets. Design source lives in Figma; only final brand assets ship
+# under apps/verify/public/brand/. The local design/ folder is the team's
+# reference, not part of the public product surface.
+design/
+
 london_version_open_house_buildathon_terms___conditions.pdf
 openhouse_london_tc.pdf
 atrium-site-tokens.json

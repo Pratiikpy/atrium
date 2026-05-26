@@ -6,7 +6,7 @@ import { MobileShell } from './mobile/mobile-shell';
 /**
  * AppShell — left-sidebar chrome wrapping every `/app/*` page.
  *
- * Pixel-aligned to `desing/Atrium App.standalone.html` per the playwright
+ * Pixel-aligned to `design/Atrium App.standalone.html` per the playwright
  * extraction. Layout:
  *
  *   ┌─────────────┬──────────────────────────────────────────────┐
@@ -88,7 +88,7 @@ export function AppShell({
   return (
     <>
     {/* Mobile chrome: dark OLED shell + iOS status bar + 5-tab bottom nav.
-        Source: desing/Mobile App.html. Renders only at < md; the desktop
+        Source: design/Mobile App.html. Renders only at < md; the desktop
         sidebar below is the md+ surface. Per-route children render twice
         (once in each chrome), CSS keeps only one visible. */}
     <MobileShell>{children}</MobileShell>

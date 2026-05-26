@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * Marketing header. Canon `.nav` in desing/extracted/Atriumnew/index.html:544-572
+ * Marketing header. Canon `.nav` in design/extracted/Atriumnew/index.html:544-572
  * is a 3-col grid (brand, centered nav, right CTA) with sticky 68px height and
  * blurred parchment background. Previously rendered as a 2-col flex
  * (justify-between) which left the nav links flush-left next to the brand

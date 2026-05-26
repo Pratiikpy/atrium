@@ -1,7 +1,7 @@
 import { SectionShell } from './section-shell';
 
 /**
- * Architecture section. Canon at desing/extracted/Atriumnew/index.html:1327-1355:
+ * Architecture section. Canon at design/extracted/Atriumnew/index.html:1327-1355:
  * a bordered stack of rows; each row is a 4-col grid (number / name /
  * chips of components / side meta). Renders the per-layer breakdown
  * with the visual rhythm of a technical spec sheet.

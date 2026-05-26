@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /**
- * 5-tab glass-blur bottom navigation. Source: desing/Mobile App.html:1321-1352.
+ * 5-tab glass-blur bottom navigation. Source: design/Mobile App.html:1321-1352.
  * Backdrop blur with hairline top border. Active tab has higher ink + a soft
  * accent halo. Each tab maps to a real /app/* route.
  *

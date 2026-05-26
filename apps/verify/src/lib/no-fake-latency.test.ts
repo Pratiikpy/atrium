@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
  * Audit U-38: no setTimeout / setInterval / Math.random in non-test
  * production code.
  *
- * The desing/ prototype HTMLs use setTimeout(2400) to fake passkey-signing
+ * The design/ prototype HTMLs use setTimeout(2400) to fake passkey-signing
  * latency and Math.random for synthetic mandate caps. Pre-iter-53 the
  * onboarding-flow lifted these mocks into the real app; the U-9 round
  * caught it. This invariant locks the pattern across the whole src/ tree
@@ -53,7 +53,7 @@ function stripComments(source: string): string {
 
 const BANNED: { pattern: RegExp; reason: string }[] = [
   // setTimeout/setInterval: classic fake-latency simulation pattern from
-  // the desing/ prototype. Real async state should flow from network
+  // the design/ prototype. Real async state should flow from network
   // events (fetch, wagmi tx receipts) or TanStack Query intervals.
   { pattern: /\bsetTimeout\s*\(/, reason: 'setTimeout banned in production code (fake-latency anti-pattern)' },
   { pattern: /\bsetInterval\s*\(/, reason: 'setInterval banned — use TanStack Query refetchInterval instead' },

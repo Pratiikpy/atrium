@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 
 /**
  * PortfolioMobile  the Home panel for /app/portfolio at < md.
- * Source: desing/Mobile App.html:910-1061 (hero card + 4-action grid +
+ * Source: design/Mobile App.html:910-1061 (hero card + 4-action grid +
  * positions list + activity feed). Renders the same /api/portfolio/*
  * data as the desktop variant, just stacked for thumb-reach.
  */

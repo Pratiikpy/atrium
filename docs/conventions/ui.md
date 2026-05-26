@@ -2,10 +2,10 @@
 
 ## Design source of truth
 
-The visual language lives in `desing/`. Two HTML files:
+The visual language lives in `design/`. Two HTML files:
 
-- `desing/Atrium.html`
-- `desing/Atrium App.standalone.html`
+- `design/Atrium.html`
+- `design/Atrium App.standalone.html`
 
 Before any UI work:
 
@@ -16,7 +16,7 @@ Before any UI work:
 
 Never blindly clone an existing screen unless the task is that exact screen. Use the system, not the page.
 
-## Tokens to extract from `desing/`
+## Tokens to extract from `design/`
 
 - Primary palette (parchment, terracotta accent, navy ground per the Atrium brand language)
 - Typography stack and scale (display, body, micro)
@@ -33,7 +33,7 @@ If a token is missing from the HTML files, raise it. Do not pick a number out of
 
 - Next.js 15 (App Router) on Vercel free tier
 - Tailwind v4
-- shadcn/ui base components, themed to match `desing/`
+- shadcn/ui base components, themed to match `design/`
 - Wagmi + Viem for chain reads and writes
 - TanStack Query for caching reads
 - next-pwa for the mobile path (Lighthouse ≥ 90)
@@ -90,7 +90,7 @@ Apply `docs/conventions/writing.md` to every label, button, tooltip, error. No b
 
 ## What not to do
 
-- Do not add a new color outside the palette extracted from `desing/`.
+- Do not add a new color outside the palette extracted from `design/`.
 - Do not copy a generic crypto dashboard (token list, big number grid, neon glow).
 - Do not show fake TVL or fake activity in screenshots, demos, or social posts.
 - Do not pad the page with hero filler. Lead with the product.
@@ -111,7 +111,7 @@ Anything else on mobile is bonus. The five above are required.
 
 ## Review checklist before merging UI
 
-- [ ] Matches tokens extracted from `desing/`
+- [ ] Matches tokens extracted from `design/`
 - [ ] All six states present (empty, loading, error, permission, success, mobile)
 - [ ] No mock data shown as real
 - [ ] No dead buttons

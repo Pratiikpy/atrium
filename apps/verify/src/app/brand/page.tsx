@@ -4,7 +4,7 @@ import { Wordmark } from '@/components/wordmark';
 /**
  * /brand  the Atrium brand kit page.
  *
- * Source of truth: `desing/Brand Kit.html`. Seven sections, roman numbered,
+ * Source of truth: `design/Brand Kit.html`. Seven sections, roman numbered,
  * exactly as the canon file lays them out:
  *   I.   Logo  (wordmark sizes, app-icon gallery, construction spec)
  *   II.  Typography  (7 specimens)
@@ -40,7 +40,7 @@ export default function BrandPage() {
         <h1 className="font-display text-5xl text-ink">Brand kit</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           The tokens, typography, palette, and components that ship in every Atrium surface.
-          Source of truth: <code className="font-mono text-ink">desing/Brand Kit.html</code>.
+          Source of truth: <code className="font-mono text-ink">design/Brand Kit.html</code>.
           Any disagreement between this page and the canon HTML is a bug. Open an issue or PR.
         </p>
       </section>

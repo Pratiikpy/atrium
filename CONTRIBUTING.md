@@ -36,7 +36,7 @@ Target: 3 community adapters by Day 180; 5 community agents by Day 180.
 - Stylus (Rust) contracts follow patterns in `contracts/plinth/src/lib.rs`
 - Solidity contracts use OpenZeppelin where possible (see `resources/openzeppelin-contracts/`)
 - All public-facing copy follows `docs/conventions/writing.md`
-- All UI follows `docs/conventions/ui.md` and the visual language in `desing/`
+- All UI follows `docs/conventions/ui.md` and the visual language in `design/`
 - All tests follow `docs/conventions/testing.md`
 
 ## Pull request flow

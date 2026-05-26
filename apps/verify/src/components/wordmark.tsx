@@ -11,7 +11,7 @@ const SIZE_CLASSES: Record<Size, string> = {
 
 /**
  * The Atrium wordmark — serif italic with a horizontal underline.
- * Matches the logo treatment in desing/Atrium.html.
+ * Matches the logo treatment in design/Atrium.html.
  */
 export function Wordmark({ size = 'md' }: { size?: Size }) {
   return (

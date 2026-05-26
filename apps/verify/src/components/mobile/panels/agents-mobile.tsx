@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 
 /**
  * AgentsMobile  the Agents panel for /app/agents at < md.
- * Source: desing/Mobile App.html:1185-1259. Active mandate banner +
+ * Source: design/Mobile App.html:1185-1259. Active mandate banner +
  * Rostrum top-7d list (5 rows). Reads /api/agents/mandates and
  * /api/agents/rostrum-leaderboard. Renders honest pending when those
  * endpoints return empty.

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Extract design tokens from desing/Atrium.html and Atrium App.standalone.html
+// Extract design tokens from design/Atrium.html and Atrium App.standalone.html
 //
 // The HTML files are React bundles wrapped in a custom unpacker. The bundler
 // payload is JSON with manifest + template, base64 + gzip encoded inside
@@ -9,7 +9,7 @@
 //  1. Reads both HTML files
 //  2. Pulls out the static <head> CSS tokens we can already see
 //  3. Best-effort attempts to decode the bundler payload (Node 18+ has zlib)
-//  4. Writes the result to desing/extracted/tokens.json
+//  4. Writes the result to design/extracted/tokens.json
 //
 // Run: node scripts/extract-design-tokens.mjs
 //
@@ -148,7 +148,7 @@ async function main() {
   console.log(JSON.stringify(CONFIRMED_TOKENS, null, 2));
   console.log('');
   console.log('For full fidelity run scripts/extract-design-tokens.browser.js');
-  console.log('Open desing/Atrium.html in Chrome, paste the snippet, save the output to');
+  console.log('Open design/Atrium.html in Chrome, paste the snippet, save the output to');
   console.log(`${OUT_DIR}/full-render.html`);
 }
 

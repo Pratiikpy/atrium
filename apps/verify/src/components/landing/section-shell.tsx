@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /**
  * SectionShell — the eyebrow / headline / sub lockup that every marketing
  * section uses. Matches the `.section-head.centered` pattern from
- * desing/Atrium.html. Optional `variant="dark"` flips to the inverse Sigil
+ * design/Atrium.html. Optional `variant="dark"` flips to the inverse Sigil
  * section colors.
  */
 export function SectionShell({

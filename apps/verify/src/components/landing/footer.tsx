@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 /**
  * Landing-page footer. 4-column layout matching
- * `desing/Atrium.html` file3.js (`Footer` component, lines 889–923).
+ * `design/Atrium.html` file3.js (`Footer` component, lines 889–923).
  *
  * Column order is canon: Product · Subsystems · Resources · Company.
  *

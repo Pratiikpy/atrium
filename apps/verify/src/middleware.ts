@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Mobile-UA rewrite — sends phone-sized clients to the dedicated mobile
- * landing / app shell from `desing/Mobile Landing.html` + `Mobile App.html`.
+ * landing / app shell from `design/Mobile Landing.html` + `Mobile App.html`.
  *
  * Why a middleware not a CSS media query: the mobile design is a different
  * page (OLED-dark, iPhone status bar, glass tab bar) — not a responsive

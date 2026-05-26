@@ -20,7 +20,7 @@ type TabId = (typeof TABS)[number]['id'];
  * tabs actually switch the rendered content — the old AgentTabBar was a
  * dead control: it toggled visual state but always showed Marketplace.
  *
- * Pixel-matched to `desing/Atrium App.standalone.html` file10.js (Agents).
+ * Pixel-matched to `design/Atrium App.standalone.html` file10.js (Agents).
  */
 export function AgentsView() {
   const [tab, setTab] = useState<TabId>('marketplace');

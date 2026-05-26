@@ -27,7 +27,7 @@ export function ProductSection() {
 
 /**
  * Impluvium  the Roman atrium catchment metaphor. Canon layout from
- * desing/extracted/Atriumnew/index.html:929-1046 is a rectangular
+ * design/extracted/Atriumnew/index.html:929-1046 is a rectangular
  * catchment, NOT a radial wheel. Three rows:
  *   1. 4-col venue cards (Portico-whitelisted adapters across the top)
  *   2. 200px pool row (centered TVL figure, ink border, hatch background)

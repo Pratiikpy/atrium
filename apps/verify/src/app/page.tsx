@@ -25,7 +25,7 @@ export const metadata = {
  * with no committed source, $4.20M TVL, 37 agents, 42,392 queries). All of
  * those failed the writing.md sourcing rule. The fix promotes the existing
  * `/legacy` React landing to canonical `/` - same 11-section reproduction
- * of `desing/Atrium.html` but with numbers hydrating from /api routes that
+ * of `design/Atrium.html` but with numbers hydrating from /api routes that
  * read Scribe + RPC and degrade to honest empty/zero on miss.
  */
 export default function LandingPage() {

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* Atrium design tokens — extracted from desing/Atrium.html via playwright
+/* Atrium design tokens — extracted from design/Atrium.html via playwright
  * post-React-render. Source-of-truth file at
- * desing/extracted/full-render-tokens.json.
+ * design/extracted/full-render-tokens.json.
  *
  * All colors are OKLCH. Modern color space; modern browsers support it.
  * Tailwind v4 reads these as native CSS vars.
@@ -29,7 +29,7 @@
   --color-parchment:         oklch(0.984 0.004 85);
   --color-parchment-light:   oklch(0.996 0.003 85);
 
-  /* ── Brand Kit canon (desing/Brand Kit.html Section III) ─────────────
+  /* ── Brand Kit canon (design/Brand Kit.html Section III) ─────────────
    * Eight tokens. New code uses these names. Legacy names below are
    * aliases that resolve to the same OKLCH values, kept for one cycle
    * so the 41-file class-name sweep (bg-terracotta → bg-accent, etc.)
@@ -70,7 +70,7 @@
   --color-dark-white-50:  oklch(1 0 0 / 0.5);
   --color-dark-white-55:  oklch(1 0 0 / 0.55);
 
-  /* ── Mobile-native OLED palette (desing/Mobile App.html lines 13-28).
+  /* ── Mobile-native OLED palette (design/Mobile App.html lines 13-28).
    *   Slightly cooler dark with more contrast for OLED. Used by the
    *   /app/* mobile responsive branch. Reused across Mobile Landing too.
    *   Tokens prefixed `mob-` so they don't collide with the desktop
@@ -174,7 +174,7 @@ body { margin: 0; padding: 0; font-weight: 400; }
   letter-spacing: -0.02em;
 }
 
-/* The Atrium wordmark — matches desing/ logo treatment */
+/* The Atrium wordmark — matches design/ logo treatment */
 .wordmark {
   font-family: var(--font-display);
   font-style: italic;
