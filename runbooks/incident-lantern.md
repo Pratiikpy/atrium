@@ -23,7 +23,7 @@ balances. When publication stops, `/lantern` dashboard renders honest
 1. `curl https://verify.atrium.fi/api/lantern/latest` . inspect
    `timestamp` field.
 2. Check the Lantern attestor host (Vercel cron OR `$5 VPS` per
-   `human_left.md`). Log tail for the most recent tick.
+   the internal ops log). Log tail for the most recent tick.
 3. Check signing key health: `cast call <lantern-attestor>
    "signing_key()" --rpc-url $RPC`. Must match the env-loaded key
    address. If mismatched, `LANTERN_KEY_ENVELOPE_JSON` Vercel env
@@ -35,7 +35,7 @@ balances. When publication stops, `/lantern` dashboard renders honest
 
 | Symptom | Fix |
 |---|---|
-| Cron not firing | trigger manual run via praetor-cli `lantern publish-now` (Phase ζ.6) |
+| Cron not firing | trigger manual run via praetor-cli `lantern publish-now` (an earlier hardening cycle) |
 | Signing key mismatch | redeploy lantern-attestor with correct `LANTERN_KEY_ENVELOPE_JSON` |
 | Scribe stale | see `runbooks/incident-scribe.md` (subgraph stalled) |
 | Wrong root published | DO NOT REVERT  the publish is on-chain. File `/incidents/` immediately, publish a corrective attestation in the next hour with a `correction-of-root: 0x...` note in the IPFS pin. |

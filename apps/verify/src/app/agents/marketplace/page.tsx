@@ -87,7 +87,7 @@ export default function AgentsMarketplacePage() {
         <RecessedCard className="mt-6">
           <p className="text-sm text-ink-soft">
             No community agents submitted yet. The Curator grant program opens
-            with the buildathon submission. See <code className="font-mono text-ink">agents/template/</code>
+            with the production release. See <code className="font-mono text-ink">agents/template/</code>
             for the scaffold layout.
           </p>
           <div className="mt-4">

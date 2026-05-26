@@ -22,7 +22,7 @@ export default function TeamPage() {
         <h1 className="font-display text-5xl text-ink">Team</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Three founders. Open GitHub histories. Year-1 testnet on $0 founder capital.
-          Year 2 raises with the buildathon track record as the credential.
+          Year 2 raises with the Year-1 testnet track record as the credential.
         </p>
       </section>
 

@@ -117,7 +117,7 @@ const DISCLOSURES: Disclosure[] = [
     id: 'reference-agents',
     surface: 'Reference agents (Augur, Haruspex, Auspex)',
     what:
-      'The three reference agents live as Vercel cron services and tick on schedule (Augur 5-min, Haruspex 1-hour, Auspex daily). Each tick reads its mandates from Codex + Scribe and records observation notes. Production behaviour would build an ActionSigil from the observation, sign it with the agent\'s session key, and submit via AtriumRouter.openPositionViaAdapter. The buildathon scaffold logs `would-act-on: <intentHash>` instead so the agents are demonstrably alive without spending mandate budget or risking user collateral.',
+      'The three reference agents live as Vercel cron services and tick on schedule (Augur 5-min, Haruspex 1-hour, Auspex daily). Each tick reads its mandates from Codex + Scribe and records observation notes. Production behaviour would build an ActionSigil from the observation, sign it with the agent\'s session key, and submit via AtriumRouter.openPositionViaAdapter. The current scaffold logs `would-act-on: <intentHash>` instead so the agents are demonstrably alive without spending mandate budget or risking user collateral.',
     why:
       'Each agent that actually acts needs (1) a dedicated session-key EOA provisioned in Vercel env, (2) a signed IntentSigil mandate from a real user funded with USDC + collateral, (3) clear risk boundaries on what each strategy can do. Without (1)-(3) the agents would either no-op (no real mandate) or burn whatever testnet USDC the founder funds. Either path is worse than the honest stub.',
     whenReal:

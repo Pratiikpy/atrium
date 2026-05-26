@@ -50,5 +50,5 @@ the /research dashboard renders stale.
 
 ## Escalation contacts
 
-- F3 (research + archive owner) per `runbooks/on-call-rotation.md`
+- On-call ops owner per `runbooks/on-call-rotation.md`
 - web3.storage support for IPFS pinning issues

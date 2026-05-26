@@ -142,7 +142,7 @@ export default function MarketsPage() {
         <h2 className="font-display text-xl text-ink">Add a venue</h2>
         <p className="mt-2 text-sm text-ink-soft">
           Adapters follow the <code className="font-mono text-ink">IPorticoAdapter v1.0</code> standard,
-          MIT-licensed at buildathon end. Curator grant of $5K ARB per accepted adapter.
+          MIT-licensed. Curator grant of $5K ARB per accepted adapter.
         </p>
         <Link href="/learn#adapters" className="mt-3 inline-block text-sm text-ink underline-offset-2 hover:underline">
           Read the adapter spec

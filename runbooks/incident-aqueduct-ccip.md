@@ -57,6 +57,6 @@ window per the claim-then-ack race (TDD §7.6).
 
 ## Escalation contacts
 
-- F1 (contract owner) per `runbooks/on-call-rotation.md`
+- On-call contract owner per `runbooks/on-call-rotation.md`
 - Chainlink CCIP support: https://chain.link/support
 - Curator multisig (Praetor) for emergency-pause execution

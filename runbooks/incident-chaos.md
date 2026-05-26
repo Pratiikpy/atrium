@@ -2,7 +2,7 @@
 
 Chaos Mode is the judge-facing demo lever that injects a controlled
 oracle-drift OR keeper-pause OR Plinth-pause via the Praetor multisig
-(Phase ζ.5). A misfire means either the chaos toggle did NOT actually
+(an earlier hardening cycle). A misfire means either the chaos toggle did NOT actually
 pause anything, OR (worse) the resume path is stuck and the subsystem
 stays paused after the demo.
 
@@ -53,5 +53,5 @@ stays paused after the demo.
 
 ## Escalation contacts
 
-- F3 (demo lead) per `runbooks/on-call-rotation.md`
+- On-call demo lead per `runbooks/on-call-rotation.md`
 - Praetor multisig signers (3-of-5) for emergency resume

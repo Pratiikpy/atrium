@@ -41,7 +41,7 @@ export default function TermsPage() {
         <section>
           <h2 className="font-display text-2xl text-ink">License</h2>
           <p className="mt-2">
-            Atrium source code is MIT-licensed at buildathon end (Jun 24, 2026). The
+            Atrium source code is MIT-licensed source available now. The
             <code className="font-mono text-ink"> IPorticoAdapter v1.0</code> adapter standard
             is open from Day 1. Reference repos in <code className="font-mono text-ink">resources/</code>
             keep their own licenses (GPL-3.0 for ERC-4337 EntryPoint, BUSL for Aave V3) — integration only,

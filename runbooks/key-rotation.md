@@ -35,7 +35,7 @@ Praetor multisig and EOA founder hardware wallets are out of scope here — thos
 
 ## Chaos drill key (per drill)
 
-The Chaos Mode (Phase ζ.5) uses an isolated EOA so a drill cannot
+The Chaos Mode (an earlier hardening cycle) uses an isolated EOA so a drill cannot
 accidentally leak the deployer or keeper key. Rotate before every
 demo + after every public rehearsal.
 
@@ -48,7 +48,7 @@ demo + after every public rehearsal.
 
 ## Sumsub webhook secret (on compromise or quarterly)
 
-The KYC webhook (Phase η.3) signs each callback with a shared secret.
+The KYC webhook (an earlier hardening cycle) signs each callback with a shared secret.
 A compromise lets an attacker fabricate tier-upgrade events that
 move users into higher-leverage tiers without real KYC.
 
@@ -81,7 +81,7 @@ the /research page would display as canonical.
 ## Notifier internal key (on compromise or quarterly)
 
 `ATRIUM_INTERNAL_KEY` is the Bearer token the notifier service passes
-to the verify-app's `/api/settings/notifications` route (Phase θ.2
+to the verify-app's `/api/settings/notifications` route (an earlier hardening cycle
 auth fix). A leak lets an attacker read or overwrite any user's
 notification prefs.
 

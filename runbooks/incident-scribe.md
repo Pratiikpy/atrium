@@ -52,5 +52,5 @@ state.
 
 ## Escalation contacts
 
-- F2 (subgraph owner) per `runbooks/on-call-rotation.md`
+- On-call frontend (subgraph owner) per `runbooks/on-call-rotation.md`
 - The Graph Studio support (free tier — best-effort SLA)

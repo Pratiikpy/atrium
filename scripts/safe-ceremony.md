@@ -1,7 +1,7 @@
 # 3-of-5 Safe ceremony runbook
 
-Phase eta.4. Right now `praetor_multisig = deployer EOA` on every
-Atrium contract. Any single key compromise = total protocol drain.
+Right now `praetor_multisig = deployer EOA` on every Atrium contract.
+Any single key compromise = total protocol drain.
 The deployer EOA was leaked locally on 2026-05-24 (see
 `incidents/2026-05-24-deployer-key-leaked-to-local-temp-log.md`).
 This ceremony hands admin to a 3-of-5 Gnosis Safe.
@@ -125,7 +125,7 @@ Add `tripwires/2026-XX-3of5-safe-migration-complete.md` recording:
 
 - The keeper key, the Lantern signing key, the Chaos drill key remain
   per-service EOAs. Those are documented separately in
-  `human_left.md` under each service.
+  the internal ops log under each service.
 - The Safe itself is not a hardware-recovery system. If three signers
   lose their hardware wallets, Atrium is locked. Each signer must
   keep their recovery phrase in a separate secure location.

@@ -37,7 +37,7 @@ events still happen but users are not paged.
 | `fetchPrefs` 401s | Confirm `ATRIUM_INTERNAL_KEY` matches between notifier + verify-app deploys | yes |
 | KV cursor frozen | Manually reset: `SET notifier:lastBlock <recent-block>` via Upstash UI | yes |
 | Telegram bot blocked | Rotate `TELEGRAM_BOT_TOKEN`; users re-`/start` the bot | yes |
-| Resend rate limit | Drop email cadence to once-per-event-class; document in `human_left.md` | yes |
+| Resend rate limit | Drop email cadence to once-per-event-class; document in the internal ops log | yes |
 | Scribe down | Wait — notifier resumes on next tick once Scribe returns | yes |
 
 ## Resolution checklist
@@ -50,6 +50,6 @@ events still happen but users are not paged.
 
 ## Escalation contacts
 
-- F2 (notifier service owner) per `runbooks/on-call-rotation.md`
+- On-call frontend (notifier service owner) per `runbooks/on-call-rotation.md`
 - Vercel KV support if KV REST API returns 5xx
 - Telegram / Discord / Resend support per the failing channel
