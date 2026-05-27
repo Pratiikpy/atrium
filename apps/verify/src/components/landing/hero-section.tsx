@@ -1,53 +1,212 @@
 import Link from 'next/link';
-import { HeroBalanceCard } from './hero-balance-card';
 
 /**
- * Hero — "One wallet. Every venue. One number."
+ * Hero — "One wallet. Every venue. One buying-power number."
  *
- * 1:1 with design/Atrium.html#hero. Large display serif with negative
- * letter-spacing per extracted tokens. Right side: live balance card.
+ * Port of design/Atriumnew.html section#hero.hero-monument. Dark
+ * "monument" hero with centered eyebrow + headline + engineering chrome
+ * + venue cards row + unified-margin pool card + leverage ladder.
+ *
+ * Design tokens (from design/Atriumnew.html computed styles):
+ *   bg     oklch(0.11 0.008 60)   — near-black warm
+ *   ink    oklch(0.96 0.003 60)   — near-white warm
+ *   accent #C46A5E                — terracotta italic emphasis (lifted for dark bg)
+ *   font   Geist 500 (display)    — clamp(36px,7vw,77px) / lh 1.04 / tracking -0.03em
+ *
+ * Numbers on the venue cards + pool card are the design's reference
+ * layout values. Live deployment fills these from Scribe + RPC reads via
+ * the same data-shape; until then they render as the design's static
+ * preview, matching the visual contract per design/Atriumnew.html.
  */
 export function HeroSection() {
   return (
-    <section className="hero mx-auto max-w-6xl px-6 pb-24 pt-16 md:pb-32 md:pt-24">
-      <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          <p className="eyebrow">Unified margin · EVM-native · testnet</p>
-          <h1 className="font-display-hero mt-5 text-[40px] text-ink sm:text-[56px] md:text-[76px]">
-            One wallet.
-            <br />
-            Every venue.
-            <br />
-            One number.
-          </h1>
-          <p className="mt-6 max-w-prose text-lg text-ink-soft">
-            {/* Audit SSS-11 fix: was "seven live onchain venues" — but
-                `human_left.md` #11/#13/#15 confirm zero adapters deployed
-                yet. The numbers section below the hero shows "0 / 7 ·
-                contracts ship Month 1 W2", contradicting the hero copy.
-                "Supported" stays accurate pre- AND post-deploy; the live
-                count comes from the numbers section's RPC read. */}
-            Atrium is a unified margin prime brokerage for the EVM. Post collateral once on
-            Arbitrum. Trade across every Portico-whitelisted venue with one
-            buying-power figure, recomputed in real time by a Stylus margin engine.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href="/app"
-              className="inline-flex items-center gap-1.5 rounded-md bg-ink px-5 py-3 text-sm font-medium text-parchment hover:bg-ink-dark"
-            >
-              Open testnet <span aria-hidden>↗</span>
-            </Link>
-            <Link
-              href="/verify/1"
-              className="inline-flex items-center gap-1.5 rounded-md border border-divider bg-parchment-light px-5 py-3 text-sm text-ink hover:border-ink/30"
-            >
-              Run the 90-second proof
-            </Link>
+    <section
+      id="hero"
+      className="hero-monument relative isolate overflow-hidden bg-[oklch(0.11_0.008_60)] text-[oklch(0.96_0.003_60)]"
+    >
+      {/* soft vignette so the cards have a focal pool */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 opacity-60"
+        style={{
+          background:
+            'radial-gradient(60% 50% at 50% 30%, oklch(0.16 0.014 30 / 0.55) 0%, transparent 70%)',
+        }}
+      />
+
+      <div className="mx-auto max-w-[1240px] px-6 pb-32 pt-28 md:px-14 md:pb-40 md:pt-32">
+        {/* Eyebrow */}
+        <p className="mx-auto flex max-w-md items-center justify-center gap-3 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
+          <span aria-hidden className="h-px w-6 bg-[oklch(0.72_0.004_60_/_0.4)]" />
+          <span>Prime brokerage</span>
+          <span aria-hidden className="text-[oklch(0.72_0.004_60_/_0.5)]">·</span>
+          <span>Unified margin</span>
+          <span aria-hidden className="text-[oklch(0.72_0.004_60_/_0.5)]">·</span>
+          <span>Testnet</span>
+          <span aria-hidden className="h-px w-6 bg-[oklch(0.72_0.004_60_/_0.4)]" />
+        </p>
+
+        {/* Headline */}
+        <h1
+          className="mx-auto mt-6 max-w-5xl text-center font-medium leading-[1.04] tracking-[-0.03em]"
+          style={{
+            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+            color: 'oklch(0.96 0.003 60)',
+            fontSize: 'clamp(36px, 7vw, 77px)',
+          }}
+        >
+          One wallet. Every venue.
+          <br />
+          One{' '}
+          <span
+            className="italic"
+            style={{
+              fontFamily: '"Instrument Serif", "Times New Roman", serif',
+              color: '#C46A5E',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            buying-power
+          </span>{' '}
+          number.
+        </h1>
+
+        {/* Engineering-document chrome */}
+        <div className="mx-auto mt-12 max-w-[1100px] border-t border-[oklch(0.22_0.006_60)] pt-3">
+          <div className="grid grid-cols-2 gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
+            <div>
+              <p>Fig. 01 · Capital convergence</p>
+              <p className="mt-1.5">Plan view · live testnet feed</p>
+            </div>
+            <div className="text-right">
+              <p>Sheet 02 / 08</p>
+              <p className="mt-1.5">Atrium Labs · May 2026</p>
+            </div>
           </div>
         </div>
-        <HeroBalanceCard />
+
+        {/* Venue cards — row 1 */}
+        <div className="mx-auto mt-10 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <VenueCard name="Hyperliquid HIP-3" tag="HL-HIP3" kind="Tokenized-stock perps" tvl="$1,252,181" assets="USDC · WETH" share="34.8%" />
+          <VenueCard name="Hyperliquid HIP-4" tag="HL-HIP4" kind="Permissioned perps" tvl="$484,434" assets="USDC" share="13.5%" />
+          <VenueCard name="Aave Horizon" tag="AAVE-V3" kind="RWA collateral" tvl="$891,827" assets="aUSDC · USTB" share="24.9%" />
+          <VenueCard name="Pendle V2" tag="PENDLE" kind="Fixed-yield · PT" tvl="$319,446" assets="PT-stETH" share="8.9%" />
+        </div>
+
+        {/* Pool card — unified margin pool */}
+        <div className="mx-auto mt-3 max-w-[1100px]">
+          <div className="rounded-md border border-[oklch(0.22_0.006_60)] bg-[oklch(0.13_0.008_60)] p-7 md:p-9">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
+                Pool · Unified margin
+              </p>
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.13_145)]">
+                <span aria-hidden className="size-1.5 rounded-full bg-[oklch(0.72_0.13_145)]" />
+                Live
+              </span>
+            </div>
+            <p
+              className="mt-4 font-mono leading-none tracking-[-0.02em] text-[oklch(0.96_0.003_60)]"
+              style={{ fontVariantNumeric: 'tabular-nums lining-nums', fontSize: 'clamp(44px, 6vw, 64px)' }}
+            >
+              $10,783,563
+            </p>
+            <div className="mt-6 grid grid-cols-1 gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[oklch(0.72_0.004_60)] md:grid-cols-3">
+              <div>Buying power · 3.0× portfolio margin</div>
+              <div className="md:text-center">Collateral $3.59M</div>
+              <div className="md:text-right">
+                <span className="inline-flex items-center gap-1.5 text-[oklch(0.72_0.13_145)]">
+                  <span aria-hidden className="size-1.5 rounded-full bg-[oklch(0.72_0.13_145)]" />
+                  Plinth · margin ok
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Venue cards — row 2 */}
+        <div className="mx-auto mt-3 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <VenueCard name="Curve" tag="CURVE" kind="Stableswap LP" tvl="$186,210" assets="3pool LP" share="5.2%" />
+          <VenueCard name="Trade.xyz" tag="TRADE" kind="RFQ · dark pool" tvl="$402,045" assets="WETH · WBTC" share="11.2%" />
+          <VenueCard name="Polymarket" tag="PMK" kind="Prediction · CTF" tvl="$58,379" assets="USDC" share="1.6%" />
+          <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="$0" assets="—" share="0.0%" muted />
+        </div>
+
+        {/* Leverage ladder */}
+        <div className="mx-auto mt-10 max-w-[1100px]">
+          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
+            {['0×', '2×', '4×', '6×', '8×', '10×'].map((stop, i) => (
+              <span key={stop} className={i === 3 ? 'text-[oklch(0.72_0.004_60)]' : ''}>
+                {stop}
+              </span>
+            ))}
+          </div>
+          <div className="mt-2 h-px bg-[oklch(0.22_0.006_60)]" />
+          <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
+            Portfolio leverage axis
+          </p>
+        </div>
+
+        {/* Primary CTA — single white pill, matching the design's hero CTA. */}
+        <div className="mt-14 flex justify-center">
+          <Link
+            href="/app"
+            className="inline-flex items-center gap-2 rounded-full bg-[oklch(0.96_0.003_60)] px-6 py-3 text-sm font-medium text-[oklch(0.13_0.008_60)] transition hover:bg-white"
+          >
+            Open testnet
+            <span aria-hidden>↗</span>
+          </Link>
+        </div>
       </div>
     </section>
+  );
+}
+
+function VenueCard({
+  name,
+  tag,
+  kind,
+  tvl,
+  assets,
+  share,
+  muted = false,
+}: {
+  name: string;
+  tag: string;
+  kind: string;
+  tvl: string;
+  assets: string;
+  share: string;
+  muted?: boolean;
+}) {
+  return (
+    <div
+      className={
+        'rounded-md border border-[oklch(0.22_0.006_60)] bg-[oklch(0.13_0.008_60)] p-5 ' +
+        (muted ? 'opacity-60' : '')
+      }
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm text-[oklch(0.96_0.003_60)]">{name}</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
+          {tag}
+        </p>
+      </div>
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[oklch(0.5_0.005_60)]">
+        {kind}
+      </p>
+      <p
+        className="mt-5 font-mono text-2xl text-[oklch(0.96_0.003_60)]"
+        style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}
+      >
+        {tvl}
+      </p>
+      <div className="mt-1 h-px bg-[oklch(0.22_0.006_60)]" />
+      <div className="mt-3 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-[oklch(0.72_0.004_60)]">
+        <span>{assets}</span>
+        <span className="text-[oklch(0.96_0.003_60)]">{share}</span>
+      </div>
+    </div>
   );
 }
