@@ -15,22 +15,17 @@ import { LandingFooter } from '@/components/landing/footer';
 export const metadata = {
   title: 'Atrium - unified margin prime brokerage for the EVM',
   description:
-    'One wallet. Every venue. One number. Atrium nets your collateral across seven onchain venues under one SPAN-style margin calculation.',
+    'One wallet. Every venue. One buying-power number. Atrium nets your collateral across seven onchain venues under one SPAN-style margin calculation.',
 };
 
 /**
- * Audit 2026-05-24 C-3 fix: the prior root `/` was rewritten in
- * `next.config.mjs` to a 1.6 MB static `landing-v2.html` Vite-dev bundle
- * with hardcoded fake numbers (Math.random TVL ticker, eight partner logos
- * with no committed source, $4.20M TVL, 37 agents, 42,392 queries). All of
- * those failed the writing.md sourcing rule. The fix promotes the existing
- * `/legacy` React landing to canonical `/` - same 11-section reproduction
- * of `design/Atrium.html` but with numbers hydrating from /api routes that
- * read Scribe + RPC and degrade to honest empty/zero on miss.
+ * Landing page — port of design/Atriumnew.html. Each section owns its
+ * own background; the dark hero + dark agents + dark closing form the
+ * page's chrome anchors, with cream sections between.
  */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-screen" style={{ backgroundColor: 'oklch(0.984 0.004 85)' }}>
       <LandingHeader />
       <HeroSection />
       <ProductSection />

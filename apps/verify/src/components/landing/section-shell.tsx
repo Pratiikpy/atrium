@@ -2,9 +2,14 @@ import type { ReactNode } from 'react';
 
 /**
  * SectionShell — the eyebrow / headline / sub lockup that every marketing
- * section uses. Matches the `.section-head.centered` pattern from
- * design/Atrium.html. Optional `variant="dark"` flips to the inverse Sigil
- * section colors.
+ * section uses. Ports the `.section-head.centered` pattern from
+ * design/Atriumnew.html. Headings are Geist 500 (bold sans), matching
+ * the design's headline treatment; the italic Instrument Serif accent
+ * is reserved for emphasis words inside specific headings (e.g. the
+ * hero's 'buying-power').
+ *
+ * Optional `variant="dark"` switches to the inverse palette for the
+ * Agents section (and any other section that lands on `--dark-bg`).
  */
 export function SectionShell({
   id,
@@ -25,31 +30,51 @@ export function SectionShell({
   return (
     <section
       id={id}
-      className={
-        'border-t ' +
-        (isDark
-          ? 'section-dark border-ink-darkest'
-          : 'border-divider bg-parchment')
+      className={isDark ? 'border-t' : 'border-t'}
+      style={
+        isDark
+          ? {
+              backgroundColor: 'oklch(0.11 0.008 60)',
+              color: 'oklch(0.96 0.003 60)',
+              borderColor: 'oklch(0.22 0.006 60)',
+            }
+          : {
+              backgroundColor: 'oklch(0.984 0.004 85)',
+              color: 'oklch(0.13 0.008 60)',
+              borderColor: 'oklch(0.88 0.004 60)',
+            }
       }
     >
-      <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+      <div className="mx-auto max-w-[1240px] px-6 py-24 md:px-14 md:py-32">
         <div className="section-head centered mx-auto max-w-3xl text-center">
-          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <h2 className="mt-3 font-display text-4xl italic md:text-[42px]" style={{ letterSpacing: '-0.02em' }}>
+          {eyebrow && (
+            <p
+              className="font-mono text-[11px] uppercase tracking-[0.18em]"
+              style={{ color: isDark ? 'oklch(0.72 0.004 60)' : 'oklch(0.54 0.005 60)' }}
+            >
+              {eyebrow}
+            </p>
+          )}
+          <h2
+            className="mt-5 font-medium leading-[1.08] tracking-[-0.02em]"
+            style={{
+              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+              fontSize: 'clamp(30px, 4vw, 48px)',
+              color: isDark ? 'oklch(0.96 0.003 60)' : 'oklch(0.13 0.008 60)',
+            }}
+          >
             {headline}
           </h2>
           {sub && (
             <p
-              className={
-                'section-sub mx-auto mt-5 max-w-prose text-lg ' +
-                (isDark ? 'text-dark-white-55' : 'text-ink-soft')
-              }
+              className="mx-auto mt-6 max-w-prose text-lg leading-relaxed"
+              style={{ color: isDark ? 'oklch(0.72 0.004 60)' : 'oklch(0.28 0.006 60)' }}
             >
               {sub}
             </p>
           )}
         </div>
-        {children && <div className="mt-12 md:mt-16">{children}</div>}
+        {children && <div className="mt-14 md:mt-16">{children}</div>}
       </div>
     </section>
   );
