@@ -95,10 +95,21 @@
   --color-status-green: var(--color-live);
   --color-status-red:   var(--color-neg);
 
-  /* ── Typography ──────────────────────────────────────────────────── */
-  --font-display: "Instrument Serif", "Times New Roman", serif;
+  /* ── Typography ──────────────────────────────────────────────────────
+   * Updated to match design/Atriumnew.html: the display face is Geist
+   * (sans) — the design uses bold-sans Geist for every section heading
+   * + every data label. The italic Instrument Serif is no longer the
+   * default display face; it's reserved for two specific accents:
+   *   1. the Atrium wordmark (inline `fontFamily: '"Instrument Serif"…'`
+   *      in components/wordmark.tsx)
+   *   2. the landing hero's italic-terracotta emphasis word
+   *      ('buying-power' in components/landing/hero-section.tsx)
+   * --font-serif is kept available for those two surfaces.
+   */
+  --font-display: Geist, ui-sans-serif, system-ui, sans-serif;
   --font-body:    Geist, ui-sans-serif, system-ui, sans-serif;
   --font-mono:    "Geist Mono", ui-monospace, monospace;
+  --font-serif:   "Instrument Serif", "Times New Roman", serif;
 
   /* ── Spacing scale (matches the extracted px values) ─────────────── */
   /* NOTE: prefixed with --gap- instead of --spacing- because Tailwind v4
