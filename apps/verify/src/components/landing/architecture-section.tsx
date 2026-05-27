@@ -56,9 +56,10 @@ const ROWS: ArchRow[] = [
 export function ArchitectureSection() {
   return (
     <SectionShell
+      id="architecture"
       eyebrow="Architecture"
-      headline="Five layers. One contract surface."
-      sub="Risk math lives in Rust as Stylus. The venue layer lives in Solidity on OpenZeppelin patterns. Chainlink CCIP is the messaging bus between chains. Every admin call routes through a 48-hour timelock."
+      headline="Stylus for hot math. Solidity for the venue layer."
+      sub="Risk math lives in Rust on Stylus. The venue layer lives in Solidity on OpenZeppelin patterns. Chainlink CCIP carries collateral between chains. Every admin call routes through a 48-hour timelock."
     >
       <div className="mx-auto mt-16 max-w-5xl overflow-hidden rounded-2xl border border-divider bg-parchment-light">
         {ROWS.map((r, i) => (

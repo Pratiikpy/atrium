@@ -15,10 +15,10 @@ export function ProductSection() {
   const count = VENUE_COUNT;
   return (
     <SectionShell
-      id="product"
+      id="portfolio"
       eyebrow="The product"
-      headline={`${capitalize(numberWord(count))} live venues feed one buying-power number.`}
-      sub="Plinth, the Stylus margin engine, reads collateral across every venue you hold positions in and computes a SPAN-style cross-product margin figure, live, on testnet."
+      headline="Capital efficiency, mathematically."
+      sub={`Plinth, the Stylus margin engine, reads collateral across every venue you hold positions in and computes a SPAN-style cross-product margin figure, live, on testnet. ${capitalize(numberWord(count))} venues feed one buying-power number.`}
     >
       <ImpluviumDiagram />
     </SectionShell>

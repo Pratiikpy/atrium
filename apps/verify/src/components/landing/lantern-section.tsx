@@ -3,13 +3,9 @@ import { SectionShell } from './section-shell';
 export function LanternSection() {
   return (
     <SectionShell
+      id="reserves"
       eyebrow="Lantern · proof-of-reserves"
-      headline={
-        <>
-          Every dollar,
-          <br className="hidden md:inline" /> on the public record.
-        </>
-      }
+      headline="Every dollar, on the public record."
       sub="Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally — without trusting Atrium."
     >
       <MerkleTreeViz />

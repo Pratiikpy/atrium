@@ -22,8 +22,9 @@ export function CohortSection() {
   const { data } = useQuery({ queryKey: ['cohort-lite'], queryFn: fetchCohort, refetchInterval: 5 * 60_000 });
   return (
     <SectionShell
+      id="network"
       eyebrow="Built with"
-      headline="Venue and infrastructure partners across the EVM stack."
+      headline="Venue and infrastructure partners across the EVM stack, shipping with us from day one."
       sub="The cohort grows as partners sign onboarding LOIs. Today the page shows the live signed count from Scribe — never an inflated number."
     >
       {(!data || data.partners.length === 0) ? (

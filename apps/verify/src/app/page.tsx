@@ -1,7 +1,6 @@
 import { LandingHeader } from '@/components/landing/header';
 import { HeroSection } from '@/components/landing/hero-section';
 import { ProductSection } from '@/components/landing/product-section';
-import { PlinthSection } from '@/components/landing/plinth-section';
 import { AqueductSection } from '@/components/landing/aqueduct-section';
 import { SigilSection } from '@/components/landing/sigil-section';
 import { LanternSection } from '@/components/landing/lantern-section';
@@ -29,7 +28,6 @@ export default function LandingPage() {
       <LandingHeader />
       <HeroSection />
       <ProductSection />
-      <PlinthSection />
       <AqueductSection />
       <SigilSection />
       <LanternSection />

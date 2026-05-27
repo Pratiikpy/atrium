@@ -3,15 +3,10 @@ import { SectionShell } from './section-shell';
 export function AqueductSection() {
   return (
     <SectionShell
-      id="network"
+      id="bridge"
       eyebrow="Aqueduct · Chainlink CCIP"
-      headline={
-        <>
-          Move collateral between chains in
-          <br className="hidden md:inline" /> one transaction.
-        </>
-      }
-      sub="Aqueduct routes assets through Chainlink CCIP. Collateral posted on a destination chain becomes Plinth credit on Arbitrum in 7–12 seconds on testnet. (Robinhood Chain support pending the public SDK — `human_left.md` #3.)"
+      headline="Move collateral between chains in one transaction."
+      sub="Aqueduct routes assets through Chainlink CCIP. Collateral posted on a destination chain becomes Plinth credit on Arbitrum in 7–12 seconds on testnet. Robinhood Chain support lands once the upstream SDK publishes."
     >
       <ChainFlowDiagram />
     </SectionShell>
