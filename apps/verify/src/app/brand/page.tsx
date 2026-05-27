@@ -37,7 +37,16 @@ export default function BrandPage() {
       </header>
 
       <section className="mt-16">
-        <h1 className="font-display text-5xl text-ink">Brand kit</h1>
+        <h1
+          className="font-medium text-ink"
+          style={{
+            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+            fontSize: 56,
+            letterSpacing: '-0.03em',
+          }}
+        >
+          Atrium brand.
+        </h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           The tokens, typography, palette, and components that ship in every Atrium surface.
           Source of truth: <code className="font-mono text-ink">design/Brand Kit.html</code>.
