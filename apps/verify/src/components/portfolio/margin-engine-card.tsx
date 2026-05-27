@@ -29,7 +29,12 @@ export function MarginEngineCard() {
       <header className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow">Plinth · margin engine</p>
-          <p className="mt-1 font-display text-xl italic text-ink">Account health</p>
+          <p
+            className="mt-1 font-medium tracking-[-0.02em] text-ink"
+            style={{ fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif', fontSize: 22 }}
+          >
+            Account health
+          </p>
         </div>
         <span className="text-xs text-muted">SPAN cross-product</span>
       </header>

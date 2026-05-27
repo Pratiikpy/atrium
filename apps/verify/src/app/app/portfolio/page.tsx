@@ -53,16 +53,26 @@ export default function PortfolioPage() {
       <div className="hidden md:block">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Portfolio</p>
-          <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">Unified margin</h1>
-          {/* Audit AAAA-1 fix: pre-fix the header rendered `● Plinth live` —
-              hardcoded green-dot + "live" status claim. But per `human_left.md`
-              #13 Plinth isn't deployed yet, and every component on this same
-              page (MarginEngineCard, BuyingPowerCard, etc.) honestly shows
-              `source: 'pending'`. The header contradicted its own contents.
-              Now: neutral descriptor "Plinth · margin engine" — live/pending
-              status comes from the cards below where it's actually sourced. */}
-          <p className="mt-2 text-sm text-muted">
+          <p
+            className="font-mono text-[11px] uppercase tracking-[0.18em]"
+            style={{ color: 'oklch(0.54 0.005 60)' }}
+          >
+            Portfolio
+          </p>
+          <h1
+            className="mt-2 font-medium leading-[1.04] tracking-[-0.03em]"
+            style={{
+              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+              fontSize: 'clamp(36px, 4.5vw, 56px)',
+              color: 'oklch(0.13 0.008 60)',
+            }}
+          >
+            Unified margin
+          </h1>
+          <p
+            className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em]"
+            style={{ color: 'oklch(0.54 0.005 60)' }}
+          >
             Plinth · margin engine
             <span className="mx-2">·</span>
             arb-sepolia
@@ -109,7 +119,16 @@ export default function PortfolioPage() {
         <PositionsFilter />
         <aside>
           <header className="mb-3 flex items-baseline justify-between">
-            <h2 className="font-display text-xl italic text-ink">Activity</h2>
+            <h2
+            className="font-medium tracking-[-0.02em]"
+            style={{
+              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+              fontSize: '20px',
+              color: 'oklch(0.13 0.008 60)',
+            }}
+          >
+            Activity
+          </h2>
             <Link href="/app/portfolio/activity" className="text-xs text-muted hover:text-ink">
               View all
             </Link>

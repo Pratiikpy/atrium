@@ -32,7 +32,15 @@ export function BuyingPowerCard() {
       <header className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow">Buying power · 30 days</p>
-          <p className="mt-1 font-display text-3xl italic text-ink">
+          <p
+            className="mt-1 font-medium text-ink"
+            style={{
+              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+              fontSize: 28,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
             {isLoading ? <span className="skeleton inline-block h-8 w-40 rounded" /> : data?.currentUsd ?? '—'}
           </p>
         </div>
