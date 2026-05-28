@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
 import { AuditFindingsTable } from '@/components/security/audit-findings-table';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium — security',
@@ -9,9 +10,9 @@ export const metadata = {
 
 export default function SecurityPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <Wordmark size="sm" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Security</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-3xl">
+      <h1 className="font-display text-5xl text-ink">Security</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Atrium targets Arbitrum Sepolia testnet in Year 1. No user funds will be at real economic
         risk. Below is the security model we design to. Where live code differs, the gap is
@@ -76,7 +77,8 @@ export default function SecurityPage() {
       >
         Back to Atrium
       </Link>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

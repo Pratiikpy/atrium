@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
 import { Card, RecessedCard, Tag } from '@/components/ui';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /changelog — public-facing release timeline.
@@ -54,17 +55,9 @@ export const metadata = {
 
 export default function ChangelogPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/security" className="hover:text-ink">Security</Link>
-          <Link href="/app" className="hover:text-ink">App</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-4xl">
+      <section>
         <h1 className="font-display text-5xl text-ink">Changelog</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Public milestones, each tied to a dated git tag. Detailed
@@ -106,6 +99,7 @@ export default function ChangelogPage() {
         disclosure policy and <Link href="/docs/honesty" className="underline">/docs/honesty</Link>{' '}
         for the live list of mocks, relays, and stubs on testnet.
       </footer>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }

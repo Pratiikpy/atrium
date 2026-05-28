@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /brand  the Atrium brand kit page.
@@ -26,17 +27,8 @@ export const metadata = {
 
 export default function BrandPage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/verify/1" className="hover:text-ink">Verify</Link>
-          <Link href="/security" className="hover:text-ink">Security</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <section>
         <h1
           className="font-medium text-ink"
           style={{
@@ -364,12 +356,12 @@ export default function BrandPage() {
         </div>
       </Section>
 
-      <footer className="mt-24 flex items-center justify-between border-t border-line pt-6 text-xs text-muted">
+      <div className="mt-24 flex items-center justify-between border-t border-line pt-6 text-xs text-muted">
         <span>(c) 2026 Atrium Labs Ltd.</span>
         <span>Brand kit v1.0 . 2026.05</span>
         <Pill color="testnet" label="testnet" />
-      </footer>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

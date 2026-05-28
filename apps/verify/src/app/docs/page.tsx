@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
 import { Card } from '@/components/ui';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Docs',
@@ -60,17 +61,9 @@ const DOCS = [
 
 export default function DocsPage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/changelog" className="hover:text-ink">Changelog</Link>
-          <Link href="/app" className="hover:text-ink">App</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
+      <section>
         <h1 className="font-display text-5xl text-ink">Documentation</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Everything Atrium claims to do is documented in source-of-truth markdown
@@ -165,6 +158,7 @@ export default function DocsPage() {
           </Link>
         </Card>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Team',
@@ -8,17 +9,9 @@ export const metadata = {
 
 export default function TeamPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/app" className="hover:text-ink">App</Link>
-          <Link href="/manifesto" className="hover:text-ink">Manifesto</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-4xl">
+      <section>
         <h1 className="font-display text-5xl text-ink">Team</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Atrium is built by a small team of founders shipping in public on Arbitrum Sepolia. Code, commits, audits, and incident post-mortems all live in the open GitHub repository — the work is the credential.
@@ -63,7 +56,8 @@ export default function TeamPage() {
           Partnerships and integrations are scoped through the Cohort programme — see <Link href="/cohort" className="underline">/cohort</Link>.
         </p>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

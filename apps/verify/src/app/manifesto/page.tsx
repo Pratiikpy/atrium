@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Manifesto',
@@ -8,17 +9,8 @@ export const metadata = {
 
 export default function ManifestoPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/team" className="hover:text-ink">Team</Link>
-          <Link href="/app" className="hover:text-ink">App</Link>
-        </nav>
-      </header>
-
-      <article className="mt-16 space-y-8 text-ink-soft">
+    <MarketingShell>
+      <article className="mx-auto max-w-3xl space-y-8 text-ink-soft">
         <h1 className="font-display text-5xl text-ink">Manifesto</h1>
 
         <p className="text-lg">
@@ -66,6 +58,6 @@ export default function ManifestoPage() {
           remaining mock, relay, and stub until the production paths land.
         </p>
       </article>
-    </main>
+    </MarketingShell>
   );
 }
