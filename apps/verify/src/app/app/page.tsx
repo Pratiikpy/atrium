@@ -1,32 +1,24 @@
-import { MobileApp } from '@/components/atrium/mobile/MobileApp';
-import { DesktopApp } from '@/components/atrium/app/DesktopApp';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Atrium · App — testnet',
-  description:
-    'Atrium authenticated app — portfolio, vault, trade, agents, reserves, tax.',
+  title: 'Atrium · App',
 };
 
 /**
- * /app — single-route dual-render (Lovable port, 2026-05-28).
+ * /app entry redirects to /app/portfolio (the canonical authenticated
+ * landing surface). The /app/portfolio route uses real wagmi/viem +
+ * Scribe data with honest "Scribe pending" / "Plinth pending" empty
+ * states. The Lovable-port DesktopApp + MobileApp components stay
+ * available as visual references in apps/verify/src/components/atrium/
+ * but they're not rendered anywhere customer-visible — they were
+ * designer mocks with Lovable's APP_VENUES / APP_POSITIONS hardcoded
+ * data, which would violate the no-fake-data rule on a production
+ * surface.
  *
- * Both the mobile shell and the desktop shell render into the page; CSS
- * media queries at 768px hide one or the other. The DesktopApp shell
- * carries its own sidebar + topbar + 7 internal panels (portfolio,
- * trade, transfer, agents, reserves, tax, settings) with internal route
- * switching. The MobileApp shell carries its own iPhone-style chrome +
- * tabbar + 5 panels.
- *
- * Real-data wiring on the dedicated /app/portfolio, /app/trade,
- * /app/transfer, etc. routes stays intact — those routes keep their
- * existing wagmi/viem + Scribe data hooks. This /app landing serves as
- * the unified entry surface.
+ * Once the underlying DesktopApp panels accept real data via props
+ * (Phase 5g), /app can become an aggregated dashboard rendering
+ * across all the /app/* sub-routes.
  */
 export default function AppPage() {
-  return (
-    <>
-      <div className="atrium-mobile-only"><MobileApp /></div>
-      <div className="atrium-desktop-only"><DesktopApp /></div>
-    </>
-  );
+  redirect('/app/portfolio');
 }
