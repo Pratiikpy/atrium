@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
+import { getSession } from '@/lib/auth-session';
 
 const TABLET_URL = process.env.TABLET_URL ?? null;
 export const dynamic = 'force-dynamic';
@@ -17,14 +19,24 @@ export async function GET(req: NextRequest) {
   const yearNum = /^\d{4}$/.test(yearRaw) ? parseInt(yearRaw, 10) : 2026;
   const year = String(yearNum >= MIN_YEAR && yearNum <= MAX_YEAR ? yearNum : 2026);
 
+  // Authorization (IDOR fix): the wallet whose tax events we fetch is derived
+  // from the authenticated session, never from a query string. Pre-fix this
+  // route forwarded ?address= straight to Tablet, so any caller could read
+  // any wallet's realised-gain history by changing the param.
+  const session = await getSession(req);
+  if (!session) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
   if (!TABLET_URL) return NextResponse.json({ events: [], source: 'pending' });
   try {
-    const params = new URLSearchParams({ jurisdiction, year });
+    const params = new URLSearchParams({ jurisdiction, year, address: session.walletAddress });
     const r = await fetch(`${TABLET_URL}/events?${params.toString()}`, {
       signal: AbortSignal.timeout(3000),
+      headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error();
-    return NextResponse.json(await r.json());
+    return NextResponse.json(await r.json(), { headers: noCacheHeaders });
   } catch {
     return NextResponse.json({ events: [], source: 'pending' });
   }

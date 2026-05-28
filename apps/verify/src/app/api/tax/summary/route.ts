@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
+import { getSession } from '@/lib/auth-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +21,21 @@ function taxRateFor(j: string): string {
   return '25%';
 }
 
+function pendingPayload(jurisdiction: string) {
+  return {
+    totalProceedsUsd: null,
+    costBasisUsd: null,
+    realisedGainUsd: null,
+    // Audit U-23: pre-fix `'flat'` direction next to null value implied a
+    // measured-zero PnL. Match the value's null state so consumers can
+    // rely on `direction != null` ↔ value != null.
+    realisedGainDirection: null,
+    taxOwedEstUsd: null,
+    taxRate: taxRateFor(jurisdiction),
+    source: 'pending' as const,
+  };
+}
+
 export async function GET(req: NextRequest) {
   const jurisdictionRaw = req.nextUrl.searchParams.get('jurisdiction') ?? 'uk';
   const yearRaw = req.nextUrl.searchParams.get('year') ?? '2026';
@@ -27,42 +44,29 @@ export async function GET(req: NextRequest) {
   const yearNum = /^\d{4}$/.test(yearRaw) ? parseInt(yearRaw, 10) : 2026;
   const year = String(yearNum >= MIN_YEAR && yearNum <= MAX_YEAR ? yearNum : 2026);
 
+  // Authorization (IDOR fix): the wallet whose tax summary we fetch is derived
+  // from the authenticated session, never from a query string. A caller must
+  // not be able to read another wallet's realised-gains data by passing an
+  // ?address= param.
+  const session = await getSession(req);
+  if (!session) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
   if (!TABLET_URL) {
-    return NextResponse.json({
-      totalProceedsUsd: null,
-      costBasisUsd: null,
-      realisedGainUsd: null,
-      // Audit U-23: pre-fix `'flat'` direction next to null value implied a
-      // measured-zero PnL. Match the value's null state so consumers can
-      // rely on `direction != null` ↔ value != null.
-      realisedGainDirection: null,
-      taxOwedEstUsd: null,
-      taxRate: taxRateFor(jurisdiction),
-      source: 'pending',
-    });
+    return NextResponse.json(pendingPayload(jurisdiction));
   }
   try {
-    // Both `jurisdiction` and `year` are now closed-enum/range-validated values,
-    // so direct interpolation is safe. URLSearchParams as a defense-in-depth
-    // re-encoding step.
-    const params = new URLSearchParams({ jurisdiction, year });
+    // jurisdiction + year are closed-enum/range-validated; address comes from
+    // the session. URLSearchParams re-encodes as defence-in-depth.
+    const params = new URLSearchParams({ jurisdiction, year, address: session.walletAddress });
     const r = await fetch(`${TABLET_URL}/summary?${params.toString()}`, {
       signal: AbortSignal.timeout(3000),
+      headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error();
-    return NextResponse.json(await r.json());
+    return NextResponse.json(await r.json(), { headers: noCacheHeaders });
   } catch {
-    return NextResponse.json({
-      totalProceedsUsd: null,
-      costBasisUsd: null,
-      realisedGainUsd: null,
-      // Audit U-23: pre-fix `'flat'` direction next to null value implied a
-      // measured-zero PnL. Match the value's null state so consumers can
-      // rely on `direction != null` ↔ value != null.
-      realisedGainDirection: null,
-      taxOwedEstUsd: null,
-      taxRate: taxRateFor(jurisdiction),
-      source: 'pending',
-    });
+    return NextResponse.json(pendingPayload(jurisdiction));
   }
 }
