@@ -1,0 +1,491 @@
+/* =====================================================================
+ * Atrium desktop landing — verbatim port of styles from Atriumnew.html
+ * Scoped to .atrium-desktop-only so nothing leaks to mobile or /app.
+ * ===================================================================== */
+
+.atrium-desktop-only .small { font-size: 12.5px; }
+.atrium-desktop-only .strong { font-weight: 500; color: var(--ink); }
+
+/* Accent gradient text */
+.atrium-desktop-only .accent-grad {
+  background: linear-gradient(120deg, var(--ink) 0%, var(--accent) 60%, var(--accent-soft) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Centered section heads (Apple-like) */
+.atrium-desktop-only .section-head-centered {
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.atrium-desktop-only .section-head-centered .eyebrow {
+  color: var(--muted);
+  display: inline-block;
+}
+.atrium-desktop-only .section-head-centered .h2 {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(36px, 4.4vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin: 18px 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.atrium-desktop-only .section-head-centered .section-sub {
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 620px;
+  margin: 22px auto 0;
+  text-wrap: pretty;
+}
+
+/* =====================================================================
+ * Impluvium — DOM diagram (venue rows + central pool + flow paths)
+ * ===================================================================== */
+.atrium-desktop-only .impluvium-section {
+  padding: var(--section-pad) 0;
+  border-top: 1px solid var(--hairline);
+}
+.atrium-desktop-only .draw-label,
+.atrium-desktop-only .draw-footer {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ink);
+}
+.atrium-desktop-only .draw-footer {
+  border-bottom: none;
+  border-top: 1px solid var(--ink);
+  margin-top: 18px;
+  padding-top: 18px; padding-bottom: 0;
+  align-items: center;
+  gap: 32px;
+}
+.atrium-desktop-only .scale-rule { width: 260px; color: var(--muted); }
+.atrium-desktop-only .scale-rule .scale-line {
+  display: grid; grid-template-columns: repeat(5, 1fr); height: 8px;
+  margin-bottom: 6px;
+}
+.atrium-desktop-only .scale-rule .scale-line span {
+  border-left: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.atrium-desktop-only .scale-rule .scale-line span:nth-child(odd) { background: var(--ink); }
+.atrium-desktop-only .scale-rule .scale-line span:last-child { border-right: 1px solid var(--ink); }
+.atrium-desktop-only .leverage-control {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 18px; align-items: center; flex: 1;
+}
+
+.atrium-desktop-only .impluvium {
+  position: relative;
+  padding: 32px;
+  border: 1px solid var(--ink);
+  background: var(--bg-raised);
+  display: grid;
+  grid-template-rows: auto 200px auto;
+  gap: 32px;
+}
+.atrium-desktop-only .impluvium-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  position: relative; z-index: 2;
+}
+.atrium-desktop-only .impluvium-pool-row {
+  position: relative; display: flex; justify-content: center;
+  z-index: 2;
+}
+.atrium-desktop-only .pool {
+  width: min(620px, 70%);
+  border: 1px solid var(--ink);
+  background: var(--bg);
+  position: relative;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.atrium-desktop-only .pool-corner {
+  position: absolute;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.atrium-desktop-only .pool-corner.top-left  { top: 12px; left: 14px; }
+.atrium-desktop-only .pool-corner.top-right { top: 12px; right: 14px; }
+.atrium-desktop-only .pool-corner.bot-left  { bottom: 12px; left: 14px; }
+.atrium-desktop-only .pool-corner.bot-right { bottom: 12px; right: 14px; }
+.atrium-desktop-only .pool-center { text-align: center; position: relative; z-index: 1; }
+.atrium-desktop-only .pool-figure {
+  font-family: var(--mono);
+  font-size: clamp(36px, 4.6vw, 56px);
+  font-weight: 500; letter-spacing: -0.025em; line-height: 1;
+}
+.atrium-desktop-only .live-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--live); margin-right: 6px; vertical-align: 1px;
+}
+.atrium-desktop-only .pool-hatch {
+  position: absolute; inset: 0; opacity: 0.05; pointer-events: none; color: var(--ink);
+}
+
+.atrium-desktop-only .impluvium-flow { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+@keyframes atrium-flowDash { to { stroke-dashoffset: -40; } }
+
+.atrium-desktop-only .venue-card {
+  padding: 14px 14px 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+  position: relative;
+}
+.atrium-desktop-only .venue-card.hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  background: var(--bg-raised);
+}
+.atrium-desktop-only .venue-num {
+  font-family: var(--mono);
+  font-size: 19px; margin-top: 12px; letter-spacing: -0.012em;
+}
+.atrium-desktop-only .venue-bar {
+  margin-top: 10px; height: 3px; background: var(--bg-sunk);
+  overflow: hidden;
+}
+.atrium-desktop-only .venue-bar > div {
+  height: 100%; transition: background 160ms ease, width 600ms ease;
+}
+
+/* Range input — only inside the desktop landing */
+.atrium-desktop-only input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  background: transparent; width: 100%; height: 22px;
+}
+.atrium-desktop-only input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--line); }
+.atrium-desktop-only input[type="range"]::-moz-range-track            { height: 1px; background: var(--line); }
+.atrium-desktop-only input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 999px;
+  background: var(--ink); margin-top: -7px;
+  cursor: ew-resize; transition: transform 120ms ease;
+}
+.atrium-desktop-only input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.atrium-desktop-only input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 999px;
+  background: var(--ink); border: 0; cursor: ew-resize;
+}
+
+/* Dark variant overrides for impluvium when it lives over the hero */
+.atrium-desktop-only .impluvium-dark .impluvium {
+  border-color: color-mix(in oklch, white 22%, transparent);
+  background: color-mix(in oklch, white 3%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.atrium-desktop-only .impluvium-dark .pool {
+  border-color: color-mix(in oklch, white 32%, transparent);
+  background: color-mix(in oklch, white 4%, transparent);
+  box-shadow:
+    0 0 80px color-mix(in oklch, var(--accent) 18%, transparent),
+    inset 0 0 60px color-mix(in oklch, var(--accent) 6%, transparent);
+}
+.atrium-desktop-only .impluvium-dark .pool-figure {
+  color: var(--dark-ink);
+  text-shadow: 0 0 32px color-mix(in oklch, var(--accent) 32%, transparent);
+}
+.atrium-desktop-only .impluvium-dark .venue-card {
+  background: color-mix(in oklch, white 4%, transparent);
+  border-color: color-mix(in oklch, white 14%, transparent);
+  color: var(--dark-ink);
+}
+.atrium-desktop-only .impluvium-dark .venue-card.hover {
+  background: color-mix(in oklch, white 8%, transparent);
+  border-color: color-mix(in oklch, var(--accent) 65%, transparent);
+}
+.atrium-desktop-only .impluvium-dark .venue-bar { background: color-mix(in oklch, white 10%, transparent); }
+.atrium-desktop-only .impluvium-dark .venue-bar > div { background: color-mix(in oklch, white 80%, transparent); }
+.atrium-desktop-only .impluvium-dark .venue-card.hover .venue-bar > div { background: var(--accent); }
+.atrium-desktop-only .impluvium-dark .pool-corner { color: color-mix(in oklch, white 60%, transparent); }
+.atrium-desktop-only .impluvium-dark .draw-label,
+.atrium-desktop-only .impluvium-dark .draw-footer {
+  border-color: color-mix(in oklch, white 24%, transparent);
+}
+.atrium-desktop-only .impluvium-dark .scale-rule { color: color-mix(in oklch, white 55%, transparent); }
+.atrium-desktop-only .impluvium-dark .scale-rule .scale-line span {
+  border-color: color-mix(in oklch, white 50%, transparent);
+}
+.atrium-desktop-only .impluvium-dark .scale-rule .scale-line span:nth-child(odd) {
+  background: color-mix(in oklch, white 35%, transparent);
+}
+.atrium-desktop-only .impluvium-dark input[type="range"]::-webkit-slider-runnable-track {
+  background: color-mix(in oklch, white 22%, transparent);
+}
+.atrium-desktop-only .impluvium-dark input[type="range"]::-webkit-slider-thumb { background: var(--dark-ink); }
+.atrium-desktop-only .impluvium-dark input[type="range"]::-moz-range-track {
+  background: color-mix(in oklch, white 22%, transparent);
+}
+.atrium-desktop-only .impluvium-dark input[type="range"]::-moz-range-thumb { background: var(--dark-ink); }
+
+/* =====================================================================
+ * Feature section (eyebrow + centered title + product mock stage)
+ * ===================================================================== */
+.atrium-desktop-only .feature {
+  padding: var(--section-pad) 0;
+  border-top: 1px solid var(--hairline);
+  background: var(--bg);
+}
+.atrium-desktop-only .feature.dark {
+  background: var(--dark-bg);
+  color: var(--dark-ink);
+  border-top-color: var(--dark-bg);
+}
+.atrium-desktop-only .feature.dark .h2 { color: var(--dark-ink); }
+.atrium-desktop-only .feature.dark .section-sub { color: var(--dark-soft); }
+.atrium-desktop-only .feature.dark .eyebrow { color: var(--dark-soft); }
+.atrium-desktop-only .feature.dark .accent-grad {
+  background: linear-gradient(120deg, var(--dark-ink) 0%, var(--accent) 60%, var(--accent-soft) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.atrium-desktop-only .feature-stage {
+  margin-top: 64px;
+  display: flex; justify-content: center;
+}
+
+/* Product mock frame */
+.atrium-desktop-only .product-frame {
+  width: 100%;
+  max-width: 1080px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-raised);
+  box-shadow:
+    0 1px 1px color-mix(in oklch, var(--ink) 5%, transparent),
+    0 10px 30px color-mix(in oklch, var(--ink) 6%, transparent),
+    0 40px 80px color-mix(in oklch, var(--ink) 7%, transparent);
+}
+.atrium-desktop-only .feature.dark .product-frame {
+  background: var(--dark-bg);
+  border-color: var(--dark-line);
+  box-shadow:
+    0 1px 1px rgba(0,0,0,0.4),
+    0 10px 30px rgba(0,0,0,0.4),
+    0 40px 80px rgba(0,0,0,0.5);
+}
+.atrium-desktop-only .browser-chrome {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg-sunk);
+}
+.atrium-desktop-only .browser-chrome.dark {
+  background: oklch(15% 0.008 60); border-bottom-color: var(--dark-line); color: var(--dark-soft);
+}
+.atrium-desktop-only .bc-dot { width: 9px; height: 9px; border-radius: 999px; background: var(--line); }
+.atrium-desktop-only .browser-chrome.dark .bc-dot { background: oklch(28% 0.006 60); }
+.atrium-desktop-only .bc-url {
+  padding: 5px 12px; border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  max-width: 540px; margin: 0 auto;
+}
+.atrium-desktop-only .browser-chrome.dark .bc-url {
+  background: oklch(18% 0.006 60);
+  color: var(--dark-soft);
+}
+.atrium-desktop-only .product-body { padding: 28px; }
+.atrium-desktop-only .product-body.dark { padding: 0; color: var(--dark-ink); }
+
+/* Dashboard mock */
+.atrium-desktop-only .dash-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--hairline);
+}
+.atrium-desktop-only .dash-actions { display: flex; gap: 8px; }
+.atrium-desktop-only .dash-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-top: 22px;
+}
+.atrium-desktop-only .stat-card {
+  padding: 14px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+.atrium-desktop-only .dash-positions { margin-top: 24px; }
+.atrium-desktop-only .dash-head-row,
+.atrium-desktop-only .dash-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.8fr 1fr 1fr 0.9fr;
+  gap: 16px;
+  align-items: center;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--hairline);
+}
+.atrium-desktop-only .dash-head-row { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+.atrium-desktop-only .dash-row:last-child { border-bottom: none; }
+.atrium-desktop-only .dash-cell { font-size: 13.5px; }
+.atrium-desktop-only .dash-cell.strong { font-weight: 500; color: var(--ink); }
+.atrium-desktop-only .dash-cell.small { font-size: 12.5px; color: var(--ink-soft); }
+.atrium-desktop-only .dash-cell.pos { color: var(--live); }
+.atrium-desktop-only .dash-cell.neg { color: var(--accent); }
+
+/* Transfer (Aqueduct) mock */
+.atrium-desktop-only .transfer-card {
+  padding: 22px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+/* Agent (Sigil) mock — dark */
+.atrium-desktop-only .agent-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 24px 24px 12px;
+  border-bottom: 1px solid var(--dark-line);
+}
+.atrium-desktop-only .agent-step {
+  display: grid; grid-template-columns: 22px 1fr auto;
+  gap: 14px; padding: 11px 0;
+  transition: opacity 400ms ease;
+}
+.atrium-desktop-only .agent-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px;
+  border-top: 1px solid var(--dark-line);
+}
+.atrium-desktop-only .agent-revoke {
+  font-family: var(--sans); font-size: 12.5px;
+  padding: 6px 12px; border-radius: 999px;
+  background: transparent; color: var(--dark-ink);
+  border: 1px solid color-mix(in oklch, white 24%, transparent);
+  cursor: pointer;
+}
+
+/* Lantern mock */
+.atrium-desktop-only .lantern-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding-bottom: 18px; border-bottom: 1px solid var(--hairline);
+}
+.atrium-desktop-only .check-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  background: color-mix(in oklch, var(--live) 12%, transparent);
+  color: var(--live);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.atrium-desktop-only .lantern-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-top: 20px;
+}
+.atrium-desktop-only .merkle-tree {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg-sunk);
+  border-radius: 10px;
+  color: var(--ink-soft);
+}
+.atrium-desktop-only .lantern-foot {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* =====================================================================
+ * Numbers strip
+ * ===================================================================== */
+.atrium-desktop-only .numbers {
+  padding: clamp(64px, 8vw, 112px) 0;
+  border-top: 1px solid var(--hairline);
+}
+.atrium-desktop-only .numbers-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+.atrium-desktop-only .number-big {
+  padding: 12px 28px;
+  border-left: 1px solid var(--hairline);
+}
+.atrium-desktop-only .number-big:first-child { border-left: none; padding-left: 0; }
+
+/* =====================================================================
+ * Floor plan — Roman domus diagram
+ * ===================================================================== */
+.atrium-desktop-only .floorplan-section {
+  padding: var(--section-pad) 0;
+  border-top: 1px solid var(--hairline);
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 70%,
+      color-mix(in oklch, var(--accent) 3%, transparent) 0%,
+      transparent 60%),
+    var(--bg);
+}
+.atrium-desktop-only .floorplan-frame {
+  max-width: 1320px;
+  margin: 56px auto 0;
+  padding: 0 var(--gutter);
+}
+.atrium-desktop-only .floor-wrap {
+  position: relative;
+  --floor-ink: var(--ink);
+  --floor-bg: var(--bg-raised);
+  --floor-muted: var(--muted);
+  color: var(--floor-ink);
+}
+.atrium-desktop-only .floor-head { border-color: var(--floor-ink); margin-bottom: 28px; }
+.atrium-desktop-only .floor-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background:
+    linear-gradient(transparent 31px, color-mix(in oklch, var(--floor-ink) 4%, transparent) 32px) 0 0 / 100% 32px,
+    linear-gradient(90deg, transparent 31px, color-mix(in oklch, var(--floor-ink) 4%, transparent) 32px) 0 0 / 32px 100%,
+    var(--floor-bg);
+  border: 1px solid var(--floor-ink);
+}
+.atrium-desktop-only .floor-svg .floor-name {
+  font-family: var(--sans); font-weight: 500;
+  font-size: 22px; letter-spacing: -0.018em;
+}
+.atrium-desktop-only .floor-svg .floor-mono {
+  font-family: var(--mono); font-weight: 500;
+  text-transform: uppercase;
+}
+.atrium-desktop-only .floor-svg .room { transition: opacity 200ms ease; }
+.atrium-desktop-only .floor-detail {
+  margin-top: 16px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  min-height: 100px;
+}
+.atrium-desktop-only .floor-wrap:has(.room.hover) .room:not(.hover) { opacity: 0.35; }
+
+@keyframes atrium-aqFlow { to { stroke-dashoffset: -24; } }
+@keyframes atrium-rainFall { to { stroke-dashoffset: -18; } }
+@keyframes atrium-lanternBreathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .atrium-desktop-only .impluvium-row { grid-template-columns: repeat(2, 1fr); }
+  .atrium-desktop-only .impluvium { grid-template-rows: auto 240px auto; }
+  .atrium-desktop-only .numbers-grid { grid-template-columns: 1fr 1fr; }
+  .atrium-desktop-only .number-big {
+    border-left: none; padding: 24px 0; border-bottom: 1px solid var(--hairline);
+  }
+  .atrium-desktop-only .dash-stats { grid-template-columns: 1fr 1fr; }
+  .atrium-desktop-only .lantern-grid { grid-template-columns: 1fr 1fr; }
+}

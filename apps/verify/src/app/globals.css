@@ -1,80 +1,119 @@
 @import "tailwindcss";
+@import "../styles/atrium-mobile.css";
+@import "../styles/atrium-landing.css";
 
-/* Atrium design tokens — extracted from design/Atrium.html via playwright
- * post-React-render. Source-of-truth file at
- * design/extracted/full-render-tokens.json.
+/* =====================================================================
+ * Atrium — design tokens (Lovable port, 2026-05-28)
  *
- * All colors are OKLCH. Modern color space; modern browsers support it.
- * Tailwind v4 reads these as native CSS vars.
- */
+ * Source of truth: the Lovable prototype at C:\Users\prate\Downloads\atrium
+ * which was generated from design/Atriumnew.html + Mobile Landing.html +
+ * Brand Kit.html + Atrium App.standalone.html + Mobile App.html.
+ *
+ * Two layers:
+ *   1. `--bg`, `--ink`, `--accent` etc. — Lovable's canonical short names,
+ *      used by `.atrium-desktop-only` / `.atrium-m-root` / `.atrium-app`
+ *      scoped CSS and by all new components.
+ *   2. `--color-*` legacy aliases — kept stable so the existing 35 routes
+ *      using `bg-accent`, `text-ink-soft`, etc. don't break during the
+ *      progressive port. Each legacy name resolves to its Lovable equiv.
+ *
+ * All colors OKLCH.
+ * ===================================================================== */
 
-@theme {
-  /* ── Ink (text / dark surfaces) ─────────────────────────────────── */
-  --color-ink-darkest:  oklch(0.11 0.008 60);
-  --color-ink-dark:     oklch(0.13 0.008 60);
-  --color-ink:          oklch(0.15 0.008 60);
-  --color-ink-soft:     oklch(0.22 0.006 60);
-  --color-ink-muted:    oklch(0.28 0.006 60);
+:root {
+  /* === Lovable canonical tokens (Light surfaces) === */
+  --bg:          oklch(98.4% 0.004 85);
+  --bg-sunk:     oklch(96% 0.005 85);
+  --bg-raised:   oklch(99.6% 0.003 85);
+  --ink:         oklch(13% 0.008 60);
+  --ink-soft:    oklch(28% 0.006 60);
+  --muted:       oklch(54% 0.005 60);
+  --faint:       oklch(74% 0.004 60);
+  --line:        oklch(88% 0.004 60);
+  --hairline:    oklch(93% 0.003 60);
+  --accent:      oklch(48% 0.13 28);
+  --accent-soft: oklch(70% 0.10 28);
+  --testnet:     oklch(70% 0.13 70);
+  --live:        oklch(58% 0.13 145);
+  --neg:         oklch(56% 0.16 28);
 
-  /* ── Neutrals ────────────────────────────────────────────────────── */
-  --color-muted:        oklch(0.54 0.005 60);
-  --color-label:        oklch(0.72 0.004 60);
-  --color-divider:      oklch(0.88 0.004 60);
-  --color-divider-soft: oklch(0.93 0.003 60);
-  --color-surface-soft: oklch(0.96 0.003 60);
+  /* === Lovable canonical tokens (Dark surfaces — hero, sigil, kill switch) === */
+  --dark-bg:     oklch(11% 0.008 60);
+  --dark-ink:    oklch(96% 0.003 60);
+  --dark-soft:   oklch(72% 0.004 60);
+  --dark-line:   oklch(22% 0.006 60);
 
-  /* ── Parchment (page background + light surfaces) ────────────────── */
-  --color-parchment-warm:    oklch(0.96 0.005 85);
-  --color-parchment-soft:    oklch(0.96 0.003 60);
-  --color-parchment:         oklch(0.984 0.004 85);
-  --color-parchment-light:   oklch(0.996 0.003 85);
+  /* === Typography === */
+  --serif: "Instrument Serif", "Times New Roman", serif;
+  --sans:  "Geist", ui-sans-serif, system-ui, sans-serif;
+  --mono:  "Geist Mono", ui-monospace, monospace;
 
-  /* ── Brand Kit canon (design/Brand Kit.html Section III) ─────────────
-   * Eight tokens. New code uses these names. Legacy names below are
-   * aliases that resolve to the same OKLCH values, kept for one cycle
-   * so the 41-file class-name sweep (bg-terracotta → bg-accent, etc.)
-   * can land as a separate mechanical commit.
-   * Canon order: paper, ink (already above), accent, live, testnet,
-   * neg, line, muted (already above).
-   */
-  --color-accent:        oklch(0.48 0.13 28);    /* #7E2A20 oxblood */
-  --color-accent-soft:   oklch(0.48 0.13 28 / 0.10);
-  --color-live:          oklch(0.58 0.13 145);   /* #43864F moss */
-  --color-live-soft:     oklch(0.58 0.13 145 / 0.12);
-  --color-testnet:       oklch(0.7  0.13 70);    /* #CC8E2D amber */
-  --color-testnet-soft:  oklch(0.7  0.13 70 / 0.12);
-  --color-neg:           oklch(0.56 0.16 28);    /* #A1352A clay */
-  --color-neg-soft:      oklch(0.56 0.16 28 / 0.10);
-  --color-paper:         oklch(0.984 0.004 85);  /* #FBFAF7, alias of --color-parchment */
-  --color-line:          oklch(0.88 0.004 60);   /* #DBD8D2, alias of --color-divider */
+  --num-feature: "tnum" 1, "lnum" 1;
 
-  /* ── Legacy aliases (pre-Brand-Kit) ──────────────────────────────────
-   * Keep stable so the 41-file class-name sweep can be one mechanical
-   * commit later. Each legacy name resolves to its canonical counterpart.
-   * Fix at the token layer: --color-danger was rgb(126,42,32) oxblood
-   * by accident, which made every Kill Switch / chaos-trip CTA render
-   * the wrong red. Now correctly resolves to neg/clay #A1352A.
-   * Same fix for --color-status-red (favicon failure state).
-   */
-  --color-success:      var(--color-live);
-  --color-success-soft: var(--color-live-soft);
-  --color-warning:      var(--color-testnet);
-  --color-terracotta:   var(--color-accent);
-  --color-danger:       var(--color-neg);
+  /* === Layout === */
+  --maxw: 1240px;
+  --gutter: clamp(20px, 4vw, 56px);
+  --section-pad: clamp(64px, 7.5vw, 112px);
 
-  /* ── Dark-section variant (Sigil section in marketing) ───────────── */
-  --color-dark-bg:        rgb(16, 16, 16);
-  --color-dark-fg:        rgb(255, 255, 255);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+
+  --radius: 10px;
+
+  /* =================================================================
+   * LEGACY ALIASES — kept stable so existing 35 routes don't break.
+   * New code should NOT use these; use the Lovable canonical names.
+   * ================================================================= */
+
+  /* Ink */
+  --color-ink-darkest:  var(--dark-bg);
+  --color-ink-dark:     var(--ink);
+  --color-ink:          var(--ink);
+  --color-ink-soft:     var(--ink-soft);
+  --color-ink-muted:    var(--ink-soft);
+
+  /* Neutrals */
+  --color-muted:        var(--muted);
+  --color-label:        var(--faint);
+  --color-divider:      var(--line);
+  --color-divider-soft: var(--hairline);
+  --color-surface-soft: var(--bg-sunk);
+
+  /* Parchment (page bg + light surfaces) */
+  --color-parchment-warm:    var(--bg-sunk);
+  --color-parchment-soft:    var(--bg-sunk);
+  --color-parchment:         var(--bg);
+  --color-parchment-light:   var(--bg-raised);
+
+  /* Brand Kit canon */
+  --color-accent:        var(--accent);
+  --color-accent-soft:   oklch(48% 0.13 28 / 0.10);
+  --color-live:          var(--live);
+  --color-live-soft:     oklch(58% 0.13 145 / 0.12);
+  --color-testnet:       var(--testnet);
+  --color-testnet-soft:  oklch(70% 0.13 70 / 0.12);
+  --color-neg:           var(--neg);
+  --color-neg-soft:      oklch(56% 0.16 28 / 0.10);
+  --color-paper:         var(--bg);
+  --color-line:          var(--line);
+
+  /* Legacy semantic aliases */
+  --color-success:      var(--live);
+  --color-success-soft: oklch(58% 0.13 145 / 0.12);
+  --color-warning:      var(--testnet);
+  --color-terracotta:   var(--accent);
+  --color-danger:       var(--neg);
+
+  /* Dark section variant */
+  --color-dark-bg:        var(--dark-bg);
+  --color-dark-fg:        var(--dark-ink);
   --color-dark-white-24:  oklch(1 0 0 / 0.24);
   --color-dark-white-40:  oklch(1 0 0 / 0.4);
   --color-dark-white-50:  oklch(1 0 0 / 0.5);
   --color-dark-white-55:  oklch(1 0 0 / 0.55);
 
-  /* ── Mobile-native OLED palette (design/Mobile App.html lines 13-28).
-   *   Slightly cooler dark with more contrast for OLED. Used by the
-   *   /app/* mobile responsive branch. Reused across Mobile Landing too.
-   *   Tokens prefixed `mob-` so they don't collide with the desktop
-   *   parchment palette. */
+  /* Mobile OLED palette (legacy --color-mob-*; canonical scope is
+     `.atrium-m-root` which redefines these per Lovable's mobile spec) */
   --color-mob-bg:        oklch(0.08 0.006 60);
   --color-mob-bg-2:      oklch(0.11 0.008 60);
   --color-mob-bg-card:   oklch(0.14 0.008 60);
@@ -90,53 +129,37 @@
   --color-mob-live:      oklch(0.72 0.15 145);
   --color-mob-neg:       oklch(0.66 0.18 28);
 
-  /* ── Status (favicon + on-page pills) ────────────────────────────── */
-  --color-status-amber: var(--color-testnet);
-  --color-status-green: var(--color-live);
-  --color-status-red:   var(--color-neg);
+  /* Status */
+  --color-status-amber: var(--testnet);
+  --color-status-green: var(--live);
+  --color-status-red:   var(--neg);
 
-  /* ── Typography ──────────────────────────────────────────────────────
-   * Updated to match design/Atriumnew.html: the display face is Geist
-   * (sans) — the design uses bold-sans Geist for every section heading
-   * + every data label. The italic Instrument Serif is no longer the
-   * default display face; it's reserved for two specific accents:
-   *   1. the Atrium wordmark (inline `fontFamily: '"Instrument Serif"…'`
-   *      in components/wordmark.tsx)
-   *   2. the landing hero's italic-terracotta emphasis word
-   *      ('buying-power' in components/landing/hero-section.tsx)
-   * --font-serif is kept available for those two surfaces.
-   */
-  --font-display: Geist, ui-sans-serif, system-ui, sans-serif;
-  --font-body:    Geist, ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    "Geist Mono", ui-monospace, monospace;
-  --font-serif:   "Instrument Serif", "Times New Roman", serif;
+  /* Typography aliases (legacy code uses --font-display / --font-body) */
+  --font-display: var(--sans);
+  --font-body:    var(--sans);
+  --font-mono:    var(--mono);
+  --font-serif:   var(--serif);
 
-  /* ── Spacing scale (matches the extracted px values) ─────────────── */
-  /* NOTE: prefixed with --gap- instead of --spacing- because Tailwind v4
-   * consumes --spacing-3xl, --spacing-2xl, etc. as the source for
-   * max-w-3xl / max-w-2xl utilities. Defining --spacing-3xl = 4rem here
-   * silently collapsed every `max-w-3xl` container in the app to 64px
-   * (visual bug found on /verify/[step]). Renamed so the design tokens
-   * stay accessible without trampling Tailwind's max-width scale. */
-  --gap-2xs: 0.25rem;   /*  4px */
-  --gap-xs:  0.5rem;    /*  8px */
-  --gap-sm:  0.75rem;   /* 12px */
-  --gap-md:  1rem;      /* 16px */
-  --gap-lg:  1.5rem;    /* 24px */
-  --gap-xl:  2rem;      /* 32px */
-  --gap-2xl: 3rem;      /* 48px */
-  --gap-3xl: 4rem;      /* 64px */
-  --gap-4xl: 6rem;      /* 96px */
+  /* Spacing scale */
+  --gap-2xs: 0.25rem;
+  --gap-xs:  0.5rem;
+  --gap-sm:  0.75rem;
+  --gap-md:  1rem;
+  --gap-lg:  1.5rem;
+  --gap-xl:  2rem;
+  --gap-2xl: 3rem;
+  --gap-3xl: 4rem;
+  --gap-4xl: 6rem;
 
-  /* ── Radii (from extracted values: 6, 10, 12, 14, 16, 999) ───────── */
+  /* Radii */
   --radius-xs:   6px;
   --radius-sm:  10px;
   --radius-md:  12px;
   --radius-lg:  14px;
-  --radius-xl:  16px;
+  --radius-xl:  18px;
   --radius-pill: 999px;
 
-  /* ── Shadows (three-layer, oklch-tinted) ─────────────────────────── */
+  /* Shadows */
   --shadow-sm: oklch(0.13 0.008 60 / 0.04) 0 1px 1px 0;
   --shadow-md:
     oklch(0.13 0.008 60 / 0.05) 0 1px 1px 0,
@@ -152,7 +175,7 @@
   --shadow-focus:
     oklab(0.7 0.0444626 0.12216 / 0.245111) 0 0 0 3.05867px;
 
-  /* ── Transition aliases (extracted as canonical durations) ───────── */
+  /* Transitions */
   --transition-color-fast: color 0.12s;
   --transition-card-lift:
     transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -162,37 +185,98 @@
   --transition-color-bg: color 0.2s, background 0.2s;
 }
 
-/* Base */
-:root {
-  font-family: var(--font-body);
+/* =====================================================================
+ * Tailwind v4 theme inline — maps canonical tokens to Tailwind utilities
+ * so `bg-accent`, `text-ink-soft`, etc. resolve to the Lovable tokens.
+ * Also keeps every legacy `--color-*` available as a Tailwind utility.
+ * ===================================================================== */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-sunk: var(--bg-sunk);
+  --color-bg-raised: var(--bg-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-hairline: var(--hairline);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-testnet: var(--testnet);
+  --color-live: var(--live);
+  --color-neg: var(--neg);
+  --color-dark-bg: var(--dark-bg);
+  --color-dark-ink: var(--dark-ink);
+  --color-dark-soft: var(--dark-soft);
+  --color-dark-line: var(--dark-line);
+
+  /* shadcn compatibility */
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-card: var(--bg-raised);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--bg-raised);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--bg);
+  --color-secondary: var(--bg-sunk);
+  --color-secondary-foreground: var(--ink);
+  --color-muted-foreground: var(--muted);
+  --color-accent-foreground: var(--bg);
+  --color-destructive: var(--neg);
+  --color-destructive-foreground: var(--bg);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--ink);
+
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+  --font-serif: var(--serif);
+  --font-display: var(--sans);
+  --font-body: var(--sans);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+}
+
+/* =====================================================================
+ * Base
+ * ===================================================================== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-height: 100vh; }
+html {
+  color-scheme: light;
+  background: var(--bg);
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  color: var(--color-ink);
-  background: var(--color-parchment);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  font-weight: 400;
 }
+::selection { background: var(--ink); color: var(--bg); }
 
-html, body { min-height: 100vh; background: var(--color-parchment); }
-body { margin: 0; padding: 0; font-weight: 400; }
-
-* { box-sizing: border-box; }
-
-/* Display type — only on hero, brand marks, big numbers */
-.font-display {
-  font-family: var(--font-display);
-  font-style: italic;
-  letter-spacing: -0.02em;
-}
-
-/* The Atrium wordmark — matches design/ logo treatment */
+/* =====================================================================
+ * Atrium wordmark — Instrument Serif italic, the ONE reserved use
+ * ===================================================================== */
+.atrium-mark,
 .wordmark {
-  font-family: var(--font-display);
+  font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
-  letter-spacing: -0.03em;
-  color: var(--color-ink);
-  position: relative;
+  letter-spacing: -0.014em;
+  color: var(--ink);
   display: inline-block;
 }
 .wordmark::after {
@@ -204,34 +288,500 @@ body { margin: 0; padding: 0; font-weight: 400; }
   margin: 0.2em auto 0;
 }
 
-/* Hero display lockup — large negative letter-spacing per extracted tokens
- * (max font-size 87.43px ≈ 5.46rem, letter-spacing -1.4 to -2.6 px) */
-.font-display-hero {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+/* =====================================================================
+ * Typography utilities (Lovable canon)
+ * ===================================================================== */
+.serif    { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
+.serif-i  { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
+.text-accent { font-weight: 500; letter-spacing: -0.012em; color: var(--ink); }
+.num, .mono {
+  font-family: var(--mono);
+  font-feature-settings: var(--num-feature);
+  font-variant-numeric: tabular-nums lining-nums;
 }
+.cap {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.muted    { color: var(--muted); }
+.ink-soft { color: var(--ink-soft); }
 
-/* Eyebrow — small caps above section heading */
+/* Legacy eyebrow class still used in some pages */
 .eyebrow {
-  font-family: var(--font-body);
+  font-family: var(--sans);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.7rem;
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
-/* Focus ring — keyboard accessible per ui.md */
-*:focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-focus);
-  border-radius: var(--radius-xs);
+/* =====================================================================
+ * Atrium button — Apple-like pill
+ * ===================================================================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 44px; padding: 0 22px;
+  font-family: var(--sans); font-size: 14.5px; font-weight: 500;
+  letter-spacing: -0.005em;
+  border-radius: 999px;
+  border: 1px solid var(--ink);
+  background: var(--ink); color: var(--bg);
+  text-decoration: none; cursor: pointer;
+  transition: transform 140ms ease, opacity 140ms ease, border-color 140ms ease;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); opacity: 0.92; }
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.5; cursor: not-allowed; transform: none;
+}
+.btn.sm { height: 34px; padding: 0 14px; font-size: 13px; }
+.btn.lg { height: 52px; padding: 0 28px; font-size: 15.5px; }
+.btn.ghost {
+  background: transparent; color: var(--ink); border-color: var(--line);
+}
+.btn.ghost:hover { border-color: var(--ink); }
+.btn.light {
+  background: var(--dark-ink); color: var(--dark-bg); border-color: var(--dark-ink);
+}
+.btn.ghost-light {
+  background: transparent; color: var(--dark-ink);
+  border-color: color-mix(in oklch, var(--dark-ink) 28%, transparent);
+}
+.btn.ghost-light:hover { border-color: var(--dark-ink); }
+.btn.danger {
+  background: var(--neg); color: oklch(99% 0 0); border-color: var(--neg);
+}
+.btn .arrow { display: inline-block; transition: transform 200ms ease; }
+.btn:hover .arrow { transform: translate(2px, -2px); }
+.btn.full { width: 100%; }
+
+/* =====================================================================
+ * Pill / Tag
+ * ===================================================================== */
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 28px; padding: 0 12px 0 9px;
+  border: 1px solid var(--line); border-radius: 999px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-soft); background: var(--bg-raised);
+}
+.pill .dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--testnet);
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--testnet) 60%, transparent);
+  animation: atrium-pulse 2.4s ease-in-out infinite;
+}
+.pill.live .dot { background: var(--live); }
+.pill.neg  .dot { background: var(--neg); }
+
+@keyframes atrium-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--testnet) 50%, transparent); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in oklch, var(--testnet) 0%, transparent); }
 }
 
-/* Reduced motion */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--line);
+  color: var(--ink-soft); background: var(--bg-raised);
+}
+.tag.green {
+  color: var(--live);
+  border-color: color-mix(in oklch, var(--live) 30%, transparent);
+  background: color-mix(in oklch, var(--live) 8%, transparent);
+}
+.tag.amber {
+  color: var(--testnet);
+  border-color: color-mix(in oklch, var(--testnet) 35%, transparent);
+  background: color-mix(in oklch, var(--testnet) 10%, transparent);
+}
+.tag.red {
+  color: var(--neg);
+  border-color: color-mix(in oklch, var(--neg) 35%, transparent);
+  background: color-mix(in oklch, var(--neg) 10%, transparent);
+}
+
+/* =====================================================================
+ * Layout helpers
+ * ===================================================================== */
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  position: relative;
+}
+.hairline { height: 1px; background: var(--hairline); width: 100%; }
+.ulink {
+  color: inherit; text-decoration: none; position: relative; padding-bottom: 1px;
+}
+.ulink::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: right;
+  transition: transform 320ms cubic-bezier(.7,.1,.2,1);
+}
+.ulink:hover::after { transform: scaleX(1); transform-origin: left; }
+
+/* =====================================================================
+ * Card
+ * ===================================================================== */
+.atrium-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+.atrium-card.dense { padding: 16px 18px; }
+
+/* =====================================================================
+ * Skeleton shimmer (NEVER spinners — per ui.md)
+ * ===================================================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--ink) 5%, transparent) 0%,
+    color-mix(in oklch, var(--ink) 10%, transparent) 50%,
+    color-mix(in oklch, var(--ink) 5%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* =====================================================================
+ * Public navigation
+ * ===================================================================== */
+.atrium-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in oklch, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(140%) blur(18px);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease, background 200ms ease, color 200ms ease;
+}
+.atrium-nav.scrolled { border-bottom-color: var(--hairline); }
+.atrium-nav.over-dark {
+  background: color-mix(in oklch, var(--dark-bg) 78%, transparent);
+  color: var(--dark-ink);
+}
+.atrium-nav.over-dark .nav-link { color: color-mix(in oklch, var(--dark-ink) 86%, transparent); }
+.atrium-nav.over-dark .nav-link:hover { color: var(--dark-ink); }
+.atrium-nav.over-dark .atrium-mark { color: var(--dark-ink); }
+.atrium-nav.over-dark .pill {
+  background: color-mix(in oklch, var(--dark-ink) 6%, transparent);
+  border-color: color-mix(in oklch, var(--dark-ink) 18%, transparent);
+  color: color-mix(in oklch, var(--dark-ink) 80%, transparent);
+}
+.atrium-nav.over-dark .btn:not(.ghost-light) {
+  background: var(--dark-ink); color: var(--dark-bg); border-color: var(--dark-ink);
+}
+
+.nav-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  height: 68px;
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 32px;
+}
+.nav-links { display: flex; gap: 28px; justify-content: center; }
+.nav-link {
+  font-size: 13.5px; color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 120ms ease;
+  letter-spacing: -0.003em;
+}
+.nav-link:hover { color: var(--ink); }
+@media (max-width: 820px) {
+  .nav-links { display: none; }
+  .nav-inner { grid-template-columns: auto auto; }
+}
+
+/* =====================================================================
+ * HERO MONUMENT
+ * ===================================================================== */
+.hero-monument {
+  position: relative;
+  color: var(--dark-ink);
+  padding: clamp(64px, 8vw, 112px) var(--gutter) clamp(80px, 9vw, 128px);
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 55%,
+      color-mix(in oklch, var(--accent) 9%, transparent) 0%,
+      transparent 65%),
+    var(--dark-bg);
+}
+.hero-grid { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.hero-vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 100%, transparent 40%, rgba(0,0,0,0.55) 100%),
+    radial-gradient(ellipse 70% 40% at 50% 0%,   transparent 40%, rgba(0,0,0,0.40) 100%);
+}
+.hero-monument-inner {
+  position: relative; z-index: 2;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex; flex-direction: column;
+  gap: clamp(40px, 5vw, 64px);
+}
+.hero-monument-top { text-align: center; max-width: 920px; margin: 0 auto; }
+.hero-eyebrow-clean {
+  display: inline-flex; align-items: center; gap: 14px;
+  color: color-mix(in oklch, var(--dark-ink) 60%, transparent);
+  font-family: var(--mono); font-weight: 500;
+  font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase;
+}
+.hairline-rule {
+  width: 56px; height: 1px;
+  background: color-mix(in oklch, var(--dark-ink) 28%, transparent);
+}
+.pulse-amber {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--testnet);
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--testnet) 60%, transparent);
+  animation: atrium-pulse 2.4s ease-in-out infinite;
+}
+.hero-monument-h {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(36px, 5.4vw, 78px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  margin: 28px 0 0;
+  color: var(--dark-ink);
+  text-wrap: balance;
+}
+.hero-light { color: color-mix(in oklch, var(--dark-ink) 55%, transparent); }
+
+.hero-monument-bot {
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+}
+.hero-cta-dark { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+.hero-trust-dark {
+  display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+  color: color-mix(in oklch, var(--dark-ink) 55%, transparent);
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em;
+}
+.hero-trust-dark .td {
+  display: inline-block; width: 5px; height: 5px; border-radius: 999px;
+  background: var(--live); margin-right: 8px; vertical-align: middle;
+}
+
+.rise   { opacity: 0; transform: translateY(14px); animation: rise 900ms cubic-bezier(.2,.7,.2,1) forwards; }
+.rise.d2 { animation-delay: 120ms; }
+.rise.d3 { animation-delay: 220ms; }
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+/* Impluvium dark variant — flips semantic tokens inside */
+.impluvium-dark {
+  --bg:        oklch(12% 0.008 60);
+  --bg-sunk:   oklch(9%  0.008 60);
+  --bg-raised: oklch(14% 0.008 60);
+  --ink:       oklch(96% 0.003 60);
+  --ink-soft:  oklch(82% 0.005 60);
+  --muted:     oklch(60% 0.005 60);
+  --faint:     oklch(40% 0.005 60);
+  --line:      color-mix(in oklch, white 14%, transparent);
+  --hairline:  color-mix(in oklch, white 8%, transparent);
+  position: relative;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 50%, color-mix(in oklch, var(--accent) 10%, transparent), transparent 70%),
+    color-mix(in oklch, var(--dark-ink) 4%, transparent);
+  border: 0;
+  padding: 28px;
+}
+
+/* =====================================================================
+ * Section primitives (light surfaces)
+ * ===================================================================== */
+.section {
+  padding: var(--section-pad) var(--gutter);
+}
+.section-head {
+  display: grid; grid-template-columns: 180px 1fr;
+  gap: 32px; align-items: end;
+  padding-bottom: 24px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--hairline);
+}
+.section-head .num {
+  font-family: var(--mono); font-weight: 500;
+  font-size: 28px; line-height: 1; letter-spacing: -0.02em; color: var(--ink);
+}
+.section-head h2 {
+  font-family: var(--sans); font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 44px);
+  letter-spacing: -0.022em; line-height: 1.06;
+  margin: 0;
+}
+.section-head .sub {
+  margin: 12px 0 0; color: var(--ink-soft); font-size: 15px;
+  max-width: 580px; line-height: 1.55;
+}
+@media (max-width: 820px) {
+  .section-head { grid-template-columns: 1fr; gap: 14px; }
+}
+
+/* =====================================================================
+ * App shell (desktop)
+ * ===================================================================== */
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.app-sidebar {
+  background: var(--bg-sunk);
+  border-right: 1px solid var(--hairline);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+}
+.app-main { display: flex; flex-direction: column; min-width: 0; }
+.app-statusbar {
+  height: 56px;
+  border-bottom: 1px solid var(--hairline);
+  background: color-mix(in oklch, var(--bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 30;
+}
+.app-content { padding: 32px 28px 80px; max-width: 1400px; width: 100%; margin: 0 auto; }
+.app-sidebar-nav {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 8px;
+}
+.app-side-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  letter-spacing: -0.003em;
+  transition: background 120ms ease, color 120ms ease;
+}
+.app-side-link:hover { background: var(--hairline); color: var(--ink); }
+.app-side-link[data-status="active"] { background: var(--ink); color: var(--bg); }
+.app-side-link[data-status="active"] .side-icon { color: var(--bg); }
+.side-icon { width: 16px; height: 16px; color: var(--muted); }
+
+@media (max-width: 1024px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .app-sidebar { display: none; }
+  .app-content { padding: 24px 20px 80px; }
+}
+
+/* =====================================================================
+ * Mobile app shell — OLED dark, glass tabbar
+ * ===================================================================== */
+.mobile-shell {
+  min-height: 100vh;
+  background: oklch(7% 0 0);
+  color: oklch(96% 0 0);
+  padding-top: var(--safe-top);
+  padding-bottom: calc(72px + var(--safe-bot));
+}
+.mobile-tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  padding-bottom: var(--safe-bot);
+  background: color-mix(in oklch, oklch(7% 0 0) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-top: 1px solid color-mix(in oklch, oklch(96% 0 0) 8%, transparent);
+}
+.mobile-tabbar-inner {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  height: 64px; padding: 0 8px;
+}
+.mobile-tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  color: color-mix(in oklch, oklch(96% 0 0) 55%, transparent);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none;
+  min-height: 44px;
+  transition: color 140ms ease;
+}
+.mobile-tab[data-active="true"] { color: var(--testnet); }
+.mobile-tab[data-active="true"] .tab-glow {
+  background: color-mix(in oklch, var(--testnet) 22%, transparent);
+}
+.tab-glow {
+  width: 28px; height: 4px; border-radius: 999px;
+  background: transparent;
+  transition: background 200ms ease;
+}
+
+/* =====================================================================
+ * Data table (desktop)
+ * ===================================================================== */
+.atrium-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.atrium-table thead th {
+  text-align: left; font-weight: 500; font-family: var(--mono);
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+.atrium-table tbody td {
+  padding: 14px 12px; border-bottom: 1px solid var(--hairline); vertical-align: top;
+}
+.atrium-table tbody tr:last-child td { border-bottom: none; }
+.atrium-table tbody tr:hover { background: var(--bg-sunk); }
+
+/* =====================================================================
+ * Focus rings — premium, on-brand, never the browser default
+ * ===================================================================== */
+:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--ink) 90%, var(--accent));
+  outline-offset: 3px;
+  border-radius: 6px;
+  transition: outline-offset 120ms ease;
+}
+.atrium-nav.over-dark :focus-visible,
+.hero-monument :focus-visible,
+.mobile-shell :focus-visible,
+.impluvium-dark :focus-visible {
+  outline-color: color-mix(in oklch, var(--dark-ink) 85%, var(--accent));
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* =====================================================================
+ * Reveal-on-scroll
+ * ===================================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: var(--delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal[data-revealed="true"] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .rise  { animation: none; opacity: 1; transform: none; }
+}
+
+/* =====================================================================
+ * Reduced motion safety
+ * ===================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -240,33 +790,301 @@ body { margin: 0; padding: 0; font-weight: 400; }
   }
 }
 
-/* Skeleton — for loading states (per ui.md: skeleton, not spinner) */
-@keyframes skeleton-pulse {
-  0% { opacity: 0.45; }
-  50% { opacity: 0.85; }
-  100% { opacity: 0.45; }
-}
-.skeleton {
-  background: var(--color-surface-soft);
-  border-radius: var(--radius-xs);
-  animation: skeleton-pulse 1.4s ease-in-out infinite;
+/* =====================================================================
+ * Cursor affordances
+ * ===================================================================== */
+.venue-card,
+.atrium-app .venue-pick,
+.atrium-app .side-link,
+.atrium-app .seg > button,
+.app-side-link,
+.mobile-tab { cursor: pointer; }
+input[type="range"] { cursor: ew-resize; }
+
+/* Lock tabular numerics on any tweened figure so width never wobbles */
+.tnum {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
-/* Section heading lockup helper */
-.section-head {
-  text-align: center;
-  max-width: 760px;
-  margin-inline: auto;
-}
-.section-head .eyebrow + h2,
-.section-head h2 {
-  margin-top: 0.5rem;
+@layer base {
+  * { border-color: var(--line); }
 }
 
-/* Dark section variant (Sigil section in marketing) */
-.section-dark {
-  background: var(--color-dark-bg);
-  color: var(--color-dark-fg);
+/* =====================================================================
+ * Dual-render visibility — drives the device split
+ * ===================================================================== */
+.atrium-desktop-only { }
+.atrium-mobile-only { display: none; }
+@media (max-width: 768px) {
+  .atrium-desktop-only { display: none !important; }
+  .atrium-mobile-only { display: block; }
 }
-.section-dark .eyebrow { color: var(--color-dark-white-55); }
-.section-dark .section-sub { color: var(--color-dark-white-55); }
+
+/* =====================================================================
+ * Desktop App Shell — `.atrium-app` scope
+ * Ported from Lovable's atrium-app.css
+ * ===================================================================== */
+:root {
+  --side-bg:   oklch(97% 0.005 85);
+  --side-w:    248px;
+  --top-h:     56px;
+  --app-pad:   32px;
+}
+
+.atrium-app .num, .atrium-app .mono {
+  font-family: var(--mono);
+  font-feature-settings: var(--num-feature);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.atrium-app .serif-i { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
+.atrium-app .mono.cap, .atrium-app .cap {
+  font-family: var(--mono); font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
+}
+.atrium-app .muted    { color: var(--muted); }
+.atrium-app .ink-soft { color: var(--ink-soft); }
+.atrium-app .small    { font-size: 12.5px; }
+.atrium-app .strong   { font-weight: 500; color: var(--ink); }
+.atrium-app .pos { color: var(--live); }
+.atrium-app .neg { color: var(--neg); }
+.atrium-app .ar  { text-align: right; }
+
+.atrium-app {
+  min-height: 100vh; display: grid;
+  grid-template-columns: var(--side-w) 1fr;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 14px; line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+.atrium-app *::selection { background: var(--ink); color: var(--bg); }
+
+.atrium-app .side {
+  background: var(--side-bg);
+  border-right: 1px solid var(--hairline);
+  display: flex; flex-direction: column;
+  padding: 16px 14px;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+.atrium-app .side-brand { padding: 8px 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+.atrium-app .side-search {
+  margin: 2px 6px 16px; padding: 7px 10px;
+  background: var(--bg); border: 1px solid var(--hairline);
+  border-radius: 8px; display: flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 12.5px; cursor: text;
+}
+.atrium-app .side-search .kbd {
+  margin-left: auto; font-family: var(--mono); font-size: 10.5px;
+  padding: 2px 6px; background: var(--bg-raised);
+  border: 1px solid var(--hairline); border-radius: 4px; color: var(--muted);
+}
+.atrium-app .side-section { margin-top: 16px; }
+.atrium-app .side-section-head {
+  padding: 0 10px 8px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+}
+.atrium-app .side-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; margin: 1px 0; border-radius: 8px;
+  text-decoration: none; color: var(--ink-soft);
+  font-size: 13px; transition: background 100ms, color 100ms;
+  position: relative; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left;
+}
+.atrium-app .side-link .si { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; opacity: 0.7; }
+.atrium-app .side-link:hover { background: var(--bg); color: var(--ink); }
+.atrium-app .side-link.active { background: var(--ink); color: var(--bg); }
+.atrium-app .side-link.active .si { opacity: 1; }
+.atrium-app .side-link .pill-mini {
+  margin-left: auto; font-family: var(--mono); font-size: 10px;
+  padding: 1px 6px; border-radius: 999px;
+  background: color-mix(in oklch, var(--ink) 8%, transparent);
+  color: var(--ink-soft);
+}
+.atrium-app .side-link.active .pill-mini {
+  background: color-mix(in oklch, var(--bg) 18%, transparent); color: var(--bg);
+}
+.atrium-app .side-foot { margin-top: auto; padding: 8px 6px 4px; }
+.atrium-app .side-wallet {
+  padding: 10px 12px; background: var(--bg); border: 1px solid var(--hairline);
+  border-radius: 10px; display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center;
+}
+.atrium-app .side-wallet .avatar {
+  width: 22px; height: 22px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent) 0%, oklch(40% 0.08 280) 100%);
+}
+.atrium-app .side-wallet .ad { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
+.atrium-app .side-wallet .net { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+.atrium-app .app-main { display: flex; flex-direction: column; min-width: 0; }
+.atrium-app .topbar {
+  height: var(--top-h); padding: 0 var(--app-pad);
+  border-bottom: 1px solid var(--hairline);
+  display: grid; grid-template-columns: 1fr auto; align-items: center;
+  background: color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  position: sticky; top: 0; z-index: 30;
+}
+.atrium-app .crumb { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.atrium-app .crumb-main { font-weight: 500; color: var(--ink); }
+.atrium-app .crumb-sep  { color: var(--faint); }
+.atrium-app .crumb-sub  { color: var(--ink-soft); }
+.atrium-app .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.atrium-app .pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 26px; padding: 0 10px 0 9px;
+  border: 1px solid var(--line); border-radius: 999px;
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-soft); background: var(--bg-raised);
+}
+.atrium-app .pill .dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--live);
+  animation: atrium-pulse 2.4s ease-in-out infinite;
+}
+.atrium-app .pill.testnet .dot { background: var(--testnet); }
+
+.atrium-app .btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 14px;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500;
+  border-radius: 8px; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--bg);
+  text-decoration: none; cursor: pointer;
+  transition: opacity 120ms;
+}
+.atrium-app .btn:hover { opacity: 0.9; }
+.atrium-app .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.atrium-app .btn.ghost:hover { border-color: var(--ink); }
+.atrium-app .btn.large { height: 40px; padding: 0 18px; font-size: 13.5px; border-radius: 10px; }
+.atrium-app .btn.tiny  { height: 24px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; }
+.atrium-app .icon-btn {
+  width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg-raised); color: var(--ink-soft); cursor: pointer;
+  transition: border-color 120ms, color 120ms;
+}
+.atrium-app .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+.atrium-app .view { padding: 28px var(--app-pad) 96px; max-width: 1480px; margin: 0 auto; width: 100%; }
+.atrium-app .view-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+.atrium-app .view-title { font-weight: 500; font-size: 28px; letter-spacing: -0.022em; line-height: 1.1; color: var(--ink); margin: 0; }
+.atrium-app .view-sub { margin-top: 6px; color: var(--ink-soft); font-size: 13.5px; }
+.atrium-app .view-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.atrium-app .card {
+  background: var(--bg-raised); border: 1px solid var(--hairline);
+  border-radius: 12px; padding: 18px 20px;
+}
+.atrium-app .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 12px; }
+.atrium-app .card-title { font-weight: 500; font-size: 14px; color: var(--ink); }
+.atrium-app .card-divider { height: 1px; background: var(--hairline); margin: 14px -20px; }
+
+.atrium-app .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.atrium-app .stat-card { padding: 16px 18px; background: var(--bg-raised); border: 1px solid var(--hairline); border-radius: 12px; }
+.atrium-app .stat-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.atrium-app .stat-value { font-family: var(--mono); font-size: 26px; letter-spacing: -0.022em; line-height: 1; margin-top: 10px; color: var(--ink); }
+.atrium-app .stat-sub { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+.atrium-app .table { width: 100%; border-collapse: collapse; }
+.atrium-app .table thead th {
+  font-family: var(--mono); font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+  text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.atrium-app .table tbody td { padding: 14px 16px; border-bottom: 1px solid var(--hairline); font-size: 13.5px; color: var(--ink-soft); vertical-align: middle; }
+.atrium-app .table tbody tr:last-child td { border-bottom: none; }
+.atrium-app .table tbody tr:hover { background: color-mix(in oklch, var(--ink) 3%, transparent); }
+.atrium-app .table tbody td.strong { color: var(--ink); font-weight: 500; }
+.atrium-app .table .num { color: var(--ink); }
+.atrium-app .table .ar { text-align: right; }
+
+.atrium-app .tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--line); color: var(--ink-soft); background: var(--bg-raised);
+}
+.atrium-app .tag.green { color: var(--live); border-color: color-mix(in oklch, var(--live) 30%, transparent); background: color-mix(in oklch, var(--live) 8%, transparent); }
+.atrium-app .tag.red   { color: var(--neg);  border-color: color-mix(in oklch, var(--neg) 30%, transparent);  background: color-mix(in oklch, var(--neg) 8%, transparent); }
+.atrium-app .tag.amber { color: oklch(60% 0.14 70); border-color: color-mix(in oklch, var(--testnet) 30%, transparent); background: color-mix(in oklch, var(--testnet) 10%, transparent); }
+
+.atrium-app .field { display: flex; flex-direction: column; gap: 6px; }
+.atrium-app .field label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.atrium-app .input, .atrium-app .select {
+  width: 100%; padding: 11px 12px;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  font-family: var(--sans); font-size: 14px; color: var(--ink);
+  transition: border-color 120ms;
+}
+.atrium-app .input:focus, .atrium-app .select:focus { outline: none; border-color: var(--ink); }
+.atrium-app .input.num-input { font-family: var(--mono); font-size: 22px; letter-spacing: -0.012em; padding: 14px; }
+.atrium-app .seg {
+  display: inline-flex; padding: 2px; background: var(--bg-sunk);
+  border-radius: 8px; gap: 2px; border: 1px solid var(--hairline);
+}
+.atrium-app .seg > button {
+  padding: 6px 14px; border: none; background: transparent;
+  font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft);
+  cursor: pointer; border-radius: 6px;
+  transition: background 120ms, color 120ms;
+}
+.atrium-app .seg > button.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }
+
+.atrium-app input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 22px; }
+.atrium-app input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--line); }
+.atrium-app input[type="range"]::-moz-range-track { height: 1px; background: var(--line); }
+.atrium-app input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 999px;
+  background: var(--ink); margin-top: -7px; cursor: ew-resize;
+}
+
+.atrium-app .row { display: flex; }
+.atrium-app .col { display: flex; flex-direction: column; }
+.atrium-app .between { display: flex; justify-content: space-between; }
+.atrium-app .between-bl { display: flex; justify-content: space-between; align-items: baseline; }
+.atrium-app .between-ct { display: flex; justify-content: space-between; align-items: center; }
+.atrium-app .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.atrium-app .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+.atrium-app .util-bar { height: 8px; border-radius: 4px; background: var(--bg-sunk); position: relative; overflow: hidden; }
+.atrium-app .util-fill { height: 100%; border-radius: 4px; transition: width 600ms ease, background 200ms ease; }
+.atrium-app .util-marker { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--ink-soft); }
+.atrium-app .util-marker.warning { background: oklch(60% 0.14 70); }
+
+.atrium-app .activity-row {
+  display: grid; grid-template-columns: 26px 1fr auto;
+  gap: 10px; align-items: center;
+  padding: 11px 0; border-bottom: 1px solid var(--hairline);
+}
+.atrium-app .activity-row:last-child { border-bottom: none; }
+.atrium-app .act-icon {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--bg-sunk); display: flex; align-items: center; justify-content: center; color: var(--ink-soft);
+}
+
+.atrium-app .venue-strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+@media (max-width: 1200px) { .atrium-app .venue-strip { grid-template-columns: repeat(4, 1fr); } }
+.atrium-app .venue-pick {
+  padding: 12px 14px; border: 1px solid var(--line);
+  background: var(--bg-raised); border-radius: 10px;
+  text-align: left; cursor: pointer; font-family: var(--sans);
+  color: var(--ink-soft); transition: border-color 120ms;
+}
+.atrium-app .venue-pick:hover { border-color: var(--ink); }
+.atrium-app .venue-pick.active { border-color: var(--ink); background: var(--bg); box-shadow: 0 0 0 1px var(--ink) inset; }
+.atrium-app .venue-pick.pending { opacity: 0.55; cursor: not-allowed; background: var(--bg-sunk); }
+.atrium-app .kv { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.atrium-app .kv > div { display: flex; justify-content: space-between; color: var(--ink-soft); }
+.atrium-app .kv .num { color: var(--ink); }
+
+@media (max-width: 880px) {
+  .atrium-app { grid-template-columns: 1fr; }
+  .atrium-app .side { display: none; }
+  .atrium-app .stat-grid { grid-template-columns: 1fr 1fr; }
+  .atrium-app .grid-2, .atrium-app .grid-3 { grid-template-columns: 1fr; }
+}
