@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /docs/honesty - public-facing list of every place Atrium uses a mock,
@@ -146,17 +147,9 @@ const SEV_LABELS: Record<Disclosure['severity'], { label: string; color: string 
 
 export default function HonestyPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/docs" className="hover:text-ink">Docs</Link>
-          <Link href="/security" className="hover:text-ink">Security</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-4xl">
+      <section>
         <p className="eyebrow">Honesty</p>
         <h1 className="mt-2 font-display text-5xl italic text-ink">What is mock . what is relay</h1>
         <p className="mt-6 max-w-prose text-ink-soft">
@@ -216,7 +209,8 @@ export default function HonestyPage() {
         product contradicts a disclosure here, that is a bug. Email
         <a className="ml-1 text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
       </footer>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

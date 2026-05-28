@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /docs/api  Codex x402 API reference. Phase eta.8 (2026-05-25).
@@ -94,15 +95,8 @@ const ENDPOINTS: Endpoint[] = [
 
 export default function CodexDocsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/docs" className="hover:text-ink">Docs</Link>
-          <Link href="/brand" className="hover:text-ink">Brand</Link>
-        </nav>
-      </header>
+    <MarketingShell>
+      <div className="mx-auto max-w-4xl">
 
       <section className="mt-16">
         <p className="eyebrow">Codex API</p>
@@ -258,7 +252,8 @@ data = r.json()`}
         Phase eta.8 docs page; live status pulled from{' '}
         <code className="font-mono">/api/codex/health</code> once that endpoint lands.
       </footer>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 
