@@ -1,10 +1,11 @@
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export default function BenchmarksPage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <Wordmark size="md" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Benchmarks</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
+      <h1 className="font-display text-5xl text-ink">Benchmarks</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Side-by-side against the closest comparables. Numbers come from competitor docs and on-chain reads.
         Where Atrium loses, we say so.
@@ -37,7 +38,8 @@ export default function BenchmarksPage() {
           Honest read: the Solana-native comparables have UX polish and mainnet liveness Atrium does not yet match. Atrium leads on chain choice (EVM is larger), open standards, agent-layer depth, and formal verification. The polish gap closes as the app surfaces complete; the standards gap holds.
         </p>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

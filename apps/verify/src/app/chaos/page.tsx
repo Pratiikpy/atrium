@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 type Fault =
   | 'oracle_drift'
@@ -109,9 +110,9 @@ export default function ChaosPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <Wordmark size="md" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Chaos Mode</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-4xl">
+      <h1 className="font-display text-5xl text-ink">Chaos Mode</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Each button injects a real fault into the testnet stack. The system handles it
         gracefully or it fails honestly. Every run is logged here and on{' '}
@@ -164,6 +165,7 @@ export default function ChaosPage() {
           </ol>
         )}
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }

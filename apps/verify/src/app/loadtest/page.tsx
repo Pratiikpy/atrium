@@ -1,5 +1,6 @@
 import { Wordmark } from '@/components/wordmark';
 import { LoadtestDashboard } from '@/components/loadtest-dashboard';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium — loadtest',
@@ -8,9 +9,9 @@ export const metadata = {
 
 export default function LoadtestPage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <Wordmark size="md" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Loadtest</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
+      <h1 className="font-display text-5xl text-ink">Loadtest</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Public latency + gas measurements. A synthetic load generator hits every Atrium contract
         24/7 at 1, 10, and 100 tx/s tiers. Reproduction script lives in
@@ -30,6 +31,7 @@ export default function LoadtestPage() {
           <li>• Lantern attestation cadence — 1 publish/hour ± 15min jitter</li>
         </ul>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }

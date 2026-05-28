@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium — learn',
@@ -8,9 +9,9 @@ export const metadata = {
 
 export default function LearnPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <Wordmark size="sm" />
-      <h1 className="mt-12 font-display text-5xl text-ink">How Atrium works</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-3xl">
+      <h1 className="font-display text-5xl text-ink">How Atrium works</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         A trader hedged across two venues today posts margin twice. Atrium nets the hedge with one
         unified margin number. One wallet, one collateral pool, many venues. The piece that makes
@@ -67,7 +68,8 @@ export default function LearnPage() {
       >
         Back to Atrium
       </Link>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 
