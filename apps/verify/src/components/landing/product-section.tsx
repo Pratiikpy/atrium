@@ -17,7 +17,22 @@ export function ProductSection() {
     <SectionShell
       id="portfolio"
       eyebrow="The product"
-      headline="Capital efficiency, mathematically."
+      headline={
+        <>
+          Capital efficiency,{' '}
+          <span
+            className="italic"
+            style={{
+              fontFamily: '"Instrument Serif", "Times New Roman", serif',
+              color: '#7E2A20',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            mathematically.
+          </span>
+        </>
+      }
       sub={`Plinth, the Stylus margin engine, reads collateral across every venue you hold positions in and computes a SPAN-style cross-product margin figure, live, on testnet. ${capitalize(numberWord(count))} venues feed one buying-power number.`}
     >
       <ImpluviumDiagram />

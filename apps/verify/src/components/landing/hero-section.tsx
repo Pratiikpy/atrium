@@ -62,7 +62,7 @@ export function HeroSection() {
             className="italic"
             style={{
               fontFamily: '"Instrument Serif", "Times New Roman", serif',
-              color: '#C46A5E',
+              color: 'oklch(0.96 0.003 60)',
               fontWeight: 400,
               letterSpacing: '-0.01em',
             }}
@@ -133,7 +133,7 @@ export function HeroSection() {
           <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="$0" assets="—" share="0.0%" muted />
         </div>
 
-        {/* Leverage ladder */}
+        {/* Leverage ladder + portfolio-margin indicator (design parity #4) */}
         <div className="mx-auto mt-10 max-w-[1100px]">
           <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
             {['0×', '2×', '4×', '6×', '8×', '10×'].map((stop, i) => (
@@ -143,13 +143,17 @@ export function HeroSection() {
             ))}
           </div>
           <div className="mt-2 h-px bg-[oklch(0.22_0.006_60)]" />
-          <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
-            Portfolio leverage axis
-          </p>
+          <div className="mt-3 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.5_0.005_60)]">
+            <span>Portfolio margin</span>
+            <span className="inline-flex items-center gap-1.5 text-[oklch(0.96_0.003_60)]">
+              <span aria-hidden className="size-1.5 rounded-full bg-[oklch(0.72_0.13_145)]" />
+              3.0×
+            </span>
+          </div>
         </div>
 
-        {/* Primary CTA — single white pill, matching the design's hero CTA. */}
-        <div className="mt-14 flex justify-center">
+        {/* CTAs — design parity #2: dual CTA (Open testnet white pill + See the product dark pill) */}
+        <div className="mt-14 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/app"
             className="inline-flex items-center gap-2 rounded-full bg-[oklch(0.96_0.003_60)] px-6 py-3 text-sm font-medium text-[oklch(0.13_0.008_60)] transition hover:bg-white"
@@ -157,6 +161,29 @@ export function HeroSection() {
             Open testnet
             <span aria-hidden>↗</span>
           </Link>
+          <a
+            href="#portfolio"
+            className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm transition"
+            style={{ borderColor: 'oklch(0.32 0.006 60)', color: 'oklch(0.96 0.003 60)' }}
+          >
+            See the product
+            <span aria-hidden>→</span>
+          </a>
+        </div>
+
+        {/* Trust strip — design parity #3: green-dot stack of integrations */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
+          {[
+            'Arbitrum Sepolia',
+            'Chainlink CCIP',
+            'ERC-8004',
+            'ERC-4337 · 7702',
+          ].map((label) => (
+            <span key={label} className="inline-flex items-center gap-1.5">
+              <span aria-hidden className="size-1.5 rounded-full" style={{ backgroundColor: 'oklch(0.58 0.13 145)' }} />
+              {label}
+            </span>
+          ))}
         </div>
       </div>
     </section>

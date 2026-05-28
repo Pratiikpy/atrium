@@ -5,7 +5,22 @@ export function LanternSection() {
     <SectionShell
       id="reserves"
       eyebrow="Lantern · proof-of-reserves"
-      headline="Every dollar, on the public record."
+      headline={
+        <>
+          Every dollar, on the public{' '}
+          <span
+            className="italic"
+            style={{
+              fontFamily: '"Instrument Serif", "Times New Roman", serif',
+              color: '#7E2A20',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            record.
+          </span>
+        </>
+      }
       sub="Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally — without trusting Atrium."
     >
       <MerkleTreeViz />

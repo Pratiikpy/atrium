@@ -8,8 +8,18 @@ export function SigilSection() {
       eyebrow="Sigil · ERC-8004 mandates"
       headline={
         <>
-          Agents trade with
-          <br className="hidden md:inline" /> bounded mandates.
+          Agents trade with bounded{' '}
+          <span
+            className="italic"
+            style={{
+              fontFamily: '"Instrument Serif", "Times New Roman", serif',
+              color: '#C46A5E',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            mandates.
+          </span>
         </>
       }
       sub="You sign one Intent Sigil — an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves."

@@ -55,6 +55,10 @@ export function SectionShell({
               {eyebrow}
             </p>
           )}
+          {/* design/Atriumnew.html pattern: every section H2 ends with an
+              italic-terracotta-serif accent on the trailing word. SectionShell
+              wraps the headline so callers can pass an `accent` string that
+              gets appended in the design's emphasis style. */}
           <h2
             className="mt-5 font-medium leading-[1.08] tracking-[-0.02em]"
             style={{

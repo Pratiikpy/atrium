@@ -5,7 +5,22 @@ export function AqueductSection() {
     <SectionShell
       id="bridge"
       eyebrow="Aqueduct · Chainlink CCIP"
-      headline="Move collateral between chains in one transaction."
+      headline={
+        <>
+          Move collateral between chains in one{' '}
+          <span
+            className="italic"
+            style={{
+              fontFamily: '"Instrument Serif", "Times New Roman", serif',
+              color: '#7E2A20',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            transaction.
+          </span>
+        </>
+      }
       sub="Aqueduct routes assets through Chainlink CCIP. Collateral posted on a destination chain becomes Plinth credit on Arbitrum in 7–12 seconds on testnet. Robinhood Chain support lands once the upstream SDK publishes."
     >
       <ChainFlowDiagram />
