@@ -1,73 +1,56 @@
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
-import { MobileShell } from './mobile/mobile-shell';
+import { MobileApp } from './atrium/mobile/MobileApp';
 
 /**
- * AppShell — left-sidebar chrome wrapping every `/app/*` page.
+ * AppShell (Lovable port, 2026-05-28).
  *
- * Pixel-aligned to `design/Atrium App.standalone.html` per the playwright
- * extraction. Layout:
+ * Wraps every /app/* page with Lovable's `.atrium-app` premium shell:
  *
- *   ┌─────────────┬──────────────────────────────────────────────┐
- *   │ Atrium TEST │ Topbar: breadcrumb · status · refresh · CTA │
- *   │ Search ⌘K   ├──────────────────────────────────────────────┤
- *   │ ─────────── │                                              │
- *   │ TRADE       │                                              │
- *   │ Portfolio   │              Main content                   │
- *   │ Trade       │                                              │
- *   │ Transfer    │                                              │
- *   │             │                                              │
- *   │ AGENTS      │                                              │
- *   │ Agents   3  │                                              │
- *   │             │                                              │
- *   │ TRUST       │                                              │
- *   │ Reserves ✓  │                                              │
- *   │ Tax         │                                              │
- *   │             │                                              │
- *   │ ACCOUNT     │                                              │
- *   │ Settings    │                                              │
- *   │             │                                              │
- *   │ 0x…wallet…  │                                              │
- *   └─────────────┴──────────────────────────────────────────────┘
+ *   - 248px sticky sidebar (search + 4 nav sections + wallet card)
+ *   - 56px sticky topbar (breadcrumb + LIVE/TESTNET pills + actions)
+ *   - 1480px max-width `.view` content area
  *
- * Section header eyebrows are uppercase muted text. Active items have a
- * dark filled background. The wallet card at the bottom shows the address
- * + chain context.
+ * The `<MobileApp />` shell renders inside `.atrium-mobile-only` so at
+ * < 768px users see the iPhone-style tabbar UI instead. Each /app/*
+ * page is rendered twice (once inside MobileApp's children prop slot
+ * via the dual-render block in app/page.tsx, and once inside this
+ * desktop branch). Tailwind's `.atrium-mobile-only` / `.atrium-desktop-only`
+ * media queries hide one or the other.
+ *
+ * Prop interface unchanged from the prior version: { children, active,
+ * breadcrumb? } — every consuming page works without modification.
  */
 
-// Audit 2026-05-24 H-3 fix: prior nav omitted /app/markets and
-// /app/notifications even though both routes exist under src/app/app/.
-// Adding them lets users discover the surfaces without typing the URL.
 const NAV_GROUPS = [
   {
     heading: 'Trade',
     items: [
       { href: '/app/portfolio', label: 'Portfolio', icon: 'rect' },
-      { href: '/app/markets', label: 'Markets', icon: 'graph' },
-      { href: '/app/trade', label: 'Trade', icon: 'graph' },
-      { href: '/app/transfer', label: 'Transfer', icon: 'arrows' },
+      { href: '/app/markets',   label: 'Markets',   icon: 'graph' },
+      { href: '/app/trade',     label: 'Trade',     icon: 'graph' },
+      { href: '/app/transfer',  label: 'Transfer',  icon: 'arrows' },
     ],
   },
   {
     heading: 'Agents',
-    // Badge intentionally omitted: ui.md says badges render real counts only.
-    // A hardcoded '0' fakes a live indicator. Wire from Sigil
-    // mandates count when that endpoint exists.
-    items: [{ href: '/app/agents', label: 'Agents', icon: 'agent' }],
+    items: [
+      { href: '/app/agents', label: 'Agents', icon: 'agent' },
+    ],
   },
   {
     heading: 'Trust',
     items: [
-      { href: '/app/reserves', label: 'Reserves', icon: 'shield', badge: '✓' },
-      { href: '/app/tax', label: 'Tax', icon: 'doc' },
+      { href: '/app/reserves', label: 'Reserves', icon: 'shield', badge: '✓' as string | undefined },
+      { href: '/app/tax',      label: 'Tax',      icon: 'doc' },
     ],
   },
   {
     heading: 'Account',
     items: [
       { href: '/app/notifications', label: 'Notifications', icon: 'bell' },
-      { href: '/app/settings', label: 'Settings', icon: 'gear' },
+      { href: '/app/settings',      label: 'Settings',      icon: 'gear' },
     ],
   },
 ] as const;
@@ -87,123 +70,101 @@ export function AppShell({
 }) {
   return (
     <>
-    {/* Mobile chrome: dark OLED shell + iOS status bar + 5-tab bottom nav.
-        Source: design/Mobile App.html. Renders only at < md; the desktop
-        sidebar below is the md+ surface. Per-route children render twice
-        (once in each chrome), CSS keeps only one visible. */}
-    <MobileShell>{children}</MobileShell>
+      {/* Mobile branch: full iPhone-style shell from Lovable. */}
+      <div className="atrium-mobile-only">
+        <MobileApp />
+      </div>
 
-    <div className="hidden md:flex min-h-screen bg-parchment text-ink">
-      {/* ── Sidebar ────────────────────────────────────────────── */}
-      <aside className="w-[248px] shrink-0 flex-col border-r border-divider flex">
-        <div className="flex items-center justify-between px-5 py-5">
-          <Link href="/app" className="font-display text-2xl italic text-ink">
-            Atrium
-          </Link>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-status-amber)]/30 bg-[var(--color-status-amber)]/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-[var(--color-status-amber)]">
-            <span className="size-1.5 rounded-full bg-[var(--color-status-amber)]" />
-            testnet
-          </span>
-        </div>
+      {/* Desktop branch: Lovable `.atrium-app` sidebar + topbar + view. */}
+      <div className="atrium-desktop-only atrium-app">
+        {/* ── Sidebar ────────────────────────────────────────────── */}
+        <aside className="side">
+          <div className="side-brand">
+            <Link href="/app" className="atrium-mark" style={{ fontSize: 22, textDecoration: 'none' }}>
+              Atrium
+            </Link>
+            <span className="pill testnet">
+              <span className="dot" />
+              testnet
+            </span>
+          </div>
 
-        {/* Search */}
-        <div className="mx-5 mt-1 flex items-center gap-2 rounded-md border border-divider bg-parchment-light px-3 py-2 text-xs text-muted">
-          <SearchIcon />
-          <span className="flex-1 truncate">Search · positions, agents</span>
-          <kbd className="rounded border border-divider px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
-        </div>
+          <div className="side-search">
+            <SearchIcon />
+            <span>Search · positions, agents</span>
+            <kbd className="kbd">⌘K</kbd>
+          </div>
 
-        <nav className="mt-6 flex-1 space-y-6 px-3">
           {NAV_GROUPS.map((group) => (
-            <div key={group.heading}>
-              <p className="px-2 pb-1.5 text-[10px] uppercase tracking-wider text-label">
-                {group.heading}
-              </p>
-              <ul className="space-y-0.5">
-                {group.items.map((item) => {
-                  const isActive = active === item.href;
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={
-                          'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ' +
-                          (isActive
-                            ? 'bg-ink text-parchment'
-                            : 'text-ink-soft hover:bg-parchment-soft/60 hover:text-ink')
-                        }
-                      >
-                        <span aria-hidden className="size-3.5 shrink-0 opacity-70">
-                          <NavIcon kind={item.icon} active={isActive} />
-                        </span>
-                        <span className="flex-1">{item.label}</span>
-                        {('badge' in item) && item.badge && (
-                          <span
-                            className={
-                              'shrink-0 rounded px-1 py-0.5 text-[10px] ' +
-                              (isActive ? 'bg-parchment/15 text-parchment' : 'text-muted')
-                            }
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+            <div key={group.heading} className="side-section">
+              <div className="side-section-head">{group.heading}</div>
+              {group.items.map((item) => {
+                const isActive = active === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={'side-link' + (isActive ? ' active' : '')}
+                  >
+                    <span className="si"><NavIcon kind={item.icon} /></span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
+                    {('badge' in item) && item.badge && (
+                      <span className="pill-mini">{item.badge}</span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           ))}
-        </nav>
 
-        {/* Wallet card: split out as a client component so it can read the
-           live wagmi account (audit 2026-05-24 H-2 fix). */}
-        <AppShellWalletCard />
-      </aside>
-
-      {/* ── Main column ────────────────────────────────────────── */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Topbar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-divider bg-parchment/85 px-6 py-3 backdrop-blur">
-          <div className="flex min-w-0 items-baseline gap-2 text-sm">
-            {(breadcrumb ?? [{ label: 'Atrium' }]).map((b, i) => (
-              <span key={i} className="flex items-baseline gap-2">
-                {i > 0 && <span className="text-muted">·</span>}
-                {b.href ? (
-                  <Link href={b.href as any} className="text-ink-soft hover:text-ink">
-                    {b.label}
-                  </Link>
-                ) : (
-                  <span className={i === 0 ? 'font-medium text-ink' : 'text-ink-soft'}>{b.label}</span>
-                )}
-              </span>
-            ))}
+          <div className="side-foot">
+            <AppShellWalletCard />
           </div>
-          {/* Audit P-11 fix: actions split into a client component so
-              Refresh actually invalidates the React Query cache instead of
-              being a dead button. */}
-          <AppShellActions />
-        </header>
+        </aside>
 
-        {/* Mobile nav strip removed: the dark MobileShell (rendered
-           above this desktop branch) carries the mobile chrome with the
-           canon 5-tab glass bottom bar. The old horizontal nav strip
-           was a half-measure that violated the OLED dark canon. */}
+        {/* ── Main column ────────────────────────────────────────── */}
+        <div className="app-main">
+          {/* Topbar */}
+          <div className="topbar">
+            <div className="crumb">
+              {(breadcrumb ?? [{ label: 'Atrium' }]).map((b, i) => (
+                <span key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  {i > 0 && <span className="crumb-sep">·</span>}
+                  {b.href ? (
+                    <Link href={b.href} className={i === 0 ? 'crumb-main' : 'crumb-sub'}>
+                      {b.label}
+                    </Link>
+                  ) : (
+                    <span className={i === 0 ? 'crumb-main' : 'crumb-sub'}>{b.label}</span>
+                  )}
+                </span>
+              ))}
+            </div>
+            <div className="topbar-right">
+              <AppShellActions />
+            </div>
+          </div>
 
-        <main className="flex-1 px-6 py-6 md:px-10 md:py-8">{children}</main>
+          {/* View content */}
+          <div className="view">{children}</div>
+        </div>
       </div>
-    </div>
     </>
   );
 }
 
-// ── Inline icons (lucide-react replaced with hand-drawn SVGs to match
-// the design's thin-stroke set without pulling lucide into this bundle) ──
-
-function NavIcon({ kind, active }: { kind: string; active?: boolean }) {
-  const stroke = active ? 'currentColor' : 'currentColor';
-  const sw = 1.5;
-  const common = { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke, strokeWidth: sw, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+// Inline icons matching Lovable's thin-stroke set
+function NavIcon({ kind }: { kind: string }) {
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.5,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  };
   switch (kind) {
     case 'rect':
       return (<svg {...common}><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M2 6h12" /></svg>);
@@ -226,5 +187,10 @@ function NavIcon({ kind, active }: { kind: string; active?: boolean }) {
   }
 }
 function SearchIcon() {
-  return (<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="7" cy="7" r="4.5" /><path d="M10.5 10.5l3 3" /></svg>);
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <circle cx="7" cy="7" r="4.5" />
+      <path d="M10.5 10.5l3 3" />
+    </svg>
+  );
 }
