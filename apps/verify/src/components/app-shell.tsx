@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
-import { MobileApp } from './atrium/mobile/MobileApp';
 
 /**
  * AppShell (Lovable port, 2026-05-28).
@@ -70,9 +69,24 @@ export function AppShell({
 }) {
   return (
     <>
-      {/* Mobile branch: full iPhone-style shell from Lovable. */}
-      <div className="atrium-mobile-only">
-        <MobileApp />
+      {/* Mobile branch: minimal Lovable-styled mobile chrome wrapping the
+          actual page content. Critically we render `{children}` here, NOT
+          Lovable's MobileApp shell — every /app/* route shows its own
+          real-data content on mobile too, not the Lovable mock dashboard. */}
+      <div className="atrium-mobile-only" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+        <header
+          className="atrium-nav"
+          style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--hairline)' }}
+        >
+          <Link href="/" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none' }}>
+            Atrium
+          </Link>
+          <span className="pill testnet" style={{ fontSize: 9 }}>
+            <span className="dot" />
+            testnet
+          </span>
+        </header>
+        <main style={{ padding: '16px', paddingBottom: '80px' }}>{children}</main>
       </div>
 
       {/* Desktop branch: Lovable `.atrium-app` sidebar + topbar + view. */}
