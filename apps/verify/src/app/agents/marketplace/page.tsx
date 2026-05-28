@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
 import { Card, Tag, RecessedCard, PrimaryButton } from '@/components/ui';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Agents marketplace',
@@ -36,17 +37,9 @@ const REFERENCE = [
 
 export default function AgentsMarketplacePage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/app/agents" className="hover:text-ink">Your mandates</Link>
-          <Link href="/docs" className="hover:text-ink">Docs</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
+      <section>
         <h1 className="font-display text-5xl text-ink">Agents marketplace</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Open-source agents that trade for you under bounded Sigil mandates. The three
@@ -119,6 +112,7 @@ export default function AgentsMarketplacePage() {
           </li>
         </ol>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }

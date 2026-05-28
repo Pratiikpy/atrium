@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
 import { Card, RecessedCard, Tag } from '@/components/ui';
 import { AgentProfileLive } from '@/components/agents/agent-profile-live';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /agents/marketplace/[id]  per-agent profile per PRD FULL_FLOW_DESIGN
@@ -92,18 +93,10 @@ export default async function AgentProfilePage({
   if (!agent) notFound();
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/agents/marketplace" className="hover:text-ink">Marketplace</Link>
-          <Link href="/app/agents" className="hover:text-ink">Your mandates</Link>
-        </nav>
-      </header>
-
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
       {/* 1. Header */}
-      <section className="mt-12">
+      <section>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
             <p className="eyebrow">Agent . {agent.id}</p>
@@ -193,7 +186,8 @@ export default async function AgentProfilePage({
           </div>
         </RecessedCard>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

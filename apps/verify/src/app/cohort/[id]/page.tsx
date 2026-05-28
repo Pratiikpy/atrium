@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Wordmark } from '@/components/wordmark';
 import { Card, Stat, RecessedCard, Tag } from '@/components/ui';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /cohort/[id] — detail page for an individual cohort partner.
@@ -26,16 +27,9 @@ export default async function CohortPartnerPage({ params }: Params) {
   if (!/^[a-z0-9-]{2,40}$/.test(id)) notFound();
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/cohort" className="hover:text-ink">All partners</Link>
-          <Link href="/app" className="hover:text-ink">App</Link>
-        </nav>
-      </header>
-
-      <section className="mt-16">
+    <MarketingShell>
+      <div className="mx-auto max-w-5xl">
+      <section>
         <p className="text-xs uppercase tracking-wider text-muted">Cohort partner</p>
         <h1 className="mt-2 font-display text-5xl text-ink">{prettifySlug(id)}</h1>
         <p className="mt-3 text-sm text-muted">
@@ -93,7 +87,8 @@ export default async function CohortPartnerPage({ params }: Params) {
           Back to cohort overview
         </Link>
       </section>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 
