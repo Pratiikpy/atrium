@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Wordmark } from '@/components/wordmark';
 import { VerifierStepRunner } from '@/components/verifier-step-runner';
 import { WagmiProviders } from '@/components/wagmi-providers';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * Per-step page for the 7-step Verifier flow.
@@ -80,17 +81,8 @@ export default async function VerifyStepPage({
   if (!cfg) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <header className="mb-12 flex items-center justify-between">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to overview
-        </Link>
-        <Wordmark size="sm" />
-      </header>
+    <MarketingShell>
+      <div className="mx-auto max-w-3xl">
 
       <p className="text-xs uppercase tracking-wider text-muted">step {step} of 7</p>
       <h1 className="mt-2 font-display text-4xl text-ink sm:text-5xl">{cfg.title}</h1>
@@ -117,7 +109,8 @@ export default async function VerifyStepPage({
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       )}
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 

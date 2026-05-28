@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Wordmark } from '@/components/wordmark';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Terms',
@@ -8,16 +9,8 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <header className="flex items-center justify-between">
-        <Wordmark size="md" />
-        <nav className="flex gap-6 text-sm text-ink-soft">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <Link href="/legal/privacy" className="hover:text-ink">Privacy</Link>
-        </nav>
-      </header>
-
-      <article className="mt-16 space-y-6 text-ink-soft">
+    <MarketingShell>
+      <article className="mx-auto max-w-3xl space-y-6 text-ink-soft">
         <h1 className="font-display text-5xl text-ink">Terms</h1>
         <p className="text-sm italic text-muted">Last updated: 2026-05-18 · Year-1 testnet baseline</p>
 
@@ -76,6 +69,6 @@ export default function TermsPage() {
           </p>
         </section>
       </article>
-    </main>
+    </MarketingShell>
   );
 }

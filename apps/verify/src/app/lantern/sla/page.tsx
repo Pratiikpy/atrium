@@ -1,11 +1,12 @@
 import { Wordmark } from '@/components/wordmark';
 import Link from 'next/link';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export default function SlaPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <Wordmark size="sm" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Withdrawal SLA</h1>
+    <MarketingShell>
+      <div className="mx-auto max-w-3xl">
+      <h1 className="font-display text-5xl text-ink">Withdrawal SLA</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Atrium is non-custodial. Your USDC sits in Coffer (ERC-4626 vault) as shares. The contracts
         let you redeem at any time, subject to the five circuit-breakers below.
@@ -69,7 +70,8 @@ export default function SlaPage() {
       <Link href="/" className="mt-16 inline-block text-sm text-ink underline-offset-2 hover:underline">
         Back to Atrium
       </Link>
-    </main>
+      </div>
+    </MarketingShell>
   );
 }
 
