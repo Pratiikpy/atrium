@@ -235,6 +235,24 @@
   --color-status-green: var(--live);
   --color-status-red: var(--neg);
 
+  /* Mobile OLED palette - exposed to Tailwind so `bg-mob-bg-card`,
+     `text-mob-ink`, `border-mob-line` etc resolve. Used by code blocks
+     on the light docs pages + by the legacy /mobile-* surfaces. */
+  --color-mob-bg: oklch(0.08 0.006 60);
+  --color-mob-bg-2: oklch(0.11 0.008 60);
+  --color-mob-bg-card: oklch(0.14 0.008 60);
+  --color-mob-bg-elev: oklch(0.17 0.008 60);
+  --color-mob-ink: oklch(0.97 0.003 60);
+  --color-mob-ink-soft: oklch(0.82 0.005 60);
+  --color-mob-muted: oklch(0.58 0.005 60);
+  --color-mob-faint: oklch(0.40 0.005 60);
+  --color-mob-line: oklch(1 0 0 / 0.12);
+  --color-mob-hairline: oklch(1 0 0 / 0.06);
+  --color-mob-accent: oklch(0.72 0.14 28);
+  --color-mob-testnet: oklch(0.78 0.14 70);
+  --color-mob-live: oklch(0.72 0.15 145);
+  --color-mob-neg: oklch(0.66 0.18 28);
+
   /* shadcn compatibility */
   --color-background: var(--bg);
   --color-foreground: var(--ink);

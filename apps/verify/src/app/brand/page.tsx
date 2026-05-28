@@ -52,13 +52,21 @@ export default function BrandPage() {
           Wordmark is Instrument Serif italic 400. Underline is 55 percent of the wordmark width.
           Display only; never set body text in Instrument Serif.
         </p>
-        <div className="mt-6 grid gap-6 sm:grid-cols-4">
-          {(['hero', 'lg', 'md', 'sm'] as const).map((size) => (
-            <div key={size} className="rounded-md border border-line bg-paper p-6 text-center">
-              <Wordmark size={size} />
-              <p className="mt-3 text-xs text-muted">{size}</p>
-            </div>
-          ))}
+        {/* Hero gets its own row so the text-9xl wordmark doesn't clip
+            against the card edge; lg/md/sm fit comfortably 3-up below. */}
+        <div className="mt-6 grid gap-6">
+          <div className="rounded-md border border-line bg-paper p-10 text-center overflow-hidden">
+            <Wordmark size="hero" />
+            <p className="mt-4 text-xs uppercase tracking-widest text-muted">hero</p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {(['lg', 'md', 'sm'] as const).map((size) => (
+              <div key={size} className="rounded-md border border-line bg-paper p-6 text-center">
+                <Wordmark size={size} />
+                <p className="mt-3 text-xs uppercase tracking-widest text-muted">{size}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Wordmark on light + dark contexts */}
@@ -370,9 +378,9 @@ export default function BrandPage() {
 function Section({ roman, title, children }: { roman: string; title: string; children: React.ReactNode }) {
   return (
     <section className="mt-16">
-      <div className="flex items-baseline gap-4">
-        <span className="font-display text-xl italic text-muted">{roman}</span>
-        <h2 className="font-display text-3xl text-ink">{title}</h2>
+      <div className="flex items-baseline gap-3">
+        <span className="font-mono text-sm uppercase tracking-[0.18em] text-muted">{roman}.</span>
+        <h2 className="font-display text-3xl font-medium text-ink">{title}</h2>
       </div>
       {children}
     </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAccount, useSignTypedData } from 'wagmi';
 import { hashTypedData, parseUnits } from 'viem';
 import { buildSigilTypedData } from './sigil-typed-data';
@@ -147,9 +147,14 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
     }
   }
 
-  function reset() {
+  // useCallback so consumers using `reset` in a useEffect dep array don't
+  // trigger an infinite re-render loop. /app/agents was firing 'Maximum
+  // update depth exceeded' 200+ times because NewMandateButton's reset-on-
+  // close effect had [open, reset] deps and `reset` was a fresh function
+  // every render.
+  const reset = useCallback(() => {
     setStatus({ kind: 'idle' });
-  }
+  }, []);
 
   return { status, issue, reset };
 }
