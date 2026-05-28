@@ -191,6 +191,7 @@
  * Also keeps every legacy `--color-*` available as a Tailwind utility.
  * ===================================================================== */
 @theme inline {
+  /* Lovable canonical names (preferred for new code) */
   --color-bg: var(--bg);
   --color-bg-sunk: var(--bg-sunk);
   --color-bg-raised: var(--bg-raised);
@@ -209,6 +210,30 @@
   --color-dark-ink: var(--dark-ink);
   --color-dark-soft: var(--dark-soft);
   --color-dark-line: var(--dark-line);
+
+  /* Legacy aliases - exposed to Tailwind so existing utility classes
+   * (text-parchment, bg-parchment-light, border-divider, etc.) keep
+   * resolving across the 35 routes that haven't been migrated yet. */
+  --color-parchment: var(--bg);
+  --color-parchment-warm: var(--bg-sunk);
+  --color-parchment-soft: var(--bg-sunk);
+  --color-parchment-light: var(--bg-raised);
+  --color-ink-darkest: var(--dark-bg);
+  --color-ink-dark: var(--ink);
+  --color-ink-muted: var(--ink-soft);
+  --color-label: var(--faint);
+  --color-divider: var(--line);
+  --color-divider-soft: var(--hairline);
+  --color-surface-soft: var(--bg-sunk);
+  --color-paper: var(--bg);
+  --color-success: var(--live);
+  --color-warning: var(--testnet);
+  --color-terracotta: var(--accent);
+  --color-danger: var(--neg);
+  --color-dark-fg: var(--dark-ink);
+  --color-status-amber: var(--testnet);
+  --color-status-green: var(--live);
+  --color-status-red: var(--neg);
 
   /* shadcn compatibility */
   --color-background: var(--bg);

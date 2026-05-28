@@ -51,7 +51,7 @@ export function KaniBadge() {
     return (
       <Link
         href="/security#audit-findings-register"
-        className="fixed right-4 bottom-4 z-40 inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+        className="fixed right-4 bottom-4 z-40 hidden md:inline-flex inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
         title="Kani status fetch failed"
       >
         <span className="size-2 rounded-full bg-testnet" aria-hidden />
@@ -62,7 +62,7 @@ export function KaniBadge() {
   if (!status) {
     return (
       <span
-        className="fixed right-4 bottom-4 z-40 inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm"
+        className="fixed right-4 bottom-4 z-40 hidden md:inline-flex inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm"
         aria-live="polite"
       >
         <span className="size-2 rounded-full bg-muted/40" aria-hidden />
@@ -94,7 +94,7 @@ export function KaniBadge() {
   return (
     <Link
       href={linkHref as any}
-      className="fixed right-4 bottom-4 z-40 inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+      className="fixed right-4 bottom-4 z-40 hidden md:inline-flex inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
       title={titleText}
     >
       <span className={`size-2 rounded-full ${dotColor}`} aria-hidden />
