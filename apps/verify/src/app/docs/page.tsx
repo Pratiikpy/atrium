@@ -153,12 +153,17 @@ export default function DocsPage() {
 
       <section className="mt-16">
         <h2 className="font-display text-2xl text-ink">Architecture decision records</h2>
-        <p className="mt-3 text-sm text-ink-soft">
-          ADR-001 through ADR-012 record every architectural decision taken during the build phase.
-          New ADRs 009–012 cover: system-wide Stylus camelCase ABI convention; uniform pause(string)
-          accepting multisig OR timelock; Codex x402 on-chain authoritative; agent-template byte-layout
-          coupling. See TDD §24.7.
+        <p className="mt-3 max-w-prose text-sm text-ink-soft">
+          ADR-001 through ADR-012 record every consequential decision taken during the build phase,
+          with context and the alternatives rejected: Stylus over Solidity, Kani over Halmos, the
+          dual-oracle median, UUPS upgradeability, the open IPorticoAdapter, and more.
         </p>
+        <Link
+          href="/docs/adr"
+          className="mt-4 inline-block text-sm text-ink underline-offset-2 hover:underline"
+        >
+          Read all 12 decisions →
+        </Link>
       </section>
 
       <section className="mt-16 grid gap-4 md:grid-cols-3">
