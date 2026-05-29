@@ -27,8 +27,21 @@ export async function GET() {
       generatedAt: string;
       metrics: Array<{ name: string; unit: string; p50: number; p95: number; p99: number; budget: number; source: string }>;
     };
-    return NextResponse.json(parsed.metrics);
+    const metrics = parsed.metrics ?? [];
+    // Audit fix (#60): a genuinely-empty run and a read failure used to be
+    // indistinguishable (both `[]`). Mark the no-runs-yet case so the
+    // dashboard can tell "no run" from "artifact unreadable" (the catch below).
+    return NextResponse.json(metrics, {
+      headers: metrics.length === 0
+        ? { 'X-Atrium-Source': 'pending', 'X-Atrium-Reason': 'no-runs-yet' }
+        : {},
+    });
   } catch {
-    return NextResponse.json([]);
+    // Audit fix (#60): the artifact is missing/corrupt - distinguish from the
+    // honest no-runs-yet state above so operators do not read a read failure
+    // as "no load test has run".
+    return NextResponse.json([], {
+      headers: { 'X-Atrium-Source': 'pending', 'X-Atrium-Reason': 'no-loadtest-artifact' },
+    });
   }
 }

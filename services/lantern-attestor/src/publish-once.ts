@@ -9,8 +9,11 @@ import { arbitrumSepolia } from 'viem/chains';
 
 import { buildTree, rootOf } from './merkle';
 import { loadSigningKey } from './signer';
-import { fetchCofferBalances } from './scribe';
+import { fetchCofferUsers } from './scribe';
 import { pinTreeToIpfs } from './ipfs';
+import { checkScribeHealth } from './scribe-health';
+import { buildLeaves } from './leaves';
+import { heartbeat } from './heartbeat';
 
 // Fail loudly at startup if any required env is missing — otherwise the
 // service silently produces empty attestations: fetchCofferBalances would
@@ -67,12 +70,35 @@ export async function publishOnce(): Promise<void> {
   const startTs = Date.now();
   console.log(`[lantern] tick start ${new Date(startTs).toISOString()}`);
 
-  const balances = await fetchCofferBalances({
-    scribeUrl: SCRIBE_URL,
-    cofferAddress: COFFER_ADDRESS,
-  });
+  // Audit fix (#56): signal liveness (no-ops when HONEYBADGER_HEARTBEAT_URL unset).
+  await heartbeat('lantern-attestor');
+
+  // Phase 4 (SD-3): Check Scribe health before fetching balances.
+  // If lagBlocks > 50 (~12s), abort — stale tree could miss recent deposits.
+  try {
+    const health = await checkScribeHealth(SCRIBE_URL);
+    if (health.isStale) {
+      console.warn(`[lantern] Scribe stale: lag=${health.lagBlocks} blocks. Aborting publish.`);
+      return;
+    }
+  } catch (err) {
+    console.warn('[lantern] Scribe health check failed, proceeding cautiously:', err);
+  }
+
+  const users = await fetchCofferUsers({ scribeUrl: SCRIBE_URL });
+  if (users.length === 0) {
+    console.log('[lantern] no users yet, skipping attestation publish');
+    return;
+  }
+
+  // Phase 6: RPC fanout — every leaf reads convertToAssets(balanceOf(user))
+  if (!COFFER_ADDRESS) {
+    console.error('[lantern] COFFER_ADDRESS not set; cannot build leaves from RPC');
+    return;
+  }
+  const balances = await buildLeaves(users, COFFER_ADDRESS);
   if (balances.length === 0) {
-    console.log('[lantern] no balances yet, skipping attestation publish');
+    console.log('[lantern] all balances zero after RPC fanout, skipping');
     return;
   }
 

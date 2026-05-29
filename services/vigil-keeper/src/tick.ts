@@ -27,6 +27,8 @@ import { createPublicClient, createWalletClient, http, keccak256, toBytes } from
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import { fetchPausedAccounts } from './lib/scribe.js';
+import { checkScribeHealth } from './lib/scribe-health.js';
+import { heartbeat } from './heartbeat.js';
 
 // Phase theta.3: precomputed topic0 for the Vigil LiquidationTriggered
 // event. Used to decode job_id from the queueLiquidation receipt and fire
@@ -52,11 +54,28 @@ export async function tickOnce(): Promise<void> {
   const tickStart = Date.now();
   const ts = new Date(tickStart).toISOString();
 
+  // Audit fix (#56): signal liveness so the dead-keeper alarm can fire. The
+  // heartbeat no-ops when HONEYBADGER_HEARTBEAT_URL is unset.
+  await heartbeat('vigil-keeper');
+
   const scribeUrl = process.env.SCRIBE_URL;
   if (!scribeUrl) {
     console.log(JSON.stringify({ ts, event: 'skip', reason: 'SCRIBE_URL not set' }));
     return;
   }
+
+  // Phase 4 (SD-4): Check Scribe health before fetching paused accounts.
+  try {
+    const health = await checkScribeHealth(scribeUrl);
+    if (health.isStale) {
+      console.log(JSON.stringify({ ts, event: 'skip', reason: 'scribe_stale', lagBlocks: health.lagBlocks }));
+      return;
+    }
+  } catch (err) {
+    console.log(JSON.stringify({ ts, event: 'skip', reason: 'scribe_health_failed', detail: err instanceof Error ? err.message : String(err) }));
+    return;
+  }
+
   const registryUrl = process.env.DEPLOYMENT_REGISTRY_URL
     ?? 'https://verify.atrium.fi/deployments/arbitrum_sepolia.json';
   const rpc = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
@@ -113,6 +132,49 @@ export async function tickOnce(): Promise<void> {
     return;
   }
 
+  // Phase 4 (SD-16): RPC cross-validation. For each paused account, confirm
+  // isPaused == true on-chain before queuing. Prevents executing against
+  // accounts that have already been resumed but Scribe hasn't caught up.
+  const plinthAddr = registry.contracts.plinth?.address as `0x${string}` | undefined;
+  const validatedPaused: typeof paused = [];
+  if (plinthAddr) {
+    const plinthAbi = [
+      { type: 'function', name: 'getAccount', stateMutability: 'view',
+        inputs: [{ type: 'address' }],
+        outputs: [{ type: 'uint256' }, { type: 'uint256' }, { type: 'uint256' }, { type: 'bool' }] },
+    ] as const;
+    for (const acct of paused) {
+      try {
+        const result = await publicClient.readContract({
+          address: plinthAddr,
+          abi: plinthAbi,
+          functionName: 'getAccount',
+          args: [acct.user as `0x${string}`],
+        }) as [bigint, bigint, bigint, boolean];
+        const [, , onChainVersion, isPaused] = result;
+        if (!isPaused) {
+          console.log(JSON.stringify({ ts: new Date().toISOString(), event: 'rpc_mismatch_not_paused', user: acct.user }));
+          continue;
+        }
+        if (onChainVersion.toString() !== acct.marginVersion) {
+          console.log(JSON.stringify({ ts: new Date().toISOString(), event: 'rpc_mismatch_version', user: acct.user, scribe: acct.marginVersion, onChain: onChainVersion.toString() }));
+          continue;
+        }
+        validatedPaused.push(acct);
+      } catch {
+        // RPC failure — include the account (fail-open for liveness)
+        validatedPaused.push(acct);
+      }
+    }
+  } else {
+    validatedPaused.push(...paused);
+  }
+
+  if (validatedPaused.length === 0) {
+    console.log(JSON.stringify({ ts: new Date().toISOString(), event: 'all_accounts_cleared_by_rpc' }));
+    return;
+  }
+
   // Per-account: call Vigil.queueLiquidation + executeLiquidation when the
   // keeper is staked. Phase eta.2 (2026-05-25) added Vigil.set_keeper_min_
   // stake_emergency so a 0.01 ETH stake is reachable on testnet. Until the
@@ -122,7 +184,7 @@ export async function tickOnce(): Promise<void> {
   const keeperReady = !!keeperKey && /^0x[0-9a-fA-F]{64}$/.test(keeperKey) && activeKeeperCount > 0;
 
   if (!keeperReady) {
-    for (const acct of paused) {
+    for (const acct of validatedPaused) {
       console.log(JSON.stringify({
         ts: new Date().toISOString(),
         event: 'liquidatable',
@@ -171,13 +233,13 @@ export async function tickOnce(): Promise<void> {
   const PER_TICK_CAP = 25;
   let executed = 0;
 
-  for (const acct of paused) {
+  for (const acct of validatedPaused) {
     if (executed >= PER_TICK_CAP) {
       console.log(JSON.stringify({
         ts: new Date().toISOString(),
         event: 'liquidation_skipped_cap_reached',
         capped_at: PER_TICK_CAP,
-        remaining_accounts: paused.length - executed,
+        remaining_accounts: validatedPaused.length - executed,
       }));
       break;
     }

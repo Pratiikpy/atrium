@@ -43,18 +43,28 @@ async function main() {
       continue;
     }
     console.log(`⬇ Downloading ${font.name}...`);
-    const res = await fetch(font.url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AtriumBuild/1.0)' },
-    });
-    if (!res.ok) {
-      console.error(`✗ Failed to download ${font.name}: ${res.status}`);
-      process.exit(1);
+    // Audit fix (build-deploy #61): a gstatic outage or firewalled CI used to
+    // hard-exit(1) here and abort the whole `next build`, even though the only
+    // consumer (opengraph-image.tsx) already falls back to generic serif when
+    // the woff2 is missing. Make the fetch non-fatal: warn and continue so a
+    // transient font-CDN hiccup can never break a deploy.
+    try {
+      const res = await fetch(font.url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AtriumBuild/1.0)' },
+      });
+      if (!res.ok) {
+        console.warn(`⚠ Skipping ${font.name}: HTTP ${res.status} (OG image falls back to serif)`);
+        continue;
+      }
+      const buf = Buffer.from(await res.arrayBuffer());
+      writeFileSync(dest, buf);
+      console.log(`✓ ${font.name} (${buf.length} bytes)`);
+    } catch (err) {
+      console.warn(`⚠ Skipping ${font.name}: ${err instanceof Error ? err.message : String(err)} (OG image falls back to serif)`);
     }
-    const buf = Buffer.from(await res.arrayBuffer());
-    writeFileSync(dest, buf);
-    console.log(`✓ ${font.name} (${buf.length} bytes)`);
   }
-  console.log('✓ All fonts downloaded to apps/verify/public/fonts/');
+  console.log('✓ Font prebuild complete (apps/verify/public/fonts/)');
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+// Never fail the build on a font issue - the OG renderer degrades gracefully.
+main().catch((e) => { console.warn('⚠ download-fonts:', e?.message ?? e); });

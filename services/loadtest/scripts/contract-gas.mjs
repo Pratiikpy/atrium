@@ -38,6 +38,12 @@ async function main() {
   const rpc = process.env.FORK_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
   const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpc) });
 
+  // Audit fix (#80): the deployer EOA (leaked 2026-05-24) was hardcoded as the
+  // simulation account + arg here. estimateContractGas only needs *some*
+  // address, so use a neutral non-precompile placeholder and keep the leaked
+  // key reference out of committed tooling. Override via GAS_PROBE_ADDRESS.
+  const GAS_PROBE_ADDRESS = process.env.GAS_PROBE_ADDRESS ?? '0x0000000000000000000000000000000000000001';
+
   const targets = [
     {
       name: 'Coffer.deposit',
@@ -46,7 +52,7 @@ async function main() {
               inputs: [{ name: 'assets', type: 'uint256' }, { name: 'receiver', type: 'address' }],
               outputs: [{ type: 'uint256' }] }],
       functionName: 'deposit',
-      args: [1_000_000n, '0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42'],
+      args: [1_000_000n, GAS_PROBE_ADDRESS],
       budget_gas: 250000,
     },
     {
@@ -55,7 +61,7 @@ async function main() {
       abi: [{ type: 'function', name: 'updateMargin', stateMutability: 'nonpayable',
               inputs: [{ name: 'user', type: 'address' }], outputs: [{ type: 'uint256' }] }],
       functionName: 'updateMargin',
-      args: ['0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42'],
+      args: [GAS_PROBE_ADDRESS],
       budget_gas: 80000,
     },
     {
@@ -65,7 +71,7 @@ async function main() {
               inputs: [{ name: 'owner', type: 'address' }, { name: 'intent_hash', type: 'bytes32' }],
               outputs: [{ type: 'bool' }] }],
       functionName: 'isRevoked',
-      args: ['0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42', '0x' + '0'.repeat(64)],
+      args: [GAS_PROBE_ADDRESS, '0x' + '0'.repeat(64)],
       budget_gas: 30000,
     },
   ];
@@ -79,7 +85,7 @@ async function main() {
         abi: t.abi,
         functionName: t.functionName,
         args: t.args,
-        account: '0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42',
+        account: GAS_PROBE_ADDRESS,
       });
       results.push({
         fn: t.name,
