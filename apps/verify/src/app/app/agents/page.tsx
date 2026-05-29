@@ -1,12 +1,15 @@
 import nextDynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { AgentsStatRow } from '@/components/agents/stat-row';
 import { AgentsView } from '@/components/agents/agents-view';
 import { AgentsMobile } from '@/components/mobile/panels/agents-mobile';
 
-/* PERF-04: NewMandateButton is heavy (EIP-712 signing logic) — dynamic */
-const NewMandateButton = nextDynamic(
-  () => import('@/components/agents/new-mandate-button').then((m) => m.NewMandateButton),
+/* PERF-04: NewMandateButton is heavy (EIP-712 signing logic) — dynamic.
+   Audit #50: CopyTradeMandate wraps it to read ?copy and prefill recommended
+   caps from the marketplace/leaderboard deep-link. */
+const CopyTradeMandate = nextDynamic(
+  () => import('@/components/agents/copy-trade-mandate').then((m) => m.CopyTradeMandate),
   { loading: () => <span className="inline-block h-10 w-32 animate-pulse rounded-md bg-ink/10" /> },
 );
 
@@ -44,8 +47,12 @@ export default function AgentsPage() {
         </div>
         {/* Audit P-11 fix: button opens a mandate-creation modal with the
             full IntentSigil form. Gated by deployment readiness via the
-            shared useDeploymentStatus hook. */}
-        <NewMandateButton />
+            shared useDeploymentStatus hook. Audit #50: wrapped so a
+            ?copy=<agent> deep-link prefills the recommended caps. Suspense
+            boundary required for useSearchParams (Next 15). */}
+        <Suspense fallback={<span className="inline-block h-10 w-32 animate-pulse rounded-md bg-ink/10" />}>
+          <CopyTradeMandate />
+        </Suspense>
       </header>
 
       <section className="mt-8">

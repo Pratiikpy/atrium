@@ -22,14 +22,44 @@ const ZERO_ADDR = '0x' + '0'.repeat(40);
  * `/api/agents/issue-mandate` which forwards to Sigil.issueIntent once
  * the contract address lands in the deployments registry.
  */
-export function NewMandateButton() {
+/** Recommended caps for a copied mandate (audit #50). */
+export interface MandatePrefill {
+  perActionUsd: number;
+  dailyUsd: number;
+  expiryDays: number;
+}
+
+export function NewMandateButton({
+  prefill,
+  prefillLabel,
+  autoOpen = false,
+}: {
+  /** Audit #50: when set, the modal pre-fills these caps (copy-trade funnel). */
+  prefill?: MandatePrefill;
+  /** e.g. "Copying Augur — recommended caps prefilled". */
+  prefillLabel?: string;
+  /** Auto-open the modal on mount once deployment is ready (deep-link landing). */
+  autoOpen?: boolean;
+} = {}) {
   const [open, setOpen] = useState(false);
+  const autoOpenedRef = useState({ done: false })[0];
   // Sigil is step 7 in the Verifier flow (Kill Switch path) but the
   // mandate-creation path itself depends on Plinth (step 2) and Sigil
   // (covered by step 7's required contracts).
   const { data: deployment } = useDeploymentStatus(7);
   const helper = readinessMessage(deployment, 'New mandate');
   const ready = deployment?.ready === true;
+
+  // Audit #50: deep-link landing (?copy=<agent>) auto-opens the prefilled modal
+  // once the contract path is ready, so the marketplace "Copy with recommended
+  // caps" link actually funnels into a prefilled mandate instead of dead-ending.
+  useEffect(() => {
+    if (autoOpen && ready && !autoOpenedRef.done) {
+      autoOpenedRef.done = true;
+      setOpen(true);
+    }
+  }, [autoOpen, ready, autoOpenedRef]);
+
   return (
     <div className="flex flex-col items-end gap-1">
       <button
@@ -38,14 +68,17 @@ export function NewMandateButton() {
         disabled={!ready}
         className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-parchment transition-colors hover:bg-ink-dark disabled:opacity-50"
       >
-        <span aria-hidden>+</span> New mandate
+        <span aria-hidden>+</span> {prefillLabel ? 'Copy mandate' : 'New mandate'}
       </button>
+      {prefillLabel && (
+        <p className="text-right text-[10px] uppercase tracking-wider text-accent">{prefillLabel}</p>
+      )}
       {helper && (
         <p className="text-right text-[10px] uppercase tracking-wider text-muted">{helper}</p>
       )}
       {/* Audit T-5 fix: single gate on `open` — MandateModal mounts once
           and Modal handles visibility. Avoids the divergent-gate footgun. */}
-      <MandateModal open={open} onClose={() => setOpen(false)} />
+      <MandateModal open={open} onClose={() => setOpen(false)} prefill={prefill} prefillLabel={prefillLabel} />
     </div>
   );
 }
@@ -56,12 +89,28 @@ export function NewMandateButton() {
 // match. Building outside the component caches forever.
 const DEFAULT_ALLOWED_IDS = [VENUES[0]?.id, VENUES[1]?.id].filter(Boolean) as string[];
 
-function MandateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function MandateModal({
+  open,
+  onClose,
+  prefill,
+  prefillLabel,
+}: {
+  open: boolean;
+  onClose: () => void;
+  prefill?: MandatePrefill;
+  prefillLabel?: string;
+}) {
+  // Audit #50: caps seed from the copied agent's recommended caps when present,
+  // else the generic defaults. actionsPerDay has no per-agent recommendation,
+  // so it keeps the default.
+  const defPerAction = prefill ? String(prefill.perActionUsd) : '50';
+  const defTotalOpen = prefill ? String(prefill.dailyUsd) : '500';
+  const defExpires = prefill ? String(prefill.expiryDays) : '14';
   const [agent, setAgent] = useState('');
-  const [perActionCap, setPerActionCap] = useState('50');
-  const [totalOpenCap, setTotalOpenCap] = useState('500');
+  const [perActionCap, setPerActionCap] = useState(defPerAction);
+  const [totalOpenCap, setTotalOpenCap] = useState(defTotalOpen);
   const [actionsPerDay, setActionsPerDay] = useState('24');
-  const [expiresDays, setExpiresDays] = useState('14');
+  const [expiresDays, setExpiresDays] = useState(defExpires);
   const [allowed, setAllowed] = useState<Set<string>>(() => new Set(DEFAULT_ALLOWED_IDS));
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -71,18 +120,20 @@ function MandateModal({ open, onClose }: { open: boolean; onClose: () => void })
   const busy = status.kind === 'signing' || status.kind === 'storing';
 
   // Audit U-4 fix: reset form + result on close → open transition.
+  // Audit #50: reset to the prefilled caps (when copying an agent) so reopening
+  // the copy modal keeps the recommendation, else the generic defaults.
   useEffect(() => {
     if (!open) {
       setAgent('');
-      setPerActionCap('50');
-      setTotalOpenCap('500');
+      setPerActionCap(defPerAction);
+      setTotalOpenCap(defTotalOpen);
       setActionsPerDay('24');
-      setExpiresDays('14');
+      setExpiresDays(defExpires);
       setAllowed(new Set(DEFAULT_ALLOWED_IDS));
       setValidationError(null);
       reset();
     }
-  }, [open, reset]);
+  }, [open, reset, defPerAction, defTotalOpen, defExpires]);
 
   function toggleVenue(id: string) {
     setAllowed((prev) => {
@@ -141,6 +192,19 @@ function MandateModal({ open, onClose }: { open: boolean; onClose: () => void })
         <p className="mt-2 text-sm text-ink-soft">
           Issue an Intent Sigil. The agent transacts within scope; your master key never moves.
         </p>
+
+        {/* Audit #50: copy-trade prefill acknowledgement + honest note that the
+            agent's on-chain address is still the user's to enter (the reference
+            AGENTS map carries no deployed address yet). */}
+        {prefillLabel && (
+          <div className="mt-3 rounded-md border border-accent/40 bg-accent/5 p-3 text-xs text-ink-soft">
+            <p className="font-medium text-ink">{prefillLabel}</p>
+            <p className="mt-1">
+              Caps below are the agent&apos;s recommended limits. Enter the agent&apos;s on-chain
+              address to sign — reference agents do not have a registered address yet.
+            </p>
+          </div>
+        )}
 
         <div className="mt-5 space-y-4">
           <label className="block">
