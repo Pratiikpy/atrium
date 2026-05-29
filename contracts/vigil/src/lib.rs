@@ -90,6 +90,12 @@ sol! {
     // failed (recipient reverted on receive). Surfaced loudly rather than
     // silently leaving the stake zeroed-but-not-paid.
     error WithdrawFailed(address to, uint256 amount);
+    // Audit fix (contracts-rust #35): queue_liquidation was called for an
+    // underwater account with no open positions (negative equity from fees),
+    // pick_nms_position returned 0, and a phantom job (position_id=0) was
+    // written. Now we refuse to queue and let Plinth's VigilQueueFailed signal
+    // fire instead.
+    error NoPositionsToLiquidate(address user);
 }
 
 #[derive(SolidityError)]
@@ -109,6 +115,7 @@ pub enum VigilError {
     Paused(VigilPaused),
     Reentrant(VigilReentrant),
     WithdrawFailed(WithdrawFailed),
+    NoPositionsToLiquidate(NoPositionsToLiquidate),
 }
 
 sol_interface! {
@@ -242,6 +249,15 @@ impl Vigil {
         let positions = plinth.get_user_positions(self.vm(), Call::new(), user)
             .map_err(|_| VigilError::PlinthGetPositionsFailed(PlinthGetPositionsFailed { user }))?;
         let position_id = pick_nms_position(&positions);
+        // Audit fix (contracts-rust #35): refuse to queue a phantom job when the
+        // account has no open position to liquidate (pick_nms_position returns 0
+        // for an empty list). Returning Err here makes Plinth's queue_liquidation
+        // call site emit VigilQueueFailed (the honest "needs manual re-queue"
+        // signal) instead of writing a position_id=0 job that later self-completes
+        // with zero recovery and pollutes keeper stats.
+        if position_id.is_zero() {
+            return Err(VigilError::NoPositionsToLiquidate(NoPositionsToLiquidate { user }));
+        }
 
         // Hoist storage and VM reads before the `.setter()` mut borrow.
         let max_liq_bps = self.params.partial_liquidation_max_bps.get();
@@ -304,7 +320,10 @@ impl Vigil {
                 job.max_liquidation_bps.get(),
             )
         };
-        if job_position_id.is_zero() && job_user.is_zero() {
+        // Audit fix (contracts-rust #35): was `&&` - a real-user/zero-position
+        // phantom job slipped through. Reject if EITHER field is zero (defense
+        // in depth alongside the queue-side guard above).
+        if job_position_id.is_zero() || job_user.is_zero() {
             return Err(VigilError::JobNotFound(JobNotFound { job_id }));
         }
         if job_is_complete {
