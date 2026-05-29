@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
 import { WrongChainBanner } from './wrong-chain-banner';
+import { MobileBottomNav } from './mobile/mobile-bottom-nav';
 
 /**
  * AppShell (2026-05-28).
@@ -88,6 +89,10 @@ export function AppShell({
           </span>
         </header>
         <main style={{ padding: '16px', paddingBottom: '80px' }}>{children}</main>
+        {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
+            never rendered one - the built MobileBottomNav was orphaned, leaving
+            mobile users with no in-app navigation between screens. Now wired. */}
+        <MobileBottomNav />
       </div>
 
       {/* Desktop branch: Lovable `.atrium-app` sidebar + topbar + view. */}
