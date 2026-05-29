@@ -109,8 +109,12 @@ function ActiveMandate({ m }: { m: Mandate }) {
         <div className="mt-1 font-display text-[20px] italic text-mob-ink truncate">{m.agent}</div>
         <div className="mt-0.5 font-mono text-[11px] text-mob-muted truncate">{spent} / {total} . {days}</div>
       </div>
+      {/* Audit fix (#18): was href="/app/agents", which on mobile re-renders
+          THIS same panel (a self-loop). Point at the real management surface -
+          the Postern session-keys registry, where the agent's access is
+          revoked/managed - instead of looping. */}
       <Link
-        href="/app/agents"
+        href="/app/settings/session-keys"
         className="shrink-0 rounded-full border border-mob-line bg-mob-bg px-3 py-1.5 text-[11px] font-medium text-mob-ink hover:border-mob-accent"
       >
         Manage

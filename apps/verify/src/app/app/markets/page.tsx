@@ -89,8 +89,10 @@ export default function MarketsPage() {
   return (
     <AppShell active="/app/markets">
       {/* Audit fix (#74): mobile gets the thumb-friendly venue browser (was the
-          cramped desktop list). Desktop unchanged below. */}
-      <MarketsMobile />
+          cramped desktop list). Desktop unchanged below.
+          Audit fix (#45 regression): md:hidden wrapper so the panel (and all its
+          loading/error/empty branches) never renders on desktop. */}
+      <div className="md:hidden"><MarketsMobile /></div>
       <div className="hidden md:block">
       <section>
         <p className="text-xs uppercase tracking-wider text-muted">Markets</p>

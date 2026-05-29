@@ -16,8 +16,9 @@ export default function TaxPage() {
         { label: 'Tablet · exports' },
       ]}
     >
-      {/* Audit fix (#74): mobile gets the thumb-friendly tax dashboard panel. */}
-      <TaxMobile />
+      {/* Audit fix (#74): mobile gets the thumb-friendly tax dashboard panel.
+          Audit fix (#45 regression): md:hidden wrapper (guards all panel branches). */}
+      <div className="md:hidden"><TaxMobile /></div>
       <div className="hidden md:block">
       <TaxView />
 

@@ -22,8 +22,9 @@ export default function ActivityPage() {
         { label: 'Activity' },
       ]}
     >
-      {/* Audit fix (#74/#45): mobile gets the thumb-friendly activity timeline. */}
-      <ActivityMobile />
+      {/* Audit fix (#74/#45): mobile gets the thumb-friendly activity timeline.
+          Audit fix (#45 regression): md:hidden wrapper (guards all panel branches). */}
+      <div className="md:hidden"><ActivityMobile /></div>
       <div className="hidden md:block">
       <header>
         <p className="eyebrow">Activity</p>

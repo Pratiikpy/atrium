@@ -35,7 +35,8 @@ export function SettingsMobile() {
       <MoreSection heading="Trust">
         <MoreRow href="/app/reserves"     label="Proof of reserves" right="≤10 min" icon={<ShieldIcon />} />
         <MoreRow href="/app/tax"          label="Tax . UK CGT" right="2026" icon={<DocIcon />} />
-        <MoreRow href="/app/settings"     label="Session keys" right="manage" icon={<ClockIcon />} />
+        {/* Audit fix (#42): deep-link to the real session-keys route (was /app/settings). */}
+        <MoreRow href="/app/settings/session-keys" label="Session keys" right="manage" icon={<ClockIcon />} />
       </MoreSection>
 
       <MoreSection heading="Account">

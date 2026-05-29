@@ -114,7 +114,10 @@ export function AppShell({
           className="atrium-nav"
           style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--hairline)' }}
         >
-          <Link href="/" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none' }}>
+          {/* Audit fix (#16): mobile header wordmark links to /app, not the
+              marketing landing - tapping it shouldn't bounce a logged-in user
+              out of the app. */}
+          <Link href="/app" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none' }}>
             Atrium
           </Link>
           <span className="pill testnet" style={{ fontSize: 9 }}>
