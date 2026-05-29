@@ -124,9 +124,6 @@ export function AppShell({
                   >
                     <span className="si"><NavIcon kind={item.icon} /></span>
                     <span style={{ flex: 1 }}>{item.label}</span>
-                    {('badge' in item) && item.badge && (
-                      <span className="pill-mini">{item.badge}</span>
-                    )}
                   </Link>
                 );
               })}
