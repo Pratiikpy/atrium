@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { Card } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
@@ -22,15 +21,15 @@ const DOCS = [
     pages: '2,333 lines',
   },
   {
-    title: 'docs/AUDIT_FINDINGS.md',
+    title: 'docs/plan-tracker.md',
     sub: '94+ patches landed across audit Waves F–N · source of truth for every fix',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/AUDIT_FINDINGS.md',
+    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/plan-tracker.md',
     pages: '254+ lines',
   },
   {
-    title: 'docs/ROADMAP.md',
+    title: 'docs/MASTER_PLAN.md',
     sub: '12-month build plan with ✅ status markers post-Wave-L',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/ROADMAP.md',
+    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/MASTER_PLAN.md',
     pages: 'Months 1–12',
   },
   {
@@ -111,6 +110,16 @@ export default function DocsPage() {
                 Python SDK snippets.
               </p>
               <p className="mt-3 text-xs text-muted">8 endpoints . x402</p>
+            </Card>
+          </Link>
+          <Link href="/docs/glossary" className="block">
+            <Card className="h-full transition-colors hover:border-accent/40">
+              <p className="font-display text-xl text-ink">Glossary</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Every subsystem name (Plinth, Sigil, Lantern...) in plain English: what it is and
+                what it does for you. The key to the product&apos;s vocabulary.
+              </p>
+              <p className="mt-3 text-xs text-muted">18 subsystems . plain language</p>
             </Card>
           </Link>
         </div>
