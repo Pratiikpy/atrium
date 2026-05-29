@@ -121,40 +121,22 @@ it's purely a find-and-replace once you own one.
 
 ---
 
-## 4. Light up the reference agents — deploy Codex + set CODEX_URL
+## 4. Reference agents' Codex feed — DONE (deployed + wired 2026-05-29)
 
-**Why:** the 3 reference agents (Augur, Haruspex, Auspex) probe Codex
-`/health` each cron tick before making any decision (a safety rule: no
-decisions on stale data). The agents' `CODEX_URL` previously pointed at
-`codex-staging.atrium.fi`, which never resolves (domain not owned), so every
-tick honestly logged "codex down — skipping" and the agents did nothing.
+**Status: live.** The Codex worker is already deployed on Cloudflare at
+`https://atrium-codex.prtk8899.workers.dev` (D1 database bound, serving with
+0 errors). `GET /health` returns `200 {"ok":true}`. `services/agents/vercel.json`
+`CODEX_URL` is now set to that URL, so the 3 reference agents (Augur, Haruspex,
+Auspex) read `codex.health=ok` each tick instead of skipping on a dead feed.
 
-I changed `services/agents/vercel.json` `CODEX_URL` to empty (the honest
-"not configured" state — the tick degrades cleanly to a skip, no crash).
-To actually light them up, deploy the Codex worker (no domain needed — you
-get a `workers.dev` URL immediately) and point the agents at it.
+**One residual founder step:** if the **agents** Vercel project was deployed
+before this change, set `CODEX_URL=https://atrium-codex.prtk8899.workers.dev`
+in that project's dashboard (Settings → Environment Variables) and redeploy,
+so the live cron picks it up. The committed `vercel.json` default is already
+correct for any fresh deploy.
 
-**Steps:**
-
-1. Deploy the Codex Cloudflare Worker (canon surface — the Vercel copy of
-   Codex was removed in Phase θ.2):
-   ```bash
-   cd "C:/Users/prate/Downloads/arb builder/services/codex"
-   # set the secrets the worker needs (one-time):
-   pnpm exec wrangler secret put CODEX_HMAC_KEY
-   pnpm exec wrangler secret put CODEX_KEY_ID            # e.g. "v1"
-   # set the real pay-to address (rotated multisig, NOT the leaked EOA):
-   #   override the CODEX_PAY_TO_ADDRESS var in wrangler.toml first.
-   pnpm exec wrangler deploy
-   ```
-   Wrangler prints the live URL, e.g.
-   `https://atrium-codex.<your-subdomain>.workers.dev`.
-2. Set that URL as `CODEX_URL` in the **agents** Vercel project env (Settings
-   → Environment Variables), and as the Codex base in the verify app env if
-   it consumes Codex directly.
-3. Confirm: `curl https://atrium-codex.<sub>.workers.dev/health` returns 200.
-   The next agent cron tick then logs `codex.health=ok` instead of `down`,
-   and the agent /status panel shows the loop fully alive.
+To push the latest Codex code (optional — the deployed version is serving
+fine): `cd services/codex && pnpm exec wrangler deploy` after `wrangler login`.
 
 **Heads-up — agents still log decisions, don't submit on-chain yet.** Even
 with Codex live, Augur/Haruspex/Auspex currently log `would-act-on: <hash>`
