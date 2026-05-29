@@ -17,6 +17,10 @@ export default defineConfig({
     exclude: ['tests/e2e/**', 'node_modules/**', '.next/**'],
     environment: 'node',
     globals: false,
+    // Stubs next/headers cookies()/headers() + sets a demo session so route
+    // handlers that call getSession() run in the node unit env. See
+    // vitest.setup.ts (2026-05-29 audit fix).
+    setupFiles: ['./vitest.setup.ts'],
     reporters: process.env.CI ? ['default', 'github-actions'] : 'default',
   },
   resolve: {

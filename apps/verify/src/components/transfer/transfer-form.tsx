@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
-import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { useScopedWallet } from '@/lib/use-scoped-wallet';
+import { useTransfer } from '@/lib/use-transfer';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
 /**
  * Transfer form. Audit P-2 fix: prior version had hardcoded balances
@@ -28,7 +30,12 @@ interface TransferQuote {
   ccipFeeUsd: string | null;
   gasFeeUsd: string | null;
   postedAt: string;
-  source: 'aqueduct' | 'pending';
+  // 'estimate' = computed testnet estimate (not a live CCIP router read);
+  // 'pending' = Aqueduct not deployed. There is no 'aqueduct' live-quote
+  // source yet — see /api/transfer/quote and human_left.md aqueduct-live-quote.
+  source: 'estimate' | 'pending';
+  isLiveQuote?: boolean;
+  note?: string;
 }
 
 async function fetchBalance(chain: string, token: string, wallet: string | null): Promise<ChainBalance> {
@@ -66,6 +73,8 @@ export function TransferForm() {
   const [to, setTo] = useState('rh-chain');
 
   const wallet = useScopedWallet();
+  const { submit: transferSubmit, status: txStatus, preflight, reset: resetTx } = useTransfer();
+  const deferredAmount = useDeferredValue(amount);
   const fromBalance = useQuery({
     queryKey: ['balance', from, token, wallet],
     queryFn: () => fetchBalance(from, token, wallet),
@@ -77,14 +86,15 @@ export function TransferForm() {
     refetchInterval: 30_000,
   });
   const quote = useQuery({
-    queryKey: ['transfer-quote', amount, from, to, token],
-    queryFn: () => fetchQuote(amount, from, to, token),
-    enabled: amount.length > 0,
+    queryKey: ['transfer-quote', deferredAmount, from, to, token],
+    queryFn: () => fetchQuote(deferredAmount, from, to, token),
+    enabled: deferredAmount.length > 0,
     refetchInterval: 15_000,
   });
   const { data: deployment } = useDeploymentStatus(1);
   const helper = readinessMessage(deployment, 'Transfer');
-  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0;
+  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !preflight;
+  const busy = txStatus.kind === 'submitting' || txStatus.kind === 'pending';
 
   return (
     <section className="rounded-md border border-divider bg-parchment p-5">
@@ -171,16 +181,47 @@ export function TransferForm() {
           <Row label="Plinth credit posted" value={quote.data?.postedAt ?? 'on arrival'} />
         </dl>
         <p className="text-[9px] uppercase tracking-wider text-muted">
-          {quote.data?.source === 'aqueduct' ? 'from Aqueduct.estimateFee' : 'aqueduct pending · estimate populates after deploy'}
+          {quote.data?.source === 'estimate'
+            ? 'testnet estimate · not a live CCIP router quote'
+            : 'aqueduct pending · estimate populates after deploy'}
         </p>
 
         <button
           type="button"
-          disabled={!ready}
+          disabled={!ready || busy}
+          onClick={() => transferSubmit({ amount, destChain: to })}
           className="w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment hover:bg-ink-dark disabled:opacity-50"
         >
-          Transfer {amount || '0'} {token} →
+          {busy ? 'Submitting…' : `Transfer ${amount || '0'} ${token} →`}
         </button>
+        {txStatus.kind === 'pending' && txStatus.hash && (
+          <p className="text-xs text-ink-soft">
+            Submitted ·{' '}
+            <a href={`https://sepolia.arbiscan.io/tx/${txStatus.hash}`} target="_blank" rel="noreferrer" className="font-mono underline">
+              {txStatus.hash.slice(0, 8)}…{txStatus.hash.slice(-4)}
+            </a>
+          </p>
+        )}
+        {txStatus.kind === 'success' && txStatus.hash && (
+          <p className="text-xs text-live">
+            Confirmed ·{' '}
+            <a href={`https://sepolia.arbiscan.io/tx/${txStatus.hash}`} target="_blank" rel="noreferrer" className="font-mono underline">
+              {txStatus.hash.slice(0, 8)}…{txStatus.hash.slice(-4)}
+            </a>
+            {' · '}
+            <button type="button" onClick={resetTx} className="underline">new transfer</button>
+          </p>
+        )}
+        {txStatus.kind === 'error' && (
+          <p className="text-xs text-neg">
+            {humanizeWalletError(txStatus.reason).message}
+            {' · '}
+            <button type="button" onClick={resetTx} className="underline">retry</button>
+          </p>
+        )}
+        {preflight && (
+          <p className="text-[10px] uppercase tracking-wider text-muted">{preflight}</p>
+        )}
         {helper && (
           <p className="text-[10px] uppercase tracking-wider text-muted">{helper}</p>
         )}

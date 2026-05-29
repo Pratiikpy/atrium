@@ -36,7 +36,7 @@ function makeRequest(method: string, query: string, body?: unknown): NextRequest
 describe('GET /api/settings/connected-sites — empty state', () => {
   it('returns source:pending when no sessions registered', async () => {
     const { GET } = await import('./route');
-    const json = await (await GET()).json();
+    const json = await (await GET(makeRequest('GET', ''))).json();
     expect(json.source).toBe('pending');
     expect(json.sites).toEqual([]);
   });
@@ -100,7 +100,7 @@ describe('GET / POST / DELETE state machine', () => {
   it('GET returns the registered session with source:postern after POST', async () => {
     const route = await import('./route');
     await route.POST(makeRequest('POST', '', { host: 'app.atrium.fi' }));
-    const json = await (await route.GET()).json();
+    const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.source).toBe('postern');
     expect(json.sites).toHaveLength(1);
     expect(json.sites[0].host).toBe('app.atrium.fi');
@@ -117,7 +117,7 @@ describe('GET / POST / DELETE state machine', () => {
     const delJson = await delRes.json();
     expect(delJson.revoked).toBe('app.a.com');
 
-    const json = await (await route.GET()).json();
+    const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.sites).toHaveLength(1);
     expect(json.sites[0].host).toBe('app.b.com');
   });
@@ -130,7 +130,7 @@ describe('GET / POST / DELETE state machine', () => {
     const delJson = await delRes.json();
     expect(delJson.revoked).toBe('all');
 
-    const json = await (await route.GET()).json();
+    const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.sites).toEqual([]);
     expect(json.source).toBe('pending');
   });
@@ -152,7 +152,7 @@ describe('LL-6 MAX_SESSIONS cap (DoS protection)', () => {
     }
     await route.POST(makeRequest('POST', '', { host: 'overflow.com' }));
 
-    const json = await (await route.GET()).json();
+    const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.sites).toHaveLength(100);
     const hosts = json.sites.map((s: any) => s.host);
     expect(hosts).toContain('overflow.com');
@@ -169,7 +169,7 @@ describe('LL-6 MAX_SESSIONS cap (DoS protection)', () => {
     // because `sessions.has(body.host)` is true.
     await route.POST(makeRequest('POST', '', { host: 'b50.com' }));
 
-    const json = await (await route.GET()).json();
+    const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.sites).toHaveLength(100);
     // b0 was NOT evicted because the re-POST didn't push over the cap.
     const hosts = json.sites.map((s: any) => s.host);
