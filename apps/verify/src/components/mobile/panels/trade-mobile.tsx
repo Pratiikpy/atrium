@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useOpenPosition } from '@/lib/use-open-position';
+import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
@@ -17,14 +18,24 @@ import { useOpenPosition } from '@/lib/use-open-position';
  */
 export function TradeMobile() {
   const [side, setSide] = useState<'long' | 'short'>('long');
-  const [amount, setAmount] = useState('1820');
+  const [amount, setAmount] = useState('');
   const [leverage, setLeverage] = useState(4);
   const { status, open, reset } = useOpenPosition();
 
-  const notional = (Number(amount || '0') * leverage).toFixed(2);
+  // Audit fix (#15): the mobile panel bypassed the desktop's deployment-
+  // readiness gate, so it would let a user fire an open before Plinth is
+  // executable. Mirror the desktop OrderForm: gate the CTA on
+  // useDeploymentStatus(2) + a clear readiness helper when not ready.
+  const { data: deployment } = useDeploymentStatus(2);
   const isSubmitting = status.kind === 'submitting' || status.kind === 'resolving';
+  const amountValid = amount.length > 0 && parseFloat(amount) > 0;
+  const ready = deployment?.ready === true && amountValid && !isSubmitting;
+  const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
+
+  const notional = (Number(amount || '0') * leverage).toFixed(2);
 
   const submit = () => {
+    if (!ready) return;
     void open({ venue: 'trade-xyz', side, sizeUsd: notional });
   };
 
@@ -121,18 +132,22 @@ export function TradeMobile() {
         <Row l="Notional" v={`$${Number(notional).toLocaleString()}`} />
         <Row l="Initial margin" v={`$${Number(amount || '0').toLocaleString()}`} />
         <Row l="Liquidation" v="pending" />
-        <Row l="Fee" v="0.05%" />
+        <Row l="Fee" v="pending" />
         <Row l="Gas" v="sponsored" />
       </div>
 
       <button
         type="button"
         onClick={submit}
-        disabled={isSubmitting}
-        className={`rounded-full py-3.5 text-center font-medium transition disabled:opacity-60 ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
+        disabled={!ready}
+        className={`rounded-full py-3.5 text-center font-medium transition disabled:opacity-50 ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
       >
         {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . rTSLA-PERP`}
       </button>
+      {/* Honest readiness gate (mirrors desktop): explains why the CTA is off. */}
+      {!deployment?.ready && (
+        <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">{helper}</p>
+      )}
       {status.kind === 'error' && (
         <p className="text-center font-mono text-[11px] text-mob-neg">
           {status.reason}
