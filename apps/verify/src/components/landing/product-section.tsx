@@ -21,9 +21,8 @@ export function ProductSection() {
         <>
           Capital efficiency,{' '}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{
-              fontFamily: '"Instrument Serif", "Times New Roman", serif',
               color: '#7E2A20',
               fontWeight: 400,
               letterSpacing: '-0.01em',
@@ -65,7 +64,7 @@ function ImpluviumDiagram() {
       <div className="flex items-start justify-between border-b border-ink pb-3.5 text-xs text-ink-soft">
         <div>
           <div className="font-medium text-ink">Fig. 01 . Capital convergence</div>
-          <div className="mt-0.5 text-muted">Plan view . live testnet</div>
+          <div className="mt-0.5 text-muted">Plan view . illustrative schematic</div>
         </div>
         <div className="text-right">
           <div className="font-medium text-ink">Sheet 02 / {String(VENUE_COUNT + 1).padStart(2, '0')}</div>

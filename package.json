@@ -9,6 +9,13 @@
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
   },
+  "pnpm": {
+    "//supportedArchitectures": "Fetch native binaries (lightningcss, sharp, etc.) for BOTH Linux (CI / WSL) and Windows (local dev). The lockfile was resolved on Linux, so a Windows-native `pnpm dev` was missing lightningcss.win32-x64-msvc.node and every CSS compile 500'd. Listing both keeps node_modules correct on either OS.",
+    "supportedArchitectures": {
+      "os": ["current", "linux", "win32"],
+      "cpu": ["current", "x64", "arm64"]
+    }
+  },
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm --filter @atrium/verify dev",

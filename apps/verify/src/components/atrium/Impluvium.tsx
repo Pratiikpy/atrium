@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { VENUES, fmtUSD } from "@/lib/atrium/mock";
+import { VENUES, fmtUSD } from "@/lib/atrium/static";
 import { useTweenNumber } from "@/hooks/useTweenNumber";
 
 /**
@@ -22,23 +22,19 @@ export function Impluvium({
   const venueRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [paths, setPaths] = useState<{ id: string; d: string; isTop: boolean }[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
   const [leverage, setLeverage] = useState(initialLeverage);
 
-  useEffect(() => {
-    const t = setInterval(() => setTick((x) => x + 1), 1600);
-    return () => clearInterval(t);
-  }, []);
-
+  // Honesty fix (2026-05-29 audit): this landing diagram previously ran a
+  // setInterval that jittered the venue figures with Math.sin/cos to LOOK
+  // like a live ticker, under a "live testnet feed" / green "Live" label.
+  // That is the exact fake-live anti-pattern task #338 was closed to kill.
+  // The landing page is allowed illustrative figures, but it must not
+  // *pretend* they are live. Numbers are now static (no autonomous wobble);
+  // the leverage slider below stays interactive (honest user input, not a
+  // simulated feed), and the chrome is relabelled "illustrative schematic".
   const liveVenues = useMemo(
-    () =>
-      VENUES.map((v, i) => {
-        const j =
-          Math.sin((tick + i * 1.7) * 0.6) * (v.collateral * 0.004) +
-          Math.cos(tick * 0.8 + i) * (v.collateral * 0.002);
-        return { ...v, live: v.collateral + j };
-      }),
-    [tick],
+    () => VENUES.map((v) => ({ ...v, live: v.collateral })),
+    [],
   );
 
   const totalCollateral = liveVenues.reduce((s, v) => s + (v.pending ? 0 : v.live), 0);
@@ -95,7 +91,7 @@ export function Impluvium({
         <div>
           <div className="mono cap">Fig. 01 · Capital convergence</div>
           <div className="mono cap muted" style={{ marginTop: 4 }}>
-            Plan view · live testnet feed
+            Plan view · illustrative schematic
           </div>
         </div>
         <div className="mono cap" style={{ textAlign: "right" }}>
@@ -124,7 +120,7 @@ export function Impluvium({
             <PoolHatch />
             <div className="pool-corner top-left">Pool · Unified margin</div>
             <div className="pool-corner top-right">
-              <span className="live-dot" /> Live
+              Schematic
             </div>
             <div className="pool-center">
               <div className="pool-figure tnum">{fmtUSD(buyingPowerTween)}</div>
