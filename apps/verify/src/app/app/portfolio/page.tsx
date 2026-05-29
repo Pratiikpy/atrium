@@ -6,7 +6,9 @@ import { BuyingPowerCard } from '@/components/portfolio/buying-power-card';
 import { PositionsFilter } from '@/components/portfolio/positions-filter';
 import { ActivityFeed } from '@/components/portfolio/activity-feed';
 import { TopUpBanner } from '@/components/portfolio/top-up-banner';
+import { EmergencyStopCard } from '@/components/portfolio/emergency-stop-card';
 import { PortfolioMobile } from '@/components/mobile/panels/portfolio-mobile';
+import { TestnetPill } from '@/components/ui/testnet-pill';
 
 /**
  * /app/portfolio — Atrium "Unified margin" view.
@@ -60,9 +62,8 @@ export default function PortfolioPage() {
             Portfolio
           </p>
           <h1
-            className="mt-2 font-medium leading-[1.04] tracking-[-0.03em]"
+            className="mt-2 font-sans font-medium leading-[1.04] tracking-[-0.03em]"
             style={{
-              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
               fontSize: 'clamp(36px, 4.5vw, 56px)',
               color: 'oklch(0.13 0.008 60)',
             }}
@@ -81,6 +82,7 @@ export default function PortfolioPage() {
         {/* Header CTAs match the prototype's view-actions ("Open position",
             "Deposit"). Routing to the existing real pages — no fake handlers. */}
         <div className="flex flex-wrap gap-2">
+          <TestnetPill />
           <Link
             href="/app/trade"
             className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2.5 text-sm min-h-[44px] font-medium text-parchment hover:bg-ink/90"
@@ -117,12 +119,13 @@ export default function PortfolioPage() {
             filterable table. HL / Aave / Pendle / PMK pills now actually
             filter the table client-side (data still comes from the API). */}
         <PositionsFilter />
-        <aside>
+        <aside className="space-y-6">
+          <EmergencyStopCard />
+          <div>
           <header className="mb-3 flex items-baseline justify-between">
             <h2
-            className="font-medium tracking-[-0.02em]"
+            className="font-sans font-medium tracking-[-0.02em]"
             style={{
-              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
               fontSize: '20px',
               color: 'oklch(0.13 0.008 60)',
             }}
@@ -134,6 +137,7 @@ export default function PortfolioPage() {
             </Link>
           </header>
           <ActivityFeed />
+          </div>
         </aside>
       </section>
       </div>
