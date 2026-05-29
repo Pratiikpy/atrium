@@ -120,7 +120,15 @@ contract PorticoRegistry {
     }
 
     function getAdapter(uint8 venue_id) external view returns (address) {
-        return adapters_by_venue[venue_id].adapter;
+        // Audit fix (contracts-sol #10): gate on is_active. Pre-fix, deregister
+        // / emergencyDeregister only flipped is_active=false but never zeroed
+        // .adapter, and this getter ignored is_active - so the Router (which
+        // resolves adapters ONLY via getAdapter and only rejects address(0))
+        // kept routing opens/closes to a delisted adapter even after the
+        // one-tx emergency fast-path. Returning address(0) for an inactive
+        // venue makes the Router's existing address(0) guards reject it.
+        AdapterRecord storage rec = adapters_by_venue[venue_id];
+        return rec.is_active ? rec.adapter : address(0);
     }
 
     function listActiveVenues() external view returns (uint8[] memory) {

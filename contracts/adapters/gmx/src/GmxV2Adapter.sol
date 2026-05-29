@@ -74,6 +74,13 @@ contract GmxV2Adapter is IPorticoAdapter, ReentrancyGuard {
     error PositionNotFound();
     error BadVenuePayload();
     error UsdcTransferFailed(address to, uint256 amount);
+    // Audit fix (contracts-sol #9): GMX is a Phase-2 scaffold (IGmxRouter is a
+    // stub; the venue placeholder is the deployer EOA). Its Morpho/Synthetix
+    // siblings revert ScaffoldNotImplemented on open; GMX did not, so the moment
+    // any benign mock/partial router is pointed at the venue slot, the Router
+    // pulls USDC into this adapter (Coffer.adapterPull) before calling open and
+    // the funds strand. Block entry until a real GMX router is wired.
+    error ScaffoldNotImplemented();
 
     modifier onlyAuthorizedCaller() {
         if (msg.sender != atrium_coffer && !is_authorized_caller[msg.sender]) revert Unauthorized();
@@ -100,9 +107,14 @@ contract GmxV2Adapter is IPorticoAdapter, ReentrancyGuard {
     function isHybrid() external pure returns (bool) { return false; }
     function supportedInstruments() external view returns (bytes32[] memory) { return supported_instruments_; }
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     function addInstrument(
@@ -126,6 +138,10 @@ contract GmxV2Adapter is IPorticoAdapter, ReentrancyGuard {
     function open_position(bytes32 instrument_id, int256 notional_signed, bytes calldata venue_payload)
         external onlyAuthorizedCaller nonReentrant returns (uint256 venue_position_id)
     {
+        // Scaffold guard (audit #9): no real GMX router is wired. Revert before
+        // any state/USDC movement so the Router cannot strand pulled collateral
+        // in this adapter. Remove when a real gmx_router is deployed + set.
+        revert ScaffoldNotImplemented();
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
         if (venue_payload.length < 20) revert BadVenuePayload();
         address originator;

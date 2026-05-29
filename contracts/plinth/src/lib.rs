@@ -910,19 +910,30 @@ impl Plinth {
         let math = IPlinthMath::new(self.plinth_math_address.get());
         let min_initial = self.params.min_initial_margin_bps.get().to::<u16>();
         let maint_buffer = self.params.maint_margin_buffer_bps.get().to::<u16>();
-        let mut required = math
-            .required_margin(
-                self.vm(),
-                Call::new(),
-                notionals,
-                entry_prices,
-                current_prices,
-                haircuts,
-                classes,
-                min_initial,
-                maint_buffer,
-            )
-            .map_err(|_| PlinthError::code(ERR_MATH_UNREACHABLE))?;
+        // Audit fix (contracts-rust #8): PlinthMath.required_margin reverts
+        // ArrayLengthMismatch on n==0. A fully-closed account - including the
+        // moment you close your LAST position, which empties the list before
+        // this recompute runs - would otherwise revert the whole
+        // close_position / update_margin tx (and block Vigil from closing a
+        // user's final position). span.rs already returns ZERO for empty; match
+        // it here and skip the wasted staticcall.
+        let mut required = if notionals.is_empty() {
+            U256::ZERO
+        } else {
+            math
+                .required_margin(
+                    self.vm(),
+                    Call::new(),
+                    notionals,
+                    entry_prices,
+                    current_prices,
+                    haircuts,
+                    classes,
+                    min_initial,
+                    maint_buffer,
+                )
+                .map_err(|_| PlinthError::code(ERR_MATH_UNREACHABLE))?
+        };
 
         // Phase 2a: apply initial margin multiplier at open time only.
         // This ensures new positions start with a 50% buffer above maintenance
