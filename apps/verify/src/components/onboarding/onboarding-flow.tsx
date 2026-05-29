@@ -45,8 +45,27 @@ const STEPS = [
 ] as const;
 
 export function OnboardingFlow() {
-  const [step, setStep] = useState(0);
-  const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  const [step, setStep] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const stored = localStorage.getItem('atrium_onboarding_v1');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return typeof parsed.step === 'number' ? parsed.step : 0;
+      }
+    } catch { /* ignore */ }
+    return 0;
+  });
+  const next = () => setStep((s: number) => {
+    const n = Math.min(s + 1, STEPS.length - 1);
+    try { localStorage.setItem('atrium_onboarding_v1', JSON.stringify({ step: n })); } catch { /* ignore */ }
+    return n;
+  });
+  const back = () => setStep((s: number) => {
+    const n = Math.max(s - 1, 0);
+    try { localStorage.setItem('atrium_onboarding_v1', JSON.stringify({ step: n })); } catch { /* ignore */ }
+    return n;
+  });
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -81,7 +100,7 @@ export function OnboardingFlow() {
               >
                 <span
                   className={
-                    'inline-flex size-[22px] items-center justify-center rounded-full border font-mono text-[11px] ' +
+                    'inline-flex size-[44px] items-center justify-center rounded-full border font-mono text-[13px] ' +
                     (state === 'current'
                       ? 'border-ink bg-ink text-parchment'
                       : state === 'done'
@@ -100,9 +119,9 @@ export function OnboardingFlow() {
         {/* Card */}
         <section className="min-h-[380px] rounded-[16px] border border-divider bg-parchment-light px-11 py-10 shadow-[0_1px_1px_rgba(0,0,0,0.02),0_10px_30px_rgba(0,0,0,0.04)] md:px-12">
           {step === 0 && <Welcome onNext={next} />}
-          {step === 1 && <Authenticator onNext={next} />}
-          {step === 2 && <Faucet onNext={next} />}
-          {step === 3 && <MarginPosted onNext={next} />}
+          {step === 1 && <Authenticator onNext={next} onBack={back} />}
+          {step === 2 && <Faucet onNext={next} onBack={back} />}
+          {step === 3 && <MarginPosted onNext={next} onBack={back} />}
           {step === 4 && <DoneStep />}
         </section>
       </div>
@@ -120,10 +139,20 @@ function Welcome({ onNext }: { onNext: () => void }) {
         Step inside the atrium.
       </h1>
       <p className="mt-3 max-w-prose text-[15px] leading-[1.55] text-ink-soft">
-        Atrium is unified margin prime brokerage for the EVM. This is the open
-        testnet. You&rsquo;ll need ninety seconds to set up an authenticator,
-        claim a faucet drop, and post your first cross-margin position.
+        Atrium gives you one buying-power number across every venue. Post collateral
+        once and the same balance backs positions on Hyperliquid, Aave, Pendle and more,
+        because your risks net instead of being re-posted. Ninety seconds: passkey,
+        faucet, your first cross-margin position.
       </p>
+
+      {/* Benefit callout - lead onboarding with the wedge, not jargon. */}
+      <div className="mt-5 rounded-[12px] border border-divider bg-parchment-soft/40 px-5 py-4">
+        <p className="text-[11px] uppercase tracking-wider text-muted">Why Atrium</p>
+        <p className="mt-1.5 text-[14px] leading-[1.5] text-ink">
+          Without unified margin you post $100K at each venue - $300K tied up. Here, one
+          $100K deposit backs Hyperliquid, Aave and Pendle together.
+        </p>
+      </div>
 
       <div className="mt-8 flex flex-col gap-3">
         <FeatureRow
@@ -160,7 +189,7 @@ function Welcome({ onNext }: { onNext: () => void }) {
 
 /* ----- Step 2: Authenticator (real WebAuthn) ----------------------------- */
 
-function Authenticator({ onNext }: { onNext: () => void }) {
+function Authenticator({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState<boolean | null>(null);
@@ -240,7 +269,7 @@ function Authenticator({ onNext }: { onNext: () => void }) {
         <div
           className={
             'mx-auto flex size-[80px] items-center justify-center rounded-full text-ink ' +
-            (signing ? 'animate-spin border-[1.5px] border-dashed border-ink' : 'border-[1.5px] border-solid border-ink')
+            (signing ? 'animate-pulse border-[1.5px] border-dashed border-ink' : 'border-[1.5px] border-solid border-ink')
           }
         >
           <Shield size={28} />
@@ -281,6 +310,15 @@ function Authenticator({ onNext }: { onNext: () => void }) {
       </div>
 
       {showWarning && <SecondDeviceWarning onContinue={onNext} onCancel={() => setShowWarning(false)} />}
+
+      <div className="mt-4 flex items-center justify-between">
+        <button type="button" onClick={onBack} className="text-xs text-muted hover:text-ink">
+          ← Back
+        </button>
+        <button type="button" onClick={onNext} className="text-xs text-muted hover:text-ink">
+          Skip for now (set up later in Settings)
+        </button>
+      </div>
     </>
   );
 }
@@ -288,6 +326,26 @@ function Authenticator({ onNext }: { onNext: () => void }) {
 /* ----- Modal: Second-device warning (Phase eta.7) ------------------------ */
 
 function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void; onCancel: () => void }) {
+  function remindLater() {
+    try {
+      localStorage.setItem('atrium_second_device_remind', String(Date.now() + 86_400_000));
+    } catch { /* ignore */ }
+    onContinue();
+  }
+
+  // Check if dismissed within 24h
+  const dismissed = (() => {
+    try {
+      const ts = localStorage.getItem('atrium_second_device_remind');
+      return ts && Date.now() < parseInt(ts, 10);
+    } catch { return false; }
+  })();
+  if (dismissed) {
+    // Auto-advance if user previously dismissed
+    onContinue();
+    return null;
+  }
+
   return (
     <div
       role="dialog"
@@ -301,7 +359,7 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
         onClick={(e) => e.stopPropagation()}
       >
         <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-accent">
-          Important . before you deposit
+          Important · before you deposit
         </p>
         <h2 id="second-device-title" className="mt-2 font-display text-[24px] italic leading-[1.2] text-ink">
           Set up a second device before deposit.
@@ -339,10 +397,17 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
           </button>
           <button
             type="button"
+            onClick={remindLater}
+            className="inline-flex h-[40px] items-center rounded-full border border-divider bg-parchment-light px-4 text-[13px] text-muted hover:border-ink/30"
+          >
+            Remind me later
+          </button>
+          <button
+            type="button"
             onClick={onContinue}
             className="inline-flex h-[40px] items-center rounded-full bg-ink px-5 text-[13px] font-medium text-parchment hover:bg-ink/90"
           >
-            I understand . continue
+            I understand · continue
           </button>
         </div>
       </div>
@@ -352,7 +417,7 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
 
 /* ----- Step 3: Faucet (real /api/faucet/status) -------------------------- */
 
-function Faucet({ onNext }: { onNext: () => void }) {
+function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const wallet = useScopedWallet();
   const [status, setStatus] = useState<FaucetStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -368,12 +433,7 @@ function Faucet({ onNext }: { onNext: () => void }) {
       .catch((e) => setError(e instanceof Error ? e.message : 'Faucet status unavailable'));
   }, [wallet]);
 
-  const drops = status?.drops ?? [
-    { token: 'USDC', amount: 10000, chain: 'arb-sepolia' as const },
-    { token: 'USDC', amount: 5000, chain: 'rh-chain' as const },
-    { token: 'rAAPL', amount: 25, chain: 'rh-chain' as const },
-    { token: 'WETH', amount: 3, chain: 'arb-sepolia' as const },
-  ];
+  const drops = status?.drops ?? [];
 
   return (
     <>
@@ -444,13 +504,24 @@ function Faucet({ onNext }: { onNext: () => void }) {
             ? 'Faucet rate-limited to one claim per address per month'
             : status?.reason ?? 'Faucet deploys with Coffer (Month 1 W2)'}
       </p>
+      <div className="mt-4 flex items-center justify-between">
+        <button type="button" onClick={onBack} className="text-xs text-muted hover:text-ink">
+          ← Back
+        </button>
+        <div className="text-right text-[11px] text-muted">
+          Need testnet ETH?{' '}
+          <a href="https://faucet.quicknode.com/arbitrum/sepolia" target="_blank" rel="noreferrer" className="underline hover:text-ink">QuickNode</a>
+          {' · '}
+          <a href="https://www.alchemy.com/faucets/arbitrum-sepolia" target="_blank" rel="noreferrer" className="underline hover:text-ink">Alchemy</a>
+        </div>
+      </div>
     </>
   );
 }
 
 /* ----- Step 4: Margin Posted (real /api/portfolio/buying-power) ---------- */
 
-function MarginPosted({ onNext }: { onNext: () => void }) {
+function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const wallet = useScopedWallet();
   const [bp, setBp] = useState<BuyingPower | null>(null);
   useEffect(() => {
@@ -465,7 +536,7 @@ function MarginPosted({ onNext }: { onNext: () => void }) {
       .catch(() => setBp({ currentUsd: null, source: 'pending' }));
   }, [wallet]);
 
-  const isLive = bp?.source === 'plinth' && bp.currentUsd != null;
+  const isLive = bp?.source === 'plinth' && bp.currentUsd != null && parseFloat(bp.currentUsd) > 0;
   const buyingPower = isLive ? `$${bp!.currentUsd}` : 'pending';
 
   return (
@@ -517,11 +588,20 @@ function MarginPosted({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2.5">
-        <PrimaryButton onClick={onNext} className="flex-1 justify-center">
+      <div className="mt-6 flex items-center justify-between">
+        <button type="button" onClick={onBack} className="text-xs text-muted hover:text-ink">
+          ← Back
+        </button>
+        <PrimaryButton onClick={onNext} className="flex-1 ml-3 justify-center">
           Open portfolio <Arrow />
         </PrimaryButton>
       </div>
+      {!isLive && (
+        <p className="mt-3 text-center text-[11px] text-muted">
+          Deposit first ·{' '}
+          <Link href="/app/vault" className="underline hover:text-ink">Go to vault</Link>
+        </p>
+      )}
     </>
   );
 }
