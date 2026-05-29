@@ -125,6 +125,12 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
           venueAllowlist: input.venueAllowlist,
           signature,
           intentHash,
+          // The server recomputes the EIP-712 hash from the form fields + these
+          // two signed-only values to verify the signature binds to this exact
+          // mandate (2026-05-29 signature-binding fix). Sent as decimal strings
+          // so the bigints survive JSON.
+          expiresAt: envelope.expiresAt.toString(),
+          nonce: envelope.nonce.toString(),
         }),
       });
       const j = await r.json();
