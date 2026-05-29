@@ -59,7 +59,9 @@ sol! {
         address indexed owner,
         uint8 venue_id,
         bytes32 instrument_id,
-        int256 notional_signed
+        int256 notional_signed,
+        uint256 entry_price_q64,
+        bytes32 intent_hash
     );
 
     event PositionClosed(
@@ -117,6 +119,20 @@ pub const ERR_PYTH_NEGATIVE_PRICE: u16 = 15;
 /// failure as a distinct error code so the calling tx reverts loud.
 pub const ERR_MATH_UNREACHABLE: u16 = 16;
 
+/// Phase 2a: distinguishes open-time margin check (applies 1.5× multiplier)
+/// from maintenance-path margin check (no multiplier). The initial margin
+/// multiplier ensures new positions have a safety buffer above maintenance.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum MarginCheckKind {
+    Open,
+    Maintenance,
+}
+
+/// Phase 2a: initial margin multiplier applied at open time only.
+/// 1.5× = 15000 / 10000. Ensures new positions start with 50% buffer above
+/// maintenance margin, giving time for orderly liquidation if price moves.
+const INITIAL_MARGIN_MULTIPLIER_BPS: u64 = 15_000;
+
 #[derive(SolidityError)]
 pub enum PlinthError {
     Err(PlinthErr),
@@ -158,6 +174,9 @@ sol_interface! {
         // persists rate-limit and credit-line counters after recovery.
         function validateAction(bytes calldata intent_bytes, bytes calldata action_bytes)
             external returns (bool valid);
+        // Phase 2a: Plinth calls this on close_position to decrement the
+        // agent's running open-notional counter. Lands in Sigil same phase.
+        function recordClose(address agent, uint256 amount) external;
     }
     // Separated SPAN math — see contracts/plinth-math. Plinth calls this
     // every time it recomputes a user's required margin.
@@ -223,6 +242,7 @@ sol_storage! {
 
     pub struct Position {
         address owner;
+        address agent;  // Phase 2a: track which agent opened this position (Address::ZERO if user-direct)
         uint8 venue_id;
         bytes32 instrument_id;
         int256 notional_signed;
@@ -357,6 +377,17 @@ impl Plinth {
         let owner = self.resolve_owner(caller, &action_sigil, &intent_sigil)?;
         self.assert_account_not_paused(owner)?;
 
+        // Phase 2a: resolve agent address from intent envelope.
+        // If action_sigil is non-empty, the agent is the second address in the
+        // intent envelope (bytes 32..64, left-padded). If empty, no agent.
+        let agent: Address = if !intent_sigil.is_empty() && intent_sigil.len() >= 64 {
+            let mut addr_bytes = [0u8; 20];
+            addr_bytes.copy_from_slice(&intent_sigil[44..64]);
+            Address::from(addr_bytes)
+        } else {
+            Address::ZERO
+        };
+
         // Validate instrument is active + has risk config
         let key = instrument_key(venue_id, instrument_id);
         let risk = self.instrument_risk.getter(key);
@@ -392,6 +423,7 @@ impl Plinth {
         // Persist position
         let mut pos = self.positions.setter(position_id);
         pos.owner.set(owner);
+        pos.agent.set(agent); // Phase 2a: store agent
         pos.venue_id.set(Uint::<8, 1>::from(venue_id));
         pos.instrument_id.set(instrument_id);
         pos.notional_signed.set(notional_signed);
@@ -404,19 +436,26 @@ impl Plinth {
         let mut user_list = self.user_position_ids.setter(owner);
         user_list.push(position_id);
 
+        // Phase 2a: compute intent_hash for Agent.totalPnlSigned join
+        let intent_hash: B256 = if !intent_sigil.is_empty() {
+            B256::from(alloy_primitives::keccak256(&intent_sigil))
+        } else {
+            B256::ZERO
+        };
+
         self.vm().log(PositionOpened {
             position_id,
             owner,
             venue_id,
             instrument_id,
             notional_signed,
+            entry_price_q64: price,
+            intent_hash,
         });
 
         // Recompute margin atomically (also triggers Vigil if under-collateralized).
-        // Audit H-H1: open_position_inner runs inside the outer reentrancy
-        // guard, so it calls `do_update_margin` directly instead of
-        // `update_margin` (which would self-detect as a reentrant call).
-        self.do_update_margin(owner)?;
+        // Phase 2a: pass MarginCheckKind::Open to apply 1.5× initial margin multiplier.
+        self.do_update_margin_with_kind(owner, MarginCheckKind::Open)?;
 
         Ok(position_id)
     }
@@ -427,6 +466,7 @@ impl Plinth {
         let caller = self.vm().msg_sender();
         let pos = self.positions.getter(position_id);
         let owner = pos.owner.get();
+        let agent = pos.agent.get(); // Phase 2a: read agent for record_close
         let is_user = caller == owner;
         let is_vigil = caller == self.vigil_address.get();
         if !is_user && !is_vigil {
@@ -498,6 +538,17 @@ impl Plinth {
             position_id,
             realized_pnl_signed: realized_pnl,
         });
+
+        // Phase 2a: call Sigil.record_close to decrement agent's open notional.
+        // Only if the position was opened by an agent (non-zero agent address).
+        if !agent.is_zero() {
+            let abs_notional = U256::try_from(notional.unsigned_abs()).unwrap_or(U256::ZERO);
+            let sigil = ISigil::new(self.sigil_address.get());
+            let sctx = Call::new_mutating(self);
+            // Best-effort: if Sigil call fails, the position is still closed.
+            // The agent's credit-line will be over-counted (fail-safe direction).
+            let _ = sigil.record_close(self.vm(), sctx, agent, abs_notional);
+        }
 
         // Release the guard BEFORE update_margin since that path takes the
         // guard itself (do_update_margin set elsewhere wraps its own).
@@ -619,8 +670,11 @@ impl Plinth {
         // hardcoded MAX_CORRELATION_CLASSES window. Without this, a Praetor
         // typo passing class=16+ creates an instrument whose positions
         // require ZERO margin — silent grant of unbounded leverage.
+        // Phase 2a: also require correlation_class > 0. Class 0 is reserved
+        // in PlinthMath as "each position is its own class" (no netting).
+        // Instruments must be assigned to a real class (1..max_classes-1).
         let max_classes: u16 = self.params.max_correlation_classes.get().to::<u16>();
-        if correlation_class >= max_classes {
+        if correlation_class == 0 || correlation_class >= max_classes {
             return Err(PlinthError::code(ERR_CORRELATION_CLASS_OOR));
         }
         let key = instrument_key(venue_id, instrument_id);
@@ -664,6 +718,26 @@ impl Plinth {
         self.vm().log(PlinthResumed {
             block_number: self.vm().block_number(),
         });
+        Ok(())
+    }
+
+    /// Manually clear a single account's pause flag. Timelock-only escape
+    /// hatch complementing the symmetric auto-heal in update_margin (audit
+    /// blocker contracts-rust #1): the auto-heal clears is_paused whenever a
+    /// recompute finds the account healthy, but this gives an explicit admin
+    /// recovery path (and emits the previously-declared-but-never-emitted
+    /// AccountResumed event) for any edge case where an account is stuck
+    /// paused while genuinely solvent.
+    pub fn resume_account(&mut self, user: Address) -> Result<(), PlinthError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_timelock.get() {
+            return Err(PlinthError::code(ERR_UNAUTHORIZED));
+        }
+        {
+            let mut acc = self.accounts.setter(user);
+            acc.is_paused.set(false);
+        }
+        self.vm().log(AccountResumed { user });
         Ok(())
     }
 }
@@ -772,6 +846,13 @@ impl Plinth {
 
     /// Actual margin recompute. Called inside the reentrancy guard.
     fn do_update_margin(&mut self, user: Address) -> Result<U256, PlinthError> {
+        self.do_update_margin_with_kind(user, MarginCheckKind::Maintenance)
+    }
+
+    /// Phase 2a: margin recompute with kind parameter.
+    /// When kind == Open, applies 1.5× initial margin multiplier so new
+    /// positions must have 50% buffer above maintenance requirement.
+    fn do_update_margin_with_kind(&mut self, user: Address, kind: MarginCheckKind) -> Result<U256, PlinthError> {
         // Read all positions and prices into parallel arrays. We pass these
         // over staticcall to PlinthMath (split out to fit EIP-170 — see
         // Phase A.7 in LAUNCH_READY.md).
@@ -800,7 +881,7 @@ impl Plinth {
         let math = IPlinthMath::new(self.plinth_math_address.get());
         let min_initial = self.params.min_initial_margin_bps.get().to::<u16>();
         let maint_buffer = self.params.maint_margin_buffer_bps.get().to::<u16>();
-        let required = math
+        let mut required = math
             .required_margin(
                 self.vm(),
                 Call::new(),
@@ -813,6 +894,16 @@ impl Plinth {
                 maint_buffer,
             )
             .map_err(|_| PlinthError::code(ERR_MATH_UNREACHABLE))?;
+
+        // Phase 2a: apply initial margin multiplier at open time only.
+        // This ensures new positions start with a 50% buffer above maintenance
+        // margin, giving the system time for orderly liquidation if price moves
+        // adversely immediately after opening.
+        if kind == MarginCheckKind::Open {
+            required = required
+                .saturating_mul(U256::from(INITIAL_MARGIN_MULTIPLIER_BPS))
+                / U256::from(10_000u64);
+        }
 
         // Read Coffer balance.
         //
@@ -844,9 +935,17 @@ impl Plinth {
             acc.required_margin_wei.set(required);
             acc.last_update_block.set(Uint::<64, 1>::from(block_now));
             acc.margin_version.set(new_version);
-            if underwater {
-                acc.is_paused.set(true);
-            }
+            // Audit blocker fix (contracts-rust #1): the pause flag was a
+            // one-way set (true on underwater, never cleared), so any transient
+            // under-collateralization permanently froze the account AND its
+            // Coffer funds (open_position + Coffer.withdraw/adapter_pull all
+            // gate on is_paused) with no on-chain recovery. Now it tracks
+            // health symmetrically: a recompute that finds the account healthy
+            // (collateral >= required) clears it. This only clears when the
+            // account is genuinely healthy, so it cannot race a still-needed
+            // liquidation (which leaves `underwater` true). A manual
+            // timelock-gated resume_account() below is the admin escape hatch.
+            acc.is_paused.set(underwater);
         }
 
         self.vm().log(MarginUpdated {
@@ -887,6 +986,70 @@ impl Plinth {
         }
 
         Ok(required)
+    }
+
+    /// Phase 2a: reduce a position by `reduction_bps` basis points.
+    /// Called by Vigil for partial liquidation instead of full close.
+    /// Returns the realized PnL on the reduced portion.
+    pub fn reduce_position(&mut self, position_id: U256, reduction_bps: u16) -> Result<I256, PlinthError> {
+        self.assert_not_globally_paused()?;
+        let caller = self.vm().msg_sender();
+        // Only Vigil can call reduce_position
+        if caller != self.vigil_address.get() {
+            return Err(PlinthError::code(ERR_UNAUTHORIZED));
+        }
+        if self.is_updating.get() {
+            return Err(PlinthError::code(ERR_REENTRANT));
+        }
+        self.is_updating.set(true);
+
+        let pos = self.positions.getter(position_id);
+        let owner = pos.owner.get();
+        let entry_price = pos.entry_price_q64.get();
+        let venue_id: u8 = pos.venue_id.get().to::<u8>();
+        let instrument_id = pos.instrument_id.get();
+        let notional = pos.notional_signed.get();
+
+        if owner.is_zero() || notional.is_zero() {
+            self.is_updating.set(false);
+            return Ok(I256::ZERO);
+        }
+
+        let current_price = match self.get_safe_price(venue_id, instrument_id) {
+            Ok(p) => p,
+            Err(e) => {
+                self.is_updating.set(false);
+                return Err(e);
+            }
+        };
+
+        // Compute the reduction amount
+        let reduction_notional = notional.saturating_mul(I256::try_from(reduction_bps as i64).unwrap_or(I256::ZERO))
+            / I256::try_from(10_000i64).unwrap_or(I256::MAX);
+        let remaining_notional = notional.saturating_sub(reduction_notional);
+
+        // Compute realized PnL on the reduced portion
+        let realized_pnl = if entry_price.is_zero() {
+            I256::ZERO
+        } else {
+            let entry_i = I256::try_from(entry_price).unwrap_or(I256::MAX);
+            let current_i = I256::try_from(current_price).unwrap_or(I256::MAX);
+            let delta = current_i.saturating_sub(entry_i);
+            reduction_notional.saturating_mul(delta) / entry_i
+        };
+
+        // Update position with reduced notional
+        let mut pos_mut = self.positions.setter(position_id);
+        pos_mut.notional_signed.set(remaining_notional);
+
+        self.vm().log(PositionClosed {
+            position_id,
+            realized_pnl_signed: realized_pnl,
+        });
+
+        self.is_updating.set(false);
+        self.update_margin(owner)?;
+        Ok(realized_pnl)
     }
 }
 
