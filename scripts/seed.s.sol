@@ -82,6 +82,14 @@ contract Seed is Script {
 
         // Step 4: placeholder backtest attestation. Real backtest ships in
         // Month 5 from the Archive Jupyter notebook (PRD §22.2).
+        // Audit fix (#64): ResearchAttestation.publish is onlyTimelock - the
+        // praetor_timelock CONTRACT, never the deployer EOA that broadcasts this
+        // seed - so this direct call ALWAYS reverts. Previously the failure was
+        // swallowed into a log while the summary below claimed "attestation all
+        // live" (a no-fake-pending violation). The real publish path is a
+        // PraetorTimelock schedule+execute (praetor-cli research/lantern
+        // publish), not the deployer seed. We attempt it so intent is recorded,
+        // but report the truth in the summary instead of pretending.
         bytes32 cid = keccak256("ipfs://Qm.../local-demo-backtest");
         (bool ok4, ) = researchAttestation.call(
             abi.encodeWithSignature(
@@ -92,10 +100,16 @@ contract Seed is Script {
                 "ipfs://Qm.../local-demo-backtest.ipynb"
             )
         );
-        if (!ok4) console2.log("ResearchAttestation.publish failed");
+        if (!ok4) {
+            console2.log("ResearchAttestation.publish skipped: onlyTimelock - run via PraetorTimelock schedule+execute (praetor-cli), not the deployer seed");
+        }
 
         vm.stopBroadcast();
 
-        console2.log("Seed complete. Wallets, keepers, position, attestation all live.");
+        if (ok4) {
+            console2.log("Seed complete. Wallets, keepers, position, attestation all live.");
+        } else {
+            console2.log("Seed complete. Wallets, keepers, position live; attestation pending timelock publish (see above).");
+        }
     }
 }

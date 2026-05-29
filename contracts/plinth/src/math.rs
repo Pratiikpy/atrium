@@ -69,8 +69,10 @@ pub fn compute_realized_pnl(
     let entry_i = I256::try_from(entry_price_q64).unwrap_or(I256::MAX);
     let current_i = I256::try_from(current_price_q64).unwrap_or(I256::MAX);
     let delta = current_i.saturating_sub(entry_i);
-    // PnL = notional * delta / entry — saturating to avoid panic
-    notional_signed.saturating_mul(delta) / entry_i
+    // Audit fix (#63): floor-divide so this reference path matches the on-chain
+    // close_position/reduce_position realization (was truncating `/ entry_i`,
+    // which under-counted losses).
+    crate::floor_div_i256(notional_signed.saturating_mul(delta), entry_i)
 }
 
 // =============================================================================

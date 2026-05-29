@@ -42,6 +42,26 @@ pub mod span;
 #[cfg(test)]
 mod tests;
 
+/// Audit fix (#63): floor-divide signed realized PnL toward negative infinity.
+/// Plain Rust integer division truncates toward zero, which rounds a losing
+/// position's booked loss toward zero (favouring the trader against the vault).
+/// The margin path (plinth-math::position_pnl_under_price) already floor-divides;
+/// the realization path (close_position / reduce_position) must match. Mirrors
+/// plinth-math::signed_floor_div, inlined here because math.rs is gated out of
+/// the on-chain build. floor_div(-7, 2) = -4, not -3.
+fn floor_div_i256(numerator: I256, denominator: I256) -> I256 {
+    if denominator.is_zero() {
+        return I256::ZERO;
+    }
+    let q = numerator / denominator;
+    let r = numerator % denominator;
+    if !r.is_zero() && (numerator ^ denominator).is_negative() {
+        q - I256::try_from(1i64).unwrap_or(I256::ZERO)
+    } else {
+        q
+    }
+}
+
 // =============================================================================
 // Events (Solidity-compatible)
 // =============================================================================
@@ -536,7 +556,9 @@ impl Plinth {
             let entry_i = I256::try_from(entry_price).unwrap_or(I256::MAX);
             let current_i = I256::try_from(current_price).unwrap_or(I256::MAX);
             let delta = current_i.saturating_sub(entry_i);
-            notional.saturating_mul(delta) / entry_i
+            // Audit fix (#63): floor-divide so a losing position's booked loss is
+            // never rounded toward zero (was `/ entry_i`, truncating).
+            floor_div_i256(notional.saturating_mul(delta), entry_i)
         };
 
         // Remove from user list (linear scan — bounded by max_positions_per_user)
@@ -1075,7 +1097,8 @@ impl Plinth {
             let entry_i = I256::try_from(entry_price).unwrap_or(I256::MAX);
             let current_i = I256::try_from(current_price).unwrap_or(I256::MAX);
             let delta = current_i.saturating_sub(entry_i);
-            reduction_notional.saturating_mul(delta) / entry_i
+            // Audit fix (#63): floor-divide (was truncating `/ entry_i`).
+            floor_div_i256(reduction_notional.saturating_mul(delta), entry_i)
         };
 
         // Update position with reduced notional
