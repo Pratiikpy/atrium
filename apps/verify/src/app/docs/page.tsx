@@ -39,6 +39,12 @@ const DOCS = [
     pages: 'Pre-demo audit',
   },
   {
+    title: 'COMPETITIVE_POSITIONING.md',
+    sub: 'The wedge: cross-venue portfolio margin from a neutral layer, why no single venue can copy it',
+    href: 'https://github.com/Pratiikpy/atrium/blob/main/COMPETITIVE_POSITIONING.md',
+    pages: 'one-page positioning',
+  },
+  {
     title: 'RESOURCES.md',
     sub: 'The 18 cloned reference repos in resources/ and what each is for',
     href: 'https://github.com/Pratiikpy/atrium/blob/main/RESOURCES.md',
