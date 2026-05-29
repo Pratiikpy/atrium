@@ -43,12 +43,16 @@ function inline(text: string): string {
   let s = escapeHtml(text);
   // inline code `...` (run first; its content is already escaped)
   s = s.replace(/`([^`]+)`/g, (_m, c) => `<code class="rounded bg-parchment-soft/70 px-1 py-0.5 font-mono text-[0.9em] text-ink">${c}</code>`);
-  // links [text](url) - href scheme validated; unsafe schemes render as plain text
+  // links [text](url) - href scheme validated; unsafe schemes render as plain
+  // text. The url is also attribute-encoded (quotes -> entities) so a `"` in
+  // the URL cannot break out of href="..." and inject an event-handler
+  // attribute. escapeHtml ran first but does not touch quotes, so this is the
+  // attribute-context guard.
   s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, t, u) => {
     const href = safeHref(u);
-    return href
-      ? `<a href="${href}" class="text-accent underline-offset-2 hover:underline">${t}</a>`
-      : t;
+    if (!href) return t;
+    const safe = href.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return `<a href="${safe}" class="text-accent underline-offset-2 hover:underline">${t}</a>`;
   });
   // bold **...**
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-medium text-ink">$1</strong>');

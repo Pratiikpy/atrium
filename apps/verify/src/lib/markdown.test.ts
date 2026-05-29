@@ -65,6 +65,13 @@ describe('renderMarkdownToHtml', () => {
     expect(renderMarkdownToHtml('[x](/docs/y)')).toContain('href="/docs/y"');
     expect(renderMarkdownToHtml('[m](mailto:a@b.io)')).toContain('href="mailto:a@b.io"');
   });
+
+  it('encodes quotes in href so a URL cannot break out of the attribute', () => {
+    // A `"` in the URL must not close href="..." and start a new attribute.
+    const html = renderMarkdownToHtml('[x](/a"onfocus=alert(1)');
+    expect(html).not.toMatch(/href="\/a"onfocus/);
+    expect(html).toContain('&quot;');
+  });
 });
 
 describe('extractFrontMatter', () => {
