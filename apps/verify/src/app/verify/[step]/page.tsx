@@ -17,7 +17,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
  * clear empty state — per docs/conventions/ui.md (empty + error + loading + permission states required).
  */
 
-const STEP_CONFIG = {
+export const STEP_CONFIG = {
   '1': {
     title: 'Deposit USDC into Coffer',
     body: 'Postern issues a passkey-bound smart wallet. Coffer locks 1,000 USDC and mints ERC-4626 shares. Plinth opens a fresh margin account.',
@@ -95,8 +95,19 @@ export default async function VerifyStepPage({
     <MarketingShell>
       <div className="mx-auto max-w-3xl">
 
-      <p className="text-xs uppercase tracking-wider text-muted">step {step} of 7</p>
-      <h1 className="mt-2 font-display text-4xl text-ink sm:text-5xl">{cfg.title}</h1>
+      {/* Overview <-> step IA: every step links back to the 7-step overview so
+          a judge/user is never stranded mid-flow. Restored after the rebuild
+          dropped it (e2e 05/03 lock this). */}
+      <Link
+        href="/verify"
+        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"
+      >
+        <ArrowRight className="size-4 rotate-180" aria-hidden />
+        Back to overview
+      </Link>
+
+      <p className="mt-6 text-xs uppercase tracking-wider text-muted">step {step} of 7</p>
+      <h1 data-testid="step-title" className="mt-2 font-display text-4xl text-ink sm:text-5xl">{cfg.title}</h1>
       <p className="mt-6 max-w-prose text-balance text-lg text-ink-soft">{cfg.body}</p>
       <p className="mt-2 text-sm text-muted">
         Contract: <code className="font-mono text-ink">{cfg.contract}</code>

@@ -27,8 +27,12 @@ export default function VaultPage() {
         { label: 'Vault · Coffer' },
       ]}
     >
-      {/* Mobile (< md): VaultMobile panel */}
-      <VaultMobile />
+      {/* Mobile (< md): VaultMobile panel. MUST be md:hidden — without it the
+          mobile panel also renders on desktop, double-mounting the deposit
+          form + stats (e2e flagged duplicate number inputs on desktop). */}
+      <div className="md:hidden">
+        <VaultMobile />
+      </div>
       <div className="hidden md:block">
       <header>
         <p className="eyebrow">Vault · Coffer</p>
