@@ -90,6 +90,12 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
     error InsufficientSignatures(uint16 got, uint16 need);
     error DuplicateAttestation(bytes32 attestation_hash);
     error UsdcTransferFailed(address to, uint256 amount);
+    // Audit fix (#65): Phase-2 scaffold guard. The validator-attestation bridge
+    // is not wired to a real venue; against the deployer-EOA placeholder bridge
+    // a call no-ops, stranding the USDC the Router pulled via Coffer.adapterPull.
+    // open_position reverts until a real bridge is set, matching the Morpho/
+    // Synthetix/GMX sibling scaffolds.
+    error ScaffoldNotImplemented();
 
     // Audit DDDDD-4 fix: validator-set rotation must be observable. Pre-fix
     // the rotation flipped storage silently — subgraph + ops dashboards
@@ -125,9 +131,14 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
         _;
     }
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     constructor(address _bridge, address _usdc, address _coffer, address _praetor, address _praetor_timelock, uint16 _required) {
@@ -166,6 +177,15 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
         nonReentrant
         returns (uint256 venue_position_id)
     {
+        // Scaffold guard (audit #65): block opens against an unwired venue. The
+        // strand risk is specifically the deployer-EOA placeholder bridge - a
+        // call to a codeless address no-ops, leaving the Router-pulled USDC
+        // stranded (approved but never deposited). A code-existence check is the
+        // precise gate: it reverts against the EOA placeholder (no strand) while
+        // preserving the real validator-attestation deposit flow once a real (or
+        // mock) bridge with code is wired. Unlike a pure scaffold (Morpho/
+        // Synthetix), Hyperliquid's relay path is a real, tested mechanism.
+        if (address(bridge).code.length == 0) revert ScaffoldNotImplemented();
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
 
         uint256 amount = uint256(notional_signed > 0 ? notional_signed : -notional_signed);

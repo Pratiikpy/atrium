@@ -32,6 +32,10 @@ sol! {
     // machinery. Off-chain consumers keccak256() the human-readable text.
     event KeeperSlashed(address indexed keeper, uint256 slashed_amount_wei, bytes32 reason);
     event KeeperRewarded(address indexed keeper, uint256 reward_wei);
+    // Audit fix (contracts-rust #6, completion): a keeper claims accrued rewards
+    // out of the reward pool (funded by slashed stakes). Distinct from
+    // KeeperRewarded, which fires on accrual at execute_liquidation time.
+    event RewardsClaimed(address indexed keeper, uint256 amount_wei);
     // Audit GGGG-1: fires when Praetor marks a keeper as having missed a
     // liquidation window. Off-chain Lantern monitor surfaces the evidence,
     // multisig records on-chain. After max_misses (default 3) marks,
@@ -96,6 +100,10 @@ sol! {
     // written. Now we refuse to queue and let Plinth's VigilQueueFailed signal
     // fire instead.
     error NoPositionsToLiquidate(address user);
+    // Audit fix (contracts-rust #6, completion): claim_rewards found no funded
+    // rewards to pay (keeper has zero accrued, or the reward pool is empty
+    // because no stakes have been slashed yet / proceeds funding #5 not live).
+    error RewardsNotAvailable(uint256 requested, uint256 available);
 }
 
 #[derive(SolidityError)]
@@ -116,6 +124,7 @@ pub enum VigilError {
     Reentrant(VigilReentrant),
     WithdrawFailed(WithdrawFailed),
     NoPositionsToLiquidate(NoPositionsToLiquidate),
+    RewardsNotAvailable(RewardsNotAvailable),
 }
 
 sol_interface! {
@@ -161,6 +170,17 @@ sol_storage! {
         // identically until the multisig sets them.
         bool is_paused;
         bool is_updating;
+
+        // Audit fix (contracts-rust #6, completion): keeper-reward + slashed-ETH
+        // pool. Before this, slash_keeper only decremented accounting (slashed
+        // ETH stranded) and total_rewards_wei was accrued but never payable -
+        // two of the three "stuck pools" the finding named. Now slashing credits
+        // this pool (the slashed bad-keeper stake stays in the contract balance
+        // and funds it), and claim_rewards() pays a keeper's accrued
+        // total_rewards_wei out of it. Appended for upgrade-safe layout.
+        // Full liquidation-proceeds funding of rewards lands with #5 (the
+        // Coffer.adapterPull collateral seizure, deploy-gated).
+        uint256 reward_pool_wei;
     }
 
     pub struct Keeper {
@@ -552,20 +572,69 @@ impl Vigil {
         };
         let slash_amount = prev_stake / U256::from(10u64); // 10% slash
         let new_stake = prev_stake.saturating_sub(slash_amount);
-        let mut k = self.keepers.setter(keeper);
-        k.stake_wei.set(new_stake);
-        k.total_slashed_wei.set(prev_slashed + slash_amount);
-        // Reset miss counter so the keeper gets a fresh window after the slash
-        k.missed_windows_24h.set(Uint::<32, 1>::ZERO);
-        if k.stake_wei.get() < self.params.keeper_min_stake_wei.get() {
-            k.is_active.set(false);
+        {
+            let mut k = self.keepers.setter(keeper);
+            k.stake_wei.set(new_stake);
+            k.total_slashed_wei.set(prev_slashed + slash_amount);
+            // Reset miss counter so the keeper gets a fresh window after the slash
+            k.missed_windows_24h.set(Uint::<32, 1>::ZERO);
+            if k.stake_wei.get() < self.params.keeper_min_stake_wei.get() {
+                k.is_active.set(false);
+            }
         }
+        // Audit fix (contracts-rust #6, completion): the slashed ETH stays in the
+        // contract balance (it was the keeper's stake); credit it to the reward
+        // pool so it is no longer stranded - it now funds keeper rewards
+        // (claim_rewards) instead of only bumping an accounting counter.
+        let pool = self.reward_pool_wei.get();
+        self.reward_pool_wei.set(pool + slash_amount);
         self.vm().log(KeeperSlashed {
             keeper,
             slashed_amount_wei: slash_amount,
             reason,
         });
         Ok(())
+    }
+
+    /// Claim a keeper's accrued rewards (audit fix contracts-rust #6, completion).
+    /// total_rewards_wei was accrued at execute_liquidation time but had no
+    /// payout path. Pays the caller out of the reward pool (funded by slashed
+    /// stakes) and zeroes the paid portion. Reentrancy-guarded; CEI ordering.
+    pub fn claim_rewards(&mut self) -> Result<U256, VigilError> {
+        if self.is_updating.get() {
+            return Err(VigilError::Reentrant(VigilReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.claim_rewards_inner();
+        self.is_updating.set(false);
+        result
+    }
+
+    fn claim_rewards_inner(&mut self) -> Result<U256, VigilError> {
+        let caller = self.vm().msg_sender();
+        let accrued = self.keepers.getter(caller).total_rewards_wei.get();
+        let pool = self.reward_pool_wei.get();
+        // Pay the smaller of what the keeper has earned and what the pool can
+        // cover. Until the pool is funded (by a slash, or proceeds funding #5),
+        // there is nothing to pay - refuse loudly rather than silently no-op.
+        let payable = if accrued < pool { accrued } else { pool };
+        if payable.is_zero() {
+            return Err(VigilError::RewardsNotAvailable(RewardsNotAvailable {
+                requested: accrued,
+                available: pool,
+            }));
+        }
+        // Effects first (CEI): debit both the keeper's accrual and the pool.
+        {
+            let mut k = self.keepers.setter(caller);
+            k.total_rewards_wei.set(accrued - payable);
+        }
+        self.reward_pool_wei.set(pool - payable);
+        // Interaction last: pay out.
+        stylus_sdk::call::transfer::transfer_eth(self.vm(), caller, payable)
+            .map_err(|_| VigilError::WithdrawFailed(WithdrawFailed { to: caller, amount: payable }))?;
+        self.vm().log(RewardsClaimed { keeper: caller, amount_wei: payable });
+        Ok(payable)
     }
 
     /// Emergency setter for keeper_min_stake_wei. Praetor-multisig-only,

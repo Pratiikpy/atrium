@@ -301,7 +301,7 @@ contract PolymarketAdapterTest is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
         assertTrue(adapter.is_authorized_caller(router_));
     }
@@ -368,6 +368,20 @@ contract PolymarketAdapterTest is Test {
         vm.prank(coffer);
         vm.expectRevert(PolymarketAdapter.Unauthorized.selector);
         fresh.open_position(TRUMP_2028, int256(100e6), payload);
+    }
+
+    // Audit fix (#65): open must revert against a codeless (deployer-EOA
+    // placeholder) aqueduct so the Router cannot strand pulled USDC on the CCIP
+    // path. setUp uses a MockAqueduct (has code) so the lifecycle tests pass;
+    // this deploys an adapter with an EOA aqueduct to prove the strand guard fires.
+    function test_open_revertsScaffoldOnCodelessAqueduct_65() public {
+        PolymarketAdapter scaffold = new PolymarketAdapter(
+            makeAddr("eoa-aqueduct"), address(usdc), coffer, praetor, timelock, POLYGON_AMOY_SELECTOR
+        );
+        bytes memory payload = abi.encodePacked(user, abi.encode(uint256(block.timestamp + 30 days)));
+        vm.prank(coffer);
+        vm.expectRevert(PolymarketAdapter.ScaffoldNotImplemented.selector);
+        scaffold.open_position(TRUMP_2028, int256(100e6), payload);
     }
 
     function test_open_rejectsUnsupportedInstrument() public {

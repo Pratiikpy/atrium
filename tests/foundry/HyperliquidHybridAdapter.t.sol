@@ -143,7 +143,7 @@ contract HyperliquidHybridAdapterTest is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
         assertTrue(adapter.is_authorized_caller(router_));
     }
@@ -244,6 +244,20 @@ contract HyperliquidHybridAdapterTest is Test {
         vm.prank(hostile);
         vm.expectRevert(HyperliquidHybridAdapter.Unauthorized.selector);
         adapter.open_position(BTC_PERP, int256(1_000e6), payload);
+    }
+
+    // Audit fix (#65): open must revert against a codeless (deployer-EOA
+    // placeholder) bridge so the Router cannot strand pulled USDC. The live
+    // setUp bridge is a MockHyperliquidBridge (has code) so the lifecycle tests
+    // above still pass; this deploys an adapter with an EOA bridge to prove the
+    // strand guard fires.
+    function test_open_revertsScaffoldOnCodelessBridge_65() public {
+        HyperliquidHybridAdapter scaffold =
+            new HyperliquidHybridAdapter(makeAddr("eoa-bridge"), address(usdc), coffer, praetor, timelock, 2);
+        bytes memory payload = _packPayloadWithOriginator(user, hex"deadbeef");
+        vm.prank(coffer);
+        vm.expectRevert(HyperliquidHybridAdapter.ScaffoldNotImplemented.selector);
+        scaffold.open_position(BTC_PERP, int256(1_000e6), payload);
     }
 
     function test_open_rejectsUnsupportedInstrument() public {

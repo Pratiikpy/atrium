@@ -90,6 +90,12 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     error DuplicateAttestation(bytes32);
     error BadVenuePayload();
     error UsdcTransferFailed(address to, uint256 amount);
+    // Audit fix (#65): Phase-2 scaffold guard. The CCIP receiver / Polymarket
+    // destination is not wired to a real venue; the dest-not-set check alone can
+    // be bypassed by installing a deployer EOA via setDestination, stranding the
+    // USDC the Router pulled via Coffer.adapterPull. open_position reverts until a
+    // real destination is wired, matching the Morpho/Synthetix/GMX siblings.
+    error ScaffoldNotImplemented();
 
     // Audit DDDDD-2 + DDDDD-3 fix: emit rotation events on validator-set
     // and destination changes so observers (subgraph, ops dashboards) can
@@ -116,9 +122,14 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     modifier onlyPraetor() { if (msg.sender != praetor_multisig) revert Unauthorized(); _; }
     modifier onlyTimelock() { if (msg.sender != praetor_timelock) revert Unauthorized(); _; }
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     constructor(
@@ -158,6 +169,13 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     function open_position(bytes32 instrument_id, int256 notional_signed, bytes calldata venue_payload)
         external onlyAuthorizedCaller nonReentrant returns (uint256 venue_position_id)
     {
+        // Scaffold guard (audit #65): block opens against an unwired venue. The
+        // strand risk is the deployer-EOA placeholder CCIP path - approving +
+        // calling send_collateral on a codeless aqueduct leaves the Router-pulled
+        // USDC stranded. A code-existence check on the aqueduct is the precise
+        // gate: reverts against the EOA placeholder (no strand) while preserving
+        // the real CCIP relay once a real (or mock) Aqueduct with code is wired.
+        if (address(aqueduct).code.length == 0) revert ScaffoldNotImplemented();
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
         if (polymarket_on_dest == address(0)) revert Unauthorized();
 
