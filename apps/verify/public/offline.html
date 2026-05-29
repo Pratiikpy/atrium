@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Atrium · Offline</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --parchment: #fbfaf7;
+        --ink: #1a1714;
+        --muted: #6b6258;
+        --divider: #e4e0d8;
+        --amber: oklch(0.7 0.13 70);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--parchment);
+        color: var(--ink);
+        font-family: Geist, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+      }
+      .tile {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 24px;
+        border-radius: 14px;
+        background: #101010;
+        color: var(--parchment);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Instrument Serif", "Times New Roman", serif;
+        font-style: italic;
+        font-size: 32px;
+      }
+      h1 {
+        font-family: "Instrument Serif", "Times New Roman", serif;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 34px;
+        letter-spacing: -0.01em;
+        margin: 0 0 12px;
+      }
+      p {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+        margin: 0 0 24px;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+        border: 1px solid var(--divider);
+        border-radius: 999px;
+        padding: 6px 14px;
+        margin-bottom: 28px;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--amber);
+      }
+      button {
+        appearance: none;
+        border: none;
+        background: var(--ink);
+        color: var(--parchment);
+        font: inherit;
+        font-weight: 500;
+        font-size: 14px;
+        padding: 12px 22px;
+        border-radius: 10px;
+        cursor: pointer;
+        min-height: 44px;
+      }
+      button:hover { opacity: 0.92; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="tile">A</div>
+      <div class="status"><span class="dot"></span>Offline</div>
+      <h1>You are offline</h1>
+      <p>
+        Atrium needs a connection to read live margin, reserves, and on-chain state. Your funds and
+        mandates are safe on-chain; nothing here is stored only on this device. Reconnect and retry.
+      </p>
+      <button type="button" onclick="location.reload()">Retry</button>
+    </main>
+  </body>
+</html>
