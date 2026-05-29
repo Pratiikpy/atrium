@@ -7,36 +7,44 @@ export const metadata = {
   description: 'Spec, technical design, runbooks, ADRs. Single source of truth.',
 };
 
+// Audit honesty fix (#12/#40/#41): cards used to link every doc to a GitHub
+// URL, but only the files actually committed to the public repo resolve - the
+// rest 404 (PRD/TDD/plan-tracker/MASTER_PLAN/LAUNCH_READINESS/RESOURCES are in
+// the repo locally but not yet published; human_left.md is intentionally
+// git-ignored internal notes and was dropped entirely). `repoOnly: true` marks
+// a doc that exists in the working tree but is not on GitHub yet; those render
+// as a non-link card with an honest "in repo · publishing pending" tag instead
+// of a dead link.
 const DOCS = [
   {
     title: 'ATRIUM_PRD.md',
-    sub: 'Product spec · what + why · v0.15 honesty baseline + §28.9 build phase',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/ATRIUM_PRD.md',
-    pages: '2,297 lines',
+    sub: 'Product spec · what + why · honesty baseline + build phase',
+    pages: 'product spec',
+    repoOnly: true,
   },
   {
     title: 'TECH_DESIGN.md',
-    sub: 'Technical design · how it works · v1.1 + §24.6–§24.9 + ADRs 001–012',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/TECH_DESIGN.md',
-    pages: '2,333 lines',
+    sub: 'Technical design · how it works · ADRs 001–012',
+    pages: 'technical design',
+    repoOnly: true,
   },
   {
     title: 'docs/plan-tracker.md',
-    sub: '94+ patches landed across audit Waves F–N · source of truth for every fix',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/plan-tracker.md',
-    pages: '254+ lines',
+    sub: 'Source of truth for every landed fix across the audit waves',
+    pages: 'patch register',
+    repoOnly: true,
   },
   {
     title: 'docs/MASTER_PLAN.md',
-    sub: '12-month build plan with ✅ status markers post-Wave-L',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/MASTER_PLAN.md',
+    sub: '12-month build plan with status markers',
     pages: 'Months 1–12',
+    repoOnly: true,
   },
   {
     title: 'docs/LAUNCH_READINESS.md',
     sub: 'Pre-demo checklist · what is built · what is deferred',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/docs/LAUNCH_READINESS.md',
     pages: 'Pre-demo audit',
+    repoOnly: true,
   },
   {
     title: 'COMPETITIVE_POSITIONING.md',
@@ -47,8 +55,8 @@ const DOCS = [
   {
     title: 'RESOURCES.md',
     sub: 'The 18 cloned reference repos in resources/ and what each is for',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/RESOURCES.md',
     pages: '18 dependencies',
+    repoOnly: true,
   },
   {
     title: 'SECURITY.md',
@@ -56,13 +64,7 @@ const DOCS = [
     href: 'https://github.com/Pratiikpy/atrium/blob/main/SECURITY.md',
     pages: 'STRIDE + PGP',
   },
-  {
-    title: 'human_left.md',
-    sub: 'The 12 tasks that genuinely require a human (Stylus WSL build, hardware-wallet sigs, …)',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/human_left.md',
-    pages: '12 entries',
-  },
-];
+] as const;
 
 export default function DocsPage() {
   return (
@@ -72,21 +74,36 @@ export default function DocsPage() {
         <h1 className="font-display text-5xl text-ink">Documentation</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Everything Atrium claims to do is documented in source-of-truth markdown
-          files that ship in the repo. The links below open the canonical version
-          on GitHub; the local clone is the working copy.
+          files in the repo. Docs already published to GitHub link out; the rest
+          live in the working tree and publish as they are finalized (marked below).
         </p>
       </section>
 
       <section className="mt-12 grid gap-4 md:grid-cols-2">
-        {DOCS.map((d) => (
-          <a key={d.title} href={d.href} target="_blank" rel="noreferrer" className="block">
+        {DOCS.map((d) => {
+          const repoOnly = 'repoOnly' in d && d.repoOnly === true;
+          const inner = (
             <Card className="h-full transition-colors hover:border-accent/40">
               <p className="font-display text-xl text-ink">{d.title}</p>
               <p className="mt-2 text-sm text-ink-soft">{d.sub}</p>
-              <p className="mt-3 text-xs text-muted">{d.pages}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted">{d.pages}</span>
+                {repoOnly && (
+                  <span className="rounded-sm bg-parchment-soft/70 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted">
+                    in repo · publishing pending
+                  </span>
+                )}
+              </div>
             </Card>
-          </a>
-        ))}
+          );
+          return repoOnly ? (
+            <div key={d.title}>{inner}</div>
+          ) : (
+            <a key={d.title} href={(d as { href: string }).href} target="_blank" rel="noreferrer" className="block">
+              {inner}
+            </a>
+          );
+        })}
       </section>
 
       <section className="mt-16">
@@ -105,7 +122,7 @@ export default function DocsPage() {
                 Every mock, relay, interim state, and third-party blocker. What it does, why,
                 when it becomes real. Sourced from the tripwires/ folder.
               </p>
-              <p className="mt-3 text-xs text-muted">8 disclosures . sourced</p>
+              <p className="mt-3 text-xs text-muted">10 disclosures . sourced</p>
             </Card>
           </Link>
           <Link href="/docs/api" className="block">

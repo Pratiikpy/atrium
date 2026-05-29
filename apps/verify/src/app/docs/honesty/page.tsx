@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
@@ -108,9 +107,9 @@ const DISCLOSURES: Disclosure[] = [
     id: 'numbers',
     surface: 'Headline numbers on landing + mobile landing',
     what:
-      'TVL, agent count, query count, venue chip amounts, partner logos all render "pending" on first paint. The bootloader fetches `/api/protocol/metrics` and replaces only with real Scribe data.',
+      'The fake-data components (Numbers.tsx, MobileLanding.tsx, Features.tsx PortfolioMock) were deleted in Phase 1 of docs/MASTER_PLAN.md (2026-05-28). The landing now renders "—" for any value not sourced from a live API.',
     why:
-      'Per `docs/conventions/ui.md`: never show a placeholder number that looks real. Per the 2026-05-25 audit, the mobile-landing was previously flashing `$12.37M` / `$4.13M` etc. before hydration; that has been removed.',
+      'Per `docs/conventions/ui.md`: never show a placeholder number that looks real. The Lovable-port components with hardcoded $4.13M / $12.37M / setInterval increments are gone.',
     whenReal: 'Live as soon as Scribe + Plinth + Coffer return non-zero data after the timelock fires.',
     severity: 'interim',
   },
@@ -204,10 +203,13 @@ export default function HonestyPage() {
       </section>
 
       <footer className="mt-16 border-t border-divider pt-6 text-xs text-muted">
-        Source of truth for this page is the `tripwires/` directory + `human_left.md`. Every item
-        above maps to a dated tripwire file that lives in the repo. If something on the live
-        product contradicts a disclosure here, that is a bug. Email
-        <a className="ml-1 text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
+        <p>Last verified: 2026-05-29 (full-codebase build audit).</p>
+        <p className="mt-2">
+          Source of truth for this page is the `tripwires/` directory + `human_left.md`. Every item
+          above maps to a dated tripwire file that lives in the repo. If something on the live
+          product contradicts a disclosure here, that is a bug. Email
+          <a className="ml-1 text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
+        </p>
       </footer>
       </div>
     </MarketingShell>
