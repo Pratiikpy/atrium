@@ -56,6 +56,11 @@ class BacktestResult:
     ipfs_cid: str | None
     publish_tx: str | None
     generated_at: str
+    # Audit fix (services #23): True when the on-chain publish was CONFIGURED
+    # (signer+rpc+contract present) but failed. Lets main() exit non-zero so
+    # archive-weekly.yml's `if: failure()` ops alert fires, instead of the old
+    # silent return-None-and-exit-0 that shipped a green run with publish_tx null.
+    publish_failed: bool = False
 
 
 def fetch_strategy_history(strategy: str) -> list[dict]:
@@ -186,8 +191,14 @@ def publish_attestation(result: BacktestResult) -> str | None:
         h = w3.eth.send_raw_transaction(raw)
         return h.hex()
     except Exception as exc:  # noqa: BLE001
-        print(f"[archive] publish_attestation failed: {exc}", file=sys.stderr)
-        return None
+        # Audit fix (services #23): we are PAST the env gate, so signer+rpc+
+        # contract are all configured - a failure here is a REAL publish failure
+        # (RPC down, contract revert, or a code bug like the rawTransaction
+        # rename), not a skip. Re-raise so run_backtest flags publish_failed and
+        # main() exits non-zero, firing archive-weekly.yml's `if: failure()` ops
+        # alert. The old `return None` swallowed it into a green run.
+        print(f"[archive] publish_attestation FAILED (configured): {exc}", file=sys.stderr)
+        raise
 
 
 def write_notebook(result: BacktestResult, trades: list[dict], path: Path) -> None:
@@ -259,7 +270,16 @@ def run_backtest(strategy: str) -> BacktestResult:
     result.ipfs_cid = pin_to_ipfs(nb_path)
     if result.ipfs_cid:
         result.notebook_url = f"https://{result.ipfs_cid}.ipfs.w3s.link/{nb_path.name}"
-    result.publish_tx = publish_attestation(result)
+    # Audit fix (services #23): a configured publish that fails now raises; catch
+    # it so the research result + latest.json are still written, but flag the
+    # failure so main() exits non-zero and ops are alerted. A not-configured
+    # publish returns None (skip) and leaves publish_failed False.
+    try:
+        result.publish_tx = publish_attestation(result)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[archive] on-chain attestation publish failed: {exc}", file=sys.stderr)
+        result.publish_tx = None
+        result.publish_failed = True
     return result
 
 
@@ -272,6 +292,12 @@ def main() -> int:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(json.dumps(asdict(result), indent=2))
     print(json.dumps(asdict(result), indent=2))
+    # Audit fix (services #23): exit non-zero when a configured on-chain publish
+    # failed, so the workflow goes red and the `if: failure()` ops alert fires.
+    # latest.json is still written above (the research output is preserved).
+    if result.publish_failed:
+        print("[archive] exiting non-zero: on-chain attestation publish failed", file=sys.stderr)
+        return 1
     return 0
 
 

@@ -16,11 +16,16 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
 /**
  * POST /v1/backtest/{strategy_id}
  *
- * Enqueue a backtest job. Heavy endpoint — priced at 1 USDC per run.
- * Returns a job id immediately; client polls /v1/backtest/jobs/{id}
- * or registers a webhook for completion.
- *
- * Year-1: enqueues into a D1 table; Archive workers pick up nightly.
+ * Records a backtest request. Audit fix (#22, honest path): there is NO
+ * completion worker wired on any current deploy - no Cloudflare scheduled()
+ * consumer, no archive-weekly poller reads backtest_jobs - so a job would sit
+ * 'pending' forever. The route previously returned a 202 + poll_url implying
+ * the job would complete (and the docstring claimed "1 USDC per run / Archive
+ * workers pick up nightly"), which is a no-fake-pending violation for a paid
+ * endpoint. Until a real consumer ships, this records the request honestly and
+ * returns status 'queued_unprocessed' with a caveat naming the missing
+ * dependency, and does NOT hand out a poll_url that never resolves to a result.
+ * The GET /jobs/:id reader stays so a future worker + existing rows still work.
  */
 backtestRouter.post('/:strategy_id', async (c) => {
   const strategyId = c.req.param('strategy_id');
@@ -45,13 +50,31 @@ backtestRouter.post('/:strategy_id', async (c) => {
   }
 
   const job_id = crypto.randomUUID();
-  await c.env.DB.prepare(
-    'INSERT INTO backtest_jobs (id, strategy_id, params_json, status, created_at) VALUES (?, ?, ?, ?, ?)',
-  )
-    .bind(job_id, strategyId, JSON.stringify(body), 'pending', Date.now())
-    .run();
+  // Audit fix (#22): record honestly as 'queued_unprocessed' (no completion
+  // worker exists) and surface a DB failure as a 500 instead of blindly
+  // returning success. D1 .run() rejects on a write error, so a try/catch is
+  // the real guard.
+  try {
+    await c.env.DB.prepare(
+      'INSERT INTO backtest_jobs (id, strategy_id, params_json, status, created_at) VALUES (?, ?, ?, ?, ?)',
+    )
+      .bind(job_id, strategyId, JSON.stringify(body), 'queued_unprocessed', Date.now())
+      .run();
+  } catch {
+    return c.json({ error: 'enqueue_failed', detail: 'could not record the backtest request' }, 500);
+  }
 
-  return c.json({ job_id, status: 'pending', poll_url: `/v1/backtest/jobs/${job_id}` }, 202);
+  // Audit fix (#22): no poll_url that never resolves to a result; an honest
+  // caveat instead. 200 (recorded) not 202 (accepted-for-processing), because
+  // nothing processes it yet.
+  return c.json(
+    {
+      job_id,
+      status: 'queued_unprocessed',
+      note: 'Request recorded, but no backtest worker is wired on this deploy yet, so it will not complete. The compute layer (Archive span_backtest worker) lands before this endpoint is billed. Do not poll for a result yet.',
+    },
+    200,
+  );
 });
 
 backtestRouter.get('/jobs/:job_id', async (c) => {
