@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { VENUES, VENUE_COUNT } from '@/lib/venues';
 
 /**
  * Five-step onboarding flow, pixel-matched to
@@ -586,6 +587,42 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Item 7: the benefit LANDS here. The welcome step pitched the wedge;
+          this step is the confirmation - the user's one balance now spans
+          every whitelisted venue, not split between them. Buying power is
+          the live Plinth read (or honest pending); the venue chips + count
+          are the real VENUES source of truth. No fabricated numbers. */}
+      <div className="mt-6 rounded-[12px] border border-divider bg-parchment-soft/40 px-6 py-5">
+        <p className="text-[11px] uppercase tracking-wider text-muted">What just happened</p>
+        <p className="mt-1.5 text-[14px] leading-[1.5] text-ink">
+          {isLive ? (
+            <>
+              Your <strong className="font-medium">{buyingPower}</strong> of buying power works on
+              any of these {VENUE_COUNT} venues - the same balance, not split between them.
+            </>
+          ) : (
+            <>
+              Once Plinth deploys, one deposit gives you buying power across all {VENUE_COUNT}{' '}
+              venues at once - you never re-post collateral per venue.
+            </>
+          )}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {VENUES.map((v) => (
+            <span
+              key={v.id}
+              className="rounded-full border border-divider bg-parchment px-2.5 py-1 font-mono text-[11px] text-ink-soft"
+            >
+              {v.shortLabel}
+            </span>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] leading-snug text-muted">
+          Without unified margin you would post separately at each venue. Plinth nets your risk into
+          one number, so the same collateral backs them all.
+        </p>
       </div>
 
       <div className="mt-6 flex items-center justify-between">
