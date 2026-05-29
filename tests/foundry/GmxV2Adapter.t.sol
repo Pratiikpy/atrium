@@ -104,7 +104,7 @@ contract GmxV2AdapterTest is Test {
     }
 
     function test_setAuthorizedCaller_succeedsFromPraetor() public {
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(makeAddr("router"), true);
         assertTrue(adapter.is_authorized_caller(makeAddr("router")));
     }
@@ -127,7 +127,7 @@ contract GmxV2AdapterTest is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
     }
 
@@ -139,70 +139,43 @@ contract GmxV2AdapterTest is Test {
     }
 
     // ── Lifecycle ────────────────────────────────────────────────────
+    //
+    // Audit fix (#9): GmxV2Adapter.open_position now reverts
+    // ScaffoldNotImplemented as its first statement, matching the Morpho Blue
+    // and Synthetix V3 sibling scaffolds. Pre-fix, GMX was the one Phase-2
+    // scaffold WITHOUT the guard: a call would accept the USDC pulled by
+    // Coffer.adapterPull, record phantom position metadata, and never deploy
+    // into a real GMX router -> fund-strand. These tests previously asserted
+    // the GMX create-position call path + event emit; they now assert the
+    // lockdown revert (same matrix as MorphoBlueAdapter.t.sol /
+    // SynthetixV3Adapter.t.sol). The happy-path GMX round-trip returns when a
+    // real router is wired (Phase 2).
 
-    function test_openPosition_revertsOnUnsupportedInstrument() public {
+    function test_openPosition_revertsScaffoldNotImplemented() public {
+        _registerInstrument();
+        vm.expectRevert(GmxV2Adapter.ScaffoldNotImplemented.selector);
+        vm.prank(coffer);
+        adapter.open_position(INSTRUMENT, 1_000e6, abi.encodePacked(user));
+    }
+
+    function test_openPosition_revertsScaffold_evenOnUnsupportedInstrument() public {
         bytes32 bad = keccak256("NOT-REGISTERED");
-        vm.expectRevert(abi.encodeWithSelector(GmxV2Adapter.UnsupportedInstrument.selector, bad));
+        vm.expectRevert(GmxV2Adapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(bad, 1e6, abi.encodePacked(user));
     }
 
-    function test_openPosition_revertsOnBadVenuePayload() public {
+    function test_openPosition_revertsScaffold_evenOnBadPayload() public {
         _registerInstrument();
-        vm.expectRevert(GmxV2Adapter.BadVenuePayload.selector);
+        vm.expectRevert(GmxV2Adapter.ScaffoldNotImplemented.selector);
         vm.prank(coffer);
         adapter.open_position(INSTRUMENT, 1e6, hex"00");
-    }
-
-    function test_openPosition_extractsOriginator_G5() public {
-        _registerInstrument();
-        vm.expectEmit(true, true, true, true);
-        emit PositionOpened(1, user, INSTRUMENT, 1_000e6);
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000e6, abi.encodePacked(user));
-        assertEq(venue_pos_id, 1);
-        IPorticoAdapter.PositionView memory pos = adapter.get_position(venue_pos_id);
-        assertEq(pos.owner, user);
-        assertEq(pos.instrument_id, INSTRUMENT);
-        assertEq(pos.notional_signed, 1_000e6);
-    }
-
-    function test_openPosition_callsGmxCreatePosition() public {
-        _registerInstrument();
-        vm.prank(coffer);
-        adapter.open_position(INSTRUMENT, 5_000e6, abi.encodePacked(user));
-        assertEq(gmx.lastCreatedMarket(), market);
-        assertEq(gmx.lastCreatedSizeUsd(), 5_000e6);
-        assertTrue(gmx.lastCreatedIsLong());
-    }
-
-    function test_openPosition_negativeNotional_passesShortToGmx() public {
-        _registerInstrument();
-        vm.prank(coffer);
-        adapter.open_position(INSTRUMENT, -2_000e6, abi.encodePacked(user));
-        assertFalse(gmx.lastCreatedIsLong());
-        assertEq(gmx.lastCreatedSizeUsd(), 2_000e6);
     }
 
     function test_closePosition_revertsOnNotFound() public {
         vm.expectRevert(GmxV2Adapter.PositionNotFound.selector);
         vm.prank(coffer);
         adapter.close_position(999, "");
-    }
-
-    function test_closePosition_emitsEventAndCallsGmxClose() public {
-        _registerInstrument();
-        vm.prank(coffer);
-        uint256 venue_pos_id = adapter.open_position(INSTRUMENT, 1_000e6, abi.encodePacked(user));
-        // Pull the GMX position key from the public positions() getter.
-        (, , , bytes32 gmx_key_used, , ) = adapter.positions(venue_pos_id);
-        gmx.setNextClosePnl(123_456);
-        vm.expectEmit(true, false, false, true);
-        emit PositionClosed(venue_pos_id, 123_456);
-        vm.prank(coffer);
-        int256 pnl = adapter.close_position(venue_pos_id, "");
-        assertEq(pnl, 123_456);
-        assertEq(gmx.lastClosedKey(), gmx_key_used);
     }
 
     function test_modifyPosition_revertsV1Locked() public {

@@ -1,14 +1,8 @@
 name: E2E (Playwright on Sepolia)
 
-# Audit K-8 fix: TDD §9 + testing.md require nightly Playwright runs of the
-# five user journeys against deployed Sepolia. Without this workflow, the
-# Verifier Mode flows are unverified between manual demo rehearsals.
-
 on:
-  # Nightly at 03:00 UTC (after Lantern's hourly attestation cycle).
   schedule:
     - cron: '0 3 * * *'
-  # Run on every PR that touches the verifier surface or its tests.
   pull_request:
     paths:
       - 'apps/verify/**'
@@ -16,40 +10,86 @@ on:
       - '.github/workflows/e2e.yml'
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   e2e:
-    name: Five-journey E2E on Sepolia
+    # Audit fix (#28): this job was titled "...on Sepolia" and wired
+    # ARBITRUM_SEPOLIA_RPC + E2E_TEST_WALLET_PRIVATE_KEY, but playwright.config.ts
+    # reads E2E_MODE (default 'local') + E2E_BASE_URL (default localhost) - none
+    # of which were set - so it ran in LOCAL mode against the honest-pending UI
+    # and every on-chain assertion was test.skip'd. The secret wiring was dead
+    # and the name misrepresented the job as chain-verified. Renamed to reflect
+    # reality and removed the dead wiring. To run the real on-chain journeys,
+    # set repo vars E2E_MODE=sepolia + E2E_BASE_URL=<deployed verify URL> and the
+    # E2E_TEST_WALLET_PRIVATE_KEY secret once the contracts + URL are live
+    # (founder-gated on deploy; flipping E2E_MODE=sepolia also disables the
+    # local auto-start web server).
+    name: Five-journey E2E (local pending-UI)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      # Tests run against the deployed verify.atrium.fi by default; override
-      # via repo variable for staging branches.
-      VERIFY_BASE_URL: ${{ vars.VERIFY_BASE_URL || 'https://verify.atrium.fi' }}
-      ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
-      E2E_TEST_WALLET_PRIVATE_KEY: ${{ secrets.E2E_TEST_WALLET_PRIVATE_KEY }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9 }
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright browsers
         run: pnpm --filter @atrium/verify exec playwright install --with-deps chromium
       - name: Run E2E journeys
         run: pnpm --filter @atrium/verify test:e2e
-      # Upload artifacts on failure so F3 can replay the demo rehearsal log.
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
         with:
           name: playwright-report
           path: apps/verify/playwright-report/
           retention-days: 30
       - name: Upload traces
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
         with:
           name: playwright-traces
+          path: apps/verify/test-results/
+          retention-days: 30
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
+
+  e2e-mobile:
+    # Audit fix (#28): same as the e2e job - ran in local pending-UI mode, not
+    # against Sepolia. Dead secret wiring removed; name unchanged (it never
+    # claimed Sepolia).
+    name: Mobile flows E2E (local pending-UI)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm --filter @atrium/verify exec playwright install --with-deps webkit
+      - name: Run mobile E2E flows
+        run: pnpm --filter @atrium/verify exec playwright test --project=mobile-safari
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
+        with:
+          name: mobile-traces
           path: apps/verify/test-results/
           retention-days: 30

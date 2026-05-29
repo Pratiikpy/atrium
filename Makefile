@@ -1,4 +1,4 @@
-.PHONY: help demo install contracts test kani frontend subgraph deploy audit lint clean
+.PHONY: help demo install contracts test kani frontend subgraph deploy audit lint clean deployment-doc banned-words press-kit
 
 # Default target: short help
 help:
@@ -67,14 +67,21 @@ contracts:
 test:
 	@echo "==> Running test suite"
 	cargo test --workspace
+	# Audit gap (#58): the Stylus crates' host tests are NOT run here. `cargo test`
+	# per crate fails to link the cdylib (WasmVM host symbols) on a native target;
+	# running them needs a Stylus TestVM harness (tracked with #24/#25).
 	forge test -vvv
 	pnpm -r test
 
 kani:
 	@echo "==> Running Kani formal verification"
-	cd contracts/plinth && cargo kani --harness solvency_invariant
-	cd contracts/plinth && cargo kani --harness oracle_freshness_invariant
-	cd contracts/sigil && cargo kani --harness mandate_expiry_invariant
+	# Audit fix (#82): the prior `--harness solvency_invariant` etc. named
+	# harnesses that do not exist (real names: solvency_non_negative,
+	# oracle_freshness_rejects_stale, mandate_expiry_monotonic), so every line
+	# exited non-zero. Drop --harness so each crate runs its full proof set,
+	# matching .github/workflows/ci.yml and staying in sync if harnesses are renamed.
+	cd contracts/plinth && cargo kani
+	cd contracts/sigil && cargo kani
 	@echo "==> All Kani proofs green"
 
 frontend:
@@ -118,3 +125,16 @@ clean:
 	forge clean
 	pnpm -r clean
 	rm -rf node_modules .pnpm-store .turbo
+
+
+deployment-doc:
+	@echo "==> Regenerating docs/deployment.md from registry"
+	node scripts/generate-deployment-doc.mjs
+
+banned-words:
+	@echo "==> Checking for banned marketing words"
+	node scripts/check-banned-words.mjs
+
+press-kit:
+	@echo "==> Building press kit ZIP"
+	node scripts/build-press-kit.mjs
