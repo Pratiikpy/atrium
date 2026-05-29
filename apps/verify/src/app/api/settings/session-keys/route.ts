@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tryGetSessionKeys } from '@/lib/postern-source';
+import { requireWalletMatch } from '@/lib/auth-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,13 @@ export async function GET(req: NextRequest) {
     walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
       ? walletParam
       : process.env.DEMO_WALLET_ADDRESS ?? null;
+
+  // Audit fix (backend-api #59): bind to the session like every other
+  // ?wallet= reader, so one wallet can't read another's session-key list.
+  if (wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
 
   const { keys, source } = await tryGetSessionKeys(wallet);
   return NextResponse.json({

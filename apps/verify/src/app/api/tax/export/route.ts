@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { safeErrorDetail } from '@/lib/safe-error';
+import { getSession } from '@/lib/auth-session';
 
 const TABLET_URL = process.env.TABLET_URL ?? null;
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,13 @@ const MIN_YEAR = 2020;
 const MAX_YEAR = 2099;
 
 export async function GET(req: NextRequest) {
+  // Audit fix (backend-api #29): this was the only wallet-scoped tax route
+  // missing the session guard its sibling tax/summary has - an unauthenticated,
+  // unscoped tax-data export (IDOR) the moment TABLET_URL is set. Gate on a
+  // session and scope the upstream call to the authenticated wallet.
+  const session = await getSession(req);
+  if (!session) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+
   const formatRaw = req.nextUrl.searchParams.get('format') ?? 'csv';
   const jurisdictionRaw = req.nextUrl.searchParams.get('jurisdiction') ?? 'uk';
   const yearRaw = req.nextUrl.searchParams.get('year') ?? '2026';
@@ -34,9 +42,10 @@ export async function GET(req: NextRequest) {
   try {
     // URLSearchParams re-encodes as defense-in-depth; the closed-enum gates
     // above are the primary defense.
-    const params = new URLSearchParams({ format, jurisdiction, year });
+    const params = new URLSearchParams({ format, jurisdiction, year, address: session.walletAddress });
     const r = await fetch(`${TABLET_URL}/export?${params.toString()}`, {
       signal: AbortSignal.timeout(10_000),
+      headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error(`tablet_${r.status}`);
     const body = await r.arrayBuffer();
