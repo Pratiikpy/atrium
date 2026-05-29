@@ -158,6 +158,19 @@ Run these on every route before the page-specific tests. Any failure is at least
 - **Test funds:** use the in-app **Faucet** (test USDC + a little ETH, 24h cooldown). For extra gas, a public Arbitrum Sepolia faucet.
 - **Live numbers are syncing:** TVL / counts come from the subgraph **v0.0.7**, which is still indexing. Early on some tiles read ${cc('pending')} - that is **correct**, not a bug. Re-check after it catches up.
 - **Testable now vs after the timelock (important):** opening a **cross-venue position** (and anything that routes funds through Coffer to an adapter) unlocks only **after the timelock executes (~2026-05-31 02:20 UTC)**. Until then, the correct behavior is that "open position" is **cleanly gated/disabled with an honest message** - so test that it is gated gracefully, *not* that it trades. **Everything else is testable today:** login, faucet, vault deposit/withdraw, portfolio reads, reserves, transfers UI, agents/mandate UI, all reads, all copy, all design, all states.
+- **One wallet covers everything.** Atrium is single-user-per-wallet (portfolio, vault, trade, transfer, mandates, reserves are all scoped to the connected wallet). There is **no user-to-user feature that needs a second wallet** - the agent and the keeper are services, not other users. So one funded Rabby wallet on Arbitrum Sepolia tests the entire product.
+
+## S3. Evidence capture + premium scoring (how to run each test)
+
+This plan is meant to be **executed with a real wallet and recorded**, not eyeballed. For **every** test case below, capture proof and a quality verdict - not just a pass/fail tick:
+
+1. **Record the journey as video** (Playwright ${cc('recordVideo')}, or a screen recorder). One clip per journey.
+2. **Screenshot the interaction + outcome:** (a) the screen *before* the action, (b) the **Rabby approve/sign popup** when one appears, (c) the **result state** after. Name them ${cc('<route>-<step>-{before|popup|after}.png')}.
+3. **Capture console + network** for the step - zero errors is part of passing (see S1.2). Note any failed request or warning.
+4. **Score the screen (premium rubric, 1-5 each; flag anything < 4):** layout/spacing, typography + brand fidelity, copy quality, motion/interaction feel, state handling (loading/empty/error), honesty (no fabricated data). End with a one-line verdict: **premium / acceptable / not launch-ready** and why.
+5. **Log** the evidence path + verdict next to the test row.
+
+**The rig (Rabby + Playwright).** Drive the app with a *real* Rabby wallet via Playwright ${cc('launchPersistentContext')}, loading the Rabby extension and a funded Arbitrum Sepolia profile - the same proven pattern as ${cc('Downloads/fhenix builder/packages/app/e2e/fixtures/rabby')} (${cc('rabby-driver.ts')} launches the extension and approves/signs popups; ${cc('setup-rabby-profile.ts')} imports the seed; ${cc('enable-rabby-testnets.ts')} turns on testnets; video + screenshots per step). Ported to ${cc('apps/verify/e2e')} it gives a repeatable, recorded run. Evidence lands under ${cc('apps/verify/qa-evidence/<date>/')}; the final output is a graded report in the ${cc('VERIFICATION_REPORT')} style (per-domain PASS/FAIL + critical issues + an overall premium grade).
 
 ---
 `);
