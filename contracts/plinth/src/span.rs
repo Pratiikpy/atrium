@@ -223,13 +223,20 @@ mod tests {
 
     #[test]
     fn hedged_position_has_lower_margin_than_unhedged() {
+        // Audit fix (#7): use a NON-ZERO correlation class (class 1). The
+        // deployed SPAN math (plinth-math) treats class 0 as standalone and
+        // gives it NO netting credit - and Plinth.set_instrument_risk rejects
+        // class 0 for real instruments - so a class-0 hedge test only proved a
+        // property of the off-chain span.rs reference, not the on-chain engine.
+        // Class 1 is netted by both span.rs AND plinth-math, so this now tests
+        // the hedging benefit that real registered instruments actually get.
         // Long 10k of asset A
         let long = PositionView {
             notional_signed: I256::try_from(10_000i64).unwrap(),
             entry_price_q64: U256::from(1_000u64),
             current_price_q64: U256::from(1_000u64),
             haircut_bps: 100,
-            correlation_class: 0,
+            correlation_class: 1,
         };
         // Short 10k of correlated asset B (same correlation class)
         let short = PositionView {
@@ -237,7 +244,7 @@ mod tests {
             entry_price_q64: U256::from(1_000u64),
             current_price_q64: U256::from(1_000u64),
             haircut_bps: 100,
-            correlation_class: 0,
+            correlation_class: 1,
         };
         let req_solo = required_margin(&[long], 500, 200);
         let req_hedged = required_margin(&[long, short], 500, 200);
