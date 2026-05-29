@@ -60,10 +60,15 @@ describe('GET /api/transfer/quote — happy path quote shape', () => {
     (loadContractAddress as any).mockResolvedValue('0x' + '1'.repeat(40));
   });
 
-  it('returns source:aqueduct + fee/gas fields when Aqueduct deployed', async () => {
+  it('returns source:estimate + fee/gas fields when Aqueduct deployed', async () => {
+    // Honesty fix (2026-05-29): source is 'estimate', not 'aqueduct' — the
+    // seconds/fees are computed here, not read from a live CCIP router. The
+    // isLiveQuote:false flag + note let the UI caption it truthfully.
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest('amount=1000'))).json();
-    expect(json.source).toBe('aqueduct');
+    expect(json.source).toBe('estimate');
+    expect(json.isLiveQuote).toBe(false);
+    expect(json.note).toMatch(/not a live CCIP router quote/i);
     expect(json.ccipFeeUsd).toBe('$0.00');
     expect(json.gasFeeUsd).toBe('$0.00 · Postern sponsored');
     expect(json.postedAt).toBe('on arrival');

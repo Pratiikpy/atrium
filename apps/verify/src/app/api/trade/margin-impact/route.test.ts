@@ -1,6 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
+
+// The shared vitest.setup.ts sets a global DEMO_WALLET_ADDRESS so session-
+// gated route tests get a demo session. This route reads that env directly
+// to decide the (!plinth || !wallet) pending branch — the tests below
+// assume NO wallet so the preview falls to the honest pending state. Force
+// it unset here and restore after, keeping the global default for everyone
+// else. (vi.stubEnv('', ) sets an empty/falsy value; unstub restores it.)
+beforeEach(() => {
+  vi.stubEnv('DEMO_WALLET_ADDRESS', '');
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 /**
  * Iter 61 audit fix: locks the JJ-1 / JJ-2 / JJ-3 audit fixes for the

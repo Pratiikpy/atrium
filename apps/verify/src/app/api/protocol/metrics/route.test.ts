@@ -50,8 +50,7 @@ afterEach(() => {
 describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
   it('uses venuesDeployed field name (not venuesLive) per iter-35', async () => {
     (gql as any).mockResolvedValue({
-      marginAccounts: [{ collateralValueWei: '1000000' }],
-      positions: [],
+      counter: { totalTvlWei: '1000000', openPositionsCount: '0', activeAgentsCount: '0' },
     });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
@@ -66,8 +65,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
 
   it('returns registeredAgents:null per iter-36 (not hardcoded 0)', async () => {
     (gql as any).mockResolvedValue({
-      marginAccounts: [{ collateralValueWei: '1000000' }],
-      positions: [],
+      counter: { totalTvlWei: '1000000', openPositionsCount: '0', activeAgentsCount: '0' },
     });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
@@ -82,8 +80,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
 
   it('returns source:scribe on successful gql', async () => {
     (gql as any).mockResolvedValue({
-      marginAccounts: [{ collateralValueWei: '5000000' }],
-      positions: [{ id: '0xaa' }],
+      counter: { totalTvlWei: '5000000', openPositionsCount: '1', activeAgentsCount: '0' },
     });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
@@ -91,14 +88,12 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
     expect(json.source).toBe('scribe');
   });
 
-  it('aggregates TVL across margin accounts', async () => {
+  it('reads aggregated TVL from the Counter entity', async () => {
+    // Phase-4 refactor: the route reads the precomputed global Counter
+    // (subgraph schema.graphql:205 totalTvlWei) instead of paginating
+    // MarginAccounts. The subgraph maintains the running total.
     (gql as any).mockResolvedValue({
-      marginAccounts: [
-        { collateralValueWei: '1000000' }, // 1 USDC
-        { collateralValueWei: '2500000' }, // 2.5 USDC
-        { collateralValueWei: '500000' }, // 0.5 USDC
-      ],
-      positions: [],
+      counter: { totalTvlWei: '4000000', openPositionsCount: '3', activeAgentsCount: '0' },
     });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
@@ -109,10 +104,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
   });
 
   it('returns null TVL when no margin accounts exist (zero-honesty)', async () => {
-    (gql as any).mockResolvedValue({
-      marginAccounts: [],
-      positions: [],
-    });
+    (gql as any).mockResolvedValue({ counter: null });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
     const json = await (await GET()).json();
@@ -122,24 +114,17 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
     expect(json.testnetTvlUsd).toBeNull();
   });
 
-  it('handles large aggregated TVL via formatUsd (MM-1)', async () => {
-    // 2^53 - 1 = 9_007_199_254_740_991 micro-USDC ≈ $9 trillion. Two
-    // accounts each at half that aggregate to a value that exceeds the
-    // safe-integer boundary in micro-USDC but lands well within
-    // safe-integer range after the /1e6 divide that formatUnits does
-    // internally. The MM-1 fix is the BigInt accumulator (`tvlWei +=
-    // BigInt(m.collateralValueWei)`) rather than a Number sum — the
-    // Number sum WOULD lose precision at the micro-USDC scale.
-    const a = (5_000_000_000_000_000n).toString(); // 5e15 micro-USDC = $5B
-    const b = (5_000_000_000_000_000n).toString();
+  it('handles large TVL via formatUsd (MM-1 BigInt precision)', async () => {
+    // 1e16 micro-USDC = $10B — past Number.MAX_SAFE_INTEGER at the
+    // micro-USDC scale. formatUsd uses BigInt division so the value is
+    // exact (the MM-1 fix). The Counter's totalTvlWei is itself a BigInt
+    // string maintained by the subgraph.
     (gql as any).mockResolvedValue({
-      marginAccounts: [{ collateralValueWei: a }, { collateralValueWei: b }],
-      positions: [],
+      counter: { totalTvlWei: '10000000000000000', openPositionsCount: '0', activeAgentsCount: '0' },
     });
     (loadDeploymentRegistry as any).mockResolvedValue({ contracts: {} });
 
     const json = await (await GET()).json();
-    // Exact BigInt sum = 10_000_000_000_000_000 micro-USDC = $10B.
     // formatUsd output: "$10,000,000,000.00" with locale separators.
     expect(json.testnetTvlUsd).toBe('$10,000,000,000.00');
   });
@@ -150,10 +135,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
     // VENUES and counts each venue whose adapterSlug has a registered
     // contract — HIP-3 and HIP-4 both count when adapter-hyperliquid
     // lands (they share the contract via Venue.adapterSlug).
-    (gql as any).mockResolvedValue({
-      marginAccounts: [],
-      positions: [],
-    });
+    (gql as any).mockResolvedValue({ counter: null });
     (loadDeploymentRegistry as any).mockResolvedValue({
       contracts: {
         'adapter-curve': { address: '0x' + '1'.repeat(40) },

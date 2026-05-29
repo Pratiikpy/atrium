@@ -10,9 +10,10 @@ import { gql } from '@/lib/scribe-helpers';
  * Iter 65 audit fix: locks iter-34 (staleness flag), KK-13 (formatUsd
  * precision), KK-14 (parseTsOrNull guards ago()) on /api/reserves/summary.
  *
- * - iter-34 / isStale: server-side computed boolean. Threshold is 2x
- *   hourly cadence (= 7200s) + 10 min jitter grace (= 600s) = 7800s
- *   = 130 min. Anything older = stale; missing = stale by default
+ * - iter-34 / isStale: server-side computed boolean. Threshold is 2x the
+ *   10-min Lantern cadence (= 1200s) + 5 min grace (= 300s) = 1500s
+ *   = 25 min (the cron moved from hourly to every-10-min in Phase
+ *   theta.3). Anything older = stale; missing = stale by default
  *   ("unknown closer to stale than fresh" per honesty rule).
  * - KK-13 / formatUsd: aggregated TVL via BigInt accumulator, rendered
  *   via formatUsd. Pre-fix `Number(tvl) / 1e6` lost precision above
@@ -33,16 +34,13 @@ afterEach(() => {
 });
 
 const NOW_SEC = Math.floor(Date.now() / 1000);
-const FRESH_TS = String(NOW_SEC - 30 * 60); // 30 min ago — well under 130-min threshold
-const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago — well past 130-min threshold
+const FRESH_TS = String(NOW_SEC - 10 * 60); // 10 min ago — under the 25-min threshold
+const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago — well past the 25-min threshold
 
 describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
   it('renders TVL via formatUsd with $ prefix and locale separators', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [
-        { balanceWei: '1500000' }, // $1.50
-        { balanceWei: '2500000' }, // $2.50
-      ],
+      counter: { totalTvlWei: '4000000' }, // $4.00, aggregated by the subgraph Counter
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -54,7 +52,7 @@ describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
 
   it('returns null TVL when zero balances aggregated (zero-honesty)', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -68,10 +66,7 @@ describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
     // 1B USDC = 1e15 micro-USDC, well past Number safe integer when
     // multiplied across many accounts. BigInt accumulator preserves.
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [
-        { balanceWei: '5000000000000000' }, // $5B
-        { balanceWei: '5000000000000000' }, // $5B
-      ],
+      counter: { totalTvlWei: '10000000000000000' }, // $10B, BigInt-precise
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -83,7 +78,7 @@ describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
 describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
   it('marks isStale=false when last attestation is fresh', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -94,7 +89,7 @@ describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
 
   it('marks isStale=true when last attestation exceeds threshold', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: STALE_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -107,7 +102,7 @@ describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
   it('marks isStale=true when no attestation indexed yet', async () => {
     // Honesty rule: unknown freshness is closer to stale than fresh.
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [],
     });
     const { GET } = await import('./route');
@@ -116,22 +111,22 @@ describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
     expect(json.staleReason).toBe('no attestation indexed yet');
   });
 
-  it('exposes the staleThresholdMin = 130 in the response', async () => {
-    // Defined per iter-34: 2x hourly + 10min jitter = 130 min.
+  it('exposes the staleThresholdMin = 25 in the response', async () => {
+    // Defined per iter-34, updated theta.3: 2x 10-min cadence + 5-min grace = 25 min.
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
     const json = await (await GET()).json();
-    expect(json.staleThresholdMin).toBe(130);
+    expect(json.staleThresholdMin).toBe(25);
   });
 });
 
 describe('GET /api/reserves/summary — KK-14 parseTsOrNull guard', () => {
   it('falls back to lastAttestedAgo:pending on malformed timestamp', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: 'NaN-text', leafCount: '8' }],
     });
     const { GET } = await import('./route');
@@ -144,7 +139,7 @@ describe('GET /api/reserves/summary — KK-14 parseTsOrNull guard', () => {
 
   it('falls back to leafCount:null on non-numeric leafCount', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: 'NaN' }],
     });
     const { GET } = await import('./route');
@@ -154,7 +149,7 @@ describe('GET /api/reserves/summary — KK-14 parseTsOrNull guard', () => {
 
   it('exposes valid leafCount as integer when present', async () => {
     (gql as any).mockResolvedValue({
-      cofferUserBalances: [],
+      counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '16' }],
     });
     const { GET } = await import('./route');
@@ -176,7 +171,7 @@ describe('GET /api/reserves/summary — Scribe outage', () => {
     expect(json.isStale).toBe(true);
     expect(json.staleReason).toBe('Scribe unavailable; freshness unknown');
     // staleThresholdMin still surfaces — consumers may render a tile
-    // labelled "threshold 130 min · unknown current age" honestly.
-    expect(json.staleThresholdMin).toBe(130);
+    // labelled "threshold 25 min · unknown current age" honestly.
+    expect(json.staleThresholdMin).toBe(25);
   });
 });

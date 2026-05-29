@@ -31,6 +31,15 @@ const ALLOWLIST: { file: string; allowed: RegExp[]; reason: string }[] = [
     allowed: [/\bsetTimeout\s*\(/],
     reason: 'Phase zeta.5 chaos auto-restore (real /api/chaos/restore call 5s after inject)',
   },
+  {
+    file: 'components/mobile/panels/reserves-mobile.tsx',
+    allowed: [/\bsetTimeout\s*\(/],
+    reason:
+      'Copy-to-clipboard confirmation auto-dismiss: setCopied(true) on a real ' +
+      'navigator.clipboard.writeText, then setCopied(false) after 1.5s. This is a ' +
+      'genuine post-user-action UI timer, NOT fake-latency simulation of network/data. ' +
+      'There is no fetch/refetchInterval equivalent for "reset a transient UI flag".',
+  },
 ];
 
 function walkTs(dir: string, out: string[] = []): string[] {
