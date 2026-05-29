@@ -1,7 +1,30 @@
 import { createConfig, http } from 'wagmi';
 import { fallback } from 'viem';
 import { arbitrumSepolia } from 'wagmi/chains';
-import { coinbaseWallet } from 'wagmi/connectors';
+import { coinbaseWallet, mock } from 'wagmi/connectors';
+
+/**
+ * E2E-ONLY mock connector. The production connector is the Coinbase Smart
+ * Wallet (passkey/hosted flow), which cannot be driven headlessly in
+ * Playwright. STRICTLY gated on NEXT_PUBLIC_E2E === '1' so it is NEVER present
+ * in a real build (a mock connector in prod would be a security hole). When
+ * set, Playwright connects this deterministic account and the app reads REAL
+ * Arbitrum Sepolia state for it via the transport below (honest zeros if the
+ * test address is unfunded). Lets the connect + read flows be verified
+ * without the Coinbase passkey UI. Address overridable via NEXT_PUBLIC_E2E_ADDRESS.
+ */
+const e2eConnectors =
+  process.env.NEXT_PUBLIC_E2E === '1'
+    ? [
+        mock({
+          accounts: [
+            (process.env.NEXT_PUBLIC_E2E_ADDRESS ??
+              '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266') as `0x${string}`,
+          ],
+          features: { defaultConnected: false },
+        }),
+      ]
+    : [];
 
 /**
  * Wagmi config. Arbitrum Sepolia primary per TDD §15.1.
@@ -21,6 +44,9 @@ export const wagmiConfig = createConfig({
   chains: [arbitrumSepolia],
   ssr: true,
   connectors: [
+    // E2E mock first (when gated on) so the connect-wallet control's
+    // connectors[0] resolves to it; empty in every real build.
+    ...e2eConnectors,
     coinbaseWallet({
       appName: 'Atrium',
       preference: 'smartWalletOnly',
