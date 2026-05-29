@@ -198,3 +198,190 @@ fn median(a: U256, b: U256) -> U256 {
         b + (a - b) / U256::from(2u64)
     }
 }
+
+// =============================================================================
+// Host tests (stylus-test TestVM). The dual-oracle reader gates EVERY Plinth
+// open_position (Plinth.get_safe_price forwards here), and before this module
+// it had ZERO coverage. We test it two ways:
+//
+//   1. The PURE price math directly: Q64.64 normalization (Chainlink decimals +
+//      Pyth exponent), the SYMMETRIC basis-point divergence, and the median.
+//      These need no mock host and pin the numeric correctness an auditor cares
+//      about (a $1 stablecoin must normalize to exactly Q64_SCALE on both legs;
+//      the 50 bps tolerance must read the same magnitude regardless of argument
+//      order; the returned price must be the midpoint).
+//
+//   2. Every Chainlink-side REVERT gate via a mocked aggregator: stale round
+//      (answeredInRound < roundId), freshness (older than the window), negative
+//      price, and an unreadable decimals() call.
+//
+// TestVM single-buffer caveat (verified against stylus-test 0.10.7, same as the
+// Coffer host-test module): the mock host keeps ONE global return-data buffer,
+// so a function making multiple cross-contract calls that each need a DIFFERENT
+// successful return value cannot be fully mocked to success. safe_price's full
+// happy path makes three such calls (latestRoundData -> a tuple, decimals -> a
+// uint8, getPriceNoOlderThan -> a tuple), so the median/disagreement SUCCESS
+// path is not host-mockable here; it is exercised by a live Arbitrum Sepolia
+// read. We therefore test the pure math directly (covering the median +
+// tolerance + normalization logic without any cross call) and every revert gate
+// (each reverts at or before the second cross call, so a single mock suffices).
+// No assertion is weakened to pass.
+// =============================================================================
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod tests {
+    use super::*;
+    use alloy_primitives::I256;
+    use alloy_sol_types::{sol, SolCall};
+    use stylus_sdk::testing::TestVM;
+
+    sol! {
+        function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80);
+        function decimals() external view returns (uint8);
+    }
+
+    fn cl_addr() -> Address { Address::from([0xC1u8; 20]) }
+    fn pyth_addr() -> Address { Address::from([0x9Au8; 20]) }
+    fn feed_id() -> FixedBytes<32> { FixedBytes::<32>::from([0xEEu8; 32]) }
+
+    /// ABI-encode the Chainlink latestRoundData 5-tuple return as raw words.
+    /// (Hand-encoded rather than via the generated `abi_encode_returns` to avoid
+    /// fighting alloy's uintN alias types; each field is one 32-byte word.)
+    fn cl_data(round_id: u64, answer: I256, updated: u64, answered_in_round: u64) -> Vec<u8> {
+        let mut v = Vec::with_capacity(160);
+        v.extend_from_slice(&U256::from(round_id).to_be_bytes::<32>());
+        v.extend_from_slice(&answer.to_be_bytes::<32>());
+        v.extend_from_slice(&U256::ZERO.to_be_bytes::<32>()); // started_at (unused)
+        v.extend_from_slice(&U256::from(updated).to_be_bytes::<32>());
+        v.extend_from_slice(&U256::from(answered_in_round).to_be_bytes::<32>());
+        v
+    }
+
+    /// OracleError has no Debug (SolidityError enum); map to an inspectable code.
+    /// StaleRound is a distinct variant → sentinel 1000.
+    fn code_of(r: &Result<U256, OracleError>) -> i32 {
+        match r {
+            Ok(_) => -1,
+            Err(OracleError::Err(e)) => e.code as i32,
+            Err(OracleError::StaleRound(_)) => 1000,
+        }
+    }
+
+    fn q64() -> U256 { Q64_SCALE }
+
+    // ---- pure price math (no mock host) -----------------------------------
+
+    #[test]
+    fn normalize_chainlink_one_dollar_is_exactly_q64() {
+        // $1.00 at 0, 6 and 8 decimals all normalize to exactly Q64_SCALE.
+        assert_eq!(normalize_to_q64(U256::from(1u64), 0), q64());
+        assert_eq!(normalize_to_q64(U256::from(1_000_000u64), 6), q64(), "1 USDC @ 6dp");
+        assert_eq!(normalize_to_q64(U256::from(100_000_000u64), 8), q64(), "$1 @ 8dp");
+    }
+
+    #[test]
+    fn normalize_pyth_handles_negative_and_positive_exponents() {
+        // $1.00 at expo -8 → exactly Q64_SCALE.
+        assert_eq!(normalize_pyth(100_000_000, -8), q64(), "$1.00 @ expo -8");
+        // The real on-chain USDC/USD read (99978203 @ expo -8 ≈ $0.99978) is
+        // just under a dollar: strictly below Q64_SCALE but within ~0.03%.
+        let p = normalize_pyth(99_978_203, -8);
+        assert!(p < q64(), "sub-dollar price < Q64");
+        assert!(p > q64() * U256::from(999u64) / U256::from(1000u64), "within 0.1% of $1");
+        // Positive exponent scales up: 5 * 10^2 = 500.
+        assert_eq!(normalize_pyth(5, 2), q64() * U256::from(500u64), "5e2 = 500");
+    }
+
+    #[test]
+    fn abs_diff_bps_is_symmetric_and_zero_on_equal() {
+        assert_eq!(abs_diff_bps(q64(), q64()), 0, "equal prices → 0 bps");
+        let a = U256::from(10_000u64);
+        let b = U256::from(10_100u64);
+        assert_eq!(abs_diff_bps(a, b), abs_diff_bps(b, a), "WW-fix: symmetric");
+    }
+
+    #[test]
+    fn abs_diff_bps_brackets_the_50bps_tolerance() {
+        // ~0.6% apart → 59 bps (> 50, would be rejected as disagreement).
+        let a = q64();
+        let over = a + a * U256::from(60u64) / U256::from(10_000u64);
+        assert!(abs_diff_bps(a, over) > 50, "0.6% diff exceeds 50 bps tolerance");
+        // ~0.4% apart → 39 bps (≤ 50, accepted).
+        let under = a + a * U256::from(40u64) / U256::from(10_000u64);
+        assert!(abs_diff_bps(a, under) <= 50, "0.4% diff within 50 bps tolerance");
+    }
+
+    #[test]
+    fn median_is_the_midpoint_either_order() {
+        assert_eq!(median(U256::from(10u64), U256::from(20u64)), U256::from(15u64));
+        assert_eq!(median(U256::from(20u64), U256::from(10u64)), U256::from(15u64));
+        assert_eq!(median(U256::from(7u64), U256::from(7u64)), U256::from(7u64));
+    }
+
+    // ---- Chainlink-side revert gates (single mock each) -------------------
+
+    #[test]
+    fn reverts_stale_round_when_answered_in_round_behind() {
+        let vm = TestVM::new();
+        vm.set_block_timestamp(1_000);
+        let oracle = PlinthOracle::from(&vm);
+        // roundId 2 but answeredInRound 1 → incomplete round → StaleRound,
+        // before any freshness/decimals/pyth call.
+        vm.mock_static_call(
+            cl_addr(),
+            latestRoundDataCall {}.abi_encode(),
+            Ok(cl_data(2, I256::try_from(100_000_000i64).unwrap(), 1_000, 1)),
+        );
+        let r = oracle.safe_price(pyth_addr(), cl_addr(), feed_id(), 60, 50);
+        assert_eq!(code_of(&r), 1000, "answeredInRound < roundId → StaleRound");
+    }
+
+    #[test]
+    fn reverts_stale_when_chainlink_older_than_freshness_window() {
+        let vm = TestVM::new();
+        vm.set_block_timestamp(1_000); // now = 1000
+        let oracle = PlinthOracle::from(&vm);
+        // updated_at = 0, now = 1000, freshness = 60 → 1000 > 60 → ERR_STALE.
+        // (answeredInRound == roundId so it passes the StaleRound gate first.)
+        vm.mock_static_call(
+            cl_addr(),
+            latestRoundDataCall {}.abi_encode(),
+            Ok(cl_data(1, I256::try_from(100_000_000i64).unwrap(), 0, 1)),
+        );
+        let r = oracle.safe_price(pyth_addr(), cl_addr(), feed_id(), 60, 50);
+        assert_eq!(code_of(&r), ERR_STALE as i32, "stale chainlink → ERR_STALE");
+    }
+
+    #[test]
+    fn reverts_negative_price_refuses_bad_chainlink_answer() {
+        let vm = TestVM::new();
+        vm.set_block_timestamp(100);
+        let oracle = PlinthOracle::from(&vm);
+        // Fresh (updated == now) + complete round, but a NEGATIVE answer must be
+        // refused before it can poison the margin math.
+        vm.mock_static_call(
+            cl_addr(),
+            latestRoundDataCall {}.abi_encode(),
+            Ok(cl_data(1, I256::try_from(-1i64).unwrap(), 100, 1)),
+        );
+        let r = oracle.safe_price(pyth_addr(), cl_addr(), feed_id(), 60, 50);
+        assert_eq!(code_of(&r), ERR_NEGATIVE_PRICE as i32, "negative chainlink → ERR_NEGATIVE_PRICE");
+    }
+
+    #[test]
+    fn reverts_decimals_unreadable_when_decimals_call_fails() {
+        let vm = TestVM::new();
+        vm.set_block_timestamp(100);
+        let oracle = PlinthOracle::from(&vm);
+        // Register decimals() as a revert FIRST, then latestRoundData() OK LAST
+        // so the single global return buffer holds the valid round tuple for the
+        // first call; the second call (decimals) then reverts → ERR_DECIMALS_UNREADABLE.
+        vm.mock_static_call(cl_addr(), decimalsCall {}.abi_encode(), Err(vec![0xde, 0xad]));
+        vm.mock_static_call(
+            cl_addr(),
+            latestRoundDataCall {}.abi_encode(),
+            Ok(cl_data(1, I256::try_from(100_000_000i64).unwrap(), 100, 1)),
+        );
+        let r = oracle.safe_price(pyth_addr(), cl_addr(), feed_id(), 60, 50);
+        assert_eq!(code_of(&r), ERR_DECIMALS_UNREADABLE as i32, "decimals() revert → ERR_DECIMALS_UNREADABLE");
+    }
+}
