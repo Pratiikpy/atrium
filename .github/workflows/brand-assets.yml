@@ -1,42 +1,71 @@
 name: brand-assets
 
-# Phase eta.10: regenerate brand raster assets whenever the canonical
-# SVGs change. Commits the rasters back so the /brand Download links
-# stay live without manual founder action.
-
 on:
   push:
     paths:
       - 'apps/verify/public/brand/assets/*.svg'
+      - 'apps/verify/public/icon.svg'
       - 'scripts/generate-brand-rasters.mjs'
+      - 'scripts/generate-pwa-icons.mjs'
   pull_request:
     paths:
       - 'apps/verify/public/brand/assets/*.svg'
+      - 'apps/verify/public/icon.svg'
       - 'scripts/generate-brand-rasters.mjs'
+      - 'scripts/generate-pwa-icons.mjs'
   workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   regenerate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: '20'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: node scripts/generate-brand-rasters.mjs
-      - name: Commit regenerated rasters
-        # Only commits if the SVG change actually produced a raster diff.
-        # The git-auto-commit action is read-only when there are no changes.
-        uses: stefanzweifel/git-auto-commit-action@v5
+      # Audit fix (#32): the committed maskable PWA icons were byte-identical
+      # copies of the non-maskable ones (no 10% safe-zone padding), so Android
+      # adaptive masks crop the wordmark/underline. brand-assets only ran the
+      # raster generator, never generate-pwa-icons.mjs, so the padded maskables
+      # could silently drift back to plain copies. Regenerate them here (CI has
+      # a working sharp native binding; local win32 does not) so the maskables
+      # are produced with padding and can never drift again.
+      - run: node scripts/generate-pwa-icons.mjs
+      - name: Create PR with regenerated rasters
+        uses: peter-evans/create-pull-request@4320041ed380b20e97d388d56a7fb4f9b8c20e79 # v7.0.0
         with:
-          commit_message: 'chore(brand): regenerate raster assets from SVG canon'
-          file_pattern: 'apps/verify/public/brand/assets/*.png apps/verify/public/favicon.ico'
+          branch: ci-data/${{ github.workflow }}
+          title: "ci: ${{ github.workflow }} data update"
+          commit-message: "ci: refresh ${{ github.workflow }} data"
+          delete-branch: true
+          add-paths: |
+            apps/verify/public/brand/**
+            apps/verify/public/favicon.ico
+            apps/verify/public/icon-192.png
+            apps/verify/public/icon-512.png
+            apps/verify/public/icon-maskable-192.png
+            apps/verify/public/icon-maskable-512.png
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
