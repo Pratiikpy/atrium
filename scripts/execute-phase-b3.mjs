@@ -50,6 +50,12 @@ async function loadDeployerKey() {
   return '0x' + plain.toString('hex');
 }
 
+// Synchronous backoff between sends — the deployer EOA is shared with the
+// Lantern cron, so a cron tick can bump the nonce mid-batch.
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 function redact(s) {
   return s.replace(/(--private-key(?:-path)?[\s=])(0x[0-9a-fA-F]+|\S+)/g, '$1***REDACTED***')
           .replace(/0x[0-9a-fA-F]{64}/g, '0x***REDACTED***');
@@ -102,10 +108,21 @@ async function main() {
     const scheduledTs = parseInt(block.timestamp, 16);
     console.log(`  schedule tx block ${parseInt(receipt.blockNumber, 16)} ts ${scheduledTs}`);
 
-    const r = cast([
-      'send', '--rpc-url', RPC, '--private-key', pk, timelock,
-      'execute(address,bytes,uint64)', action.target, action.data, String(scheduledTs),
-    ], { captureOutput: true });
+    let r;
+    for (let attempt = 1; attempt <= 6; attempt++) {
+      r = cast([
+        'send', '--rpc-url', RPC, '--private-key', pk, timelock,
+        'execute(address,bytes,uint64)', action.target, action.data, String(scheduledTs),
+      ], { captureOutput: true });
+      if (r.status === 0) break;
+      const errText = (r.stderr ?? '') + (r.stdout ?? '');
+      if (/nonce too low|already known|replacement transaction underpriced/i.test(errText) && attempt < 6) {
+        console.log(`  nonce clash (attempt ${attempt}/6); retrying in 5s...`);
+        sleepSync(5000);
+        continue;
+      }
+      break; // success, non-nonce error, or last attempt — handled below
+    }
     if (r.status !== 0) {
       const stderr = r.stderr ?? '';
       if (/AlreadyExecuted/i.test(stderr)) {

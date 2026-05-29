@@ -92,15 +92,24 @@ const CAST_BIN = process.env.CAST_BIN ?? (process.platform === 'win32'
   ? 'C:/Users/prate/.foundry/bin/cast.exe'
   : 'cast');
 
+// Synchronous sleep (no deps) — backoff between sends on a nonce clash.
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 function cast(args, opts = {}) {
-  console.log(`\n$ cast ${args.join(' ')}`);
+  // 2026-05-29 security: NEVER print the raw --private-key value. Previously
+  // this line logged the full `cast send --private-key 0x...` command, leaking
+  // the deployer key into the run log. Redact the value after --private-key.
+  const shown = args.map((a, i) => (args[i - 1] === '--private-key' ? '<REDACTED>' : a));
+  console.log(`\n$ cast ${shown.join(' ')}`);
   const r = spawnSync(CAST_BIN, args, {
     stdio: opts.captureOutput ? ['ignore', 'pipe', 'pipe'] : 'inherit',
     encoding: 'utf8',
     env: process.env,
   });
   if (r.error) throw r.error;
-  if (r.status !== 0) throw new Error(`cast exit ${r.status}: ${r.stderr ?? ''}`);
+  if (r.status !== 0) throw new Error(`cast exit ${r.status}: ${(r.stderr ?? '') + (r.stdout ?? '')}`);
   return r;
 }
 
@@ -130,20 +139,45 @@ async function main() {
   const schedules = [];
 
   function scheduleAction(label, target, data) {
-    const r = cast(
-      ['send', '--rpc-url', RPC, '--private-key', pk, timelock,
-       'schedule(address,bytes)(bytes32)', target, data],
-      { captureOutput: true },
-    );
-    const txHashMatch = r.stdout.match(/transactionHash\s+(0x[a-fA-F0-9]{64})/);
-    schedules.push({
-      label,
-      target,
-      data,
-      tx: txHashMatch?.[1] ?? null,
-      scheduledAt: new Date().toISOString(),
-    });
-    console.log(`scheduled: ${label} (tx ${txHashMatch?.[1] ?? '?'})`);
+    // The deployer EOA is shared with the Lantern attestor cron, which fires
+    // txs from the same address. A cron tick landing mid-run advances the
+    // nonce and cast errors "nonce too low". Retry on that (cast refetches the
+    // nonce each send), backing off long enough for the cron tx to settle.
+    const MAX_ATTEMPTS = 6;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const r = cast(
+          ['send', '--rpc-url', RPC, '--private-key', pk, timelock,
+           'schedule(address,bytes)(bytes32)', target, data],
+          { captureOutput: true },
+        );
+        const tx = r.stdout.match(/transactionHash\s+(0x[a-fA-F0-9]{64})/)?.[1] ?? null;
+        const blockNumber = r.stdout.match(/blockNumber\s+(\d+)/)?.[1] ?? null;
+        // CRITICAL for execute(): PraetorTimelock derives the operation id as
+        // keccak256(abi.encode(target, data, block.timestamp)) — so execute
+        // MUST pass the exact block.timestamp of the schedule tx. Capture the
+        // real on-chain timestamp now (the prior wall-clock ISO string would
+        // have produced the wrong id and reverted NotScheduled at execute).
+        let scheduledTimestamp = null;
+        if (blockNumber) {
+          scheduledTimestamp = cast(
+            ['block', blockNumber, '--rpc-url', RPC, '--field', 'timestamp'],
+            { captureOutput: true },
+          ).stdout.trim();
+        }
+        schedules.push({ label, target, data, tx, blockNumber, scheduledTimestamp, scheduledAt: new Date().toISOString() });
+        console.log(`scheduled: ${label} (tx ${tx ?? '?'}, ts ${scheduledTimestamp ?? '?'})`);
+        return;
+      } catch (e) {
+        const msg = String(e?.message ?? e);
+        if (/nonce too low|already known|replacement transaction underpriced/i.test(msg) && attempt < MAX_ATTEMPTS) {
+          console.log(`  nonce clash on "${label}" (attempt ${attempt}/${MAX_ATTEMPTS}); refetching nonce in 5s...`);
+          sleepSync(5000);
+          continue;
+        }
+        throw e;
+      }
+    }
   }
 
   // Block 1: Coffer.setAdapter(AtriumRouter, true, perBlockCap).
