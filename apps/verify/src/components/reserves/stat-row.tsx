@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 
 interface Summary {
   tvlUsd: string | null;
+  /** Coffer.totalAssets() - the underlying USDC redeemable right now. */
+  redeemableUsd: string | null;
   lastAttestedTvlUsd: string | null;
   lastAttestedAgo: string;
   leafCount: number | null;
@@ -27,6 +29,7 @@ async function fetchSummary(): Promise<Summary> {
     // exactly when an operator most needs the truth.
     return {
       tvlUsd: null,
+      redeemableUsd: null,
       lastAttestedTvlUsd: null,
       lastAttestedAgo: 'pending',
       leafCount: null,
@@ -42,7 +45,7 @@ export function ReservesStatRow() {
   const { data } = useQuery({ queryKey: ['reserves-summary'], queryFn: fetchSummary, refetchInterval: 60_000 });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Tile label="Live TVL" value={data?.tvlUsd ?? '—'} sub="from Coffer ERC-4626" />
+      <Tile label="Redeemable now" value={data?.redeemableUsd ?? '—'} sub="Coffer.totalAssets() · live read" />
       <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '—'} sub="last hourly attestation" />
       <Tile
         label="Last attestation"
