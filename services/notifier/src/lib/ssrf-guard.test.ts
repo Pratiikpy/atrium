@@ -35,10 +35,13 @@ describe('assertPublicHttps', () => {
     await expect(assertPublicHttps('https://[::1]')).rejects.toMatchObject({ code: 'webhook_private_ip' });
   });
 
-  it('accepts https://api.example.com resolving to public IP', async () => {
+  it('accepts https://api.example.com resolving to public IP and pins it', async () => {
     mockLookup.mockResolvedValue([{ address: '93.184.216.34', family: 4 }] as any);
     const result = await assertPublicHttps('https://api.example.com');
-    expect(result.hostname).toBe('api.example.com');
+    expect(result.url.hostname).toBe('api.example.com');
+    // The validated IP is returned so the caller can pin the connection to it.
+    expect(result.address).toBe('93.184.216.34');
+    expect(result.family).toBe(4);
   });
 
   it('rejects hostname resolving to private IP', async () => {
@@ -49,5 +52,20 @@ describe('assertPublicHttps', () => {
   it('rejects CGNAT range 100.64.x.x', async () => {
     mockLookup.mockResolvedValue([{ address: '100.64.0.1', family: 4 }] as any);
     await expect(assertPublicHttps('https://cgnat.example.com')).rejects.toMatchObject({ code: 'webhook_private_ip' });
+  });
+
+  it('rejects IPv4-mapped IPv6 loopback (::ffff:127.0.0.1)', async () => {
+    // isIP() reports these as family 6, so without embedded-IPv4 decoding the
+    // private range would be bypassed. Literal form (no DNS).
+    await expect(assertPublicHttps('https://[::ffff:127.0.0.1]')).rejects.toMatchObject({ code: 'webhook_private_ip' });
+  });
+
+  it('rejects IPv4-mapped IPv6 metadata IP via DNS (::ffff:169.254.169.254)', async () => {
+    mockLookup.mockResolvedValue([{ address: '::ffff:169.254.169.254', family: 6 }] as any);
+    await expect(assertPublicHttps('https://rebind.example.com')).rejects.toMatchObject({ code: 'webhook_private_ip' });
+  });
+
+  it('rejects IPv6 unspecified (::)', async () => {
+    await expect(assertPublicHttps('https://[::]')).rejects.toMatchObject({ code: 'webhook_private_ip' });
   });
 });
