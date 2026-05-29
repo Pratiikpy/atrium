@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { NewMandateButton } from '@/components/agents/new-mandate-button';
 
 /**
  * AgentsMobile  the Agents panel for /app/agents at < md.
@@ -50,7 +51,18 @@ export function AgentsMobile() {
 
   return (
     <div className="md:hidden flex flex-col gap-4">
-      <SectionHead t={`Your mandates . ${mandates.data?.mandates?.length ?? 0} active`} moreHref="/app/agents" moreLabel="New ↗" />
+      {/* Audit fix (#18): the mandate CTAs ("New ↗", "Issue your first Sigil")
+          all linked back to /app/agents, which on mobile re-renders this same
+          panel - an infinite loop, and the real mandate modal was desktop-only.
+          Now the self-contained NewMandateButton (full IntentSigil form +
+          deployment gate) is rendered here, so mobile users can actually issue
+          a mandate. */}
+      <div className="flex items-center justify-between px-1">
+        <span className="font-display text-[18px] italic text-mob-ink">
+          Your mandates . {mandates.data?.mandates?.length ?? 0} active
+        </span>
+        <NewMandateButton />
+      </div>
 
       {/* Active mandate banner */}
       {active ? (
@@ -58,9 +70,9 @@ export function AgentsMobile() {
       ) : (
         <div className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-5 text-center">
           <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">No active mandate</div>
-          <Link href="/app/agents" className="mt-2 inline-block font-mono text-[12px] text-mob-accent underline">
-            Issue your first Sigil
-          </Link>
+          <div className="mt-3 flex justify-center">
+            <NewMandateButton />
+          </div>
         </div>
       )}
 
@@ -136,13 +148,15 @@ function AgentRow({ r }: { r: LeaderboardRow }) {
   );
 }
 
-function SectionHead({ t, moreHref, moreLabel }: { t: string; moreHref: string; moreLabel: string }) {
+function SectionHead({ t, moreHref, moreLabel }: { t: string; moreHref?: string; moreLabel?: string }) {
   return (
     <div className="flex items-baseline justify-between px-1">
       <span className="font-display text-[18px] italic text-mob-ink">{t}</span>
-      <Link href={moreHref as any} className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted hover:text-mob-ink">
-        {moreLabel}
-      </Link>
+      {moreHref && moreLabel && (
+        <Link href={moreHref as any} className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted hover:text-mob-ink">
+          {moreLabel}
+        </Link>
+      )}
     </div>
   );
 }
