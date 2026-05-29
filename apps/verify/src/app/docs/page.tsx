@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
+import { DISCLOSURES } from '@/app/docs/honesty/page';
 
 export const metadata = {
   title: 'Atrium · Docs',
@@ -122,7 +123,9 @@ export default function DocsPage() {
                 Every mock, relay, interim state, and third-party blocker. What it does, why,
                 when it becomes real. Sourced from the tripwires/ folder.
               </p>
-              <p className="mt-3 text-xs text-muted">10 disclosures . sourced</p>
+              {/* Audit fix (#39): count is derived from the DISCLOSURES array so
+                  it can never drift from the honesty page again. */}
+              <p className="mt-3 text-xs text-muted">{DISCLOSURES.length} disclosures . sourced</p>
             </Card>
           </Link>
           <Link href="/docs/api" className="block">

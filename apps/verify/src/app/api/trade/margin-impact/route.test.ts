@@ -155,10 +155,12 @@ describe('GET /api/trade/margin-impact — valid input passes JJ-1, falls to pen
     expect(res.status).toBe(200);
   });
 
-  it('mentions the venue in pending notes (default hl-hip3)', async () => {
+  it('mentions the venue in pending notes (default hyperliquid)', async () => {
+    // Audit fix (#19): default venue is now a real VENUES id ('hyperliquid'),
+    // not the bogus 'hl-hip3' the route used to fall back to.
     const res = await GET(makeRequest('size=100'));
     const json = await res.json();
-    expect(json.notes).toContain('hl-hip3');
+    expect(json.notes).toContain('hyperliquid');
   });
 
   it('mentions the custom venue in pending notes', async () => {

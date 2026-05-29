@@ -1,6 +1,8 @@
 // Atrium — static catalog data for the landing page.
 //
-// VENUES and SUBSYSTEMS are factual descriptions of the system architecture.
+// VENUES and SUBSYSTEMS describe the system architecture. The factual fields
+// on a Venue are id/name/short/type/asset/chain/pending; the `collateral`
+// field is an ILLUSTRATIVE relative weight (see note below), NOT a real TVL.
 // TECHNOLOGY_STACK lists the protocols Atrium builds on (all verifiable from
 // the codebase under resources/ and contracts/).
 //

@@ -116,10 +116,12 @@ export default function LandingPage() {
         {/* ============== VENUES ============== */}
         <section className="section" id="portfolio">
           <div className="container">
+            {/* Audit fix (#69): the live count is derived from VENUES so the
+                copy can never drift from the per-card Registered/Pending tags. */}
             <SectionHead
               num="II"
               title={<>Eight venues. One margin engine.</>}
-              sub="Whitelisted Portico adapters on Arbitrum Sepolia testnet. RH-Chain ships within 14 days of the Robinhood SDK going public."
+              sub={`${VENUES.filter((v) => !v.pending).length} adapters registered in PorticoRegistry on Arbitrum Sepolia testnet. RH-Chain ships within 14 days of the Robinhood SDK going public.`}
             />
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {VENUES.map((v) => (

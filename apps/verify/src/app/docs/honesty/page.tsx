@@ -27,7 +27,7 @@ interface Disclosure {
   severity: 'venue-mock' | 'relay' | 'interim' | 'waiting-on-3p';
 }
 
-const DISCLOSURES: Disclosure[] = [
+export const DISCLOSURES: Disclosure[] = [
   {
     id: 'aave',
     surface: 'Aave Horizon adapter',
@@ -107,7 +107,7 @@ const DISCLOSURES: Disclosure[] = [
     id: 'numbers',
     surface: 'Headline numbers on landing + mobile landing',
     what:
-      'The fake-data components (Numbers.tsx, MobileLanding.tsx, Features.tsx PortfolioMock) were deleted in Phase 1 of docs/MASTER_PLAN.md (2026-05-28). The landing now renders "—" for any value not sourced from a live API.',
+      'The fake-data components (Numbers.tsx, MobileLanding.tsx, Features.tsx PortfolioMock) with hardcoded $4.13M / $12.37M / setInterval increments were deleted in the 2026-05-28 honesty pass. The live-stats strip (NumbersSection) now renders "—" for any value not sourced from a live API. One surface is explicitly illustrative rather than "—": the "capital convergence" diagram (Impluvium) shows sample per-venue collateral figures, but it is labelled "illustrative schematic" so it is never read as live measurement.',
     why:
       'Per `docs/conventions/ui.md`: never show a placeholder number that looks real. The Lovable-port components with hardcoded $4.13M / $12.37M / setInterval increments are gone.',
     whenReal: 'Live as soon as Scribe + Plinth + Coffer return non-zero data after the timelock fires.',

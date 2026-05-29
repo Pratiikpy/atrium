@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tryGetPlinth } from '@/lib/portfolio-source';
 import { formatUsd } from '@/lib/format-usd';
+import { VENUES } from '@/lib/venues';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,8 @@ export async function GET(req: NextRequest) {
       : process.env.DEMO_WALLET_ADDRESS ?? null;
   const plinth = await tryGetPlinth();
   const sizeUsd = parseSizeUsdOrNull(req.nextUrl.searchParams.get('size'));
-  const venue = req.nextUrl.searchParams.get('venue') ?? 'hl-hip3';
+  // Default to a real VENUES id (was 'hl-hip3', which is not a valid id).
+  const venue = req.nextUrl.searchParams.get('venue') ?? 'hyperliquid';
 
   if (sizeUsd == null) {
     // Audit JJ-1 fix: malformed `size` no longer crashes the route. Honest 400.
@@ -54,7 +56,15 @@ export async function GET(req: NextRequest) {
   }
   try {
     const [collateral, required] = await plinth.read.getAccount([wallet]);
-    const initialBps = venue.startsWith('hl') ? 1000 : venue === 'aave-v3' ? 100 : 500;
+    // Audit fix (#19): the prior `venue.startsWith('hl') ? 1000 : venue === 'aave-v3' ? 100 : 500`
+    // ternary keyed on ids that the UI never sends ('aave-v3' is never a venue
+    // id; 'hyperliquid'/'aave-horizon'/'trade-xyz'/'polymarket' all fell through
+    // to 500bps), so the margin shown disagreed with the haircut column rendered
+    // beside it in venue-margin-compare (e.g. Polymarket showed "50% haircut"
+    // next to a 5% margin). Read the canonical per-venue haircut so the table
+    // agrees with itself. Falls back to 400bps only for an unknown id.
+    const venueRow = VENUES.find((v) => v.id === venue);
+    const initialBps = venueRow?.haircutBps ?? 400;
     const maintenanceBps = Math.floor(initialBps * 0.8);
     const sizeWei = BigInt(Math.floor(sizeUsd * 1e6));
     const initialMargin = (sizeWei * BigInt(initialBps)) / 10_000n;
@@ -76,7 +86,7 @@ export async function GET(req: NextRequest) {
       liquidationBufferBps: Math.min(10_000, bufferBps),
       initialMarginUsd: formatUsd(initialMargin, USDC_DECIMALS),
       maintenanceMarginUsd: formatUsd(maintenanceMargin, USDC_DECIMALS),
-      notes: `Venue ${venue} haircut applied via SPAN scenario matrix. Cross-correlation netting handled by Plinth.`,
+      notes: `Venue ${venue} initial-margin haircut ${(initialBps / 100).toFixed(0)}% (Plinth per-venue risk parameter). Cross-correlation netting handled by Plinth.`,
       source: 'plinth' as const,
     });
   } catch {
