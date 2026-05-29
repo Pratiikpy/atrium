@@ -8,18 +8,22 @@
  * finding (#335 + #337 in the 2026-05-24 sweep) was that every
  * router-mediated open_position would revert UnauthorizedCaller
  * because:
- *   - Coffer.set_adapter was never scheduled, so
- *     coffer.adapter_pull(...) rejects every adapter caller.
+ *   - Coffer.setAdapter(Router, true, cap) was never scheduled, so
+ *     coffer.adapterPull(...) rejects the Router (its msg_sender).
  *   - The 9 venue adapters never had setAuthorizedCaller(router, true)
  *     scheduled, so the adapter.open() entry point rejects the Router.
  *
  * This script schedules the full corrected batch:
- *   - 9x Coffer.set_adapter(adapter, true)
+ *   - 1x Coffer.setAdapter(AtriumRouter, true, perBlockCap)  [3-arg selector]
  *   - 9x <adapter>.setAuthorizedCaller(router, true)
  *   - 10x PorticoRegistry.registerAdapter(venue_id, adapter, codehash, 1)
  *   - 3x Aqueduct wiring (setAqueductOnDest, setAllowedSource, setClaimbackRegistry)
  *
- * Total: 31 scheduled actions, all executable T+48h after this run.
+ * Total: 23 scheduled actions, all executable T+48h after this run.
+ *
+ * 2026-05-29 correction: Block 1 previously scheduled 10x 2-arg
+ * setAdapter(address,bool) against each venue adapter — wrong selector AND
+ * wrong target. See the Block 1 comment for the contract-verified rationale.
  *
  * Usage:
  *   ATRIUM_KEYDIR=/c/Users/prate/.atrium node scripts/reschedule-phase-b3.mjs
@@ -42,6 +46,12 @@ const REGISTRY_PATH = resolve(REPO_ROOT, 'deployments/arbitrum_sepolia.json');
 const SCHEDULE_PATH = resolve(REPO_ROOT, '.forge-cache/phase-b3-schedule-corrected.json');
 
 const ETH_SEPOLIA_SELECTOR = '16015286601757825753'; // CCIP chain selector
+
+// Per-block notional cap for the Router as a Coffer orchestrator: 10_000
+// USDC (6 decimals). Mirrors script/SetCofferAdapterSchedule.s.sol. Tune up
+// after mainnet stress-testing. Coffer.set_adapter (lib.rs:619) stores this
+// as adapter_budgets[router].per_block_cap_wei.
+const PER_BLOCK_CAP_USDC_WEI = (10_000n * (10n ** 6n)).toString();
 
 // Adapter venue ids per script/PhaseB3-Schedule.s.sol — preserve the
 // mapping the existing PorticoRegistry knows about.
@@ -136,15 +146,30 @@ async function main() {
     console.log(`scheduled: ${label} (tx ${txHashMatch?.[1] ?? '?'})`);
   }
 
-  // Block 1: Coffer.set_adapter(adapter, true) — auditor C-7 fix.
-  // Use Stylus camelCase ABI (setAdapter, not set_adapter).
-  for (const v of VENUES) {
-    const adapter = get(v.slug);
+  // Block 1: Coffer.setAdapter(AtriumRouter, true, perBlockCap).
+  // 2026-05-29 CRITICAL CORRECTION (verified against the deployed contracts).
+  // The prior version looped over VENUES calling 2-arg
+  // `setAdapter(address,bool)` on each venue adapter. That was wrong on BOTH
+  // axes:
+  //   1. SELECTOR — Coffer (contracts/coffer/src/lib.rs:615) exports the
+  //      3-arg `setAdapter(address,bool,uint256)` = 0x4de27bea. The 2-arg
+  //      form 0x332f6465 is not on the Stylus dispatcher, so
+  //      PraetorTimelock.execute (PraetorTimelock.sol:85 target.call(data))
+  //      would revert CallFailed even after the 48h wait.
+  //   2. TARGET — coffer.adapter_pull (lib.rs:534) authorizes msg_sender, and
+  //      AtriumRouter.sol:252/402 is the ONLY caller of coffer.adapterPull.
+  //      So the ROUTER must be approved, exactly once. Approving each venue
+  //      adapter would (a) be unnecessary and (b) re-open the direct-pull
+  //      bypass the Router's ICofferApprovedQuery defense-in-depth
+  //      (AtriumRouter.sol:54-60) is built to prevent.
+  // The standalone script/SetCofferAdapterSchedule.s.sol encodes the same
+  // correct call; keep the two in lockstep.
+  {
     const data = cast(
-      ['calldata', 'setAdapter(address,bool)', adapter, 'true'],
+      ['calldata', 'setAdapter(address,bool,uint256)', router, 'true', PER_BLOCK_CAP_USDC_WEI],
       { captureOutput: true },
     ).stdout.trim();
-    scheduleAction(`Coffer.setAdapter(${v.name}, true)`, coffer, data);
+    scheduleAction('Coffer.setAdapter(AtriumRouter, true, cap)', coffer, data);
   }
 
   // Block 2: <adapter>.setAuthorizedCaller(router, true) — auditor C-3 fix.
