@@ -5,14 +5,13 @@ export function SigilSection() {
     <SectionShell
       id="agents"
       variant="dark"
-      eyebrow="Sigil · ERC-8004 mandates"
+      eyebrow="Agent mandates · Sigil"
       headline={
         <>
           Agents trade with bounded{' '}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{
-              fontFamily: '"Instrument Serif", "Times New Roman", serif',
               color: '#C46A5E',
               fontWeight: 400,
               letterSpacing: '-0.01em',
@@ -22,7 +21,7 @@ export function SigilSection() {
           </span>
         </>
       }
-      sub="You sign one Intent Sigil — an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves."
+      sub="You sign one Intent Sigil, an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves."
     >
       <MandateCard />
     </SectionShell>

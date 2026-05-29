@@ -3,7 +3,7 @@ import { SectionShell } from './section-shell';
 export function PlinthSection() {
   return (
     <SectionShell
-      eyebrow="Plinth · margin engine"
+      eyebrow="Margin engine · Plinth"
       headline={
         <>
           Capital efficiency,

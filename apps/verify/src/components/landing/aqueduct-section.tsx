@@ -4,14 +4,13 @@ export function AqueductSection() {
   return (
     <SectionShell
       id="bridge"
-      eyebrow="Aqueduct · Chainlink CCIP"
+      eyebrow="Cross-chain collateral · Aqueduct"
       headline={
         <>
           Move collateral between chains in one{' '}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{
-              fontFamily: '"Instrument Serif", "Times New Roman", serif',
               color: '#7E2A20',
               fontWeight: 400,
               letterSpacing: '-0.01em',

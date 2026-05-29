@@ -4,14 +4,13 @@ export function LanternSection() {
   return (
     <SectionShell
       id="reserves"
-      eyebrow="Lantern · proof-of-reserves"
+      eyebrow="Proof of reserves · Lantern"
       headline={
         <>
           Every dollar, on the public{' '}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{
-              fontFamily: '"Instrument Serif", "Times New Roman", serif',
               color: '#7E2A20',
               fontWeight: 400,
               letterSpacing: '-0.01em',
