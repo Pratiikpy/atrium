@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { VENUE_COUNT } from '@/lib/venues';
+import { HelpTip } from '@/components/ui/help-tip';
 
 /**
  * Portfolio stat row — port of design/Atrium App.standalone.html#portfolio
@@ -57,6 +58,7 @@ export function PortfolioStatRow() {
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <BigStatCard
         label="Buying power"
+        tip="buying power"
         value={data?.buyingPowerUsd ?? data?.totalAccountValueUsd}
         sub={
           marginX != null
@@ -70,6 +72,7 @@ export function PortfolioStatRow() {
       />
       <BigStatCard
         label="Total collateral"
+        tip="total collateral"
         value={data?.totalCollateralUsd ?? null}
         sub={
           sourceLive
@@ -80,6 +83,7 @@ export function PortfolioStatRow() {
       />
       <BigStatCard
         label="Open notional"
+        tip="open notional"
         value={data?.totalNotionalUsd}
         sub={
           utilisation != null
@@ -92,6 +96,7 @@ export function PortfolioStatRow() {
       />
       <BigStatCard
         label="P&L · 24h"
+        tip="p&l 24h"
         value={data?.pnl24hUsd}
         sub={
           pnlPct != null
@@ -109,6 +114,7 @@ export function PortfolioStatRow() {
 
 function BigStatCard({
   label,
+  tip,
   value,
   sub,
   loading,
@@ -116,6 +122,7 @@ function BigStatCard({
   emphasis = false,
 }: {
   label: string;
+  tip?: string;
   value: string | null | undefined;
   sub: string;
   loading: boolean;
@@ -141,18 +148,18 @@ function BigStatCard({
       }}
     >
       <p
-        className="font-mono text-[10px] uppercase tracking-[0.18em]"
+        className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em]"
         style={{ color: 'oklch(0.54 0.005 60)' }}
       >
         {label}
+        {tip && <HelpTip term={tip} />}
       </p>
       {loading ? (
         <div className="skeleton mt-3 h-10 w-44 rounded" />
       ) : (
         <p
-          className="mt-3 font-medium leading-none"
+          className="mt-3 font-sans font-medium leading-none"
           style={{
-            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
             fontSize: 'clamp(28px, 3.2vw, 42px)',
             letterSpacing: '-0.02em',
             color: valueColor,

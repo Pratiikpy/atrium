@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { SUBSYSTEMS } from '@/lib/atrium/copy';
+import { HelpTip } from '@/components/ui/help-tip';
 
 interface MarginHealth {
   marginHealthBps: number | null;
@@ -96,7 +97,10 @@ export function MarginEngineCard() {
 
           <div className="mt-6 rounded-md bg-parchment-soft/60 px-4 py-3">
             <div className="flex items-baseline justify-between">
-              <p className="text-[10px] uppercase tracking-wider text-muted">Liquidation buffer</p>
+              <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted">
+                Liquidation buffer
+                <HelpTip term="liquidation buffer" />
+              </p>
               <p className="font-mono text-2xl text-ink">
                 {data?.liquidationBufferBps == null
                   ? '—'
