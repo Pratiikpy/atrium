@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { SUBSYSTEMS } from '@/lib/atrium/copy';
 
 interface MarginHealth {
   marginHealthBps: number | null;
@@ -28,16 +29,22 @@ export function MarginEngineCard() {
     <div className="rounded-md border border-divider bg-parchment p-5">
       <header className="flex items-baseline justify-between">
         <div>
-          <p className="eyebrow">Plinth · margin engine</p>
+          <p className="eyebrow">{SUBSYSTEMS.plinth.plain} · {SUBSYSTEMS.plinth.brand}</p>
           <p
-            className="mt-1 font-medium tracking-[-0.02em] text-ink"
-            style={{ fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif', fontSize: 22 }}
+            className="mt-1 font-sans font-medium tracking-[-0.02em] text-ink"
+            style={{ fontSize: 22 }}
           >
             Account health
           </p>
         </div>
         <span className="text-xs text-muted">SPAN cross-product</span>
       </header>
+
+      {/* Plain-English "why is my margin lower?" - the engine's whole point. */}
+      <p className="mt-2 text-[12px] leading-snug text-ink-soft">
+        Required margin drops when your positions offset. Atrium nets correlated risk across venues,
+        so the same collateral backs more.
+      </p>
 
       {isLoading ? (
         <div className="mt-5 space-y-2">

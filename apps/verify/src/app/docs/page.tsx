@@ -122,6 +122,16 @@ export default function DocsPage() {
               <p className="mt-3 text-xs text-muted">18 subsystems . plain language</p>
             </Card>
           </Link>
+          <Link href="/docs/deployment" className="block">
+            <Card className="h-full transition-colors hover:border-accent/40">
+              <p className="font-display text-xl text-ink">Deployment</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Every contract on Arbitrum Sepolia with its address + Arbiscan link, and who controls
+                it. Read the bytecode and state yourself.
+              </p>
+              <p className="mt-3 text-xs text-muted">live registry . on-chain</p>
+            </Card>
+          </Link>
         </div>
       </section>
 
@@ -159,8 +169,9 @@ export default function DocsPage() {
         <Card>
           <p className="font-display text-xl text-ink">SPAN scenarios</p>
           <p className="mt-2 text-sm text-ink-soft">
-            14 shock scenarios (±1×, ±2×, ±3×) per instrument, with cross-correlation netting
-            across instruments in the same correlation class.
+            7 shock scenarios (±10%, ±5%, ±2%, 0) per instrument, sourced to
+            <code className="ml-1 font-mono text-ink">span.rs SCENARIOS_BPS</code>, with
+            cross-correlation netting across instruments in the same correlation class.
           </p>
           <Link href="/learn#span" className="mt-3 inline-block text-xs text-ink underline-offset-2 hover:underline">
             Read

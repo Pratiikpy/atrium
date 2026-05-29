@@ -31,3 +31,19 @@ export function arbiscanTxUrl(
 export function isValidTxHash(txHash: string | null | undefined): txHash is string {
   return typeof txHash === 'string' && TX_HASH_REGEX.test(txHash);
 }
+
+const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+
+/**
+ * Returns a validated Arbiscan address URL, or null if the address is
+ * malformed. Same injection-guard rationale as the tx helper above; used by
+ * the /docs/deployment transparency table.
+ */
+export function arbiscanAddressUrl(
+  address: string | null | undefined,
+  network: 'sepolia' | 'mainnet' = 'sepolia',
+): string | null {
+  if (typeof address !== 'string' || !ADDRESS_REGEX.test(address)) return null;
+  const host = network === 'mainnet' ? 'arbiscan.io' : 'sepolia.arbiscan.io';
+  return `https://${host}/address/${address}`;
+}
