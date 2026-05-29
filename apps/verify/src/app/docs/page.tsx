@@ -138,6 +138,16 @@ export default function DocsPage() {
               <p className="mt-3 text-xs text-muted">live registry . on-chain</p>
             </Card>
           </Link>
+          <Link href="/docs/runbooks" className="block">
+            <Card className="h-full transition-colors hover:border-accent/40">
+              <p className="font-display text-xl text-ink">Runbooks</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                The operational playbooks Atrium runs on: incident response, deploy, key rotation,
+                monitoring, on-call. Rendered from the runbooks/ markdown in the repo.
+              </p>
+              <p className="mt-3 text-xs text-muted">34 runbooks . ops-ready</p>
+            </Card>
+          </Link>
         </div>
       </section>
 
