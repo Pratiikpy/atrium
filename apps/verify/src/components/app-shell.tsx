@@ -1,25 +1,22 @@
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
+import { WrongChainBanner } from './wrong-chain-banner';
 
 /**
- * AppShell (Lovable port, 2026-05-28).
+ * AppShell (2026-05-28).
  *
- * Wraps every /app/* page with Lovable's `.atrium-app` premium shell:
+ * Wraps every /app/* page with the premium shell:
  *
  *   - 248px sticky sidebar (search + 4 nav sections + wallet card)
  *   - 56px sticky topbar (breadcrumb + LIVE/TESTNET pills + actions)
  *   - 1480px max-width `.view` content area
  *
- * The `<MobileApp />` shell renders inside `.atrium-mobile-only` so at
- * < 768px users see the iPhone-style tabbar UI instead. Each /app/*
- * page is rendered twice (once inside MobileApp's children prop slot
- * via the dual-render block in app/page.tsx, and once inside this
- * desktop branch). Tailwind's `.atrium-mobile-only` / `.atrium-desktop-only`
- * media queries hide one or the other.
+ * Mobile: at < 768px the `.atrium-mobile-only` branch renders a
+ * minimal chrome wrapping the same {children} content. No separate
+ * MobileApp component — the Lovable-port was deleted in Phase 1.
  *
- * Prop interface unchanged from the prior version: { children, active,
- * breadcrumb? } — every consuming page works without modification.
+ * Prop interface: { children, active, breadcrumb? }.
  */
 
 const NAV_GROUPS = [
@@ -36,6 +33,7 @@ const NAV_GROUPS = [
     heading: 'Agents',
     items: [
       { href: '/app/agents', label: 'Agents', icon: 'agent' },
+      { href: '/app/integrations', label: 'Integrations', icon: 'graph' },
     ],
   },
   {
@@ -69,10 +67,9 @@ export function AppShell({
 }) {
   return (
     <>
-      {/* Mobile branch: minimal Lovable-styled mobile chrome wrapping the
-          actual page content. Critically we render `{children}` here, NOT
-          Lovable's MobileApp shell — every /app/* route shows its own
-          real-data content on mobile too, not the Lovable mock dashboard. */}
+      {/* Mobile branch: minimal chrome wrapping the
+          actual page content. Renders `{children}` directly — every
+          /app/* route shows its own real-data content on mobile. */}
       <div className="atrium-mobile-only" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
         <header
           className="atrium-nav"
@@ -91,6 +88,7 @@ export function AppShell({
 
       {/* Desktop branch: Lovable `.atrium-app` sidebar + topbar + view. */}
       <div className="atrium-desktop-only atrium-app">
+        <WrongChainBanner />
         {/* ── Sidebar ────────────────────────────────────────────── */}
         <aside className="side">
           <div className="side-brand">
@@ -145,7 +143,7 @@ export function AppShell({
                 <span key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
                   {i > 0 && <span className="crumb-sep">·</span>}
                   {b.href ? (
-                    <Link href={b.href} className={i === 0 ? 'crumb-main' : 'crumb-sub'}>
+                    <Link href={b.href as any} className={i === 0 ? 'crumb-main' : 'crumb-sub'}>
                       {b.label}
                     </Link>
                   ) : (
