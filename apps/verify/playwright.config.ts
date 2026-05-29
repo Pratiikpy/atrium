@@ -38,7 +38,15 @@ export default defineConfig({
   },
 
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium-desktop',
+      use: { ...devices['Desktop Chrome'] },
+      // @mobile-tagged journeys assert the mobile-only panels (VaultMobile,
+      // KillSwitchFAB, ReservesMobile) which are `md:hidden` on desktop — they
+      // belong to the mobile-safari project below. Excluding them here keeps
+      // the desktop project asserting the desktop layout only.
+      grepInvert: /@mobile/,
+    },
     {
       name: 'mobile-safari',
       use: { ...devices['iPhone 14'] },

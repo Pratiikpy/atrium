@@ -17,32 +17,41 @@ test.describe('Onboarding flow', () => {
   });
 
   test('full onboarding with WebAuthn mock', async ({ page }) => {
-    await page.goto('/app');
-    // Expect onboarding step 1
-    await expect(page.locator('[data-testid="onboarding-step"]')).toBeVisible();
+    await page.goto('/app/onboarding');
+    await page.waitForLoadState('domcontentloaded');
+    // Expect onboarding step 1 (Welcome). The flow renders a step rail + the
+    // current step's heading; there is no data-testid, so assert the real
+    // step-1 heading that the OnboardingFlow Welcome step renders.
+    await expect(page.getByRole('heading', { name: /step inside the atrium/i })).toBeVisible();
   });
 
   test('back navigation works', async ({ page }) => {
-    await page.goto('/app');
-    const nextBtn = page.getByRole('button', { name: /next|continue/i });
+    await page.goto('/app/onboarding');
+    await page.waitForLoadState('domcontentloaded');
+    // Step-1 advance button is labelled "Set up authenticator" (not next/continue).
+    const nextBtn = page.getByRole('button', { name: /set up authenticator/i });
     if (await nextBtn.isVisible()) {
       await nextBtn.click();
-      const backBtn = page.getByRole('button', { name: /back/i });
+      // Step 2 (Authenticator) renders a "← Back" control.
+      const backBtn = page.getByRole('button', { name: /back/i }).first();
       if (await backBtn.isVisible()) {
         await backBtn.click();
-        await expect(page.locator('[data-testid="onboarding-step"]')).toBeVisible();
+        await expect(page.getByRole('heading', { name: /step inside the atrium/i })).toBeVisible();
       }
     }
   });
 
   test('state persists on reload', async ({ page }) => {
-    await page.goto('/app');
-    const nextBtn = page.getByRole('button', { name: /next|continue/i });
+    await page.goto('/app/onboarding');
+    await page.waitForLoadState('domcontentloaded');
+    const nextBtn = page.getByRole('button', { name: /set up authenticator/i });
     if (await nextBtn.isVisible()) {
       await nextBtn.click();
       await page.reload();
-      // Should resume from where we left off, not restart
-      await expect(page.locator('[data-testid="onboarding-step"]')).toBeVisible();
+      await page.waitForLoadState('domcontentloaded');
+      // Should resume from where we left off (step 2 Authenticator), not restart.
+      // OnboardingFlow persists step to localStorage 'atrium_onboarding_v1'.
+      await expect(page.getByRole('heading', { name: /create your passkey/i })).toBeVisible();
     }
   });
 });

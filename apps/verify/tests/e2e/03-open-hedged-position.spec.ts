@@ -19,23 +19,31 @@ import { test, expect } from '@playwright/test';
 test.describe('Journey 3 — Open hedged position', () => {
   test('Verifier step 2 — title renders @critical @mobile', async ({ page }) => {
     await page.goto('/verify/2');
-    await expect(page.getByRole('heading', { name: /open hedged position/i })).toBeVisible();
+    // Honesty pass (page.tsx STEP_CONFIG['2'].title, 2026-05-25 audit follow-up):
+    // the Verifier only exposes a single-leg open today, so the title was
+    // softened from "Open hedged position" to "Open a position".
+    await expect(page.getByRole('heading', { name: /open a position/i })).toBeVisible();
   });
 
-  test('Step 2 names BOTH adapters: Hyperliquid + Aave Horizon @critical', async ({ page }) => {
+  test('Step 2 honestly routes via AtriumRouter and defers the hedged batch @critical', async ({ page }) => {
     await page.goto('/verify/2');
-    // Honesty: the demo opens TWO positions in parallel. Locks the copy
-    // so a future refactor can't quietly drop one adapter.
+    // Honesty pass (page.tsx STEP_CONFIG['2'].body, 2026-05-25 audit follow-up):
+    // the demo no longer claims TWO parallel adapter legs. The copy now
+    // names AtriumRouter as the single-leg path and explicitly defers the
+    // hedged batch flow to a follow-up release. Lock that honest wording so
+    // a future refactor can't silently re-inflate it back to a fake hedge.
     const body = (await page.textContent('body')) ?? '';
-    expect(/hyperliquid/i.test(body)).toBe(true);
-    expect(/aave horizon/i.test(body)).toBe(true);
+    expect(/atriumrouter/i.test(body)).toBe(true);
+    expect(/hedged batch flow lands in a follow-up release/i.test(body)).toBe(true);
   });
 
-  test('Step 2 names Plinth.open_position as the contract @critical', async ({ page }) => {
+  test('Step 2 names AtriumRouter.open_position_via_adapter as the contract @critical', async ({ page }) => {
     await page.goto('/verify/2');
     // The contract whose deployment gates this step must be NAMED on the
-    // page. No vague "coming soon" copy.
-    await expect(page.getByText(/Plinth\.open_position/i)).toBeVisible();
+    // page. No vague "coming soon" copy. Honesty pass renamed the gating
+    // contract from Plinth.open_position to the real single-leg path
+    // AtriumRouter.open_position_via_adapter (page.tsx STEP_CONFIG['2'].contract).
+    await expect(page.getByText(/AtriumRouter\.open_position_via_adapter/i)).toBeVisible();
   });
 
   test('Run step 2 button exists and is disabled before deployment @critical', async ({ page }) => {

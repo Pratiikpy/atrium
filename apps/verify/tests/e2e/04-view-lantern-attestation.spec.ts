@@ -45,9 +45,19 @@ test.describe('Journey 4 — Lantern attestation', () => {
     // Button label is literally "Verify my inclusion". The button may render
     // only when there's a successful attestation to verify against; assert
     // either it's visible OR the page is in a recognized empty/error state.
+    // Lantern dashboard is a client component that fetches /api/lantern/latest
+    // then renders one of: the verify button (data + wallet), "No attestation
+    // published yet" (no data), "Connect a wallet to verify…" (data, no wallet),
+    // or "Lantern source unavailable" (error). Wait for it to settle before
+    // reading the body, or we race the fetch and see neither state.
+    await expect(
+      page
+        .getByText(/no attestation published yet|verify my inclusion|connect a wallet to verify|lantern source unavailable|not indexed/i)
+        .first(),
+    ).toBeVisible({ timeout: 12_000 });
     const verifyButton = page.getByRole('button', { name: /verify my inclusion/i });
     const body = (await page.textContent('body')) ?? '';
-    const inEmptyState = /pending|unavailable|attestor service|not indexed/i.test(body);
+    const inEmptyState = /pending|unavailable|attestor service|not indexed|no attestation|connect a wallet to verify/i.test(body);
 
     if (!inEmptyState) {
       await expect(verifyButton.first()).toBeVisible();
