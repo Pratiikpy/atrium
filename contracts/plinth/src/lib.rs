@@ -377,6 +377,35 @@ impl Plinth {
         let owner = self.resolve_owner(caller, &action_sigil, &intent_sigil)?;
         self.assert_account_not_paused(owner)?;
 
+        // Audit blocker fix (contracts-rust #2): bind the calldata args to the
+        // SIGNED ActionSigil. resolve_owner only verifies the signature + caps
+        // via Sigil; it never returns or checks the action's venue/instrument/
+        // notional against Plinth's plain calldata args. Without this, an agent
+        // could sign a valid ActionSigil for (venue X, instrument Y, $100) -
+        // passing every Sigil cap check - then call open_position with ANY
+        // venue/instrument/notional it wants, defeating the per-action notional
+        // cap and the venue/instrument allowlist entirely. We decode the action
+        // body (same fixed layout as sigil::eip712::decode_action: venue_id @
+        // byte 63, instrument_id @ 64..96, notional_signed I256-BE @ 96..128)
+        // and require the calldata to match exactly. Enforced only on the agent
+        // path (non-empty action_sigil); an owner-direct open signs the tx itself.
+        if !action_sigil.is_empty() {
+            if action_sigil.len() < 128 {
+                return Err(PlinthError::code(ERR_INVALID_ACTION_SIGIL));
+            }
+            let action_venue = action_sigil[63];
+            let action_instrument = FixedBytes::<32>::from_slice(&action_sigil[64..96]);
+            let mut nbytes = [0u8; 32];
+            nbytes.copy_from_slice(&action_sigil[96..128]);
+            let action_notional = I256::from_be_bytes::<32>(nbytes);
+            if action_venue != venue_id
+                || action_instrument != instrument_id
+                || action_notional != notional_signed
+            {
+                return Err(PlinthError::code(ERR_INVALID_ACTION_SIGIL));
+            }
+        }
+
         // Phase 2a: resolve agent address from intent envelope.
         // If action_sigil is non-empty, the agent is the second address in the
         // intent envelope (bytes 32..64, left-padded). If empty, no agent.
