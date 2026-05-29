@@ -33,15 +33,18 @@ export function SettingsMobile() {
       </section>
 
       <MoreSection heading="Trust">
-        <MoreRow href="/app/reserves"     label="Proof of reserves" right="hourly" icon={<ShieldIcon />} />
+        <MoreRow href="/app/reserves"     label="Proof of reserves" right="≤10 min" icon={<ShieldIcon />} />
         <MoreRow href="/app/tax"          label="Tax . UK CGT" right="2026" icon={<DocIcon />} />
         <MoreRow href="/app/settings"     label="Session keys" right="manage" icon={<ClockIcon />} />
       </MoreSection>
 
       <MoreSection heading="Account">
         <MoreRow href="/app/settings"      label="Settings" right="›" icon={<GearIcon />} />
-        <MoreRow href="/app/settings"      label="Recovery guardians" right="3" icon={<GuardIcon />} />
-        <MoreRow href="/app/notifications" label="Notifications" right="on" icon={<BellIcon />} />
+        {/* Audit fix (#42): guardian count ("3") and notification state ("on")
+            were hardcoded, presenting unread account state as real. Neutral
+            nav chevrons until these read live state. */}
+        <MoreRow href="/app/settings"      label="Recovery guardians" right="›" icon={<GuardIcon />} />
+        <MoreRow href="/app/notifications" label="Notifications" right="›" icon={<BellIcon />} />
       </MoreSection>
 
       <MoreSection heading="Trust mode">
