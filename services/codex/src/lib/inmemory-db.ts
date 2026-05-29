@@ -68,7 +68,7 @@ function makeStatement(sql: string): D1Statement {
         return null;
       }
       // ---- backtest lookup ----
-      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtests')) {
+      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtest_jobs')) {
         const id = String(bound[0] ?? '');
         return (backtests.get(id) as T | undefined) ?? null;
       }
@@ -76,7 +76,7 @@ function makeStatement(sql: string): D1Statement {
     },
     async all<T = D1Row>(): Promise<{ results: T[] }> {
       // Codex only uses .all() for backtest enumeration today.
-      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtests')) {
+      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtest_jobs')) {
         return { results: Array.from(backtests.values()) as T[] };
       }
       return { results: [] };
@@ -119,7 +119,7 @@ function makeStatement(sql: string): D1Statement {
         return { success: true, meta: { rows_written: 1 } };
       }
       // ---- INSERT backtest ----
-      if (trimmed.startsWith('INSERT') && trimmed.includes('INTO backtests')) {
+      if (trimmed.startsWith('INSERT') && trimmed.includes('INTO backtest_jobs')) {
         const [id] = bound as [string, ...unknown[]];
         backtests.set(id, { id, raw_args: bound });
         return { success: true, meta: { rows_written: 1 } };

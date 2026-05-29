@@ -9,7 +9,7 @@
  * and Idempotency-Key requests that landed on different instances were
  * not deduplicated.
  *
- * Per the "proper not fastest" rule (CLAUDE.md), the Vercel deploy stays
+ * Per the "proper not fastest" rule, the Vercel deploy stays
  * online (it is a redundant region for the Cloudflare Worker primary).
  * Both deploys now share identical replay/idempotency semantics:
  *
@@ -145,7 +145,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
       }
 
       // backtest lookup
-      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtests')) {
+      if (trimmed.startsWith('SELECT') && trimmed.includes('FROM backtest_jobs')) {
         const id = String(bound[0] ?? '');
         const raw = await upstash<string>(cfg, ['GET', backtestKey(id)]);
         return raw ? ((JSON.parse(raw) as unknown) as T) : null;
@@ -156,7 +156,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
     async all<T = D1Row>(): Promise<{ results: T[] }> {
       if (
         trimmed.startsWith('SELECT') &&
-        trimmed.includes('FROM backtests')
+        trimmed.includes('FROM backtest_jobs')
       ) {
         // SMEMBERS bt-index → list of backtest ids; MGET to materialise.
         const ids = (await upstash<string[]>(cfg, ['SMEMBERS', BACKTEST_INDEX_KEY])) ?? [];
@@ -244,7 +244,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
       }
 
       // INSERT backtest
-      if (trimmed.startsWith('INSERT') && trimmed.includes('INTO backtests')) {
+      if (trimmed.startsWith('INSERT') && trimmed.includes('INTO backtest_jobs')) {
         const [id] = bound as [string, ...unknown[]];
         const row: D1Row = { id, raw_args: bound };
         await upstash(cfg, ['SET', backtestKey(id), JSON.stringify(row)]);

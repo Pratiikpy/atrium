@@ -144,7 +144,7 @@ describe('UpstashDB — backtest enumeration', () => {
   it('all() on backtests uses SMEMBERS + MGET', async () => {
     mockUpstash(['bt1', 'bt2']); // SMEMBERS
     mockUpstash([JSON.stringify({ id: 'bt1' }), JSON.stringify({ id: 'bt2' })]); // MGET
-    const { results } = await db.prepare('SELECT * FROM backtests').all();
+    const { results } = await db.prepare('SELECT * FROM backtest_jobs').all();
     expect(results).toHaveLength(2);
     expect(results[0]).toEqual({ id: 'bt1' });
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(['SMEMBERS', 'bt-index']);
@@ -152,7 +152,7 @@ describe('UpstashDB — backtest enumeration', () => {
 
   it('all() returns empty when SMEMBERS is empty', async () => {
     mockUpstash([]); // empty backtest index
-    const { results } = await db.prepare('SELECT * FROM backtests').all();
+    const { results } = await db.prepare('SELECT * FROM backtest_jobs').all();
     expect(results).toEqual([]);
   });
 });

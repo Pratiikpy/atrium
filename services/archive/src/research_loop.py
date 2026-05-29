@@ -176,7 +176,14 @@ def publish_attestation(result: BacktestResult) -> str | None:
             }
         )
         signed = w3.eth.account.sign_transaction(tx, signer)
-        h = w3.eth.send_raw_transaction(signed.rawTransaction)
+        # Audit fix (services #23): web3.py >=7.0 renamed SignedTransaction
+        # .rawTransaction -> .raw_transaction. On web3 7.x the old attribute
+        # raises AttributeError, so this publish silently failed (caught below)
+        # and no attestation ever landed on-chain. Read both names for 6/7 compat.
+        raw = getattr(signed, "raw_transaction", None) or getattr(signed, "rawTransaction", None)
+        if raw is None:
+            raise AttributeError("SignedTransaction exposes neither raw_transaction nor rawTransaction")
+        h = w3.eth.send_raw_transaction(raw)
         return h.hex()
     except Exception as exc:  # noqa: BLE001
         print(f"[archive] publish_attestation failed: {exc}", file=sys.stderr)
