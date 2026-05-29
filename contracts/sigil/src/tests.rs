@@ -899,3 +899,72 @@ fn domain_separator_is_stable_for_fixed_inputs() {
     );
     let _ = hex::encode(ds); // exercise the import; value asserted above
 }
+
+// ---------------------------------------------------------------------------
+// EIP-712 cross-check reference (for scripts/build-aave-fill-envelope.mjs)
+// ---------------------------------------------------------------------------
+//
+// The off-chain fill driver (viem) builds + signs the SAME intent/action
+// envelopes this contract decodes. To prove the JS signer is byte-compatible
+// with the Stylus decoder, both compute EIP-712 over IDENTICAL fixed inputs and
+// must print the SAME domain separator, struct hashes, digests, and flat wire
+// envelopes. The script's `--selfcheck` mode reproduces these exact values;
+// `make`/CI can diff them. If they ever drift, a real on-chain signature would
+// fail recovery silently (the WW-1 class of bug) — this is the tripwire.
+#[test]
+fn prints_eip712_reference_for_aave_fill_crosscheck() {
+    let verifying = address!("c9933ebe7dc8c4849a1720b2e5b33e381442c873"); // deployed Sigil
+    let owner = address!("f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); // anvil[0], a public test addr
+    let agent = owner; // user is its own agent for a self-directed open
+    let instrument = FixedBytes::<32>::from(keccak256(b"USDC-LEND").0);
+
+    let intent = IntentSigil {
+        owner,
+        agent,
+        venues_allowed: [2u8].to_vec(),
+        instruments_allowed: [instrument].to_vec(),
+        max_notional_per_action_wei: U256::from(1_000_000_000u64),
+        max_total_open_notional_wei: U256::from(1_000_000_000u64),
+        max_actions_per_24h: 10,
+        expires_at: 2_000_000_000,
+        nonce: U256::from(1u64),
+        agent_revocation_nonce_at_signing: 0,
+    };
+
+    let name_hash = B256::from(keccak256(b"AtriumSigil").0);
+    let version_hash = B256::from(keccak256(b"1").0);
+    let ds = eip712::domain_separator(name_hash, version_hash, U256::from(TEST_CHAIN_ID), verifying);
+    let intent_struct = eip712::hash_intent(&intent);
+    let intent_digest = eip712::final_digest(ds, intent_struct);
+
+    let action = ActionSigil {
+        intent_hash: intent_struct,
+        venue_id: 2,
+        instrument_id: instrument,
+        notional_signed: I256::try_from(1_000_000i64).unwrap(),
+        submitted_at: 1_780_000_000,
+        action_nonce: U256::from(1u64),
+    };
+    let action_struct = eip712::hash_action(&action);
+    let action_digest = eip712::final_digest(ds, action_struct);
+
+    let dummy = Signature {
+        r: FixedBytes::<32>::from([0x11u8; 32]),
+        s: FixedBytes::<32>::from([0x22u8; 32]),
+        v: 27,
+    };
+    let intent_env = encode_intent(&intent, &dummy);
+    let action_env = encode_action(&action, &dummy);
+
+    println!("XCHECK domain_sep    0x{}", hex::encode(ds));
+    println!("XCHECK intent_struct 0x{}", hex::encode(intent_struct));
+    println!("XCHECK intent_digest 0x{}", hex::encode(intent_digest));
+    println!("XCHECK action_struct 0x{}", hex::encode(action_struct));
+    println!("XCHECK action_digest 0x{}", hex::encode(action_digest));
+    println!("XCHECK intent_env    0x{}", hex::encode(&intent_env));
+    println!("XCHECK action_env    0x{}", hex::encode(&action_env));
+
+    assert_ne!(intent_digest, B256::ZERO);
+    assert_ne!(action_digest, B256::ZERO);
+    assert_eq!(action_env.len(), 32 * 6 + 65, "action envelope = 6 words + 65-byte sig");
+}
