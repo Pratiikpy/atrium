@@ -48,9 +48,8 @@ export function HeroSection() {
 
         {/* Headline */}
         <h1
-          className="mx-auto mt-6 max-w-5xl text-center font-medium leading-[1.04] tracking-[-0.03em]"
+          className="mx-auto mt-6 max-w-5xl text-center font-sans font-medium leading-[1.04] tracking-[-0.03em]"
           style={{
-            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
             color: 'oklch(0.96 0.003 60)',
             fontSize: 'clamp(36px, 7vw, 77px)',
           }}
@@ -59,9 +58,8 @@ export function HeroSection() {
           <br />
           One{' '}
           <span
-            className="italic"
+            className="font-serif italic"
             style={{
-              fontFamily: '"Instrument Serif", "Times New Roman", serif',
               color: 'oklch(0.96 0.003 60)',
               fontWeight: 400,
               letterSpacing: '-0.01em',
@@ -72,12 +70,46 @@ export function HeroSection() {
           number.
         </h1>
 
+        {/* Benefit band — the margin-multiplier wedge, plain + concrete (Phase 1
+            legibility). Numbers are clearly labelled illustrative, not live TVL;
+            real buying power is computed by Plinth and shown in /app. */}
+        <div className="mx-auto mt-8 max-w-2xl">
+          <p className="text-center text-[15px] leading-relaxed text-[oklch(0.82_0.004_60)]">
+            Post collateral once. The same balance backs positions on every venue,
+            because Atrium nets your risk instead of making you re-post it.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="rounded-md border border-[oklch(0.22_0.006_60)] bg-[oklch(0.13_0.008_60)] p-4">
+              <p className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-[oklch(0.6_0.005_60)]">
+                Without unified margin
+              </p>
+              <p className="mt-2 font-mono text-[12px] text-[oklch(0.82_0.004_60)]">$100K · Hyperliquid</p>
+              <p className="font-mono text-[12px] text-[oklch(0.82_0.004_60)]">$100K · Aave</p>
+              <p className="font-mono text-[12px] text-[oklch(0.82_0.004_60)]">$100K · Pendle</p>
+              <p className="mt-2 font-mono text-[12px] text-[oklch(0.7_0.13_70)]">= $300K tied up</p>
+            </div>
+            <div
+              className="rounded-md border p-4"
+              style={{ borderColor: 'oklch(0.4 0.09 145 / 0.5)', background: 'oklch(0.14 0.02 145 / 0.25)' }}
+            >
+              <p className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-[oklch(0.72_0.13_145)]">
+                With Atrium
+              </p>
+              <p className="mt-2 font-mono text-[12px] text-[oklch(0.92_0.004_60)]">$100K · backs all three</p>
+              <p className="mt-[26px] font-mono text-[12px] text-[oklch(0.72_0.13_145)]">= one margin account</p>
+            </div>
+          </div>
+          <p className="mt-3 text-center font-mono text-[9.5px] uppercase tracking-[0.16em] text-[oklch(0.5_0.005_60)]">
+            Illustrative · your buying power is computed live by Plinth
+          </p>
+        </div>
+
         {/* Engineering-document chrome */}
         <div className="mx-auto mt-12 max-w-[1100px] border-t border-[oklch(0.22_0.006_60)] pt-3">
           <div className="grid grid-cols-2 gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
             <div>
               <p>Fig. 01 · Capital convergence</p>
-              <p className="mt-1.5">Plan view · live testnet feed</p>
+              <p className="mt-1.5">Plan view · live where measured</p>
             </div>
             <div className="text-right">
               <p>Sheet 02 / 08</p>
@@ -88,10 +120,10 @@ export function HeroSection() {
 
         {/* Venue cards — row 1 */}
         <div className="mx-auto mt-10 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <VenueCard name="Hyperliquid HIP-3" tag="HL-HIP3" kind="Tokenized-stock perps" tvl="$1,252,181" assets="USDC · WETH" share="34.8%" />
-          <VenueCard name="Hyperliquid HIP-4" tag="HL-HIP4" kind="Permissioned perps" tvl="$484,434" assets="USDC" share="13.5%" />
-          <VenueCard name="Aave Horizon" tag="AAVE-V3" kind="RWA collateral" tvl="$891,827" assets="aUSDC · USTB" share="24.9%" />
-          <VenueCard name="Pendle V2" tag="PENDLE" kind="Fixed-yield · PT" tvl="$319,446" assets="PT-stETH" share="8.9%" />
+          <VenueCard name="Hyperliquid HIP-3" tag="HL-HIP3" kind="Tokenized-stock perps" tvl="—" assets="USDC · WETH" share="—" />
+          <VenueCard name="Hyperliquid HIP-4" tag="HL-HIP4" kind="Permissioned perps" tvl="—" assets="USDC" share="—" />
+          <VenueCard name="Aave Horizon" tag="AAVE-V3" kind="RWA collateral" tvl="—" assets="aUSDC · USTB" share="—" />
+          <VenueCard name="Pendle V2" tag="PENDLE" kind="Fixed-yield · PT" tvl="—" assets="PT-stETH" share="—" />
         </div>
 
         {/* Pool card — unified margin pool */}
@@ -110,11 +142,11 @@ export function HeroSection() {
               className="mt-4 font-mono leading-none tracking-[-0.02em] text-[oklch(0.96_0.003_60)]"
               style={{ fontVariantNumeric: 'tabular-nums lining-nums', fontSize: 'clamp(44px, 6vw, 64px)' }}
             >
-              $10,783,563
+              —
             </p>
             <div className="mt-6 grid grid-cols-1 gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[oklch(0.72_0.004_60)] md:grid-cols-3">
               <div>Buying power · 3.0× portfolio margin</div>
-              <div className="md:text-center">Collateral $3.59M</div>
+              <div className="md:text-center">Collateral —</div>
               <div className="md:text-right">
                 <span className="inline-flex items-center gap-1.5 text-[oklch(0.72_0.13_145)]">
                   <span aria-hidden className="size-1.5 rounded-full bg-[oklch(0.72_0.13_145)]" />
@@ -127,10 +159,10 @@ export function HeroSection() {
 
         {/* Venue cards — row 2 */}
         <div className="mx-auto mt-3 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <VenueCard name="Curve" tag="CURVE" kind="Stableswap LP" tvl="$186,210" assets="3pool LP" share="5.2%" />
-          <VenueCard name="Trade.xyz" tag="TRADE" kind="RFQ · dark pool" tvl="$402,045" assets="WETH · WBTC" share="11.2%" />
-          <VenueCard name="Polymarket" tag="PMK" kind="Prediction · CTF" tvl="$58,379" assets="USDC" share="1.6%" />
-          <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="$0" assets="—" share="0.0%" muted />
+          <VenueCard name="Curve" tag="CURVE" kind="Stableswap LP" tvl="—" assets="3pool LP" share="—" />
+          <VenueCard name="Trade.xyz" tag="TRADE" kind="RFQ · dark pool" tvl="—" assets="WETH · WBTC" share="—" />
+          <VenueCard name="Polymarket" tag="PMK" kind="Prediction · CTF" tvl="—" assets="USDC" share="—" />
+          <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="—" assets="—" share="—" muted />
         </div>
 
         {/* Leverage ladder + portfolio-margin indicator (design parity #4) */}
