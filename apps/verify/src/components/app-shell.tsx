@@ -39,7 +39,11 @@ const NAV_GROUPS = [
   {
     heading: 'Trust',
     items: [
-      { href: '/app/reserves', label: 'Reserves', icon: 'shield', badge: '✓' as string | undefined },
+      // Audit fix (#51): the nav badge was a hardcoded "✓" implying reserves are
+      // always verified-fresh. That is a static claim, not live state - the real
+      // freshness lives on /app/reserves (the stat row flips to STALE from
+      // /api/reserves/summary). Dropped the false always-✓ rather than assert it.
+      { href: '/app/reserves', label: 'Reserves', icon: 'shield' },
       { href: '/app/tax',      label: 'Tax',      icon: 'doc' },
     ],
   },
