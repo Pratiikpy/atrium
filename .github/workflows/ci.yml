@@ -92,6 +92,29 @@ jobs:
       - run: forge test -vvv
       - name: Coverage
         run: forge coverage --report lcov --ir-minimum
+      # Audit fix (#83): coverage was upload-only (informational) - it could
+      # never regress-fail the build. This gate parses lcov.info and fails below
+      # a line-coverage floor, so a coverage regression breaks CI. The floor is
+      # set below the current measured level (13.91% as of 2026-05-29) with
+      # margin; ratchet it UP as coverage improves. NOTE: this number is
+      # SOLIDITY contracts only - the Stylus (Rust) crates are out of
+      # forge-coverage scope (track Rust coverage separately if wanted).
+      - name: Coverage floor gate (Solidity only)
+        run: |
+          node -e '
+            const fs = require("fs");
+            const t = fs.readFileSync("lcov.info", "utf8");
+            let lf = 0, lh = 0;
+            for (const l of t.split("\n")) {
+              if (l.startsWith("LF:")) lf += parseInt(l.slice(3)) || 0;
+              if (l.startsWith("LH:")) lh += parseInt(l.slice(3)) || 0;
+            }
+            const pct = lf ? (100 * lh / lf) : 0;
+            const FLOOR = 12;
+            console.log(`Solidity line coverage: ${pct.toFixed(2)}% (${lh}/${lf}); floor ${FLOOR}%`);
+            console.log("NOTE: Solidity contracts only - Stylus crates are out of forge-coverage scope.");
+            if (pct < FLOOR) { console.error(`Coverage ${pct.toFixed(2)}% is below the ${FLOOR}% floor`); process.exit(1); }
+          '
       - uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         if: always()
         with:
