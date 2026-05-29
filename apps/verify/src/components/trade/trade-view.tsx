@@ -6,6 +6,7 @@ import { VenueChipBar } from './venue-chip-bar';
 import { OrderForm } from './order-form';
 import { OrderBook } from './order-book';
 import { MarginImpactPanel } from './margin-impact-panel';
+import { VenueMarginCompare } from './venue-margin-compare';
 
 /**
  * Parent client view for /app/trade. Owns the selected venue + order size
@@ -26,8 +27,9 @@ export function TradeView() {
 
   return (
     <>
-      <section className="mt-6">
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <VenueChipBar active={venue} onSelect={setVenue} />
+        <VenueMarginCompare size={size} activeVenue={venue} />
       </section>
 
       <section className="mt-6 grid gap-4 xl:grid-cols-[340px_1fr_320px]">
