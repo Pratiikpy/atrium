@@ -33,7 +33,7 @@ export function Impluvium({
   // the leverage slider below stays interactive (honest user input, not a
   // simulated feed), and the chrome is relabelled "illustrative schematic".
   const liveVenues = useMemo(
-    () => VENUES.map((v) => ({ ...v, live: v.collateral })),
+    () => VENUES.map((v) => ({ ...v, live: v.illustrativeCollateral })),
     [],
   );
 
@@ -41,8 +41,8 @@ export function Impluvium({
   const buyingPower = totalCollateral * leverage;
   const buyingPowerTween = useTweenNumber(buyingPower, 700);
   const totalCollateralTween = useTweenNumber(totalCollateral, 700);
-  const maxC = Math.max(...VENUES.map((v) => v.collateral));
-  const totalRef = VENUES.reduce((s, v) => s + v.collateral, 0);
+  const maxC = Math.max(...VENUES.map((v) => v.illustrativeCollateral));
+  const totalRef = VENUES.reduce((s, v) => s + v.illustrativeCollateral, 0);
 
   const recompute = useCallback(() => {
     const c = containerRef.current;
@@ -96,7 +96,7 @@ export function Impluvium({
         </div>
         <div className="mono cap" style={{ textAlign: "right" }}>
           <div>Sheet 02 / 08</div>
-          <div className="muted" style={{ marginTop: 4 }}>Atrium Labs · May 2026</div>
+          <div className="muted" style={{ marginTop: 4 }}>Atrium · May 2026</div>
         </div>
       </div>
 
@@ -231,8 +231,8 @@ function VenueCard({
   totalRef: number;
 }) {
   const isHover = hovered === v.id;
-  const pct = (v.collateral / maxC) * 100;
-  const share = (v.collateral / totalRef) * 100;
+  const pct = (v.illustrativeCollateral / maxC) * 100;
+  const share = (v.illustrativeCollateral / totalRef) * 100;
   return (
     <div
       ref={refSet}

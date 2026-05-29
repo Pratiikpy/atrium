@@ -15,6 +15,12 @@ export function Footer() {
             <div className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
               v0.15 · 2026.05 · testnet only
             </div>
+            <p className="text-[12px] text-[var(--muted)]">
+              <a href="mailto:support@atrium.fi" className="hover:text-[var(--ink)]">support@atrium.fi</a>
+              {' · '}
+              Discord launching with testnet — see{' '}
+              <Link href="/security" className="hover:text-[var(--ink)]">/security</Link> for security@ contact
+            </p>
           </div>
           <FootCol title="Product" links={[
             ["App", "/app"],
@@ -27,17 +33,22 @@ export function Footer() {
             ["Team", "/team"],
             ["Cohort", "/cohort"],
             ["Security", "/security"],
+            ["Bug bounty", "/security/bounty"],
           ]} />
-          <FootCol title="Resources" links={[
-            ["Brand kit", "/brand"],
-            ["Learn", "/learn"],
-            ["Legal", "/legal/terms"],
+          <FootCol title="Legal" links={[
+            ["Privacy", "/legal/privacy"],
+            ["Terms", "/legal/terms"],
+            ["KYC disclosure", "/legal/kyc"],
+            ["Sub-processors", "/legal/sub-processors"],
+            ["Accessibility", "/accessibility"],
           ]} />
         </div>
       </div>
       <div className="border-t border-[var(--hairline)]">
         <div className="container flex flex-col gap-3 py-6 text-[12px] text-[var(--muted)] sm:flex-row sm:justify-between">
-          <div>© 2026 Atrium Labs Ltd · CC-BY-4.0 brand assets</div>
+          {/* Audit fix (#68): no entity is registered; "Ltd" was a false
+              incorporation claim. Founder decision: render plain "Atrium". */}
+          <div>© 2026 Atrium · CC-BY-4.0 brand assets</div>
           <div className="mono uppercase tracking-[0.12em]">Testnet only · not investment advice</div>
         </div>
       </div>
@@ -52,7 +63,7 @@ function FootCol({ title, links }: { title: string; links: [string, string][] })
       <ul className="flex flex-col gap-2.5">
         {links.map(([label, href]) => (
           <li key={href}>
-            <Link href={href} className="text-[13.5px] text-[var(--ink-soft)] hover:text-[var(--ink)]">
+            <Link href={href as any} className="text-[13.5px] text-[var(--ink-soft)] hover:text-[var(--ink)]">
               {label}
             </Link>
           </li>

@@ -68,7 +68,7 @@ function ImpluviumDiagram() {
         </div>
         <div className="text-right">
           <div className="font-medium text-ink">Sheet 02 / {String(VENUE_COUNT + 1).padStart(2, '0')}</div>
-          <div className="mt-0.5 text-muted">Atrium Labs . 2026</div>
+          <div className="mt-0.5 text-muted">Atrium . 2026</div>
         </div>
       </div>
 

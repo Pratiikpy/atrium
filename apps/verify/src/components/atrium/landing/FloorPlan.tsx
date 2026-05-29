@@ -45,7 +45,7 @@ const ROOM_DESC: Record<string, string> = {
   edict:     "Jurisdiction-tier registry. Sumsub sandbox KYC. Gates venue access by tier.",
   praetor:   "CLI and ops tooling. Built on Foundry + cargo-stylus.",
   coffer:    "ERC-4626 collateral vaults in Rust on the OpenZeppelin Rust ERC-4626 base.",
-  lantern:   "Hourly Merkle attestations published on-chain. Independent 14kb verifier.",
+  lantern:   "Merkle attestations published every ≤10 minutes on-chain. Independent 14kb verifier.",
   cohort:    "Five to eight named design partners, sharing venue-specific knowledge.",
   curator:   "Open-source grant programme — $20–50K ARB — for community-built Portico adapters.",
   postern:   "ERC-4337 + EIP-7702 wallet abstraction. Passkey login, session keys, social recovery.",
@@ -223,7 +223,7 @@ export function FloorPlanSection() {
             </div>
             <div className="mono cap" style={{ textAlign: "right" }}>
               <div>Sheet 03 / 08</div>
-              <div className="muted" style={{ marginTop: 4 }}>Atrium Labs · May 2026</div>
+              <div className="muted" style={{ marginTop: 4 }}>Atrium · May 2026</div>
             </div>
           </div>
 

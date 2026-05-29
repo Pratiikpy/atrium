@@ -30,9 +30,8 @@ export default function BrandPage() {
     <MarketingShell>
       <section>
         <h1
-          className="font-medium text-ink"
+          className="font-sans font-medium text-ink"
           style={{
-            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
             fontSize: 56,
             letterSpacing: '-0.03em',
           }}
@@ -329,7 +328,7 @@ export default function BrandPage() {
       <Section roman="VII" title="Download">
         <p className="mt-3 max-w-prose text-sm text-ink-soft">
           All brand assets in vector and raster formats. Brand kit licensed CC-BY-4.0; wordmark trademark
-          reserved by Atrium Labs Ltd.
+          reserved by Atrium.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <ComponentCard title="Wordmark" cap="SVG . PNG">
@@ -365,7 +364,7 @@ export default function BrandPage() {
       </Section>
 
       <div className="mt-24 flex items-center justify-between border-t border-line pt-6 text-xs text-muted">
-        <span>(c) 2026 Atrium Labs Ltd.</span>
+        <span>(c) 2026 Atrium.</span>
         <span>Brand kit v1.0 . 2026.05</span>
         <Pill color="testnet" label="testnet" />
       </div>

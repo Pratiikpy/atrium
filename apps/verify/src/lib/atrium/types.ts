@@ -12,7 +12,7 @@ export type Venue = {
   type: string;
   asset: string;
   chain: string;
-  collateral: number;
+  illustrativeCollateral: number;
   pending?: boolean;
 };
 

@@ -1,7 +1,7 @@
 // Atrium — static catalog data for the landing page.
 //
 // VENUES and SUBSYSTEMS describe the system architecture. The factual fields
-// on a Venue are id/name/short/type/asset/chain/pending; the `collateral`
+// on a Venue are id/name/short/type/asset/chain/pending; the `illustrativeCollateral`
 // field is an ILLUSTRATIVE relative weight (see note below), NOT a real TVL.
 // TECHNOLOGY_STACK lists the protocols Atrium builds on (all verifiable from
 // the codebase under resources/ and contracts/).
@@ -21,14 +21,14 @@ import type { Subsystem, Venue } from "./types";
 // asset types instead). Any real per-venue TVL must come from a live Scribe/
 // RPC read, never from this file.
 export const VENUES: Venue[] = [
-  { id: "hl3", name: "Hyperliquid HIP-3", short: "HL-HIP3", type: "Tokenized-stock perps", collateral: 1_247_820, asset: "USDC · WETH", chain: "Arbitrum Sepolia" },
-  { id: "hl4", name: "Hyperliquid HIP-4", short: "HL-HIP4", type: "Permissioned perps",   collateral: 483_160,   asset: "USDC",         chain: "Arbitrum Sepolia" },
-  { id: "aav", name: "Aave Horizon",      short: "AAVE-V3", type: "RWA collateral",       collateral: 892_440,   asset: "aUSDC · USTB", chain: "Arbitrum Sepolia" },
-  { id: "pen", name: "Pendle V2",         short: "PENDLE",  type: "Fixed-yield · PT",     collateral: 320_500,   asset: "PT-stETH",     chain: "Arbitrum Sepolia" },
-  { id: "cur", name: "Curve",             short: "CURVE",   type: "Stableswap LP",        collateral: 186_720,   asset: "3pool LP",     chain: "Ethereum Sepolia" },
-  { id: "trd", name: "Trade.xyz",         short: "TRADE",   type: "RFQ · dark pool",      collateral: 401_890,   asset: "WETH · WBTC",  chain: "Arbitrum Sepolia" },
-  { id: "pmk", name: "Polymarket",        short: "PMK",     type: "Prediction · CTF",     collateral:  58_200,   asset: "USDC",         chain: "via Aqueduct" },
-  { id: "rhc", name: "RH-Chain",          short: "RH-NTV",  type: "Native spot · pending", collateral: 0,        asset: "—",            chain: "Robinhood testnet", pending: true },
+  { id: "hl3", name: "Hyperliquid HIP-3", short: "HL-HIP3", type: "Tokenized-stock perps", illustrativeCollateral: 1_247_820, asset: "USDC · WETH", chain: "Arbitrum Sepolia" },
+  { id: "hl4", name: "Hyperliquid HIP-4", short: "HL-HIP4", type: "Permissioned perps",   illustrativeCollateral: 483_160,   asset: "USDC",         chain: "Arbitrum Sepolia" },
+  { id: "aav", name: "Aave Horizon",      short: "AAVE-V3", type: "RWA collateral",       illustrativeCollateral: 892_440,   asset: "aUSDC · USTB", chain: "Arbitrum Sepolia" },
+  { id: "pen", name: "Pendle V2",         short: "PENDLE",  type: "Fixed-yield · PT",     illustrativeCollateral: 320_500,   asset: "PT-stETH",     chain: "Arbitrum Sepolia" },
+  { id: "cur", name: "Curve",             short: "CURVE",   type: "Stableswap LP",        illustrativeCollateral: 186_720,   asset: "3pool LP",     chain: "Ethereum Sepolia" },
+  { id: "trd", name: "Trade.xyz",         short: "TRADE",   type: "RFQ · dark pool",      illustrativeCollateral: 401_890,   asset: "WETH · WBTC",  chain: "Arbitrum Sepolia" },
+  { id: "pmk", name: "Polymarket",        short: "PMK",     type: "Prediction · CTF",     illustrativeCollateral:  58_200,   asset: "USDC",         chain: "via Aqueduct" },
+  { id: "rhc", name: "RH-Chain",          short: "RH-NTV",  type: "Native spot · pending", illustrativeCollateral: 0,        asset: "—",            chain: "Robinhood testnet", pending: true },
 ];
 
 export const SUBSYSTEMS: Subsystem[] = [

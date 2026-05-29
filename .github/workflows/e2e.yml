@@ -1,4 +1,8 @@
-name: E2E (Playwright on Sepolia)
+# Audit fix (#28): both jobs run in LOCAL pending-UI mode (E2E_MODE defaults to
+# 'local'), not against Sepolia, so the workflow-level name must not advertise
+# "Sepolia" - it shows in the Actions UI, PR checks, and the Discord alert via
+# ${{ github.workflow }}.
+name: E2E (Playwright local pending-UI)
 
 on:
   schedule:

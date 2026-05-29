@@ -21,6 +21,8 @@ const VENUES = [
     desc: 'Perpetual futures via the HIP-3 bridge + validator attestation.',
     risk: 'Perp; haircut 10%; correlation class CRYPTO_PERP.',
     instruments: 'BTC-PERP, ETH-PERP, SOL-PERP, +12 more',
+    // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
+    pendingVenue: true,
   },
   {
     name: 'Aave Horizon',
@@ -35,6 +37,8 @@ const VENUES = [
     desc: 'Yield-bearing principal tokens (PT) and yield tokens (YT).',
     risk: 'Yield-bearing; haircut 5%; correlation class YIELD.',
     instruments: 'USDC-YT-MAR26, GLP-PT-JUN26, +n more',
+    // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
+    pendingVenue: true,
   },
   {
     name: 'Curve',
@@ -42,6 +46,8 @@ const VENUES = [
     desc: 'Stable LP positions. Treated as netting cash equivalent if pool composition stable.',
     risk: 'LP; haircut 5%; correlation class STABLE_LP.',
     instruments: '3pool, FRAX-USDC, +5 more',
+    // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
+    pendingVenue: true,
   },
   {
     name: 'Trade.xyz',
@@ -49,6 +55,8 @@ const VENUES = [
     desc: 'Equity perps (NVDA, AAPL, TSLA, MSFT).',
     risk: 'Equity perp; haircut 15%; correlation class EQUITY_PERP.',
     instruments: 'NVDA-PERP, AAPL-PERP, TSLA-PERP, MSFT-PERP',
+    // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
+    pendingVenue: true,
   },
   {
     name: 'Polymarket (via CCIP)',
@@ -56,6 +64,8 @@ const VENUES = [
     desc: 'Prediction markets settled on Polygon Amoy. Cross-chain via Aqueduct CCIP.',
     risk: 'Binary event; haircut 50%; correlation class BINARY.',
     instruments: '2026 election cycle, +macro/sports',
+    // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
+    pendingVenue: true,
   },
   {
     name: 'GMX V2',
@@ -63,6 +73,9 @@ const VENUES = [
     desc: 'Perp DEX with GLP-style multi-asset pool. Decentralized order book on Arbitrum.',
     risk: 'Perp; haircut 12%; correlation class CRYPTO_PERP.',
     instruments: 'BTC-USD, ETH-USD, ARB-USD, LINK-USD',
+    // Audit fix (#37): GmxV2Adapter.open_position reverts ScaffoldNotImplemented
+    // (no real GMX router wired), so it is open-blocked like Morpho/Synthetix.
+    scaffold: true,
   },
   {
     name: 'Morpho Blue',
@@ -105,15 +118,20 @@ export default function MarketsPage() {
       </section>
 
       <section className="mt-10 space-y-4">
+        {/* Audit fix (#37): badges now reflect actual openability instead of a
+            blanket "live source". scaffold = open reverts ScaffoldNotImplemented
+            (GMX/Morpho/Synthetix). pending-venue = the immutable venue address is
+            a testnet placeholder (deployer EOA), so an open reverts until a real
+            or mock venue is wired (Curve/Pendle/Trade.xyz/Polymarket/Hyperliquid).
+            Only Aave Horizon is mock-backed (MockAavePool) and demoable today. */}
         {VENUES.map((v) => {
           const isScaffold = 'scaffold' in v && v.scaffold === true;
+          const isPending = 'pendingVenue' in v && v.pendingVenue === true;
+          const dim = isScaffold || isPending;
           return (
             <article
               key={v.name}
-              className={
-                'rounded-md border bg-parchment p-6 ' +
-                (isScaffold ? 'border-divider opacity-60' : 'border-divider')
-              }
+              className={'rounded-md border bg-parchment p-6 ' + (dim ? 'border-divider opacity-60' : 'border-divider')}
             >
               <header className="flex flex-wrap items-baseline justify-between gap-3">
                 <p className="font-display text-2xl text-ink">{v.name}</p>
@@ -121,9 +139,13 @@ export default function MarketsPage() {
                   <span className="rounded-full border border-testnet/40 bg-testnet/10 px-3 py-1 text-xs text-testnet">
                     scaffold · open blocked
                   </span>
+                ) : isPending ? (
+                  <span className="rounded-full border border-testnet/40 bg-testnet/10 px-3 py-1 text-xs text-testnet">
+                    pending · venue not wired
+                  </span>
                 ) : (
                   <span className="rounded-full border border-divider px-3 py-1 text-xs text-muted">
-                    live source
+                    mock-backed · demoable
                   </span>
                 )}
               </header>
@@ -132,13 +154,16 @@ export default function MarketsPage() {
               <p className="mt-1 text-xs text-muted">Instruments: {v.instruments}</p>
               {isScaffold && (
                 <p className="mt-3 text-xs text-testnet">
-                  {/* Phase theta-followup: scaffold adapters revert
-                      ScaffoldNotImplemented on open_position to prevent
-                      Coffer.adapterPull from stranding USDC in the adapter.
-                      Real Synthetix V3 + Morpho Blue impls land Year-2. */}
                   Open is disabled — adapter is a Year-1 scaffold without venue-side
-                  deployment. Listed here for visibility; real implementation lands
-                  Year-2.
+                  deployment (open_position reverts ScaffoldNotImplemented so the
+                  Router cannot strand pulled USDC). Real implementation lands Year-2.
+                </p>
+              )}
+              {isPending && (
+                <p className="mt-3 text-xs text-testnet">
+                  Venue address is a testnet placeholder, so an open reverts until a
+                  real (or mock) venue is wired. Aave Horizon is the one mock-backed
+                  venue demoable on testnet today.
                 </p>
               )}
             </article>

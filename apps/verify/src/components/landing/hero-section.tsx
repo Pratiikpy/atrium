@@ -113,7 +113,7 @@ export function HeroSection() {
             </div>
             <div className="text-right">
               <p>Sheet 02 / 08</p>
-              <p className="mt-1.5">Atrium Labs · May 2026</p>
+              <p className="mt-1.5">Atrium · May 2026</p>
             </div>
           </div>
         </div>
