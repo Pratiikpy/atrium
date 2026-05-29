@@ -2,6 +2,7 @@ import { createConfig, http } from 'wagmi';
 import { fallback } from 'viem';
 import { arbitrumSepolia } from 'wagmi/chains';
 import { coinbaseWallet, mock } from 'wagmi/connectors';
+import { e2eKeyConnector } from './e2e-key-connector';
 
 /**
  * E2E-ONLY mock connector. The production connector is the Coinbase Smart
@@ -13,17 +14,30 @@ import { coinbaseWallet, mock } from 'wagmi/connectors';
  * test address is unfunded). Lets the connect + read flows be verified
  * without the Coinbase passkey UI. Address overridable via NEXT_PUBLIC_E2E_ADDRESS.
  */
+const E2E_RPC =
+  process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
+
 const e2eConnectors =
   process.env.NEXT_PUBLIC_E2E === '1'
-    ? [
-        mock({
-          accounts: [
-            (process.env.NEXT_PUBLIC_E2E_ADDRESS ??
-              '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266') as `0x${string}`,
-          ],
-          features: { defaultConnected: false },
-        }),
-      ]
+    ? process.env.NEXT_PUBLIC_E2E_PRIVATE_KEY
+      ? // Funded throwaway key → real signatures + real txs through the UI
+        // (deposit / trade / mandate / kill-switch). See e2e-key-connector.ts.
+        [
+          e2eKeyConnector(
+            process.env.NEXT_PUBLIC_E2E_PRIVATE_KEY as `0x${string}`,
+            E2E_RPC,
+          ),
+        ]
+      : // No key → read-only mock connector (connect + read flows only).
+        [
+          mock({
+            accounts: [
+              (process.env.NEXT_PUBLIC_E2E_ADDRESS ??
+                '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266') as `0x${string}`,
+            ],
+            features: { defaultConnected: false },
+          }),
+        ]
     : [];
 
 /**
