@@ -48,6 +48,17 @@ interface IAqueductSourceMinimal {
     function hasDeliveryAck(bytes32 message_id) external view returns (bool);
 }
 
+/// Chainlink CCIP Client library — extraArgs encoding helper.
+library Client {
+    struct EVMExtraArgsV1 {
+        uint256 gasLimit;
+    }
+    bytes4 private constant EVM_EXTRA_ARGS_V1_TAG = 0x97a657c9;
+    function _argsToBytes(EVMExtraArgsV1 memory extraArgs) internal pure returns (bytes memory) {
+        return abi.encodeWithSelector(EVM_EXTRA_ARGS_V1_TAG, extraArgs);
+    }
+}
+
 contract Aqueduct {
     IRouterClient public immutable router;
     IERC20 public immutable usdc;
@@ -178,7 +189,7 @@ contract Aqueduct {
         emit EmergencyPaused(msg.sender, reason);
     }
 
-    function resume() external onlyPraetor {
+    function resume() external onlyTimelock {
         is_paused = false;
         emit Resumed(msg.sender);
     }
@@ -206,8 +217,8 @@ contract Aqueduct {
         uint256 minExpiresAt = block.timestamp + MIN_EXPIRES_AT_DELTA;
         if (expires_at < minExpiresAt) revert ExpiresAtTooSoon(expires_at, minExpiresAt);
 
-        // Reorg safety
-        bytes32 nonce = keccak256(abi.encode(msg.sender, amount_wei, block.number, dest_user));
+        // Reorg safety — include destSelector so multi-chain sends in same block don't false-positive
+        bytes32 nonce = keccak256(abi.encode(msg.sender, amount_wei, block.number, dest_user, destSelector));
         if (seen_send_nonces[nonce]) revert ReplayDetected(nonce);
         seen_send_nonces[nonce] = true;
 
@@ -224,7 +235,7 @@ contract Aqueduct {
             data: abi.encode(dest_user, expires_at, msg.sender),
             tokenAmounts: tokens,
             feeToken: address(link),
-            extraArgs: ""
+            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000}))
         });
 
         uint256 fee = router.getFee(destSelector, message);

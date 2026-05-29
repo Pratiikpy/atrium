@@ -78,9 +78,14 @@ contract CurveAdapter is IPorticoAdapter, ReentrancyGuard {
 
     event AuthorizedCallerUpdated(address indexed caller, bool authorized);
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     // Audit EEEEE-3 fix: emit on risk param changes.

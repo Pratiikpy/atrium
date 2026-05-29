@@ -53,11 +53,14 @@ sol_interface! {
 // =============================================================================
 sol! {
     error OracleErr(uint16 code);
+    // Phase 2a: stale round error when answeredInRound < roundId
+    error StaleRound();
 }
 
 #[derive(SolidityError)]
 pub enum OracleError {
     Err(OracleErr),
+    StaleRound(StaleRound),
 }
 
 impl OracleError {
@@ -98,9 +101,14 @@ impl PlinthOracle {
 
         // Chainlink
         let chainlink = IChainlinkAggregator::new(chainlink_feed);
-        let (_, cl_answer, _, cl_updated, _) = chainlink
+        let (cl_round_id, cl_answer, _, cl_updated, cl_answered_in_round) = chainlink
             .latest_round_data(self.vm(), Call::new())
             .map_err(|_| OracleError::code(ERR_STALE))?;
+        // Phase 2a: validate answeredInRound >= roundId. If the oracle hasn't
+        // answered the current round yet, the price data is stale/incomplete.
+        if cl_answered_in_round < cl_round_id {
+            return Err(OracleError::StaleRound(StaleRound {}));
+        }
         if now.saturating_sub(cl_updated.to::<u64>()) > freshness_seconds {
             return Err(OracleError::code(ERR_STALE));
         }
@@ -165,12 +173,17 @@ fn normalize_pyth(price_i64: i64, expo_i32: i32) -> U256 {
     }
 }
 
+/// Phase 2a fix: symmetric abs_diff_bps. Divides by max(a, b) instead of just `a`
+/// so that abs_diff_bps(a, b) == abs_diff_bps(b, a). Previously dividing by `a`
+/// meant the tolerance check was asymmetric — a 5% difference measured from the
+/// lower price is larger than 5% measured from the higher price.
 fn abs_diff_bps(a: U256, b: U256) -> u16 {
-    if a.is_zero() {
+    let max_val = if a > b { a } else { b };
+    if max_val.is_zero() {
         return u16::MAX;
     }
     let diff = if a > b { a - b } else { b - a };
-    let bps = diff.saturating_mul(U256::from(10_000u64)) / a;
+    let bps = diff.saturating_mul(U256::from(10_000u64)) / max_val;
     if bps > U256::from(u16::MAX as u64) {
         u16::MAX
     } else {

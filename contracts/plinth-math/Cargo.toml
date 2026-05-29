@@ -20,6 +20,16 @@ alloy-primitives = "1"
 alloy-sol-types = "1"
 mini-alloc = "0.6"
 
+[dev-dependencies]
+# Audit (#24/#58): this crate is crate-type=["lib","cdylib"]; a bare
+# `cargo test` otherwise fails to link the cdylib test harness natively
+# (link.exe 1120 - no WasmVM host). The `stylus-test` feature swaps in the
+# native TestVM mock host so `cargo test` links and runs. Matches the
+# plinth/coffer/vigil/sigil pattern. plinth-math is workspace-excluded, so
+# CI's `cargo test --workspace` never reaches it; this is for local `cargo
+# test` hygiene and to unblock future host tests for the SPAN math here.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
+
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]

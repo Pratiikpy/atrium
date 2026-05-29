@@ -45,12 +45,16 @@ contract Rostrum is ReentrancyGuard {
     mapping(address => mapping(address => CopyTradeFollow)) public follows;
     // leader => list of follower addresses
     mapping(address => address[]) public leader_followers;
+    // leader => follower => index in leader_followers array (for O(1) swap-and-pop)
+    mapping(address => mapping(address => uint256)) public followerIndex;
     // agent => reputation (mirrored from ERC-8004)
     mapping(address => uint64) public reputation_cache;
     // leader => follower => cumulative mirrored exposure (wei)
     mapping(address => mapping(address => uint256)) public follower_exposure;
     // leader => deboost flag (set by Archive's wash-trade detector)
     mapping(address => bool) public is_deboosted;
+    // approved keepers that can call mirrorOpen on behalf of followers
+    mapping(address => bool) public approvedKeepers;
 
     event FollowStarted(address indexed follower, address indexed leader, uint16 allocation_bps, uint256 expires_at);
     event FollowEnded(address indexed follower, address indexed leader, string reason);
@@ -93,6 +97,10 @@ contract Rostrum is ReentrancyGuard {
         praetor_timelock = _praetor_timelock;
     }
 
+    function setApprovedKeeper(address keeper, bool approved) external onlyTimelock {
+        approvedKeepers[keeper] = approved;
+    }
+
     /// @notice Follower starts copying a leader. Allocates a fraction of the
     ///         follower's available margin, capped per-action and per-follow.
     function follow(
@@ -122,6 +130,7 @@ contract Rostrum is ReentrancyGuard {
             is_paused_by_follower: false
         });
         follows[msg.sender][leader] = f;
+        followerIndex[leader][msg.sender] = leader_followers[leader].length;
         leader_followers[leader].push(msg.sender);
         emit FollowStarted(msg.sender, leader, allocation_bps, expires_at);
     }
@@ -141,6 +150,16 @@ contract Rostrum is ReentrancyGuard {
         // stale lifetime exposure forward and gets throttled by
         // follower_max_allocation_wei before opening a single mirror.
         delete follower_exposure[leader][msg.sender];
+        // Swap-and-pop removal to keep leader_followers bounded
+        uint256 idx = followerIndex[leader][msg.sender];
+        uint256 lastIdx = leader_followers[leader].length - 1;
+        if (idx != lastIdx) {
+            address lastFollower = leader_followers[leader][lastIdx];
+            leader_followers[leader][idx] = lastFollower;
+            followerIndex[leader][lastFollower] = idx;
+        }
+        leader_followers[leader].pop();
+        delete followerIndex[leader][msg.sender];
         emit FollowEnded(msg.sender, leader, reason);
     }
 
@@ -207,6 +226,8 @@ contract Rostrum is ReentrancyGuard {
         bytes calldata follower_action_sigil,
         bytes calldata follower_intent_sigil
     ) external nonReentrant {
+        // Auth: only the follower themselves or an approved keeper can trigger mirrors
+        if (msg.sender != follower && !approvedKeepers[msg.sender]) revert Unauthorized();
         // Audit DDD-4 fix: mirrorOpen calls IPlinth.openPosition which calls
         // an adapter which could (if malicious) reenter Rostrum.mirrorOpen
         // for the same follower/leader. Without the guard, the reentry would

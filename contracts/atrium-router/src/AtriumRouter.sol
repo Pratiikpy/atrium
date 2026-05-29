@@ -98,6 +98,9 @@ contract AtriumRouter {
     ICoffer public immutable coffer;
     IPorticoRegistry public immutable registry;
     address public immutable praetor_multisig;
+    address public immutable praetor_timelock;
+
+    bool public is_paused;
 
     /// @notice Emitted on every successful end-to-end open via the Router.
     /// Pre-Router this event channel was non-existent — the only on-chain
@@ -119,7 +122,11 @@ contract AtriumRouter {
         int256 realized_pnl_signed
     );
 
+    event RouterPaused(bytes32 reason);
+    event RouterResumed();
+
     error Unauthorized();
+    error RouterPausedError();
     error VenueNotRegistered(uint8 venue_id);
     error AccountPaused(address user);
     /// Audit FIRE76-1 fix (HIGH): close_position_via_adapter was reachable
@@ -133,7 +140,17 @@ contract AtriumRouter {
     /// view, so the Router cannot decide between the v1.0 and v1.1 ABI.
     error AdapterMissingVersion(address adapter);
 
-    constructor(address _plinth, address _coffer, address _registry, address _praetor) {
+    modifier onlyPraetor() {
+        if (msg.sender != praetor_multisig) revert Unauthorized();
+        _;
+    }
+
+    modifier onlyTimelock() {
+        if (msg.sender != praetor_timelock) revert Unauthorized();
+        _;
+    }
+
+    constructor(address _plinth, address _coffer, address _registry, address _praetor, address _praetor_timelock) {
         // Per DDD-5 / NNNN-1 / MMM-10 / LLL-1 / BBBBB-1 audit-pattern: fail
         // loud at deploy time if any critical dep is zero. The audit-pattern
         // completeness sweep (Wave-YYYY) made this the standard for every
@@ -142,10 +159,22 @@ contract AtriumRouter {
         require(_coffer != address(0), "zero coffer");
         require(_registry != address(0), "zero registry");
         require(_praetor != address(0), "zero praetor");
+        require(_praetor_timelock != address(0), "zero timelock");
         plinth = IPlinth(_plinth);
         coffer = ICoffer(_coffer);
         registry = IPorticoRegistry(_registry);
         praetor_multisig = _praetor;
+        praetor_timelock = _praetor_timelock;
+    }
+
+    function pause(bytes32 reason) external onlyPraetor {
+        is_paused = true;
+        emit RouterPaused(reason);
+    }
+
+    function resume() external onlyTimelock {
+        is_paused = false;
+        emit RouterResumed();
     }
 
     /// @notice Open a position end-to-end across the margin → registry →
@@ -158,12 +187,13 @@ contract AtriumRouter {
         bytes calldata intent_sigil,
         bytes calldata venue_payload
     ) external returns (uint256 plinth_position_id, uint256 venue_position_id) {
+        if (is_paused) revert RouterPausedError();
         address user = msg.sender;
 
         // Step 0: short-circuit on a paused account. Plinth would also catch
         // this but failing here keeps the revert closer to the caller.
-        (,, , bool is_paused) = plinth.getAccount(user);
-        if (is_paused) revert AccountPaused(user);
+        (,, , bool is_paused_acct) = plinth.getAccount(user);
+        if (is_paused_acct) revert AccountPaused(user);
 
         // Audit FIRE76-2 fix (sub-agent HIGH): pull the margin amount Plinth
         // approved, NOT the raw notional. Pre-fix, the Router asked Coffer
@@ -261,6 +291,7 @@ contract AtriumRouter {
         uint256 venue_position_id,
         bytes calldata venue_payload
     ) external returns (int256 realized_pnl_signed) {
+        if (is_paused) revert RouterPausedError();
         address user = msg.sender;
 
         // Audit FIRE76-1 fix (HIGH from sub-agent audit): verify ownership
@@ -305,6 +336,83 @@ contract AtriumRouter {
 
         emit PositionClosedViaRouter(
             user, venue_id, plinth_position_id, venue_position_id, realized_pnl_signed
+        );
+    }
+
+    /// @notice Open two positions atomically in a single tx — the "hedged pair"
+    /// pattern for Verifier Step 2. Both legs succeed or both revert.
+    /// Phase 8 addition (Option A): avoids two separate tx confirmations in the
+    /// demo flow. ~200 bytes of glue, well within EIP-170 budget.
+    struct HedgedLeg {
+        uint8 venue_id;
+        bytes32 instrument_id;
+        int256 notional_signed;
+        bytes action_sigil;
+        bytes intent_sigil;
+        bytes venue_payload;
+    }
+
+    event HedgedPairOpened(
+        address indexed user,
+        uint256 plinth_position_id_a,
+        uint256 venue_position_id_a,
+        uint256 plinth_position_id_b,
+        uint256 venue_position_id_b
+    );
+
+    /// @notice Open a hedged pair (two legs) atomically. Both succeed or both revert.
+    /// Uses the same logic as open_position_via_adapter but preserves msg.sender
+    /// across both legs by inlining the calls rather than using this.external().
+    function openHedgedPair(HedgedLeg calldata legA, HedgedLeg calldata legB)
+        external
+        returns (
+            uint256 plinth_id_a, uint256 venue_id_a,
+            uint256 plinth_id_b, uint256 venue_id_b
+        )
+    {
+        if (is_paused) revert RouterPausedError();
+        address user = msg.sender;
+        (,, , bool is_paused_acct) = plinth.getAccount(user);
+        if (is_paused_acct) revert AccountPaused(user);
+
+        (plinth_id_a, venue_id_a) = _openLeg(user, legA);
+        (plinth_id_b, venue_id_b) = _openLeg(user, legB);
+        emit HedgedPairOpened(user, plinth_id_a, venue_id_a, plinth_id_b, venue_id_b);
+    }
+
+    function _openLeg(address user, HedgedLeg calldata leg)
+        internal
+        returns (uint256 plinth_position_id, uint256 venue_position_id)
+    {
+        (, uint256 required_before,,) = plinth.getAccount(user);
+        plinth_position_id = plinth.openPosition(
+            leg.venue_id, leg.instrument_id, leg.notional_signed,
+            leg.action_sigil, leg.intent_sigil
+        );
+        address adapter_addr = registry.getAdapter(leg.venue_id);
+        if (adapter_addr == address(0)) revert VenueNotRegistered(leg.venue_id);
+        if (ICofferApprovedQuery(address(coffer)).isAdapterApproved(adapter_addr)) {
+            revert AdapterAlsoApprovedAsOrchestrator(adapter_addr);
+        }
+        (, uint256 required_after,,) = plinth.getAccount(user);
+        uint256 amount = required_after > required_before ? required_after - required_before : 0;
+        if (amount == 0) {
+            amount = uint256(leg.notional_signed > 0 ? leg.notional_signed : -leg.notional_signed);
+        }
+        coffer.adapterPull(amount, user, adapter_addr);
+        if (_isAdapterV11(adapter_addr)) {
+            venue_position_id = IPorticoAdapterV11(adapter_addr).open_position_v11(
+                user, leg.instrument_id, leg.notional_signed, leg.venue_payload
+            );
+        } else {
+            bytes memory full_payload = abi.encodePacked(user, leg.venue_payload);
+            venue_position_id = IPorticoAdapter(adapter_addr).open_position(
+                leg.instrument_id, leg.notional_signed, full_payload
+            );
+        }
+        emit PositionOpenedViaRouter(
+            user, leg.venue_id, leg.instrument_id, leg.notional_signed,
+            plinth_position_id, venue_position_id
         );
     }
 

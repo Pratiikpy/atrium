@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {ReentrancyGuard} from "../../portico-registry/src/ReentrancyGuard.sol";
+
 /// Chainlink CCIP receiver primitives. Verified at
 /// resources/chainlink-brownie-contracts/contracts/src/v0.8/ccip/applications/CCIPReceiver.sol
 abstract contract CCIPReceiverBase {
@@ -59,7 +61,8 @@ interface IAqueductSourceAck {
 ///         `destTokenAmounts` (audit B-6/F-4). Delivery-ack is sent back to
 ///         the source chain via a return CCIP message so claim-back can
 ///         refuse double-spend (audit B-12).
-contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver {
+
+contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, ReentrancyGuard {
     address public immutable usdc;
     address public immutable coffer_or_zero;
     address public immutable praetor_multisig;
@@ -122,7 +125,7 @@ contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver {
         praetor_timelock = _praetor_timelock;
     }
 
-    function ccipReceive(Any2EVMMessage calldata message) external onlyRouter {
+    function ccipReceive(Any2EVMMessage calldata message) external onlyRouter nonReentrant {
         address source_sender = abi.decode(message.sender, (address));
         if (allowedSourceAqueduct[message.sourceChainSelector] != source_sender) {
             revert UnknownSource(message.sourceChainSelector, source_sender);

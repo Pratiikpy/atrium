@@ -71,9 +71,14 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
     modifier onlyPraetor() { if (msg.sender != praetor_multisig) revert Unauthorized(); _; }
     modifier onlyTimelock() { if (msg.sender != praetor_timelock) revert Unauthorized(); _; }
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     constructor(address _pool, address _usdc, address _coffer, address _praetor, address _timelock) {
@@ -128,6 +133,8 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         venue_payload;
     }
 
+    error InsufficientAaveLiquidity();
+
     function close_position_v11(
         address originator,
         uint256 venue_position_id,
@@ -147,6 +154,7 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         // proper fix (pro-rata aToken-balance share) needs aToken-interface
         // tracking + totalSupplied state and is deferred Year-2.
         uint256 withdrawn = pool.withdraw(usdc, pos.supplied_amount, atrium_coffer);
+        if (withdrawn < pos.supplied_amount) revert InsufficientAaveLiquidity();
         realized_pnl_signed = int256(withdrawn) - int256(pos.supplied_amount);
         emit PositionClosed(venue_position_id, realized_pnl_signed);
         delete positions[venue_position_id];

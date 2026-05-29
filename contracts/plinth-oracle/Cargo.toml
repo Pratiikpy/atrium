@@ -20,6 +20,15 @@ alloy-primitives = "1"
 alloy-sol-types = "1"
 mini-alloc = "0.6"
 
+[dev-dependencies]
+# Audit (#24/#58): crate-type=["lib","cdylib"]; a bare `cargo test` otherwise
+# fails to link the cdylib test harness natively (link.exe 1120 - no WasmVM
+# host). The `stylus-test` feature swaps in the native TestVM mock host so
+# `cargo test` links and runs. Matches plinth/coffer/vigil/sigil/plinth-math.
+# plinth-oracle is workspace-excluded, so CI never runs it; local hygiene +
+# unblocks future host tests for the dual-oracle reader here.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
+
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]

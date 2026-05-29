@@ -13,10 +13,16 @@ contract PosternKeyRegistry {
     mapping(address => address[]) private _activeKeys;
     mapping(address => mapping(address => bool)) public isActive;
     mapping(address => mapping(address => uint256)) public expiresAt;
+    // chunked revocation progress tracker
+    mapping(address => uint256) public revokeProgress;
+
+    uint256 public constant MAX_ACTIVE_KEYS = 50;
 
     event SessionKeyIssued(address indexed user, address indexed sessionKey, uint256 expiresAt);
     event SessionKeyRevoked(address indexed user, address indexed sessionKey);
     event SessionKeyExpiredCleaned(address indexed user, address indexed sessionKey);
+
+    error MaxActiveKeysExceeded();
 
     constructor(address _posternKillSwitch) {
         // Audit MMM-10 fix (DDD-5 pattern): zero kill switch bricks
@@ -35,21 +41,37 @@ contract PosternKeyRegistry {
         require(user == msg.sender || _isAuthenticatedPosternWallet(msg.sender, user), "unauthorized");
         require(!isActive[user][sessionKey], "duplicate");
         require(_expiresAt > block.timestamp, "expired");
+        if (_activeKeys[user].length >= MAX_ACTIVE_KEYS) revert MaxActiveKeysExceeded();
         _activeKeys[user].push(sessionKey);
         isActive[user][sessionKey] = true;
         expiresAt[user][sessionKey] = _expiresAt;
         emit SessionKeyIssued(user, sessionKey, _expiresAt);
     }
 
-    /// @notice Called by PosternKillSwitch only.
+    /// @notice Called by PosternKillSwitch only. Backward-compat single-shot.
     function markAllRevoked(address user) external {
         require(msg.sender == posternKillSwitch, "kill-switch only");
+        markAllRevokedChunk(user, type(uint256).max);
+    }
+
+    /// @notice Chunked revocation: revokes up to `chunkSize` keys per call.
+    ///         Repeat-call until `revokeProgress[user] == 0 && _activeKeys[user].length == 0`.
+    function markAllRevokedChunk(address user, uint256 chunkSize) public {
+        require(msg.sender == posternKillSwitch, "kill-switch only");
         address[] storage keys = _activeKeys[user];
-        for (uint256 i = 0; i < keys.length; i++) {
+        uint256 start = revokeProgress[user];
+        uint256 end = start + chunkSize;
+        if (end > keys.length) end = keys.length;
+        for (uint256 i = start; i < end; i++) {
             isActive[user][keys[i]] = false;
             emit SessionKeyRevoked(user, keys[i]);
         }
-        delete _activeKeys[user];
+        if (end >= keys.length) {
+            delete _activeKeys[user];
+            revokeProgress[user] = 0;
+        } else {
+            revokeProgress[user] = end;
+        }
     }
 
     /// @notice Anyone can prune expired keys to keep the active list short.

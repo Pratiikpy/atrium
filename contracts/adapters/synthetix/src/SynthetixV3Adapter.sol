@@ -115,9 +115,14 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     function isHybrid() external pure returns (bool) { return false; }
     function supportedInstruments() external view returns (bytes32[] memory) { return supported_instruments_; }
 
-    function setAuthorizedCaller(address caller, bool authorized) external onlyPraetor {
+    function setAuthorizedCaller(address caller, bool authorized) external onlyTimelock {
         is_authorized_caller[caller] = authorized;
         emit AuthorizedCallerUpdated(caller, authorized);
+    }
+
+    function deauthorizeCaller(address caller) external onlyPraetor {
+        is_authorized_caller[caller] = false;
+        emit AuthorizedCallerUpdated(caller, false);
     }
 
     function addInstrument(
