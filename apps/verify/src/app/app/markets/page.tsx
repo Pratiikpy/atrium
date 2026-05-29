@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
+import { StrategyCombos } from '@/components/markets/strategy-combos';
 
 export const metadata = {
   title: 'Atrium · Markets',
@@ -137,6 +138,8 @@ export default function MarketsPage() {
           );
         })}
       </section>
+
+      <StrategyCombos />
 
       <section className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
         <h2 className="font-display text-xl text-ink">Add a venue</h2>
