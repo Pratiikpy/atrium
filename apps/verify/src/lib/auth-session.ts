@@ -43,13 +43,21 @@ export async function getSession(_req: Request): Promise<Session | null> {
     if (session) return session;
   }
   // Demo fallback (single-wallet testnet demo model, per the founder's
-  // "test everything with one wallet" decision). Audit fix (backend-api
-  // #30/#53): this silently authenticated every request as the demo wallet
-  // when no session cookie was present - acceptable for the shared testnet
-  // demo, but it must be an explicit opt-out, not a silent fail-open. Set
-  // ATRIUM_DEMO_MODE=0 (e.g. on a real/mainnet deploy) to require a real
-  // SIWE session and return null instead.
-  if (process.env.ATRIUM_DEMO_MODE === '0') return null;
+  // "test everything with one wallet" decision).
+  //
+  // Audit fix (backend-api #30/#53), corrected after adversarial review: the
+  // first pass made this an opt-OUT (ATRIUM_DEMO_MODE=0), which is still
+  // fail-OPEN by default - a production deploy with DEMO_WALLET_ADDRESS set but
+  // the flag forgotten would silently authenticate every anonymous caller as
+  // the demo wallet (the exact footgun the finding warns about). It is now
+  // fail-CLOSED in production: the demo fallback only ever fires when NOT in
+  // production, OR when an operator has EXPLICITLY opted in with
+  // ATRIUM_ALLOW_DEMO_SESSION=true. So a misconfigured prod env can never
+  // fabricate a session. Local dev + vitest (NODE_ENV !== 'production') keep
+  // the single-wallet convenience.
+  const inProduction = process.env.NODE_ENV === 'production';
+  const demoOptIn = process.env.ATRIUM_ALLOW_DEMO_SESSION === 'true';
+  if (inProduction && !demoOptIn) return null;
   const addr = process.env.DEMO_WALLET_ADDRESS;
   if (!addr) return null;
   return { walletAddress: addr.toLowerCase() };

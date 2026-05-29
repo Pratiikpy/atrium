@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { safeErrorDetail } from '@/lib/safe-error';
 import { loadDeploymentRegistry } from '@/lib/deployments-registry';
 import { isAllowedOriginStrict } from '@/lib/allowed-origins';
+import { requireChaosBearer } from '@/lib/chaos-auth';
 
 /**
  * POST /api/chaos/restore
@@ -52,6 +53,9 @@ export async function POST(req: NextRequest) {
   if (!isOriginAllowed(req)) {
     return NextResponse.json({ error: 'origin_not_allowed' }, { status: 403 });
   }
+  // Audit fix (#77): authenticated-bridge gate (no-op unless CHAOS_DRILL_KEY set).
+  const bearerDenied = requireChaosBearer(req);
+  if (bearerDenied) return bearerDenied;
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     req.headers.get('x-real-ip') ??

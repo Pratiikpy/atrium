@@ -74,9 +74,10 @@ afterEach(() => {
 // route that signs on-chain pauses). The browser Chaos UI always sends an
 // Origin, so the default here mirrors that. Pass `null` to exercise the
 // no-Origin rejection path.
-function makeReq(body: unknown, origin: string | null = 'http://localhost:3000'): NextRequest {
+function makeReq(body: unknown, origin: string | null = 'http://localhost:3000', bearer?: string): NextRequest {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (origin) headers['origin'] = origin;
+  if (bearer) headers['authorization'] = `Bearer ${bearer}`;
   return new Request('http://localhost/api/chaos/inject', {
     method: 'POST',
     headers,
@@ -96,6 +97,38 @@ describe('POST /api/chaos/inject - origin gate (#77)', () => {
   it('rejects a disallowed Origin (403)', async () => {
     const res = await POST(makeReq({ fault: 'oracle_drift' }, 'https://evil.example.com'));
     expect(res.status).toBe(403);
+  });
+});
+
+/* ============ Bearer lockdown gate (#77) ============ */
+
+describe('POST /api/chaos/inject - bearer lockdown (#77)', () => {
+  afterEach(() => { delete process.env.CHAOS_DRILL_KEY; });
+
+  it('401s when CHAOS_DRILL_KEY is set but no Bearer is presented', async () => {
+    process.env.CHAOS_DRILL_KEY = 'drill-secret-xyz';
+    vi.resetModules();
+    ({ POST } = await import('./route'));
+    const res = await POST(makeReq({ fault: 'oracle_drift' })); // valid Origin, no Bearer
+    expect(res.status).toBe(401);
+    expect((await res.json()).error).toBe('unauthorized');
+  });
+
+  it('401s on a wrong Bearer token', async () => {
+    process.env.CHAOS_DRILL_KEY = 'drill-secret-xyz';
+    vi.resetModules();
+    ({ POST } = await import('./route'));
+    const res = await POST(makeReq({ fault: 'oracle_drift' }, 'http://localhost:3000', 'wrong-token'));
+    expect(res.status).toBe(401);
+  });
+
+  it('passes the bearer gate with the correct token (not 401/403)', async () => {
+    process.env.CHAOS_DRILL_KEY = 'drill-secret-xyz';
+    vi.resetModules();
+    ({ POST } = await import('./route'));
+    const res = await POST(makeReq({ fault: 'oracle_drift' }, 'http://localhost:3000', 'drill-secret-xyz'));
+    expect(res.status).not.toBe(401);
+    expect(res.status).not.toBe(403);
   });
 });
 

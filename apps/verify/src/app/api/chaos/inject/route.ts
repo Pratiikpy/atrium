@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { safeErrorDetail } from '@/lib/safe-error';
 import { loadDeploymentRegistry } from '@/lib/deployments-registry';
 import { isAllowedOriginStrict } from '@/lib/allowed-origins';
+import { requireChaosBearer } from '@/lib/chaos-auth';
 
 /**
  * POST /api/chaos/inject
@@ -91,6 +92,10 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     );
   }
+  // Audit fix (#77): authenticated-bridge gate. No-op on the testnet demo
+  // (CHAOS_DRILL_KEY unset); requires a Bearer token when locked down.
+  const bearerDenied = requireChaosBearer(req);
+  if (bearerDenied) return bearerDenied;
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     req.headers.get('x-real-ip') ??
