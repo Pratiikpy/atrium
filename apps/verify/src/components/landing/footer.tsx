@@ -57,6 +57,7 @@ const COLUMNS: FooterColumn[] = [
     title: 'Resources',
     items: [
       { label: 'Documentation', href: '/docs' },
+      { label: 'Honest disclosures', href: '/docs/honesty' },
       { label: 'Architecture', href: '/#architecture' },
       { label: 'GitHub', href: 'https://github.com/Pratiikpy/atrium' },
       { label: 'Status', href: '/sla' },
@@ -70,6 +71,17 @@ const COLUMNS: FooterColumn[] = [
       { label: 'Adapter grants', href: '/rostrum' },
       { label: 'Manifesto', href: '/manifesto' },
       { label: 'Team', href: '/team' },
+      { label: 'Bug bounty', href: '/security/bounty' },
+    ],
+  },
+  {
+    title: 'Legal',
+    items: [
+      { label: 'Privacy', href: '/legal/privacy' },
+      { label: 'Terms', href: '/legal/terms' },
+      { label: 'KYC disclosure', href: '/legal/kyc' },
+      { label: 'Sub-processors', href: '/legal/sub-processors' },
+      { label: 'Accessibility', href: '/accessibility' },
     ],
   },
 ];
@@ -77,7 +89,7 @@ const COLUMNS: FooterColumn[] = [
 export function LandingFooter() {
   return (
     <footer className="border-t border-divider bg-parchment">
-      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 md:grid-cols-5">
+      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 md:grid-cols-6">
         <div className="md:col-span-1">
           <p className="font-display text-2xl italic text-ink">Atrium</p>
           <p className="mt-3 max-w-xs text-sm text-ink-soft">
@@ -137,7 +149,7 @@ export function LandingFooter() {
                 <path d="M8 0a8 8 0 00-2.5 15.6c.4 0 .55-.18.55-.4v-1.4c-2.23.48-2.7-1.08-2.7-1.08-.36-.93-.9-1.18-.9-1.18-.72-.5.06-.48.06-.48.8.05 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.5-1.08-1.78-.2-3.65-.9-3.65-3.97 0-.88.31-1.6.83-2.16-.08-.2-.36-1.02.08-2.13 0 0 .67-.22 2.2.82A7.6 7.6 0 018 4.06c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.16 0 3.08-1.87 3.76-3.65 3.96.29.25.54.74.54 1.49v2.21c0 .22.15.48.55.4A8 8 0 008 0z" />
               </svg>
             </SocialLink>
-            <SocialLink href="https://atrium.fi/discord" label="Discord">
+            <SocialLink href="/security" label="Discord — launching with testnet">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
                 <path d="M13.55 3a13 13 0 00-3.2-1l-.16.32a12 12 0 00-3.4 0L6.65 2A13 13 0 003.45 3 13.5 13.5 0 001 11a13.2 13.2 0 004 2 9.5 9.5 0 00.84-1.36 8.5 8.5 0 01-1.32-.64l.33-.24a9.4 9.4 0 008.3 0l.33.24a8.4 8.4 0 01-1.33.64A9.5 9.5 0 0011 13a13.2 13.2 0 004-2A13.5 13.5 0 0013.55 3zM5.85 9.4c-.78 0-1.42-.72-1.42-1.6s.62-1.6 1.42-1.6c.79 0 1.43.73 1.42 1.6 0 .88-.63 1.6-1.42 1.6zm4.3 0c-.79 0-1.43-.72-1.43-1.6s.63-1.6 1.42-1.6c.79 0 1.42.73 1.42 1.6 0 .88-.63 1.6-1.42 1.6z" />
               </svg>
