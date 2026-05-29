@@ -23,7 +23,7 @@ ENV = "production"
 # than silently accepting free traffic. Wrangler does not error on these
 # at deploy time because they're vars (not bindings); the server is the
 # gate. See services/codex/src/middleware/x402.ts iter-42 guard.
-SCRIBE_URL = "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/version/latest"
+SCRIBE_URL = "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.7"
 ARBITRUM_SEPOLIA_RPC = "https://arbitrum-sepolia.publicnode.com"
 # Audit K-9 fix: x402 verifier needs these to validate USDC Transfer logs.
 # Arbitrum Sepolia USDC (verified at https://docs.circle.com/stablecoins/usdc-on-test-networks).

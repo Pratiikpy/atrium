@@ -64,34 +64,39 @@ corrected job; ignore/let-expire the stale one.
 
 ---
 
-## 2. Get SCRIBE_URL — deploy the subgraph to Graph Studio
+## 2. Subgraph — DONE (deployed v0.0.7, 2026-05-29)
 
-**Why:** `SCRIBE_URL` is pinned to a frozen old subgraph (v0.0.3), so live
-metrics (TVL, agents, queries) never show current data. We currently render
-honest "not indexed yet" empty states. To light them up, publish the current
-subgraph and give me the query URL.
+**Status: deployed + indexing.** The current subgraph (with the `Counter`
+schema the routes read: `totalTvlWei`, `openPositionsCount`,
+`activeAgentsCount`) was built on Linux (WSL, because the Windows graph-cli
+optimizer crashes) and deployed to Graph Studio:
 
-**Steps:**
+- Query URL: `https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.7`
+- Schema verified live (HTTP 200, no field errors, `hasIndexingErrors: false`).
+- Still syncing from block ~270.4M toward chain head; metric tiles fill in
+  from "pending" to real values as it catches up + as on-chain activity lands.
 
-1. Go to https://thegraph.com/studio/ and sign in with your wallet.
-2. Click **Create a Subgraph**, name it `atrium-sepolia`. Studio shows you a
-   **deploy key**.
-3. Build + publish from the repo:
-   ```bash
-   cd "C:/Users/prate/Downloads/arb builder"
-   pnpm subgraph:build
-   # authenticate once with the deploy key Studio gave you:
-   pnpm --filter @atrium/subgraph exec graph auth <DEPLOY_KEY>
-   pnpm subgraph:deploy        # deploys to your Studio subgraph
-   ```
-4. Studio shows a **Query URL** like
-   `https://api.studio.thegraph.com/query/<id>/atrium-sepolia/<version>`.
-   **Paste that URL to me** (or set it yourself as `SCRIBE_URL` in
-   `apps/verify/.env.local` + the Vercel project env). The metric surfaces
-   flip from "pending" to live automatically once it's set + indexed.
+The committed defaults (`services/agents/vercel.json`, `services/codex/vercel.json`,
+`services/codex/wrangler.toml`) + a local `apps/verify/.env.local` now pin the
+explicit `/v0.0.7` URL. **Note on `version/latest`:** the Studio "latest" alias
+still serves the OLD schema (it hadn't switched to v0.0.7 at deploy time), which
+is why we pin the explicit version instead.
 
-If you'd rather not deploy yet, do nothing — every metric stays honestly
-"pending", which is correct.
+**Residual founder steps (one-time dashboard env sets):**
+
+1. **verify app (Vercel):** set `NEXT_PUBLIC_SCRIBE_URL` =
+   `https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.7`
+   in the project env, then redeploy. (Local dev already uses `.env.local`.)
+2. **Codex worker:** the live worker still has the old `SCRIBE_URL` baked in.
+   `cd services/codex && pnpm exec wrangler deploy` (after `wrangler login`)
+   picks up the updated `wrangler.toml`. Only needed for Codex's `/v1` data
+   routes; the agents' `/health` probe is unaffected.
+3. **Tablet / Lantern (if their Vercel envs still point at an old version):**
+   set their `SCRIBE_URL` to the same `/v0.0.7` URL.
+
+When a future subgraph version ships, bump the `v0.0.x` label in those same
+spots (or repoint to `version/latest` once Studio promotes the new version to
+the latest alias).
 
 ---
 

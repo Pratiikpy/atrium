@@ -8,7 +8,7 @@
     { "path": "/api/auspex",   "schedule": "10 12 * * *" }
   ],
   "env": {
-    "SCRIBE_URL": "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/version/latest",
+    "SCRIBE_URL": "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.7",
     "CODEX_URL": "https://atrium-codex.prtk8899.workers.dev"
   }
 }
