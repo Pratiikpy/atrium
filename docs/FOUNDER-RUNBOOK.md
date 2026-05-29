@@ -11,36 +11,34 @@ broadcast / account actions that finish the job.
 
 ## 1. Make trading work — execute the corrected timelock batch
 
-**Why:** `openPosition()` reverts `UnauthorizedCaller` today. The Router is
-not yet on Coffer's approved-orchestrator list, and the venue adapters have
-not authorized the Router. The batch that fixes this was scheduled once with
-a wrong `setAdapter` selector (would revert on execute), so it must be
-re-scheduled with the corrected script, then executed after the 48h timelock.
+**Status: SCHEDULED 2026-05-29. Execute on/after 2026-05-31T02:20:26Z.**
 
-The calldata bug is already fixed in `scripts/reschedule-phase-b3.mjs`
-(commit 696af49): `Coffer.setAdapter(AtriumRouter, true, cap)` with the
-correct 3-arg selector `0x4de27bea`, approving the Router exactly once.
+The corrected 24-action batch is scheduled on-chain (Coffer.setAdapter with the
+right 3-arg selector `0x4de27bea` approving the Router once + 10 adapter
+`setAuthorizedCaller(Router)` + 10 `PorticoRegistry.registerAdapter` + 3
+Aqueduct wiring). Each action's real on-chain `block.timestamp` is recorded in
+`.forge-cache/phase-b3-schedule-corrected.json` (the PraetorTimelock derives
+its operation id from that timestamp, so execute needs it). The 48h timer is
+running.
 
-**Run it (needs the deployer/praetor key):**
+> Note: the deployer EOA is shared with the Lantern attestor cron, so a cron
+> tick can bump the nonce mid-run. Both scripts now retry on `nonce too low`.
+> A first attempt partially scheduled before the retry logic existed, leaving
+> a handful of duplicate scheduled ops on-chain (different timestamps) — they
+> are harmless (idempotent setters) and execute uses the authoritative JSON.
+
+**Remaining step — run once the window opens (needs the deployer/praetor key):**
 
 ```bash
 # Key lives encrypted at $ATRIUM_KEYDIR (default C:/Users/prate/.atrium).
-# The script decrypts lantern-key-deployer.json with lantern-passphrase.txt.
 cd "C:/Users/prate/Downloads/arb builder"
-
-# Step 1 — schedule the corrected 23-action batch on-chain.
-node scripts/reschedule-phase-b3.mjs
-#   writes .forge-cache/phase-b3-schedule-corrected.json with real tx hashes.
-
-# Step 2 — wait 48h (the PraetorTimelock delay). The script prints the
-#   earliest-executable timestamp.
-
-# Step 3 — execute every scheduled job after the window:
-node scripts/execute-phase-b3.mjs        # if present; else use the Foundry
-#   path below for the Coffer.setAdapter job specifically:
-forge script script/SetCofferAdapterExecute.s.sol --broadcast \
-  --rpc-url "$ARBITRUM_SEPOLIA_RPC"
+# On or after 2026-05-31T02:20:26Z — executes every scheduled action. Reads the
+# schedule JSON, re-derives each timestamp from chain, skips already-executed,
+# retries through nonce clashes. Safe to re-run.
+node scripts/execute-phase-b3.mjs
 ```
+
+(Ask the code agent to run this when the window opens, or run it yourself.)
 
 **Verify it worked (read-only, do these after execute):**
 
