@@ -35,6 +35,12 @@ mini-alloc = "0.6"
 
 [dev-dependencies]
 proptest = "1.5"
+# Audit fix (#391 / Phase θ.5): stylus-sdk 0.10.7 ships a `stylus-test` feature
+# that swaps the on-chain WasmVM host for a native TestVM mock, so host-level
+# unit tests (ERC-4626 invariants, deposit-cap #36, per-user/per-adapter caps,
+# adapter_pull auth + pause gating, USDC-paused detection) LINK and RUN under a
+# plain `cargo test` on this box. Mirrors the plinth crate's dev-dep.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]

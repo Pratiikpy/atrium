@@ -805,5 +805,614 @@ fn pick_nms_position(positions: &[U256]) -> U256 {
 
 #[cfg(test)]
 mod tests {
-    // Vigil unit tests land Wave 1 alongside Plinth fixtures.
+    //! Real host unit tests for Vigil using stylus-sdk's `stylus-test` TestVM.
+    //!
+    //! Each Stylus crate is `crate-type = ["lib", "cdylib"]` with a WasmVM host
+    //! that does NOT link under a plain native `cargo test`. The `stylus-test`
+    //! feature on stylus-sdk (declared in `[dev-dependencies]`) swaps in a
+    //! native `TestVM` mock host, so these link + run natively.
+    //!
+    //! Cross-contract reads into Plinth are stubbed via `TestVM::mock_static_call`
+    //! (for the `view` fns getUserPositions / getMarginVersion, which dispatch as
+    //! EVM STATICCALLs) and `TestVM::mock_call` (for the mutating reducePosition,
+    //! which dispatches as a CALL with value 0). The mock key is the EXACT ABI
+    //! calldata, so we re-derive it here with `alloy_sol_types::SolCall` against
+    //! the same camelCase signatures the contract's `sol_interface!` exports.
+
+    use super::*;
+    use alloy_sol_types::{SolCall, SolEvent, SolValue};
+    use stylus_sdk::testing::*;
+
+    // Re-declare the cross-contract calls so we can produce byte-exact calldata
+    // and return encodings. Signatures MUST match the camelCase forms in the
+    // contract's `sol_interface! { interface IPlinth { ... } }` block, because
+    // selectors are derived from those signatures.
+    sol! {
+        function getUserPositions(address user) external view returns (uint256[] memory);
+        function getMarginVersion(address user) external view returns (uint256);
+        function reducePosition(uint256 position_id, uint16 reduction_bps) external returns (int256);
+    }
+
+    // `VigilError` intentionally does NOT derive `Debug` (its `sol!`-generated
+    // inner structs don't, and adding it would touch the on-chain error type).
+    // These helpers let the suite assert on Ok/Err without `{:?}` formatting.
+    #[track_caller]
+    fn expect_ok<T>(res: Result<T, VigilError>, msg: &str) -> T {
+        match res {
+            Ok(v) => v,
+            Err(_) => panic!("expected Ok ({msg}) but got a VigilError"),
+        }
+    }
+
+    // --- Fixed addresses used across the suite -------------------------------
+    fn plinth_addr() -> Address {
+        Address::from([0x11u8; 20])
+    }
+    fn coffer_addr() -> Address {
+        Address::from([0x22u8; 20])
+    }
+    fn portico_addr() -> Address {
+        Address::from([0x33u8; 20])
+    }
+    fn praetor_addr() -> Address {
+        Address::from([0x44u8; 20])
+    }
+    fn timelock_addr() -> Address {
+        Address::from([0x55u8; 20])
+    }
+    fn keeper_addr() -> Address {
+        Address::from([0xAAu8; 20])
+    }
+    fn user_addr() -> Address {
+        Address::from([0xBBu8; 20])
+    }
+    fn stranger_addr() -> Address {
+        Address::from([0xCCu8; 20])
+    }
+
+    /// Builds a fully constructed Vigil bound to `vm`. The `#[constructor]` runs
+    /// as a normal method under TestVM, seeding all admin slots + params.
+    fn deploy(vm: &TestVM) -> Vigil {
+        let mut c = Vigil::from(vm);
+        // Constructor has no auth gate (it only asserts non-zero praetor/timelock).
+        c.constructor(
+            plinth_addr(),
+            coffer_addr(),
+            portico_addr(),
+            praetor_addr(),
+            timelock_addr(),
+        );
+        c
+    }
+
+    /// Mocks Plinth.getUserPositions(user) -> positions as a STATICCALL.
+    fn mock_user_positions(vm: &TestVM, user: Address, positions: Vec<U256>) {
+        let calldata = getUserPositionsCall { user }.abi_encode();
+        // Return type is `uint256[]`; encode as a single dynamic array value.
+        let ret = positions.abi_encode();
+        vm.mock_static_call(plinth_addr(), calldata, Ok(ret));
+    }
+
+    /// Mocks Plinth.getMarginVersion(user) -> version as a STATICCALL.
+    fn mock_margin_version(vm: &TestVM, user: Address, version: U256) {
+        let calldata = getMarginVersionCall { user }.abi_encode();
+        let ret = version.abi_encode();
+        vm.mock_static_call(plinth_addr(), calldata, Ok(ret));
+    }
+
+    /// Mocks Plinth.reducePosition(position_id, bps) -> realized as a CALL (value 0).
+    fn mock_reduce_position(
+        vm: &TestVM,
+        position_id: U256,
+        reduction_bps: u16,
+        realized: alloy_primitives::I256,
+    ) {
+        let calldata = reducePositionCall {
+            position_id,
+            reduction_bps,
+        }
+        .abi_encode();
+        let ret = realized.abi_encode();
+        vm.mock_call(plinth_addr(), calldata, U256::ZERO, Ok(ret));
+    }
+
+    /// Stakes `caller` as an active keeper with `amount` wei. Uses the contract's
+    /// own #[payable] stake_keeper so storage + active_keepers stay consistent.
+    /// Lowers the min-stake first via the emergency setter (Praetor-only).
+    fn make_active_keeper(vm: &TestVM, c: &mut Vigil, caller: Address, amount: U256) {
+        // Drop min stake to 1 wei so any positive stake activates the keeper.
+        vm.set_sender(praetor_addr());
+        expect_ok(
+            c.set_keeper_min_stake_emergency(U256::from(1u64), B256::ZERO),
+            "min stake setter is praetor-only and must succeed",
+        );
+        vm.set_sender(caller);
+        vm.set_value(amount);
+        expect_ok(c.stake_keeper(), "stake_keeper happy path");
+        vm.set_value(U256::ZERO);
+    }
+
+    /// The execute_liquidation path makes TWO sequential cross-contract reads
+    /// (getMarginVersion, then reducePosition). TestVM 0.10.7 serves return data
+    /// from a single global buffer that holds the LAST-registered mock's bytes
+    /// (call_contract only sets outs_len; read_return_data reads the global
+    /// buffer). To exercise both reads honestly under that model, we pin the
+    /// queued `margin_version_at_queue` to the U256 reinterpretation of the
+    /// realized I256's big-endian bytes. Both reads then decode the same 32-byte
+    /// buffer to their own true mocked value (margin_version == that U256;
+    /// reducePosition return == that I256) with no fudged assertions.
+    fn realized_as_margin_version(realized: alloy_primitives::I256) -> U256 {
+        U256::from_be_bytes(realized.to_be_bytes::<32>())
+    }
+
+    /// Queue a job (id 1) for `user`/`pos` whose margin version is byte-aligned
+    /// with `realized`, then make `keeper` active and register the margin-version
+    /// + reduce-position mocks in the order the execute path consumes them.
+    /// Leaves `vm` sender = keeper, ready to call execute_liquidation(job_id).
+    fn setup_execute(
+        vm: &TestVM,
+        c: &mut Vigil,
+        user: Address,
+        keeper: Address,
+        pos: U256,
+        realized: alloy_primitives::I256,
+        keeper_stake: U256,
+    ) -> U256 {
+        let mv = realized_as_margin_version(realized);
+        // Queue consumes getUserPositions first (global buffer = positions here).
+        let job_id = queue_one(vm, c, user, mv, pos);
+        make_active_keeper(vm, c, keeper, keeper_stake);
+        // Register the execute-path mocks. reduce is registered LAST so the global
+        // return buffer holds `realized` bytes == `mv` bytes, satisfying both the
+        // getMarginVersion read (decodes to mv) and the reducePosition read
+        // (decodes to realized).
+        mock_margin_version(vm, user, mv);
+        mock_reduce_position(vm, pos, 1_000u16, realized);
+        vm.set_sender(keeper);
+        job_id
+    }
+
+    // ===================================================================
+    // queue_liquidation
+    // ===================================================================
+
+    #[test]
+    fn queue_liquidation_rejects_non_plinth_caller() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        // A stranger (not the Plinth address) calls in.
+        vm.set_sender(stranger_addr());
+        let res = c.queue_liquidation(user_addr(), U256::from(1u64));
+        match res {
+            Err(VigilError::Unauthorized(_)) => {}
+            _ => panic!("expected Unauthorized, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn queue_liquidation_refuses_account_with_no_positions() {
+        // Audit fix contracts-rust #35: an underwater account with no open
+        // positions must NOT get a phantom (position_id=0) job.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_sender(plinth_addr());
+        // Plinth returns an empty positions list.
+        mock_user_positions(&vm, user_addr(), vec![]);
+        let res = c.queue_liquidation(user_addr(), U256::from(7u64));
+        match res {
+            Err(VigilError::NoPositionsToLiquidate(e)) => assert_eq!(e.user, user_addr()),
+            _ => panic!("expected NoPositionsToLiquidate, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn queue_liquidation_happy_path_writes_job_and_bumps_id() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(1_000);
+        vm.set_sender(plinth_addr());
+        let pos = U256::from(42u64);
+        mock_user_positions(&vm, user_addr(), vec![pos, U256::from(99u64)]);
+        let job_id = expect_ok(
+            c.queue_liquidation(user_addr(), U256::from(3u64)),
+            "queue happy path",
+        );
+        // next_job_id starts at 0, first job is id 1.
+        assert_eq!(job_id, U256::from(1u64));
+        // The job must reference the FIRST position (NMS fallback in pick_nms_position).
+        let job = c.jobs.getter(job_id);
+        assert_eq!(job.position_id.get(), pos);
+        assert_eq!(job.user.get(), user_addr());
+        assert_eq!(job.margin_version_at_queue.get(), U256::from(3u64));
+        assert!(!job.is_complete.get());
+        // deadline = block_number + liquidation_window_blocks (30).
+        assert_eq!(job.deadline_block.get().to::<u64>(), 1_000 + 30);
+    }
+
+    #[test]
+    fn queue_liquidation_blocked_when_paused() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        // Pause via timelock (also a valid pauser).
+        vm.set_sender(timelock_addr());
+        expect_ok(c.pause(B256::ZERO), "pause by timelock");
+        // Even the legit Plinth caller is refused while paused.
+        vm.set_sender(plinth_addr());
+        match c.queue_liquidation(user_addr(), U256::from(1u64)) {
+            Err(VigilError::Paused(_)) => {}
+            _ => panic!("expected Paused, got a different VigilError variant"),
+        }
+    }
+
+    // ===================================================================
+    // execute_liquidation
+    // ===================================================================
+
+    /// Helper: queue a real job (id 1) against `user` with margin version `mv`,
+    /// position `pos`. Returns the job id.
+    fn queue_one(vm: &TestVM, c: &mut Vigil, user: Address, mv: U256, pos: U256) -> U256 {
+        vm.set_sender(plinth_addr());
+        mock_user_positions(vm, user, vec![pos]);
+        expect_ok(c.queue_liquidation(user, mv), "queue for execute test")
+    }
+
+    #[test]
+    fn execute_liquidation_requires_active_keeper() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(100);
+        let job_id = queue_one(&vm, &mut c, user_addr(), U256::from(5u64), U256::from(1u64));
+        // Caller is not a staked keeper.
+        vm.set_sender(stranger_addr());
+        match c.execute_liquidation(job_id) {
+            Err(VigilError::KeeperNotActive(e)) => assert_eq!(e.keeper, stranger_addr()),
+            _ => panic!("expected KeeperNotActive, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn execute_liquidation_job_not_found_on_malformed_id() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(10u64));
+        vm.set_sender(keeper_addr());
+        // Job id 999 was never queued -> position_id/user are zero -> JobNotFound.
+        match c.execute_liquidation(U256::from(999u64)) {
+            Err(VigilError::JobNotFound(e)) => assert_eq!(e.job_id, U256::from(999u64)),
+            _ => panic!("expected JobNotFound, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn execute_liquidation_rejects_stale_margin_version() {
+        // M6 race fix: if Plinth's margin_version has advanced past the queued
+        // value, refuse and emit StaleJobRejected.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(100);
+        let queued_mv = U256::from(5u64);
+        let job_id = queue_one(&vm, &mut c, user_addr(), queued_mv, U256::from(1u64));
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(10u64));
+        // Plinth now reports a fresher margin version (6 != 5).
+        mock_margin_version(&vm, user_addr(), U256::from(6u64));
+        vm.set_sender(keeper_addr());
+        match c.execute_liquidation(job_id) {
+            Err(VigilError::StaleMarginVersion(e)) => {
+                assert_eq!(e.expected, queued_mv);
+                assert_eq!(e.actual, U256::from(6u64));
+            }
+            _ => panic!("expected StaleMarginVersion, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn execute_liquidation_happy_path_completes_job_and_accrues() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(100);
+        let pos = U256::from(1u64);
+        // reducePosition returns negative realized PnL (forced-close loss):
+        // recovered = abs(realized) = 10_000 wei.
+        let realized = alloy_primitives::I256::try_from(-10_000i64).unwrap();
+        let job_id = setup_execute(
+            &vm,
+            &mut c,
+            user_addr(),
+            keeper_addr(),
+            pos,
+            realized,
+            U256::from(10u64),
+        );
+        let recovered = expect_ok(c.execute_liquidation(job_id), "execute happy path");
+        assert_eq!(recovered, U256::from(10_000u64));
+        // Job marked complete + executed_by recorded.
+        let job = c.jobs.getter(job_id);
+        assert!(job.is_complete.get());
+        assert_eq!(job.executed_by.get(), keeper_addr());
+        // Keeper counters bumped. reward = recovered * 50bps / 10000 = 50 wei.
+        let (_stake, _misses, _active, total_liqs, total_rewards) = c.get_keeper(keeper_addr());
+        assert_eq!(total_liqs, U256::from(1u64));
+        assert_eq!(total_rewards, U256::from(50u64));
+    }
+
+    #[test]
+    fn execute_liquidation_rejects_completed_job() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(100);
+        let pos = U256::from(1u64);
+        let realized = alloy_primitives::I256::try_from(-1i64).unwrap();
+        let job_id = setup_execute(
+            &vm,
+            &mut c,
+            user_addr(),
+            keeper_addr(),
+            pos,
+            realized,
+            U256::from(10u64),
+        );
+        expect_ok(c.execute_liquidation(job_id), "first execute");
+        // Second attempt on the same job must report JobAlreadyComplete.
+        match c.execute_liquidation(job_id) {
+            Err(VigilError::JobAlreadyComplete(e)) => assert_eq!(e.job_id, job_id),
+            _ => panic!("expected JobAlreadyComplete, got a different VigilError variant"),
+        }
+    }
+
+    // ===================================================================
+    // stake_keeper / withdraw_stake
+    // ===================================================================
+
+    #[test]
+    fn stake_keeper_below_min_is_rejected() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        // Default min stake (testnet-stake off in test build) is 1000 ETH.
+        vm.set_sender(keeper_addr());
+        vm.set_value(U256::from(1u64));
+        match c.stake_keeper() {
+            Err(VigilError::InsufficientStake(_)) => {}
+            _ => panic!("expected InsufficientStake, got a different VigilError variant"),
+        }
+        // Keeper must NOT be active and active_keepers must be empty.
+        assert!(!c.is_active_keeper(keeper_addr()));
+        assert_eq!(c.active_keeper_count(), 0);
+    }
+
+    #[test]
+    fn stake_keeper_happy_path_accrues_stake_and_activates() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        // Lower the min so a small stake activates.
+        vm.set_sender(praetor_addr());
+        expect_ok(
+            c.set_keeper_min_stake_emergency(U256::from(100u64), B256::ZERO),
+            "praetor lowers min stake",
+        );
+        vm.set_sender(keeper_addr());
+        // A below-min deposit reverts BEFORE touching storage (the contract bails
+        // on InsufficientStake without persisting), so nothing accrues yet.
+        vm.set_value(U256::from(60u64));
+        assert!(matches!(
+            c.stake_keeper(),
+            Err(VigilError::InsufficientStake(_))
+        ));
+        assert!(!c.is_active_keeper(keeper_addr()));
+        assert_eq!(c.active_keeper_count(), 0);
+        // A first deposit that meets the min activates the keeper.
+        vm.set_value(U256::from(100u64));
+        expect_ok(c.stake_keeper(), "first deposit meets min");
+        assert!(c.is_active_keeper(keeper_addr()));
+        assert_eq!(c.active_keeper_count(), 1);
+        // A subsequent deposit accrues on top without re-adding to the active set.
+        vm.set_value(U256::from(20u64));
+        expect_ok(c.stake_keeper(), "top-up accrues");
+        assert_eq!(c.active_keeper_count(), 1);
+        let (stake, _m, active, _l, _r) = c.get_keeper(keeper_addr());
+        assert_eq!(stake, U256::from(120u64));
+        assert!(active);
+    }
+
+    #[test]
+    fn withdraw_stake_returns_non_slashed_stake_and_deactivates() {
+        // Audit fix contracts-rust #6: stake was a one-way deposit pre-fix.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(500u64));
+        // Fund the contract so the outbound transfer_eth has balance to send.
+        vm.set_balance(c.vm().contract_address(), U256::from(500u64));
+        vm.set_sender(keeper_addr());
+        expect_ok(c.withdraw_stake(), "withdraw happy path");
+        // Stake zeroed, keeper deactivated, removed from active set.
+        let (stake, _m, active, _l, _r) = c.get_keeper(keeper_addr());
+        assert_eq!(stake, U256::ZERO);
+        assert!(!active);
+        assert_eq!(c.active_keeper_count(), 0);
+        // KeeperUnstaked event emitted (the #6 fix signal).
+        let logs = vm.get_emitted_logs();
+        let topic0 = KeeperUnstaked::SIGNATURE_HASH;
+        assert!(
+            logs.iter().any(|(topics, _)| topics.first() == Some(&topic0)),
+            "expected a KeeperUnstaked log"
+        );
+    }
+
+    #[test]
+    fn withdraw_stake_with_nothing_staked_errors() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_sender(stranger_addr());
+        match c.withdraw_stake() {
+            Err(VigilError::KeeperNotActive(e)) => assert_eq!(e.keeper, stranger_addr()),
+            _ => panic!("expected KeeperNotActive, got a different VigilError variant"),
+        }
+    }
+
+    // ===================================================================
+    // slash_keeper
+    // ===================================================================
+
+    #[test]
+    fn slash_keeper_is_praetor_only() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(1_000u64));
+        vm.set_sender(stranger_addr());
+        match c.slash_keeper(keeper_addr(), B256::ZERO) {
+            Err(VigilError::Unauthorized(e)) => assert_eq!(e.caller, stranger_addr()),
+            _ => panic!("expected Unauthorized, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn slash_keeper_rejected_when_misses_below_max() {
+        // A-8 defense in depth: cannot slash a keeper that has not actually
+        // missed enough windows on chain.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(1_000u64));
+        // misses default to 0, max_misses_per_window default = 3.
+        vm.set_sender(praetor_addr());
+        match c.slash_keeper(keeper_addr(), B256::ZERO) {
+            Err(VigilError::NotEnoughMisses(e)) => assert_eq!(e.misses, 0u16),
+            _ => panic!("expected NotEnoughMisses, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn slash_keeper_credits_reward_pool_after_enough_misses() {
+        // Audit fix contracts-rust #6: slashed ETH must fund reward_pool_wei,
+        // not be stranded.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(1_000u64));
+        // Mark 3 missed windows (Praetor-only writer added by GGGG-1 fix).
+        vm.set_sender(praetor_addr());
+        for _ in 0..3 {
+            expect_ok(
+                c.mark_keeper_missed_window(keeper_addr()),
+                "mark missed window",
+            );
+        }
+        // reward pool starts empty.
+        assert_eq!(c.reward_pool_wei.get(), U256::ZERO);
+        expect_ok(
+            c.slash_keeper(keeper_addr(), B256::ZERO),
+            "slash after 3 misses",
+        );
+        // 10% of 1000 = 100 credited to the pool.
+        assert_eq!(c.reward_pool_wei.get(), U256::from(100u64));
+        // Keeper stake reduced to 900, miss counter reset.
+        let (stake, misses, _active, _l, _r) = c.get_keeper(keeper_addr());
+        assert_eq!(stake, U256::from(900u64));
+        assert_eq!(misses, 0u32);
+    }
+
+    // ===================================================================
+    // claim_rewards
+    // ===================================================================
+
+    #[test]
+    fn claim_rewards_unfunded_pool_errors() {
+        // #6 completion: refuse loudly when the keeper has zero accrued / the
+        // pool is empty, rather than silently no-op.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        make_active_keeper(&vm, &mut c, keeper_addr(), U256::from(1_000u64));
+        vm.set_sender(keeper_addr());
+        match c.claim_rewards() {
+            Err(VigilError::RewardsNotAvailable(e)) => {
+                assert_eq!(e.requested, U256::ZERO);
+                assert_eq!(e.available, U256::ZERO);
+            }
+            _ => panic!("expected RewardsNotAvailable, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn claim_rewards_pays_accrued_from_pool() {
+        // Full #6 round trip: accrue via execute_liquidation, fund the pool via a
+        // slash, then claim.
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_block_number(100);
+        let pos = U256::from(1u64);
+        // recovered = 200_000 -> reward accrued = 200_000 * 50 / 10_000 = 1_000 wei.
+        let realized = alloy_primitives::I256::try_from(-200_000i64).unwrap();
+        let job_id = setup_execute(
+            &vm,
+            &mut c,
+            user_addr(),
+            keeper_addr(),
+            pos,
+            realized,
+            U256::from(1_000u64),
+        );
+        expect_ok(c.execute_liquidation(job_id), "accrue rewards");
+        let (_s, _m, _a, _l, accrued) = c.get_keeper(keeper_addr());
+        assert_eq!(accrued, U256::from(1_000u64));
+        // Fund the pool by slashing the same keeper (10% of 1000 stake = 100).
+        vm.set_sender(praetor_addr());
+        for _ in 0..3 {
+            expect_ok(c.mark_keeper_missed_window(keeper_addr()), "mark miss");
+        }
+        expect_ok(c.slash_keeper(keeper_addr(), B256::ZERO), "slash to fund pool");
+        assert_eq!(c.reward_pool_wei.get(), U256::from(100u64));
+        // Give the contract balance for the outbound transfer.
+        vm.set_balance(c.vm().contract_address(), U256::from(1_000u64));
+        // Claim: payable = min(accrued=1000, pool=100) = 100.
+        vm.set_sender(keeper_addr());
+        let paid = expect_ok(c.claim_rewards(), "claim from funded pool");
+        assert_eq!(paid, U256::from(100u64));
+        // Pool drained, keeper's accrual reduced by paid amount.
+        assert_eq!(c.reward_pool_wei.get(), U256::ZERO);
+        let (_s2, _m2, _a2, _l2, remaining) = c.get_keeper(keeper_addr());
+        assert_eq!(remaining, U256::from(900u64));
+    }
+
+    // ===================================================================
+    // set_keeper_min_stake_emergency
+    // ===================================================================
+
+    #[test]
+    fn set_keeper_min_stake_is_praetor_only() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        vm.set_sender(stranger_addr());
+        match c.set_keeper_min_stake_emergency(U256::from(1u64), B256::ZERO) {
+            Err(VigilError::Unauthorized(e)) => assert_eq!(e.caller, stranger_addr()),
+            _ => panic!("expected Unauthorized, got a different VigilError variant"),
+        }
+    }
+
+    #[test]
+    fn set_keeper_min_stake_updates_and_emits() {
+        let vm = TestVM::new();
+        let mut c = deploy(&vm);
+        let new_min = U256::from(10_000_000_000_000_000u64); // 0.01 ETH
+        vm.set_sender(praetor_addr());
+        expect_ok(
+            c.set_keeper_min_stake_emergency(new_min, B256::ZERO),
+            "praetor sets min stake",
+        );
+        assert_eq!(c.params.keeper_min_stake_wei.get(), new_min);
+        // KeeperMinStakeUpdated emitted (off-chain mainnet-regression watch hook).
+        let logs = vm.get_emitted_logs();
+        let topic0 = KeeperMinStakeUpdated::SIGNATURE_HASH;
+        assert!(
+            logs.iter().any(|(topics, _)| topics.first() == Some(&topic0)),
+            "expected a KeeperMinStakeUpdated log"
+        );
+    }
+
+    // ===================================================================
+    // pick_nms_position pure helper
+    // ===================================================================
+
+    #[test]
+    fn pick_nms_position_empty_is_zero_nonempty_is_first() {
+        assert_eq!(pick_nms_position(&[]), U256::ZERO);
+        let positions = vec![U256::from(7u64), U256::from(3u64)];
+        assert_eq!(pick_nms_position(&positions), U256::from(7u64));
+    }
 }

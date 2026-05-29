@@ -30,13 +30,16 @@ use stylus_sdk::{
 // --- Module: pure math (Kani-verifiable, no storage) ---
 // math.rs gated to test/export-abi builds only — its functions either inlined
 // at call sites or moved to plinth-math/plinth-oracle for the on-chain build.
-#[cfg(any(test, feature = "export-abi"))]
+// `test-host` exposes it to the external proptest integration test crate
+// (tests/proptest_invariants.rs), which runs as a separate compilation unit
+// where the implicit `test` cfg on this lib is NOT set.
+#[cfg(any(test, feature = "export-abi", feature = "test-host"))]
 pub mod math;
 // span::required_margin moved to the standalone PlinthMath contract
 // (contracts/plinth-math) to keep Plinth under EIP-170's 24 KB cap.
 // span.rs stays in the tree as the off-chain reference implementation
 // for tests and Kani proofs, gated to non-wasm builds.
-#[cfg(any(test, feature = "export-abi"))]
+#[cfg(any(test, feature = "export-abi", feature = "test-host"))]
 pub mod span;
 
 #[cfg(test)]

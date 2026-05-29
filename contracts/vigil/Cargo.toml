@@ -23,8 +23,18 @@ mini-alloc = "0.6"
 
 [dev-dependencies]
 proptest = "1.5"
+# Audit fix (#24/#58): stylus-sdk 0.10.7 exposes a `stylus-test` feature that
+# swaps the WasmVM host for a native TestVM mock, so host-level unit tests
+# (auth / error / reentrancy / reward-pool / keeper-economics) link and run
+# natively via `cargo test` on this box. Same recipe verified working for the
+# Plinth crate.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 contract-client-gen = []
+# Phase 2a: testnet-stake reduces keeper_min_stake_wei from 1000 ETH to 0.01 ETH.
+# MUST NOT be enabled for mainnet builds. Only for Arbitrum Sepolia testnet
+# where faucets cap at ~0.1 ETH and keepers cannot meet the 1000 ETH threshold.
+testnet-stake = []

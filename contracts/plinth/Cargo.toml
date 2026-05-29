@@ -30,16 +30,33 @@ mini-alloc = "0.6"
 
 [dev-dependencies]
 proptest = "1.5"
-# Note: stylus-sdk 0.6 does not yet expose a `stylus-test` feature. Host-side
-# tests run via plain `cargo test` on pure functions; integration tests run
-# against a local Nitro dev node via Foundry. Re-introduce the test harness
-# feature when stylus-sdk publishes it.
+# Audit fix (#24/#58): stylus-sdk 0.10.7 exposes a `stylus-test` feature that
+# swaps the WasmVM host for a native TestVM mock, so host-level unit tests
+# (auth / error / reentrancy / version-bump) link and run natively via
+# `cargo test` on this box. The prior note claimed 0.6 lacked it and deferred
+# all host tests - that was wrong; TestVM is verified working here.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 serde = ["dep:serde", "alloy-primitives/serde"]
 contract-client-gen = []
+# Exposes the host-only `math` + `span` reference modules to external test
+# crates (tests/proptest_invariants.rs). The integration test's own header
+# documents `cargo test --features test-host`. A bare `cargo test` skips that
+# test target (see `required-features` below) and runs the in-crate host unit
+# tests in src/tests.rs, which link via the stylus-test mock VM.
+test-host = []
+
+# The proptest integration test imports atrium_plinth::math / ::span, which
+# only exist under `test-host` / `export-abi`. Gate the test target on the
+# feature so a bare `cargo test` does not fail to compile it; run it with
+# `cargo test --features test-host`.
+[[test]]
+name = "proptest_invariants"
+path = "tests/proptest_invariants.rs"
+required-features = ["test-host"]
 
 # Declare the `kani` cfg so check-cfg under -D warnings does not flag the
 # #[cfg(kani)] gates around #[kani::proof] modules (math.rs + span.rs).
