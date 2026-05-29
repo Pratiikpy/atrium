@@ -24,7 +24,7 @@ const TAB_CONTEXT = createContext<{ active: SettingsTabId } | null>(null);
 
 const TABS: { id: SettingsTabId; label: string; icon: string; readyMonth?: string }[] = [
   { id: 'wallet', label: 'Wallet', icon: '✦' },
-  { id: 'session-keys', label: 'Session keys', icon: '◉', readyMonth: 'Month 2 W1' },
+  { id: 'session-keys', label: 'Session keys', icon: '◉' },
   { id: 'recovery', label: 'Recovery', icon: '◐', readyMonth: 'Month 8' },
   { id: 'network', label: 'Network', icon: '⇌', readyMonth: 'Month 3' },
   { id: 'notifications', label: 'Notifications', icon: '♬', readyMonth: 'Month 5' },
@@ -70,7 +70,7 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
               <p className="font-medium text-testnet">{tabMeta.label} — coming {tabMeta.readyMonth}</p>
               <p className="mt-1 text-ink-soft">
                 The {tabMeta.label.toLowerCase()} tab is scaffolded but not yet wired.
-                See <code className="font-mono">docs/ROADMAP.md</code> for the exact ship date.
+                See <code className="font-mono">docs/MASTER_PLAN.md</code> for the exact ship date.
               </p>
             </div>
           )}
