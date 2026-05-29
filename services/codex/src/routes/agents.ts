@@ -9,7 +9,18 @@ import { gql } from '../lib/scribe';
 // all import this helper; agents.ts was the lone gap.
 import { safeErrorDetail } from '../lib/error-safe';
 
-export const agentsRouter = new Hono<{ Bindings: { SCRIBE_URL: string; ENV?: string } }>();
+export const agentsRouter = new Hono<{
+  Bindings: {
+    SCRIBE_URL: string;
+    ENV?: string;
+    // Agent EOAs are Worker env bindings, not Node process env. Codex runs
+    // on Cloudflare Workers where `process` is undefined at runtime, so these
+    // must come off `c.env` (set in wrangler.toml / dashboard vars).
+    AUGUR_ADDRESS?: string;
+    HARUSPEX_ADDRESS?: string;
+    AUSPEX_ADDRESS?: string;
+  };
+}>();
 
 // Audit EEE-1/2/3 fix: every user-controlled parameter that flows into a gql
 // query must be validated. Pre-fix, malformed cursors / since-timestamps /
@@ -182,6 +193,54 @@ agentsRouter.post('/intent-validation', async (c) => {
     }
 
     return c.json({ valid: true, mandateState: m });
+  } catch (err) {
+    return c.json({ error: 'scribe_unavailable', detail: safeErrorDetail(err, c.env) }, 503);
+  }
+});
+
+
+
+/**
+ * Phase 6 (FULL_AUDIT #50): Real agent status from Scribe.
+ * Returns lastAction timestamp, totalActions count, currentMandateAddress.
+ */
+agentsRouter.get('/status/:agentName', async (c) => {
+  const agentName = c.req.param('agentName');
+  const KNOWN_AGENTS: Record<string, string> = {
+    augur: (c.env.AUGUR_ADDRESS ?? '').toLowerCase(),
+    haruspex: (c.env.HARUSPEX_ADDRESS ?? '').toLowerCase(),
+    auspex: (c.env.AUSPEX_ADDRESS ?? '').toLowerCase(),
+  };
+  const agentAddr = KNOWN_AGENTS[agentName];
+  if (!agentAddr || !ADDRESS_REGEX.test(agentAddr)) {
+    return c.json({ error: 'unknown_agent', detail: `agent "${agentName}" not configured` }, 404);
+  }
+  try {
+    const data = await gql<{
+      agentActions: Array<{ timestamp: string }>;
+      agent: { totalActionsCount: string; mandateAddress: string } | null;
+    }>(c.env, `
+      query AgentStatus($addr: ID!) {
+        agentActions(where: { agent: $addr }, first: 1, orderBy: timestamp, orderDirection: desc) {
+          timestamp
+        }
+        agent(id: $addr) {
+          totalActionsCount
+          mandateAddress
+        }
+      }
+    `, { addr: agentAddr });
+
+    const lastAction = data.agentActions?.[0]?.timestamp
+      ? new Date(Number(data.agentActions[0].timestamp) * 1000).toISOString()
+      : null;
+    return c.json({
+      agent: agentName,
+      address: agentAddr,
+      lastAction,
+      totalActions: data.agent?.totalActionsCount ? Number(data.agent.totalActionsCount) : 0,
+      currentMandateAddress: data.agent?.mandateAddress ?? null,
+    });
   } catch (err) {
     return c.json({ error: 'scribe_unavailable', detail: safeErrorDetail(err, c.env) }, 503);
   }

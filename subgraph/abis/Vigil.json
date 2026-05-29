@@ -1,5 +1,59 @@
 [
   {
+    "inputs": [
+      {
+        "name": "job_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "name": "jobs",
+    "outputs": [
+      {
+        "name": "position_id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "max_liquidation_bps",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "margin_version_at_queue",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "deadline_block",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "priority",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "is_complete",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "executed_by",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {

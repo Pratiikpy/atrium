@@ -56,6 +56,8 @@ type LiquidationEvent @entity(immutable: true) {
   # nullable matches the documented deferral; consumers already handle
   # null via the @derivedFrom pattern on MarginAccount.liquidations.
   account: MarginAccount
+  user: Bytes!
+  txHash: Bytes!
   positionId: BigInt!
   keeper: Bytes!
   recoveredCollateralWei: BigInt!
@@ -199,22 +201,34 @@ type BacktestAttestation @entity(immutable: true) {
   blockNumber: BigInt!
 }
 
-"Counter helpers for the public counters (PRD §28.1 honest-numbers patch)."
+"Counter helpers for the public counters (PRD §28.1 honest-numbers patch). Single row keyed by 'global'."
 type Counter @entity {
   id: ID!
-  activeAgentsCount: Int!
-  cohortPartnersCount: Int!
-  liveKeepersCount: Int!
+  openPositionsCount: BigInt!
+  closedPositionsCount: BigInt!
+  totalDepositsCount: BigInt!
+  totalWithdrawalsCount: BigInt!
   totalTvlWei: BigInt!
+  totalLiquidationsCount: BigInt!
+  activeAgentsCount: BigInt!
+  cohortPartnersCount: BigInt!
+  liveKeepersCount: BigInt!
   lastUpdated: BigInt!
 }
 
-"Per-user Coffer balance derived from deposit + withdraw events. Read by Lantern."
+"""
+Per-user Coffer balance derived from deposit + withdraw events. Read by Lantern.
+balanceWei is net deposited assets (not redeemable; Lantern reads
+Coffer.convertToAssets(balanceOf(user)) directly via RPC for POR — see Phase 6).
+"""
 type CofferUserBalance @entity {
   "user address"
   id: ID!
   user: Bytes!
+  "Net deposited assets (deposits minus withdrawals, clamped to zero). Preferred alias: netDepositedAssetsWei."
   balanceWei: BigInt!
+  "Synonym for balanceWei — preferred for new consumers (FULL_AUDIT #20)."
+  netDepositedAssetsWei: BigInt!
   salt: Bytes!
   lastUpdatedBlock: BigInt!
 }
@@ -226,6 +240,7 @@ type SigilRevocation @entity(immutable: true) {
   agent: Bytes
   intentHash: Bytes
   newNonce: BigInt
+  txHash: Bytes!
   blockNumber: BigInt!
   timestamp: BigInt!
 }
@@ -280,6 +295,18 @@ type LanternAttestation @entity {
   timestamp: BigInt!
   leafCount: Int!
   ipfsCid: String
+}
+
+"""
+IntentToAgent — maps Sigil intent_hash to the agent that validated it.
+Written by handleIntentValidated; read by handlePositionClosed to attribute
+PnL to agents. Immutable because a given intent_hash is validated exactly once.
+"""
+type IntentToAgent @entity(immutable: true) {
+  id: ID!
+  agent: Bytes!
+  owner: Bytes!
+  createdAt: BigInt!
 }
 
 """
@@ -538,6 +565,8 @@ type AlertEvent @entity(immutable: true) {
   kind: String!
   "Plinth | Aqueduct | Coffer | PorticoRegistry"
   contract: String!
+  txHash: Bytes!
+  detail: String
   blockNumber: BigInt!
   timestamp: BigInt!
   # Oracle disagreement (Plinth)

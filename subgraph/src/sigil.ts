@@ -1,17 +1,20 @@
+import { BigInt } from '@graphprotocol/graph-ts';
 import {
   SigilRevoked,
   SigilRevokeAll,
   IntentValidated,
   SigilOpenNotionalDecremented,
 } from '../generated/Sigil/Sigil';
-import { SigilRevocation, SigilValidation, SubsystemDiagnosticEvent } from '../generated/schema';
+import { SigilRevocation, SigilValidation, SubsystemDiagnosticEvent, IntentToAgent } from '../generated/schema';
 import { recordAction } from './_shared/agent_aggregate';
+import { incrementCounter } from './_shared/counter';
 
 export function handleSigilRevoked(event: SigilRevoked): void {
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString();
   const r = new SigilRevocation(id);
   r.owner = event.params.owner;
   r.intentHash = event.params.intent_hash;
+  r.txHash = event.transaction.hash;
   r.blockNumber = event.block.number;
   r.timestamp = event.block.timestamp;
   r.save();
@@ -23,6 +26,7 @@ export function handleSigilRevokeAll(event: SigilRevokeAll): void {
   r.owner = event.params.owner;
   r.agent = event.params.agent;
   r.newNonce = event.params.new_nonce;
+  r.txHash = event.transaction.hash;
   r.blockNumber = event.block.number;
   r.timestamp = event.block.timestamp;
   r.save();
@@ -41,11 +45,25 @@ export function handleIntentValidated(event: IntentValidated): void {
   v.timestamp = event.block.timestamp;
   v.txHash = event.transaction.hash;
   v.save();
+
+  // Phase 4 (SD-23): Write IntentToAgent mapping for PnL attribution
+  const intentId = event.params.intent_hash.toHexString();
+  const mapping = new IntentToAgent(intentId);
+  mapping.agent = event.params.agent;
+  mapping.owner = event.params.owner;
+  mapping.createdAt = event.block.timestamp;
+  mapping.save();
+
   // Silent-failure fix (iteration 16): bump the Agent aggregate so the
   // verify-app leaderboards (rostrum-leaderboard, agents/leaderboard) have
   // a real data source. Pre-fix the Agent entity was schema-defined but
   // never written.
   recordAction(event.params.agent, event.block.timestamp);
+
+  // Phase 4: Counter — increment activeAgentsCount (approximation: each
+  // new agent validation bumps the count; the Agent entity creation in
+  // recordAction is the authoritative signal for distinct agents).
+  incrementCounter('activeAgentsCount', BigInt.fromI32(1), event.block.timestamp);
 }
 
 // Tier-2 defensive observability. Plinth-driven credit-line decrement

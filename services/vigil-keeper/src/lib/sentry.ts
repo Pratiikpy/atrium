@@ -36,8 +36,11 @@ export async function initSentry(): Promise<void> {
   try {
     // Lazy import so the dependency is optional. If @sentry/node is
     // not installed, the keeper still ticks and just lacks remote
-    // error reporting.
-    const mod = await import('@sentry/node');
+    // error reporting. String-based specifier keeps tsc decoupled from
+    // @sentry/node's types (matches services/codex/src/lib/sentry.ts);
+    // @sentry/node is a declared dependency so it resolves at runtime.
+    const sentryPackage = '@sentry/node';
+    const mod = await import(sentryPackage);
     mod.init({
       dsn,
       environment: process.env.NODE_ENV ?? 'production',
@@ -46,7 +49,7 @@ export async function initSentry(): Promise<void> {
       // scrubbed before send. Per docs/conventions/security.md disclosure
       // posture, the goal is "the error is debuggable, the request
       // body is not leaked".
-      beforeSend(event) {
+      beforeSend(event: { request?: { data?: unknown }; contexts?: { runtime?: unknown } }) {
         if (event.request?.data) delete event.request.data;
         if (event.contexts?.runtime) delete event.contexts.runtime;
         return event;

@@ -33,6 +33,7 @@ export async function fetchPausedAccounts(scribeUrl: string): Promise<PausedMarg
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: QUERY_PAUSED }),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const err = new Error(`Scribe responded ${res.status}`) as ScribeError;

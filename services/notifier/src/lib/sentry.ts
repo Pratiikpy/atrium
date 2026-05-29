@@ -19,12 +19,17 @@ export async function initSentry(): Promise<void> {
   const dsn = process.env.SENTRY_DSN;
   if (!dsn) return;
   try {
-    const mod = await import('@sentry/node');
+    // String-based dynamic import keeps tsc decoupled from @sentry/node's
+    // types (matches services/codex/src/lib/sentry.ts). @sentry/node is a
+    // declared dependency so it resolves at runtime in prod; if a deploy
+    // strips it, the catch below is an honest no-op.
+    const sentryPackage = '@sentry/node';
+    const mod = await import(sentryPackage);
     mod.init({
       dsn,
       environment: process.env.NODE_ENV ?? 'production',
       tracesSampleRate: 0.1,
-      beforeSend(event) {
+      beforeSend(event: { request?: { data?: unknown }; contexts?: { runtime?: unknown } }) {
         if (event.request?.data) delete event.request.data;
         if (event.contexts?.runtime) delete event.contexts.runtime;
         return event;

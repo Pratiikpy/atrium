@@ -41,6 +41,8 @@ export function handleAdapterEmergencyDeregistered(event: AdapterEmergencyDeregi
   const alert = new AlertEvent(alertId);
   alert.kind = 'adapter_emergency_deregistered';
   alert.contract = 'PorticoRegistry';
+  alert.txHash = event.transaction.hash;
+  alert.detail = 'Adapter emergency deregistered by Praetor multisig';
   alert.blockNumber = event.block.number;
   alert.timestamp = event.block.timestamp;
   alert.venueId = event.params.venue_id;

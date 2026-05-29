@@ -68,6 +68,18 @@
         "type": "int256",
         "indexed": false,
         "internalType": "int256"
+      },
+      {
+        "name": "entry_price_q64",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "intent_hash",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
       }
     ],
     "name": "PositionOpened",

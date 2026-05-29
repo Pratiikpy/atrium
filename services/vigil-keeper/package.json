@@ -12,6 +12,7 @@
     "lint": "echo 'eslint flat-config migration tracked in human_left.md' && exit 0"
   },
   "dependencies": {
+    "@sentry/node": "^10.53.1",
     "viem": "^2.21.0"
   },
   "devDependencies": {

@@ -39,15 +39,16 @@ async def fetch_trades_for_year(
     end_ts = int(datetime.fromisoformat(tax_year_end).timestamp())
 
     query = """
-      query Trades($owner: ID!, $start: BigInt!, $end: BigInt!) {
+      query Trades($owner: ID!, $start: BigInt!, $end: BigInt!, $first: Int!, $cursor: String!) {
         positions(
           where: {
             owner: $owner,
             openedAtTimestamp_gte: $start,
-            openedAtTimestamp_lte: $end
+            openedAtTimestamp_lte: $end,
+            id_gt: $cursor
           },
-          first: 1000,
-          orderBy: openedAtTimestamp
+          first: $first,
+          orderBy: id
         ) {
           id
           venueId
@@ -60,45 +61,50 @@ async def fetch_trades_for_year(
         }
       }
     """
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.post(
-            scribe_url,
-            json={
-                "query": query,
-                "variables": {"owner": address, "start": str(start_ts), "end": str(end_ts)},
-            },
-        )
-        r.raise_for_status()
-        payload = r.json()
+    PAGE_SIZE = 1000
+    all_positions: list[dict] = []
+    cursor = ""
 
-    # Audit fix (iteration 26): pre-fix this was `r.json().get("data", {})`
-    # which silently swallowed GraphQL errors. A subgraph that returned
-    # `{"errors": [{"message": "field X not found"}]}` (schema drift) or
-    # `{"data": null}` (network blip) would produce an empty trades list,
-    # which then yielded a CSV claiming "you traded zero times this year"
-    # — exactly the wrong shape for a tax tool where false-negatives mean
-    # underreporting. The four failure paths (errors array, missing data,
-    # missing positions field, wrong positions type) all bail now.
-    errors = payload.get("errors")
-    if errors:
-        raise ScribeError(f"Scribe returned GraphQL errors: {errors}")
-    data = payload.get("data")
-    if data is None:
-        raise ScribeError(f"Scribe response missing 'data' field: {payload}")
-    positions = data.get("positions")
-    if positions is None:
-        raise ScribeError(
-            f"Scribe response missing 'positions' field — "
-            f"schema drift or wrong subgraph deployed: {data}"
-        )
-    if not isinstance(positions, list):
-        raise ScribeError(f"Scribe 'positions' is not a list: {type(positions).__name__}")
-    # Rebind for the downstream loop, keeping the same name shape so the
-    # rest of the function reads naturally.
-    data = {"positions": positions}
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        while True:
+            r = await client.post(
+                scribe_url,
+                json={
+                    "query": query,
+                    "variables": {
+                        "owner": address,
+                        "start": str(start_ts),
+                        "end": str(end_ts),
+                        "first": PAGE_SIZE,
+                        "cursor": cursor,
+                    },
+                },
+            )
+            r.raise_for_status()
+            payload = r.json()
+
+            errors = payload.get("errors")
+            if errors:
+                raise ScribeError(f"Scribe returned GraphQL errors: {errors}")
+            data = payload.get("data")
+            if data is None:
+                raise ScribeError(f"Scribe response missing 'data' field: {payload}")
+            positions = data.get("positions")
+            if positions is None:
+                raise ScribeError(
+                    f"Scribe response missing 'positions' field — "
+                    f"schema drift or wrong subgraph deployed: {data}"
+                )
+            if not isinstance(positions, list):
+                raise ScribeError(f"Scribe 'positions' is not a list: {type(positions).__name__}")
+
+            all_positions.extend(positions)
+            if len(positions) < PAGE_SIZE:
+                break
+            cursor = positions[-1]["id"]
 
     trades: list[Trade] = []
-    for p in data.get("positions", []):
+    for p in all_positions:
         # Audit fix (iteration 27): pre-fix this did
         #   notional = float(p["notionalSigned"])
         #   price    = float(p["entryPriceQ64"]) / (2 ** 64)

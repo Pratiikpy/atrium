@@ -25,7 +25,7 @@ dataSources:
       eventHandlers:
         - event: MarginUpdated(indexed address,uint256,uint256,uint256,uint64)
           handler: handleMarginUpdated
-        - event: PositionOpened(indexed uint256,indexed address,uint8,bytes32,int256)
+        - event: PositionOpened(indexed uint256,indexed address,uint8,bytes32,int256,uint256,bytes32)
           handler: handlePositionOpened
         - event: PositionClosed(indexed uint256,int256)
           handler: handlePositionClosed

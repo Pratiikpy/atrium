@@ -40,6 +40,8 @@ export function handleEmergencyPaused(event: EmergencyPaused): void {
   const a = new AlertEvent(id);
   a.kind = 'emergency_pause_invoked';
   a.contract = 'PraetorTimelock';
+  a.txHash = event.transaction.hash;
+  a.detail = 'Emergency pause invoked via Praetor timelock bypass';
   a.blockNumber = event.block.number;
   a.timestamp = event.block.timestamp;
   // Reuse `adapter` for the paused target — semantically it's the

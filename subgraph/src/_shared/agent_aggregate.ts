@@ -19,7 +19,7 @@ import { Agent } from '../../generated/schema';
  *     Copies the current score (also stored authoritatively in
  *     RostrumReputation; the Agent rollup is a denormalized read path).
  *
- * Known gap (documented honestly per CLAUDE.md "honesty over hype"):
+ * Known gap (documented honestly per "honesty over hype" conventions):
  * `totalPnlSigned` requires binding agent → position → realized PnL.
  * Plinth.PositionOpened/Closed events carry the position OWNER, not the
  * AGENT that triggered the action. The link runs through Sigil.intent_hash:

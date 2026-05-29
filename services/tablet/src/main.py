@@ -13,7 +13,7 @@ import os
 import re
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends, Header
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
@@ -24,8 +24,22 @@ from .scribe_client import fetch_trades_for_year, ScribeError
 from .exporters.csv import to_sa108_csv
 from .exporters.form8949_csv import to_form8949_csv
 from .exporters.de_fifo_csv import to_de_fifo_csv
+from .fx_rates import FxRateUnavailable
 
 app = FastAPI(title="Atrium Tablet", version="0.2.0")
+
+_INTERNAL_KEY = os.environ.get("ATRIUM_INTERNAL_KEY", "")
+
+
+async def require_internal_key(
+    authorization: str = Header(..., alias="Authorization"),
+) -> None:
+    """Validate Bearer token matches ATRIUM_INTERNAL_KEY env var."""
+    if not _INTERNAL_KEY:
+        raise HTTPException(503, "ATRIUM_INTERNAL_KEY not configured")
+    expected = f"Bearer {_INTERNAL_KEY}"
+    if authorization != expected:
+        raise HTTPException(401, "Invalid or missing internal key")
 
 
 class HealthResponse(BaseModel):
@@ -56,7 +70,7 @@ _ADDRESS_REGEX = re.compile(r"^0x[0-9a-fA-F]{40}$")
 _ISO_DATE_REGEX = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
-@app.get("/export")
+@app.get("/export", dependencies=[Depends(require_internal_key)])
 async def export(
     address: str = Query(..., description="0x-prefixed 40-hex wallet address"),
     jurisdiction: Literal["uk", "us", "de"] = Query("uk"),
@@ -107,3 +121,100 @@ async def export(
         media_type="text/csv",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+
+@app.get("/summary", dependencies=[Depends(require_internal_key)])
+async def summary(
+    address: str = Query(...),
+    jurisdiction: Literal["uk", "us", "de"] = Query("uk"),
+    year: int = Query(...),
+):
+    if not _ADDRESS_REGEX.match(address):
+        raise HTTPException(400, "address must be a 0x-prefixed 40-hex string")
+
+    scribe_url = os.environ.get("SCRIBE_URL")
+    if not scribe_url:
+        raise HTTPException(503, "SCRIBE_URL not configured")
+
+    tax_year_start = f"{year}-01-01"
+    tax_year_end = f"{year}-12-31"
+    if jurisdiction == "uk":
+        tax_year_start = f"{year}-04-06"
+        tax_year_end = f"{year + 1}-04-05"
+
+    try:
+        trades = await fetch_trades_for_year(scribe_url, address.lower(), tax_year_start, tax_year_end)
+    except ScribeError as e:
+        raise HTTPException(502, f"Scribe upstream failed: {e}") from e
+
+    try:
+        if jurisdiction == "uk":
+            report = calculate_uk_cgt(trades)
+            realized = report.total_gain - report.total_loss
+        elif jurisdiction == "de":
+            report = calculate_de_fifo(trades)
+            realized = report.total_gain_eur - report.total_loss_eur
+        else:
+            report = calculate_us_form_8949(trades)
+            realized = sum(getattr(r, "gain", 0) for r in report.disposals) if hasattr(report, "disposals") else 0
+    except FxRateUnavailable as e:
+        raise HTTPException(502, f"FX rate unavailable: {e}") from e
+
+    return {
+        "realized_gain_usd": realized,
+        "unrealized_gain_usd": None,
+        "allowance_used_pct": None,
+    }
+
+
+@app.get("/events", dependencies=[Depends(require_internal_key)])
+async def events(
+    address: str = Query(...),
+    jurisdiction: Literal["uk", "us", "de"] = Query("uk"),
+    year: int = Query(...),
+    cursor: str = Query(""),
+    limit: int = Query(50, ge=1, le=200),
+):
+    if not _ADDRESS_REGEX.match(address):
+        raise HTTPException(400, "address must be a 0x-prefixed 40-hex string")
+
+    scribe_url = os.environ.get("SCRIBE_URL")
+    if not scribe_url:
+        raise HTTPException(503, "SCRIBE_URL not configured")
+
+    tax_year_start = f"{year}-01-01"
+    tax_year_end = f"{year}-12-31"
+    if jurisdiction == "uk":
+        tax_year_start = f"{year}-04-06"
+        tax_year_end = f"{year + 1}-04-05"
+
+    try:
+        trades = await fetch_trades_for_year(scribe_url, address.lower(), tax_year_start, tax_year_end)
+    except ScribeError as e:
+        raise HTTPException(502, f"Scribe upstream failed: {e}") from e
+
+    # Simple cursor-based pagination over trade list
+    trades_sorted = sorted(trades, key=lambda t: t.timestamp)
+    start_idx = 0
+    if cursor:
+        try:
+            start_idx = int(cursor)
+        except ValueError:
+            start_idx = 0
+
+    page = trades_sorted[start_idx : start_idx + limit]
+    next_cursor = str(start_idx + limit) if start_idx + limit < len(trades_sorted) else ""
+
+    events_out = [
+        {
+            "timestamp": t.timestamp.isoformat(),
+            "venue_id": t.venue_id,
+            "instrument_id": t.instrument_id,
+            "side": t.side,
+            "quantity": t.quantity,
+            "price": t.price,
+        }
+        for t in page
+    ]
+    return {"events": events_out, "cursor": next_cursor}

@@ -20,6 +20,7 @@ from datetime import timedelta
 from typing import Iterable
 
 from ..models import Trade
+from ..fx_rates import get_usd_to_eur_rate, FxRateUnavailable
 
 HOLDING_EXEMPTION_DAYS = 365
 
@@ -67,17 +68,19 @@ def calculate_de_fifo(trades: Iterable[Trade]) -> DeFifoReport:
             continue
         # Sell: FIFO match
         remaining = t.quantity
+        sell_eur_rate = get_usd_to_eur_rate(t.timestamp.date())
         while remaining > 0 and pools[key]:
             front = pools[key][0]
             match_qty = min(front.remaining_qty, remaining)
             holding_days = (t.timestamp - front.timestamp).days
+            buy_eur_rate = get_usd_to_eur_rate(front.timestamp.date())
             row = DeDisposalRow(
                 asset_key=f"venue:{t.venue_id} {t.instrument_id}",
                 date_acquired=front.timestamp.date().isoformat(),
                 date_sold=t.timestamp.date().isoformat(),
                 quantity=match_qty,
-                proceeds_eur=match_qty * t.price,  # caller responsible for EUR conversion
-                cost_basis_eur=match_qty * front.price,
+                proceeds_eur=match_qty * t.price * sell_eur_rate,
+                cost_basis_eur=match_qty * front.price * buy_eur_rate,
                 holding_days=holding_days,
                 flag_exemption_review=holding_days > HOLDING_EXEMPTION_DAYS,
             )

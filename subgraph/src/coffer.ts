@@ -1,4 +1,4 @@
-import { BigInt, Bytes, crypto, ByteArray } from '@graphprotocol/graph-ts';
+import { BigInt, Bytes, crypto, ByteArray, log } from '@graphprotocol/graph-ts';
 import {
   Deposit,
   Withdraw,
@@ -20,6 +20,7 @@ import {
   AlertEvent,
   SubsystemDiagnosticEvent,
 } from '../generated/schema';
+import { incrementCounter } from './_shared/counter';
 
 const COFFER_PAUSE_STATE_ID = '0';
 
@@ -40,6 +41,7 @@ function getOrCreateBalance(user: Bytes, blockNumber: BigInt): CofferUserBalance
     b = new CofferUserBalance(id);
     b.user = user;
     b.balanceWei = BigInt.zero();
+    b.netDepositedAssetsWei = BigInt.zero();
     // Per-user salt = keccak256(user) — deterministic, private (off-chain caller must know the address)
     b.salt = Bytes.fromByteArray(crypto.keccak256(ByteArray.fromHexString(user.toHexString())));
     b.lastUpdatedBlock = blockNumber;
@@ -60,8 +62,13 @@ export function handleDeposit(event: Deposit): void {
 
   const b = getOrCreateBalance(event.params.owner, event.block.number);
   b.balanceWei = b.balanceWei.plus(event.params.assets);
+  b.netDepositedAssetsWei = b.balanceWei;
   b.lastUpdatedBlock = event.block.number;
   b.save();
+
+  // Phase 4: Counter writes (SD-10)
+  incrementCounter('totalDepositsCount', BigInt.fromI32(1), event.block.timestamp);
+  incrementCounter('totalTvlWei', event.params.assets, event.block.timestamp);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -77,12 +84,25 @@ export function handleWithdraw(event: Withdraw): void {
   w.save();
 
   const b = getOrCreateBalance(event.params.owner, event.block.number);
-  b.balanceWei = b.balanceWei.minus(event.params.assets);
-  if (b.balanceWei.lt(BigInt.zero())) {
+  const newBalance = b.balanceWei.minus(event.params.assets);
+  if (newBalance.lt(BigInt.zero())) {
+    // Phase 4 (SD-17): log warning on underflow, clamp to zero for display safety.
+    log.warning('balance subtraction underflow user={} amount={}', [
+      event.params.owner.toHexString(),
+      event.params.assets.toString(),
+    ]);
     b.balanceWei = BigInt.zero();
+  } else {
+    b.balanceWei = newBalance;
   }
+  b.netDepositedAssetsWei = b.balanceWei;
   b.lastUpdatedBlock = event.block.number;
   b.save();
+
+  // Phase 4: Counter writes (SD-10)
+  incrementCounter('totalWithdrawalsCount', BigInt.fromI32(1), event.block.timestamp);
+  // Subtract from TVL (incrementCounter clamps to zero internally)
+  incrementCounter('totalTvlWei', BigInt.zero().minus(event.params.assets), event.block.timestamp);
 }
 
 export function handleCircuitBreaker(event: CircuitBreakerTripped): void {
@@ -137,6 +157,8 @@ export function handleUsdcPausedDetected(event: UsdcPausedDetected): void {
   const a = new AlertEvent(id);
   a.kind = 'usdc_paused';
   a.contract = 'Coffer';
+  a.txHash = event.transaction.hash;
+  a.detail = 'Upstream USDC contract paused by Circle';
   a.blockNumber = event.block.number;
   a.timestamp = event.block.timestamp;
   a.save();

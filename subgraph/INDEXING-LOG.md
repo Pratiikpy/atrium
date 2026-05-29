@@ -77,3 +77,37 @@ If the event genuinely should NOT be indexed (admin action duplicated by `Praeto
 ## How NOT to close an item
 
 Do not add events to `INDEXING_IGNORE` without a real reason. The allow-list is the audit surface for the next reviewer; treating it as a snooze button defeats the gate.
+
+
+## Phase 4 — Counter entity + CohortPartner deferral (2026-05-28)
+
+### Counter entity (closes #44 ghost-entity, SD-10)
+
+The `Counter` entity (id: `'global'`) is now written by all relevant handlers:
+- `plinth.ts`: openPositionsCount, closedPositionsCount
+- `coffer.ts`: totalDepositsCount, totalWithdrawalsCount, totalTvlWei
+- `vigil.ts`: totalLiquidationsCount, liveKeepersCount
+- `sigil.ts`: activeAgentsCount
+
+Helper: `subgraph/src/_shared/counter.ts` exports `incrementCounter` and `setCounterField`.
+
+### CohortPartner — testnet deferral (docs/MASTER_PLAN.md Section 8.1)
+
+The `CohortPartner` entity remains on the `WRITER_IGNORE` allow-list. Trade-off:
+- On-chain Cohort contract is mainnet work (Phase 8).
+- For testnet, `/api/cohort/partners` returns the empty array honestly.
+- No on-chain registration event exists in Year-1 (human-curated program).
+- When the contract lands, add a data source + handler + remove the allow-list entry.
+
+### LanternAttestation ID change (closes #58, SD-11)
+
+ID changed from `root.toHexString()` to `txHash + '-' + logIndex`. A republish
+of the same root now creates a new entity row, preserving attestation history.
+Consumers query by root via `lanternAttestations(where: { root: $root })`.
+
+### CofferUserBalance netDepositedAssetsWei (FULL_AUDIT #20)
+
+Added `netDepositedAssetsWei` as a synonym field for `balanceWei`. Both fields
+carry the same value. New consumers should prefer `netDepositedAssetsWei` for
+clarity — the name makes explicit that this is net deposited (not redeemable).
+Lantern reads `Coffer.convertToAssets(balanceOf(user))` via RPC for POR.

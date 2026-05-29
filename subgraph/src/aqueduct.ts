@@ -89,6 +89,8 @@ export function handleLinkBalanceLow(event: LinkBalanceLowEvent): void {
   const a = new AlertEvent(id);
   a.kind = 'link_balance_low';
   a.contract = 'Aqueduct';
+  a.txHash = event.transaction.hash;
+  a.detail = 'LINK balance below threshold for CCIP fees';
   a.blockNumber = event.block.number;
   a.timestamp = event.block.timestamp;
   a.linkBalanceWei = event.params.balance;

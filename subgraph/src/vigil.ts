@@ -8,7 +8,9 @@ import {
   KeeperRewarded,
   StaleJobRejected,
 } from '../generated/Vigil/Vigil';
+import { Vigil } from '../generated/Vigil/Vigil';
 import { LiquidationEvent, Keeper, SubsystemDiagnosticEvent } from '../generated/schema';
+import { incrementCounter, setCounterField } from './_shared/counter';
 
 export function handleLiquidationTriggered(event: LiquidationTriggered): void {
   // Triggered → not yet executed. The Executed handler creates the LiquidationEvent.
@@ -23,11 +25,18 @@ export function handleLiquidationExecuted(event: LiquidationExecuted): void {
   liq.actualLiquidationBps = event.params.actual_liquidation_bps;
   liq.blockNumber = event.block.number;
   liq.timestamp = event.block.timestamp;
-  // Agent C audit fix: account is the liquidated user, not the keeper.
-  // Wave-2 wiring loads the Job → user mapping via Vigil.jobs(job_id).user.
-  // Until the contract call binding is generated, leave account empty rather
-  // than incorrect; the @derivedFrom resolver tolerates null FKs.
-  liq.account = ''; // backref resolves once `Vigil.jobs(job_id).user` view binding lands Wave 2
+  liq.txHash = event.transaction.hash;
+  // Phase 2c: resolve user from Vigil.jobs(job_id).user view call.
+  const vigilContract = Vigil.bind(event.address);
+  const jobResult = vigilContract.try_jobs(event.params.job_id);
+  if (!jobResult.reverted) {
+    // jobs() returns (position_id, user, ...) — value1 = user address
+    liq.user = jobResult.value.value1;
+    liq.account = jobResult.value.value1.toHexString();
+  } else {
+    liq.user = event.params.keeper; // fallback: keeper address if view reverts
+    liq.account = '';
+  }
   liq.save();
 
   // Bump keeper counters
@@ -45,11 +54,15 @@ export function handleLiquidationExecuted(event: LiquidationExecuted): void {
   k.totalLiquidationsExecuted = k.totalLiquidationsExecuted.plus(BigInt.fromI32(1));
   k.lastActionTimestamp = event.block.timestamp;
   k.save();
+
+  // Phase 4: Counter writes (SD-10)
+  incrementCounter('totalLiquidationsCount', BigInt.fromI32(1), event.block.timestamp);
 }
 
 export function handleKeeperStaked(event: KeeperStaked): void {
   const keeperId = event.params.keeper.toHexString();
   let k = Keeper.load(keeperId);
+  const wasActive = k != null ? k.isActive : false;
   if (!k) {
     k = new Keeper(keeperId);
     k.stakeWei = BigInt.zero();
@@ -60,13 +73,21 @@ export function handleKeeperStaked(event: KeeperStaked): void {
     k.totalSlashedWei = BigInt.zero();
   }
   k.stakeWei = k.stakeWei.plus(event.params.stake_amount_wei);
+  // Staking always reactivates the keeper
+  k.isActive = true;
   k.save();
+
+  // Phase 4: rebuild liveKeepersCount if activation state changed
+  if (!wasActive) {
+    incrementCounter('liveKeepersCount', BigInt.fromI32(1), event.block.timestamp);
+  }
 }
 
 export function handleKeeperSlashed(event: KeeperSlashed): void {
   const keeperId = event.params.keeper.toHexString();
   const k = Keeper.load(keeperId);
   if (!k) return;
+  const wasActive = k.isActive;
   k.totalSlashedWei = k.totalSlashedWei.plus(event.params.slashed_amount_wei);
   k.stakeWei = k.stakeWei.minus(event.params.slashed_amount_wei);
   if (k.stakeWei.lt(BigInt.fromString('1000000000000000000000'))) {
@@ -78,6 +99,11 @@ export function handleKeeperSlashed(event: KeeperSlashed): void {
   // slash state immediately rather than waiting for the next miss event.
   k.missedWindows24h = 0;
   k.save();
+
+  // Phase 4: decrement liveKeepersCount if keeper became inactive
+  if (wasActive && !k.isActive) {
+    incrementCounter('liveKeepersCount', BigInt.fromI32(-1), event.block.timestamp);
+  }
 }
 
 // Audit KKKK-1: handler paired with `Vigil.mark_keeper_missed_window`

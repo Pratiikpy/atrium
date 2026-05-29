@@ -22,6 +22,7 @@ from datetime import datetime, timedelta
 from typing import Iterable
 
 from ..models import Trade
+from ..fx_rates import get_usd_to_gbp_rate, FxRateUnavailable
 
 
 @dataclass
@@ -110,7 +111,8 @@ def calculate_uk_cgt(trades: Iterable[Trade]) -> CgtReport:
 
         report = DisposalReport(disposal=t)
         remaining_qty = t.quantity
-        proceeds = t.quantity * t.price
+        sell_gbp_rate = get_usd_to_gbp_rate(t.timestamp.date())
+        proceeds = t.quantity * t.price * sell_gbp_rate
 
         # 1. Same-day buys
         for a in acquisitions[key]:
@@ -122,7 +124,8 @@ def calculate_uk_cgt(trades: Iterable[Trade]) -> CgtReport:
                 continue
             match = min(a.remaining_qty, remaining_qty)
             report.matched_same_day.append(_clone_partial(a, match))
-            report.cost += match * a.price
+            buy_gbp_rate = get_usd_to_gbp_rate(a.timestamp.date())
+            report.cost += match * a.price * buy_gbp_rate
             a.remaining_qty -= match
             remaining_qty -= match
 
@@ -137,7 +140,8 @@ def calculate_uk_cgt(trades: Iterable[Trade]) -> CgtReport:
                 continue
             match = min(a.remaining_qty, remaining_qty)
             report.matched_bnb.append(_clone_partial(a, match))
-            report.cost += match * a.price
+            bnb_gbp_rate = get_usd_to_gbp_rate(a.timestamp.date())
+            report.cost += match * a.price * bnb_gbp_rate
             a.remaining_qty -= match
             remaining_qty -= match
 
@@ -149,7 +153,8 @@ def calculate_uk_cgt(trades: Iterable[Trade]) -> CgtReport:
                 continue
             if a.remaining_qty <= 0:
                 continue
-            pools[key].add(a.remaining_qty, a.remaining_qty * a.price)
+            pool_gbp_rate = get_usd_to_gbp_rate(a.timestamp.date())
+            pools[key].add(a.remaining_qty, a.remaining_qty * a.price * pool_gbp_rate)
             a.remaining_qty = 0
         if remaining_qty > 0:
             cost = pools[key].take(remaining_qty)
