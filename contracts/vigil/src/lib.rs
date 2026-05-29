@@ -24,6 +24,10 @@ sol! {
     event LiquidationTriggered(uint256 indexed job_id, uint256 indexed position_id, uint64 deadline_block, uint8 priority);
     event LiquidationExecuted(uint256 indexed job_id, address indexed keeper, int256 recovered_collateral_wei, uint16 actual_liquidation_bps);
     event KeeperStaked(address indexed keeper, uint256 stake_amount_wei);
+    // Audit fix (contracts-rust #6): keeper stake was a one-way deposit with no
+    // withdraw path. KeeperUnstaked fires when a keeper recovers its non-slashed
+    // stake and deactivates.
+    event KeeperUnstaked(address indexed keeper, uint256 amount_wei);
     // `reason` was `string`. bytes32 saves about 400 bytes of no_std alloc/format
     // machinery. Off-chain consumers keccak256() the human-readable text.
     event KeeperSlashed(address indexed keeper, uint256 slashed_amount_wei, bytes32 reason);
@@ -82,6 +86,10 @@ sol! {
     /// execute_liquidation (the only mutating fn that makes external calls).
     error VigilPaused();
     error VigilReentrant();
+    // Audit fix (contracts-rust #6): the outbound ETH transfer in withdraw_stake
+    // failed (recipient reverted on receive). Surfaced loudly rather than
+    // silently leaving the stake zeroed-but-not-paid.
+    error WithdrawFailed(address to, uint256 amount);
 }
 
 #[derive(SolidityError)]
@@ -100,6 +108,7 @@ pub enum VigilError {
     PlinthGetMarginVersionFailed(PlinthGetMarginVersionFailed),
     Paused(VigilPaused),
     Reentrant(VigilReentrant),
+    WithdrawFailed(WithdrawFailed),
 }
 
 sol_interface! {
@@ -113,6 +122,8 @@ sol_interface! {
         function getAccount(address user) external view returns (uint256, uint256, uint256, bool);
         function closePosition(uint256 position_id) external returns (int256);
         function getUserPositions(address user) external view returns (uint256[] memory);
+        // Phase 2a: partial liquidation — reduce position by bps fraction
+        function reducePosition(uint256 position_id, uint16 reduction_bps) external returns (int256);
     }
     interface ICoffer {
         function adapterPull(uint256 amount, address from_user, address to) external;
@@ -179,48 +190,39 @@ sol_storage! {
 
 #[public]
 impl Vigil {
-    pub fn initialize(
+    /// Phase 2a: migrated from initialize() to #[constructor] per Plinth pattern.
+    #[constructor]
+    pub fn constructor(
         &mut self,
         plinth: Address,
         coffer: Address,
         portico_registry: Address,
         praetor: Address,
         praetor_timelock: Address,
-    ) -> Result<(), VigilError> {
-        if !self.praetor_multisig.get().is_zero() {
-            return Err(VigilError::Unauthorized(UnauthorizedCaller {
-                caller: self.vm().msg_sender(),
-            }));
-        }
-        // Audit A-4 fix
-        if self.vm().msg_sender().is_zero() {
-            return Err(VigilError::Unauthorized(UnauthorizedCaller {
-                caller: self.vm().msg_sender(),
-            }));
-        }
-        // Audit F-G fix: zero-address admin args would brick the contract.
-        if praetor.is_zero() || praetor_timelock.is_zero() {
-            return Err(VigilError::Unauthorized(UnauthorizedCaller {
-                caller: praetor,
-            }));
-        }
+    ) {
+        assert!(!praetor.is_zero(), "praetor zero");
+        assert!(!praetor_timelock.is_zero(), "timelock zero");
         self.plinth_address.set(plinth);
         self.coffer_address.set(coffer);
         self.portico_registry_address.set(portico_registry);
         self.praetor_multisig.set(praetor);
         self.praetor_timelock.set(praetor_timelock);
 
-        self.params.keeper_min_stake_wei.set(U256::from(1_000u64) * U256::from(10u64).pow(U256::from(18u64)));
+        self.params.keeper_min_stake_wei.set(keeper_min_stake_default());
         self.params.keeper_reward_bps.set(Uint::<16, 1>::from(50u16));
         self.params.slash_window_blocks.set(Uint::<32, 1>::from(7_200u32));
         self.params.max_misses_per_window.set(Uint::<16, 1>::from(3u16));
         self.params.liquidation_window_blocks.set(Uint::<16, 1>::from(30u16));
         self.params.partial_liquidation_max_bps.set(Uint::<16, 1>::from(1_000u16));
-        Ok(())
     }
 
     /// Called by Plinth.update_margin when an account becomes under-collateralized.
     pub fn queue_liquidation(&mut self, user: Address, margin_version: U256) -> Result<U256, VigilError> {
+        // Phase 2a: gate behind pause check. If Vigil is paused during incident
+        // response, new liquidation jobs must not be queued.
+        if self.is_paused.get() {
+            return Err(VigilError::Paused(VigilPaused {}));
+        }
         if self.vm().msg_sender() != self.plinth_address.get() {
             return Err(VigilError::Unauthorized(UnauthorizedCaller {
                 caller: self.vm().msg_sender(),
@@ -352,19 +354,14 @@ impl Vigil {
             }));
         }
 
-        // Execute the liquidation by calling Plinth.close_position
-        //
-        // Audit AAA-3 fix: prior code used `.unwrap_or_default()` which
-        // returns I256::ZERO on Plinth failure. The function then marked
-        // the job COMPLETE, emitted LiquidationExecuted with realized=0,
-        // and the keeper got no reward. **But the Plinth position was
-        // never actually closed** — the user stayed paused with an open
-        // under-collateralized position and the system thought the
-        // liquidation was done. Same "completed-on-paper-only" antipattern
-        // as ZZ-5/6 in Coffer. Now: propagate Err so the job stays open
-        // and a keeper can retry.
+        // Execute the liquidation by calling Plinth.reduce_position for partial
+        // liquidation (Phase 2a fix). Instead of fully closing the position,
+        // reduce it by partial_liquidation_max_bps fraction. This preserves
+        // the user's remaining position and only liquidates enough to restore
+        // margin health.
+        let partial_bps = self.params.partial_liquidation_max_bps.get().to::<u16>();
         let close_ctx = Call::new_mutating(self);
-        let realized = plinth.close_position(self.vm(), close_ctx, job_position_id)
+        let realized = plinth.reduce_position(self.vm(), close_ctx, job_position_id, partial_bps)
             .map_err(|_| VigilError::PlinthCloseFailed(PlinthCloseFailed {
                 job_id,
                 position_id: job_position_id,
@@ -444,6 +441,71 @@ impl Vigil {
             keeper: caller,
             stake_amount_wei: value,
         });
+        Ok(())
+    }
+
+    /// Withdraw a keeper's full non-slashed stake and deactivate.
+    ///
+    /// Audit fix (contracts-rust #6): stake_keeper was #[payable] with NO
+    /// counterpart, so an honest keeper's ETH was a one-way deposit it could
+    /// never recover (and slashed ETH / rewards had no payout path either).
+    /// Guards: the existing is_updating reentrancy flag, plus strict
+    /// checks-effects-interactions - the stake is zeroed, the keeper
+    /// deactivated, and removed from active_keepers BEFORE the external ETH
+    /// transfer, so a re-entrant call finds nothing left. Vigil liquidation
+    /// jobs are open to any active keeper (not assigned per-keeper at queue
+    /// time), so there is no per-keeper in-flight job to lock against here.
+    pub fn withdraw_stake(&mut self) -> Result<(), VigilError> {
+        if self.is_updating.get() {
+            return Err(VigilError::Reentrant(VigilReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.withdraw_stake_inner();
+        self.is_updating.set(false);
+        result
+    }
+
+    fn withdraw_stake_inner(&mut self) -> Result<(), VigilError> {
+        let caller = self.vm().msg_sender();
+        let amount = self.keepers.getter(caller).stake_wei.get();
+        if amount.is_zero() {
+            // Nothing staked to withdraw.
+            return Err(VigilError::KeeperNotActive(KeeperNotActive { keeper: caller }));
+        }
+
+        // Effects first: zero the stake + deactivate before the transfer.
+        {
+            let mut k = self.keepers.setter(caller);
+            k.stake_wei.set(U256::ZERO);
+            k.is_active.set(false);
+        }
+
+        // Remove from active_keepers via swap-remove.
+        let len = self.active_keepers.len();
+        let mut found: Option<usize> = None;
+        for i in 0..len {
+            if self.active_keepers.get(i) == Some(caller) {
+                found = Some(i);
+                break;
+            }
+        }
+        if let Some(i) = found {
+            let last = len - 1;
+            if i != last {
+                if let Some(last_addr) = self.active_keepers.get(last) {
+                    if let Some(mut slot) = self.active_keepers.setter(i) {
+                        slot.set(last_addr);
+                    }
+                }
+            }
+            self.active_keepers.pop();
+        }
+
+        // Interaction last: return the non-slashed stake to the keeper.
+        stylus_sdk::call::transfer::transfer_eth(self.vm(), caller, amount)
+            .map_err(|_| VigilError::WithdrawFailed(WithdrawFailed { to: caller, amount }))?;
+
+        self.vm().log(KeeperUnstaked { keeper: caller, amount_wei: amount });
         Ok(())
     }
 
@@ -618,6 +680,22 @@ impl Vigil {
         self.vm().log(VigilResumedEvent { block_number: block_now });
         Ok(())
     }
+}
+
+// Phase 2a: feature-flagged keeper minimum stake.
+// `testnet-stake` feature reduces the minimum from 1000 ETH to 0.01 ETH
+// so keepers can actually stake on Arbitrum Sepolia (faucet caps ~0.1 ETH).
+// Mainnet builds MUST NOT enable this feature.
+#[cfg(feature = "testnet-stake")]
+fn keeper_min_stake_default() -> U256 {
+    // 0.01 ETH = 10^16 wei
+    U256::from(10_000_000_000_000_000u64)
+}
+
+#[cfg(not(feature = "testnet-stake"))]
+fn keeper_min_stake_default() -> U256 {
+    // 1000 ETH = 1000 * 10^18 wei
+    U256::from(1_000u64) * U256::from(10u64).pow(U256::from(18u64))
 }
 
 // NMS ordering helper (audit A-7 fix).
