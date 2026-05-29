@@ -1,6 +1,5 @@
-import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
+import { CodexLiveStatus, CodexTryIt } from '@/components/docs/codex-live';
 
 /**
  * /docs/api  Codex x402 API reference. Phase eta.8 (2026-05-25).
@@ -99,7 +98,10 @@ export default function CodexDocsPage() {
       <div className="mx-auto max-w-4xl">
 
       <section className="mt-16">
-        <p className="eyebrow">Codex API</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="eyebrow">Codex API</p>
+          <CodexLiveStatus />
+        </div>
         <h1 className="mt-2 font-display text-5xl italic text-ink">x402-payable . onchain queries</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Codex is the read-side API surface for Atrium. Eight endpoints expose margin, positions,
@@ -138,6 +140,11 @@ curl -H "X-PAYMENT: $X402_TOKEN" \\
 # Headers: X-Codex-Key-Id: 1
 #          X-Codex-Signature: 0xabc...`}
         </pre>
+      </Section>
+
+      {/* Try it */}
+      <Section title="Try it">
+        <CodexTryIt />
       </Section>
 
       {/* Authentication */}
@@ -248,9 +255,12 @@ data = r.json()`}
       </Section>
 
       <footer className="mt-16 border-t border-divider pt-6 text-xs text-muted">
-        Codex source: <code className="font-mono text-ink">services/codex/</code> .
-        Phase eta.8 docs page; live status pulled from{' '}
-        <code className="font-mono">/api/codex/health</code> once that endpoint lands.
+        <p>Pricing set by Praetor governance. See <code className="font-mono text-ink">docs/MASTER_PLAN.md</code> Phase 6.</p>
+        <p className="mt-2">
+          Codex source: <code className="font-mono text-ink">services/codex/</code> .
+          Phase eta.8 docs page; live status pulled from{' '}
+          <code className="font-mono">/api/codex/health</code> once that endpoint lands.
+        </p>
       </footer>
       </div>
     </MarketingShell>
