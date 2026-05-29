@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { arbiscanAddressUrl, arbiscanTxUrl } from '@/lib/arbiscan';
@@ -89,6 +89,15 @@ export function SessionKeysView() {
   const expiredCount = keys.filter((k) => k.expired).length;
   const deployed = Boolean(registryAddress);
 
+  // Reactively refresh the list when the prune tx actually confirms on-chain,
+  // instead of guessing a delay with setTimeout (the no-fake-latency invariant
+  // bans timers; waiting on the receipt is both correct and timer-free).
+  const cleanHash = clean.kind === 'success' ? clean.hash : undefined;
+  const { isSuccess: pruneConfirmed } = useWaitForTransactionReceipt({ hash: cleanHash });
+  useEffect(() => {
+    if (pruneConfirmed) refetch();
+  }, [pruneConfirmed, refetch]);
+
   async function cleanExpired() {
     if (!account || !registryAddress) {
       setClean({ kind: 'error', reason: 'wallet_not_connected' });
@@ -103,8 +112,6 @@ export function SessionKeysView() {
         args: [account],
       });
       setClean({ kind: 'success', hash });
-      // Let the prune confirm, then refresh the list.
-      setTimeout(() => refetch(), 4_000);
     } catch (e) {
       setClean({ kind: 'error', reason: e instanceof Error ? e.message : 'unknown_error' });
     }
