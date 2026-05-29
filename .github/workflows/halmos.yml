@@ -1,0 +1,65 @@
+name: Halmos Symbolic Execution
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "tests/halmos/**"
+      - "contracts/**"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "tests/halmos/**"
+      - "contracts/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: halmos-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  halmos:
+    name: Halmos proofs
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773 # v1.2.0
+
+      - uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Install Halmos
+        run: pip install halmos==0.2.1
+
+      - name: Build contracts
+        run: forge build
+
+      - name: Run Halmos proofs
+        run: |
+          halmos --root . \
+            --contract PlinthMathHalmosTest \
+            --contract CofferRoundTripHalmosTest \
+            --contract SigilNonceMonotonicityHalmosTest \
+            --contract AtriumRouterPreconditionsHalmosTest \
+            --solver-timeout-assertion 60000 \
+            --test-parallel \
+            --statistics
+
+      - name: Discord notification on failure
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: sarisia/actions-status-discord@4138d2d190a466c986fe9842407284d9fc3e7793 # v1.14.3
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_CI }}
+          title: "Halmos proofs FAILED"
+          description: "Symbolic execution found a counterexample. Check the run."
+          color: 0xff0000
+          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

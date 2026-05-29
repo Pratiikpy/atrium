@@ -1,0 +1,46 @@
+owner: atrium-protocol
+repo: atrium
+
+workflowSchedule:
+  graphs: "0 0 * * *"
+  responseTime: "0 23 * * *"
+  staticSite: "0 1 * * *"
+  summary: "*/5 * * * *"
+  updateTemplate: "0 0 * * *"
+  updates: "0 3 * * *"
+
+sites:
+  - name: Verify (production)
+    url: https://verify.atrium.fi
+  - name: Codex API
+    url: https://codex.atrium.fi/healthz
+  - name: Tablet (tax service)
+    url: https://tablet.atrium.fi/healthz
+  - name: Scribe (subgraph)
+    url: $SCRIBE_URL
+    method: POST
+    headers:
+      - "Content-Type: application/json"
+    body: '{"query":"{ _meta { block { number } } }"}'
+  - name: Atrium docs
+    url: https://atrium.fi
+  - name: Lantern Attestor
+    url: https://lantern-attestor.atrium.fi/api/cron
+    method: GET
+  - name: Subgraph (proxied)
+    url: https://verify.atrium.fi/api/scribe/health
+
+status-website:
+  cname: status.atrium.fi
+  logoUrl: https://atrium.fi/brand/atrium-wordmark.svg
+  name: Atrium status
+  introTitle: Atrium status
+  introMessage: Live uptime for Atrium services. Updates every 5 minutes.
+  navbar:
+    - title: Status
+      href: /
+    - title: GitHub
+      href: https://github.com/atrium-protocol/atrium
+  themeConfig:
+    colors:
+      primary: "#FBFAF7"

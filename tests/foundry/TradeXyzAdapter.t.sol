@@ -124,7 +124,7 @@ contract TradeXyzAdapterTest is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
         assertTrue(adapter.is_authorized_caller(router_));
     }

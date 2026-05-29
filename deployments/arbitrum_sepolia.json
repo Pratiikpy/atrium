@@ -15,6 +15,7 @@
     "lantern-attestor": {
       "address": "0xF0B90b94C0B8a52c545768bFf06a3932c67d5888",
       "tx": "0x9ddd82d326fae6210b04146efaca45c333e8c5d46906f784ce0956a19a0f7ef4",
+      "block": 270918668,
       "deployed_at": "2026-05-25T20:00:00.000Z",
       "kind": "solidity",
       "version": "v2",

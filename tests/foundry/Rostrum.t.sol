@@ -33,6 +33,9 @@ contract RostrumTest is Test {
         hostile = makeAddr("hostile");
         plinth = new MockPlinth();
         rostrum = new Rostrum(address(plinth), praetor, timelock);
+        // Approve test contract as keeper so mirrorOpen calls succeed
+        vm.prank(timelock);
+        rostrum.setApprovedKeeper(address(this), true);
     }
 
     // ── follow() param validation ─────────────────────────────────────
@@ -714,6 +717,9 @@ contract RostrumTest is Test {
         MaliciousReentrantPlinth malPlinth = new MaliciousReentrantPlinth();
         Rostrum rost = new Rostrum(address(malPlinth), praetor, timelock);
         malPlinth.setTarget(rost);
+        // Approve test contract as keeper so mirrorOpen calls succeed
+        vm.prank(timelock);
+        rost.setApprovedKeeper(address(this), true);
 
         // Set up follower account state through the malicious plinth's
         // getAccount return values — collateral > required so available > 0.

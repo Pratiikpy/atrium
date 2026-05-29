@@ -32,17 +32,9 @@ const HANDLERS_DIR = path.join(REPO_ROOT, 'subgraph', 'src');
 // reason. Keep tight; the gate's value is forcing a decision per entity.
 const WRITER_IGNORE = new Map([
   // Atrium's Cohort program is currently human-curated; no on-chain Cohort
-  // contract exists in Year-1. The CohortPartner entity is queried by the
-  // verify-app's /cohort surfaces; until an on-chain registration event
-  // ships, the surfaces honestly show "0 partners". When the contract
-  // lands, add a data source + handler + remove this allow-list entry.
-  ['CohortPartner', 'planned: needs on-chain Cohort contract + registration event (Year-1 is human-curated)'],
-  // Counter is a planned aggregation entity — the existing apps/verify
-  // lib/scribe.ts comment acknowledges "needs Counter @entity aggregation
-  // added to mapping handlers". Cross-handler aggregate work; tracked but
-  // not blocking testnet launch. The verify-app's LiveCounter component
-  // falls back to direct RPC counts in the meantime.
-  ['Counter', 'planned: cross-handler aggregate; LiveCounter uses RPC fallback today'],
+  // contract exists in Year-1. See docs/MASTER_PLAN.md Section 8.1 for the
+  // mainnet path. For testnet, /api/cohort/partners returns empty honestly.
+  ['CohortPartner', 'deferred: on-chain Cohort contract is mainnet work (docs/MASTER_PLAN.md Section 8.1)'],
 ]);
 
 const ENTITY_DECL_RE = /^type\s+(\w+)\s+@entity/gm;

@@ -28,7 +28,8 @@ contract PhaseB2 is Script {
             PLINTH_STYLUS,
             COFFER_STYLUS,
             PORTICO_REGISTRY,
-            deployer            // praetor (testnet = deployer EOA)
+            deployer,           // praetor (testnet = deployer EOA)
+            PRAETOR_TIMELOCK
         );
         console.log("AtriumRouter:    ", address(router));
 

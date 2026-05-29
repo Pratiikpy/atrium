@@ -102,7 +102,7 @@ contract MorphoBlueAdapterTest is Test {
     }
 
     function test_setAuthorizedCaller_succeedsFromPraetor() public {
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(makeAddr("router"), true);
         assertTrue(adapter.is_authorized_caller(makeAddr("router")));
     }
@@ -128,7 +128,7 @@ contract MorphoBlueAdapterTest is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
     }
 

@@ -88,15 +88,15 @@ contract AqueductTest is Test {
         vm.stopPrank();
     }
 
-    function test_resume_onlyPraetor() public {
+    function test_resume_onlyTimelock() public {
         vm.prank(praetor);
         aqueduct.pause(keccak256(bytes("p")));
 
-        vm.prank(timelock);
+        vm.prank(praetor);
         vm.expectRevert(Aqueduct.Unauthorized.selector);
         aqueduct.resume();
 
-        vm.prank(praetor);
+        vm.prank(timelock);
         aqueduct.resume();
         assertFalse(aqueduct.is_paused());
     }
@@ -122,7 +122,7 @@ contract AqueductTest is Test {
         // identical second send in the same block → replay nonce caught.
         // Audit U-6 fix: explicit selector so a different revert path
         // (e.g. USDC allowance, mock router) fails the test loudly.
-        bytes32 expectedNonce = keccak256(abi.encode(user, uint256(1_000_000), block.number, destUser));
+        bytes32 expectedNonce = keccak256(abi.encode(user, uint256(1_000_000), block.number, destUser, uint64(1)));
         vm.expectRevert(abi.encodeWithSelector(Aqueduct.ReplayDetected.selector, expectedNonce));
         aqueduct.send_collateral(1, destUser, 1_000_000, block.timestamp + 1 hours);
         vm.stopPrank();
@@ -506,8 +506,8 @@ contract AqueductTest is Test {
         aqueduct.pause(keccak256(bytes("test")));
 
         vm.expectEmit(true, false, false, false, address(aqueduct));
-        emit Resumed(praetor);
-        vm.prank(praetor);
+        emit Resumed(timelock);
+        vm.prank(timelock);
         aqueduct.resume();
     }
 

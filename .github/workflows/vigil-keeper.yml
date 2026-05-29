@@ -1,26 +1,26 @@
 name: Atrium vigil-keeper — 5-minute cron loop
 
-# Mirror of agents-cron.yml: GHA's tightest cron cadence is 5 min, which
-# matches the Vigil liquidation_window_blocks parameter (30 blocks ~ 2 min
-# on Arbitrum Sepolia plus a buffer). Each tick polls Scribe for paused
-# MarginAccounts and logs intended actions; real execute_liquidation calls
-# unblock once Vigil supports a configurable keeper_min_stake (Year-2;
-# current contract hardcodes 1000 ETH on testnet, see
-# services/vigil-keeper/src/tick.ts docstring + human_left.md).
-
 on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   tick:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: 20
           cache: pnpm
@@ -32,3 +32,11 @@ jobs:
           DEPLOYMENT_REGISTRY_URL: https://verify.atrium.fi/deployments/arbitrum_sepolia.json
           KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
         run: pnpm --filter @atrium/vigil-keeper tick
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

@@ -25,6 +25,5 @@ attack pre-condition. -->
 
 ## Bounty preference
 
-- [ ] I'd like to be considered for the bug-bounty program (Year-1
-      Immunefi standard tier, $25K ceiling)
+- [ ] I'd like to be considered for the [bug bounty program](https://verify.atrium.fi/security/bounty)
 - [ ] No bounty needed — just want it fixed

@@ -102,7 +102,7 @@ When adding a new subsystem:
 - Never store private keys in the repo, in env files committed to git, or in CI logs
 - Never accept an oracle price without a freshness and tolerance check
 - Never let a contract upgrade ship without the post upgrade smoke test
-- Never run `git push --no-verify` without explicit written approval from the user
+- Never run `git push --no-verify` without explicit written approval from the engineering leads
 - Never assume mainnet contracts behave the same as their testnet counterparts. Test on the actual target chain.
 
 ## What to do when something looks wrong

@@ -54,8 +54,8 @@ contract AdapterCloseTransferTest is Test {
         adapter.addInstrument(AAPL_PERP, 200, 1_000, 500);
 
         // Authorize caller used in the open path (defaults to onlyCoffer +
-        // additional setAuthorizedCaller adds via Praetor).
-        vm.prank(praetor);
+        // additional setAuthorizedCaller adds via Timelock).
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(address(this), true);
     }
 

@@ -31,6 +31,7 @@ contract RouterV11RoutingTest is Test {
 
     address internal user;
     address internal praetor;
+    address internal timelock;
 
     uint8 internal constant V11_VENUE = 1;
     uint8 internal constant V10_VENUE = 2;
@@ -40,6 +41,7 @@ contract RouterV11RoutingTest is Test {
     function setUp() public {
         user = makeAddr("user");
         praetor = makeAddr("praetor");
+        timelock = makeAddr("timelock");
 
         usdc = new MockERC20("USDC", 6);
         plinth = new FakePlinth();
@@ -49,7 +51,7 @@ contract RouterV11RoutingTest is Test {
         v11 = new FakeAdapterV11();
         v10 = new FakeAdapterV10();
 
-        router = new AtriumRouter(address(plinth), address(coffer), address(registry), praetor);
+        router = new AtriumRouter(address(plinth), address(coffer), address(registry), praetor, timelock);
 
         coffer.setApprovedAdapter(address(router), true);
         registry.setAdapter(V11_VENUE, address(v11));

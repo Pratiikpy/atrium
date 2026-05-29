@@ -11,19 +11,18 @@ import {Script, console} from "forge-std/Script.sol";
 ///         `close_position` from the Router with `Unauthorized()`. The
 ///         Router needs to be flipped on once per adapter.
 ///
-///         `setAuthorizedCaller(address, bool)` is `onlyPraetor` — direct
-///         multisig call, NOT timelock-gated. Year-1 the praetor key is
-///         the deployer EOA; post-#342 it is the 3-of-5 Safe.
+///         `setAuthorizedCaller(address, bool)` is `onlyTimelock` — must be
+///         called via PraetorTimelock (48h veto window). Phase 2b changed
+///         all 9 adapters from onlyPraetor to onlyTimelock per MASTER_PLAN §6.2.
 ///
-///         Two run modes:
-///           1. ONE-OF-ONE (Year-1 today): `forge script ... --broadcast`
-///              with `DEPLOYER_PRIVATE_KEY` set. Submits all 8 txs
-///              directly.
-///           2. SAFE BATCH (post-#342): `forge script ... --sig "encode()"`
-///              prints (target, calldata) pairs. Paste each into the
-///              Gnosis Safe transaction builder; sign with 3 of 5.
+///         IMPORTANT: This script is DEPRECATED for production use. Use
+///         `services/praetor-cli/src/commands/setup-stylus-adapters.ts`
+///         which routes through timelock-schedule → timelock-execute.
 ///
-///         No timelock window — same-block effect once mined.
+///         For testnet bootstrapping only (deployer == timelock admin),
+///         the script can still be run with the deployer key if the
+///         PraetorTimelock.execute() path is used, or if the deployer
+///         is temporarily set as the timelock executor.
 ///
 ///         Verification: `cast call <adapter> "is_authorized_caller(address)(bool)" <router>`
 ///         returns `true` for all 8.

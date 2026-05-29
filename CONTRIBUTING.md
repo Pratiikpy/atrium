@@ -11,10 +11,10 @@ The adapter interface is in `contracts/portico-registry/src/IPorticoAdapter.sol`
 To submit:
 
 1. Implement `IPorticoAdapter v1.0` for your venue.
-2. Pass the 6 conformance tests in `tests/adapter-conformance/`.
+2. Pass the 6 conformance tests in `tests/adapter-conformance/`. (Test suite ships in Phase 9 of `docs/MASTER_PLAN.md`. PRs without it will be reviewed manually against `IPorticoAdapter v1.0` until then.)
 3. Open a PR with the adapter contract, tests, README, and a sample transaction trace.
 4. Curator review (3 reviewers from 3 independent organizations) within 30 days.
-5. On acceptance: $5K ARB grant and whitelisting on PorticoRegistry.
+5. On acceptance: grant from the Praetor treasury, payable post-mainnet. Grant program activates after testnet launch. Until then, contributors are credited in CHANGELOG.md and the public hall of fame.
 
 ### 2. Build a reference agent
 
@@ -27,7 +27,7 @@ To submit:
 3. Run for 30 days on testnet with public Rostrum leaderboard entry.
 4. Open a PR with code, README, and 30-day performance summary.
 5. Curator review within 30 days.
-6. On acceptance: $5K ARB grant.
+6. On acceptance: grant from the Praetor treasury, payable post-mainnet. Grant program activates after testnet launch. Until then, contributors are credited in CHANGELOG.md and the public hall of fame.
 
 Target: 3 community adapters by Day 180; 5 community agents by Day 180.
 
@@ -49,9 +49,9 @@ Target: 3 community adapters by Day 180; 5 community agents by Day 180.
 6. CI must be green. At least one code review.
 7. Squash merge to main.
 
-## No AI coauthor lines
+## No automated attribution lines
 
-Never add `Co-authored-by: Claude` or similar to commits. See `docs/conventions/git.md`.
+Do not add automated tool attribution or AI coauthor lines to commit messages. See `docs/conventions/git.md`.
 
 ## License
 

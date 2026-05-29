@@ -1,35 +1,26 @@
 name: lantern-cron
 
-# Phase theta.3 fix (2026-05-25). Pre-fix Lantern attestation publishing
-# ran via Vercel Cron on `0 12 * * *` (daily 12:00 UTC). The verify-app's
-# /lantern dashboard renders `isStale: true` once the latest attestation
-# is older than 130 minutes, so a once-a-day cron flagged Lantern stale
-# for ~22.8h out of every 24h — silently shipping "stale" while the
-# attestation service was healthy.
-#
-# Vercel Hobby caps cron at daily granularity. GHA supports per-minute
-# scheduling, so the cron moves here. The Vercel cron entry in
-# services/lantern-attestor/vercel.json is removed in the same commit
-# to avoid double-publishing.
-#
-# Cadence: every 10 minutes. The 130-min staleness threshold gives us
-# 13 successful cron ticks of headroom before the dashboard alerts —
-# enough buffer that a single GHA runner queue delay does not page.
-
 on:
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9 }
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: '20'
           cache: pnpm
@@ -37,9 +28,6 @@ jobs:
       - name: Trigger Lantern publish
         run: pnpm --filter @atrium/lantern-attestor publish-now
         env:
-          # The lantern-attestor service reads these from its own env at
-          # runtime. Vercel deploy carried them too; the GHA cron now
-          # owns the trigger and inherits the same secret names.
           SCRIBE_URL:                 ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC:       ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
           LANTERN_SIGNER_KEY:         ${{ secrets.LANTERN_SIGNER_KEY }}
@@ -47,15 +35,11 @@ jobs:
           WEB3_STORAGE_TOKEN:         ${{ secrets.WEB3_STORAGE_TOKEN }}
           COFFER_ADDR:                ${{ secrets.COFFER_ADDR }}
           USDC_ADDR:                  ${{ secrets.USDC_ADDR }}
-
-      # Single shared failure-fanout step. Posts to the ops Discord webhook
-      # when publish fails so a stuck cron paginates within one tick rather
-      # than waiting for the /lantern dashboard staleness banner.
       - name: Notify ops on failure
         if: failure()
         run: |
-          curl -fsS -X POST "$DISCORD_OPS_WEBHOOK" \
-            -H 'Content-Type: application/json' \
-            -d "{\"content\":\"🚨 lantern-cron FAILED (run ${GITHUB_RUN_ID}). See ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

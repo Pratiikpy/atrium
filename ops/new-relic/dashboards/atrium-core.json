@@ -1,0 +1,48 @@
+{
+  "name": "Atrium Core Flow Latency",
+  "description": "Request latency, error rates, and Web Vitals for verify.atrium.fi",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Overview",
+      "widgets": [
+        {
+          "title": "Request Latency p50/p95 per Route",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT percentile(duration, 50, 95) FROM Transaction FACET request.uri TIMESERIES AUTO SINCE 1 hour ago" }
+            ]
+          }
+        },
+        {
+          "title": "Error Rate per Route",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT percentage(count(*), WHERE error IS true) FROM Transaction FACET request.uri TIMESERIES AUTO SINCE 1 hour ago" }
+            ]
+          }
+        },
+        {
+          "title": "Top Slowest Endpoints",
+          "visualization": { "id": "viz.bar" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT average(duration) FROM Transaction FACET request.uri SINCE 1 hour ago LIMIT 10" }
+            ]
+          }
+        },
+        {
+          "title": "Web Vitals (LCP, FID, CLS)",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT average(largestContentfulPaint) as 'LCP', average(firstInputDelay) as 'FID', average(cumulativeLayoutShift) as 'CLS' FROM PageViewTiming TIMESERIES AUTO SINCE 1 hour ago" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

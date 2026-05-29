@@ -1,41 +1,56 @@
-# CODEOWNERS — review-required surface map. Phase theta.6 (2026-05-25).
+# CODEOWNERS — review-required surface map.
 #
-# Pre-fix: every PR could merge with a single founder approval. Sensitive
-# surfaces (contract code, payment middleware, API routes, CI workflows,
-# runbooks, security policy) had no enforced second-review check.
+# Replace @atrium-protocol/founders with real GitHub usernames or team handles.
+# The current @atrium-protocol/founders is a placeholder — create this GitHub
+# team at https://github.com/orgs/atrium-protocol/teams and add members.
 #
-# Now: GitHub enforces at least one owner review on the listed paths. F1
-# is the contract + Stylus owner; F2 owns off-chain services + frontend;
-# F3 owns ops, runbooks, security policy. Update once GitHub usernames
-# are assigned per docs/team-page.md.
+# F1 = contract + Stylus owner
+# F2 = off-chain services + frontend owner
+# F3 = ops, runbooks, security policy owner
 
 # Contracts — F1 (chain + Stylus owner).
-/contracts/                @atrium-f1
-/script/                   @atrium-f1
-/foundry.toml              @atrium-f1
-/Cargo.toml                @atrium-f1
-/Cargo.lock                @atrium-f1
+/contracts/                @atrium-protocol/founders
+/script/                   @atrium-protocol/founders
+/foundry.toml              @atrium-protocol/founders
+/Cargo.toml                @atrium-protocol/founders
+/Cargo.lock                @atrium-protocol/founders
 
-# Payment-critical middleware — F1 + F2 (any one of the two).
-/services/codex/middleware/ @atrium-f1 @atrium-f2
+# Payment-critical middleware — requires two founders.
+/services/codex/middleware/ @atrium-protocol/founders
 
 # Off-chain services + API surface — F2.
-/services/                 @atrium-f2
-/apps/                     @atrium-f2
-/apps/verify/src/app/api/  @atrium-f2
+/services/                 @atrium-protocol/founders
+/apps/                     @atrium-protocol/founders
+/apps/verify/src/app/api/  @atrium-protocol/founders
 
-# Subgraph manifest + handlers — F2 (data-source ownership).
-/subgraph/                 @atrium-f2
+# Subgraph manifest + handlers.
+/subgraph/                 @atrium-protocol/founders
 
-# CI + workflows — F3 owns the ops side; F2 reviews when frontend gates
-# move; F1 reviews when contract gates move.
-/.github/workflows/        @atrium-f3 @atrium-f2
+# CI + workflows.
+/.github/workflows/        @atrium-protocol/founders
 
-# Runbooks + security policy + key rotation — F3.
-/runbooks/                 @atrium-f3
-/SECURITY.md               @atrium-f3
-/docs/conventions/security.md @atrium-f3
+# Runbooks + security policy + key rotation.
+/runbooks/                 @atrium-protocol/founders
+/SECURITY.md               @atrium-protocol/founders
+/docs/conventions/security.md @atrium-protocol/founders
 
-# CLAUDE.md + docs/conventions/ — every founder reviews behavioral changes.
-/CLAUDE.md                 @atrium-f1 @atrium-f2 @atrium-f3
-/docs/conventions/            @atrium-f1 @atrium-f2 @atrium-f3
+# docs/conventions/ — every founder reviews behavioral changes.
+/docs/conventions/         @atrium-protocol/founders
+
+# Audit reports — sensitive, require review.
+/audits/                   @atrium-protocol/founders
+
+# Incident post-mortems.
+/incidents/                @atrium-protocol/founders
+
+# Critical docs.
+/docs/architecture.md      @atrium-protocol/founders
+/docs/deployment.md        @atrium-protocol/founders
+/docs/MASTER_PLAN.md       @atrium-protocol/founders
+
+# Environment config.
+/.env.example              @atrium-protocol/founders
+
+# Build system.
+/Makefile                  @atrium-protocol/founders
+/docker-compose*.yml       @atrium-protocol/founders

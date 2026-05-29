@@ -1,25 +1,28 @@
 name: notifier-cron
 
-# Phase eta.5: notifier service polls Scribe every minute for new
-# alert-class events and fans them out via Telegram / Discord /
-# email / custom webhook per per-user preferences.
+# Decommissioned 2026-05-28: notifier daemon now runs on DigitalOcean
+# droplet (Phase 7). This workflow remains as `workflow_dispatch:` only
+# for emergency manual triggers.
 
 on:
-  schedule:
-    # 1-minute cadence is GHA's tightest. Notifier is idempotent
-    # via the Vercel KV last-block cursor, so over-runs are safe.
-    - cron: '* * * * *'
   workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   tick:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9 }
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: '20'
           cache: pnpm
@@ -33,3 +36,11 @@ jobs:
           ATRIUM_KV_REST_TOKEN:     ${{ secrets.ATRIUM_KV_REST_TOKEN }}
           TELEGRAM_BOT_TOKEN:       ${{ secrets.TELEGRAM_BOT_TOKEN }}
           RESEND_API_KEY:           ${{ secrets.RESEND_API_KEY }}
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

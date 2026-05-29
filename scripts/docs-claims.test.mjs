@@ -11,7 +11,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /**
  * Iter 81 audit fix: pins documentation-vs-filesystem consistency.
  *
- * README.md and CLAUDE.md make structural claims — "code lives at X",
+ * README.md makes structural claims — "code lives at X",
  * "see file Y", "the layout is Z". A future rename / move would
  * silently leave docs pointing at vanished paths. New contributors
  * read the README first; broken-link rot here is the worst onboarding
@@ -23,10 +23,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
  */
 
 const FUTURE_STATE_PATHS = new Map([
-  // Deploy script writes this on first contract deploy. Until then the
-  // path is documented but doesn't exist. praetor-cli's load_address
-  // creates the file when registering a contract address.
-  ['deployments/arbitrum_sepolia.json', 'created by `praetor deploy` on first deploy'],
+  // No future-state paths currently in README.md
 ]);
 
 function extractBacktickedPaths(text) {
@@ -72,19 +69,6 @@ describe('README.md — every backticked file path exists', () => {
   });
 });
 
-describe('CLAUDE.md — every backticked file path exists', () => {
-  it('all CLAUDE.md file-path references resolve on disk', async () => {
-    const text = await readDoc('CLAUDE.md');
-    const paths = extractBacktickedPaths(text);
-    assert.ok(paths.length > 0);
-    const missing = paths.filter((p) => !existsSync(resolve(REPO_ROOT, p)) && !FUTURE_STATE_PATHS.has(p));
-    assert.deepEqual(
-      missing,
-      [],
-      `CLAUDE.md references paths that do not exist: ${missing.join(', ')}`,
-    );
-  });
-});
 
 describe('README.md — repo layout ASCII tree directories all exist', () => {
   it('every directory line in the "Repo layout" tree resolves', async () => {
@@ -125,31 +109,4 @@ describe('README.md — repo layout ASCII tree directories all exist', () => {
   });
 });
 
-describe('CLAUDE.md — desing prototype HTML files exist', () => {
-  it('both prototype HTML files exist (Prototype UI contract)', () => {
-    // CLAUDE.md says "Study every HTML file in design/". The two specific
-    // files referenced by name MUST exist or the UI scaffolding has no
-    // source of truth.
-    assert.ok(existsSync(resolve(REPO_ROOT, 'design/Atrium.html')));
-    assert.ok(existsSync(resolve(REPO_ROOT, 'design/Atrium App.standalone.html')));
-  });
 
-  it('extracted tokens files exist (referenced by UI scaffolding)', () => {
-    assert.ok(existsSync(resolve(REPO_ROOT, 'design/extracted/tokens.json')));
-    assert.ok(existsSync(resolve(REPO_ROOT, 'design/extracted/full-render-tokens.json')));
-  });
-});
-
-describe('CLAUDE.md — rules files exist', () => {
-  it('every docs/conventions/*.md file referenced exists', () => {
-    // CLAUDE.md "Detailed rules" table names 5 rule files. Each must exist.
-    const rules = ['ui.md', 'testing.md', 'security.md', 'git.md', 'writing.md'];
-    for (const rule of rules) {
-      const p = `docs/conventions/${rule}`;
-      assert.ok(
-        existsSync(resolve(REPO_ROOT, p)),
-        `CLAUDE.md references ${p} which doesn't exist`,
-      );
-    }
-  });
-});

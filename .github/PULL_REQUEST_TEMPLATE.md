@@ -34,3 +34,7 @@ fine for component-level work. -->
       (docs/conventions/ui.md, if UI changes)
 - [ ] No new dependency without justification
 - [ ] Commit body explains the "why", not the "what"
+- [ ] No deployed-contract ABI change (or migration plan documented)
+- [ ] Findings closed (list IDs from `docs/plan-tracker.md`)
+- [ ] Tests added/updated for changed behavior
+- [ ] Documentation updated for user-visible changes

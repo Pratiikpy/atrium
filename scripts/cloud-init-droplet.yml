@@ -1,0 +1,55 @@
+#cloud-config
+# Atrium daemons droplet — first-boot provisioning.
+# Applied automatically when provision-do-droplet.sh creates the droplet.
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - jq
+  - curl
+  - git
+  - ufw
+  - unzip
+
+runcmd:
+  # --- Node 20 via NodeSource ---
+  - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  - apt-get install -y nodejs
+
+  # --- pnpm ---
+  - npm install -g pnpm@9
+
+  # --- pm2 ---
+  - npm install -g pm2
+  - pm2 startup systemd -u root --hp /root
+
+  # --- Doppler CLI ---
+  - curl -sLf --retry 3 --tlsv1.2 --proto "=https" "https://cli.doppler.com/install.sh" | sh
+
+  # --- Caddy (reverse proxy with auto-TLS) ---
+  - apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+  - apt-get update
+  - apt-get install -y caddy
+
+  # --- UFW firewall ---
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw --force enable
+
+  # --- Create service directories ---
+  - mkdir -p /etc/atrium
+  - mkdir -p /opt/atrium
+
+write_files:
+  - path: /etc/atrium/README
+    content: |
+      Atrium daemons droplet.
+      Service tokens go in /etc/atrium/<service>.env
+      App code lives in /opt/atrium (clone the repo here).
+      See: runbooks/do-droplet-setup.md

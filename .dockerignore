@@ -63,7 +63,7 @@ Thumbs.db
 .vscode/
 
 # Founder personal notes (also gitignored)
-my convo with one ai agent.txt
+*convo*.txt
 read this.txt
 think_data.md
 atrium-site-tokens.json

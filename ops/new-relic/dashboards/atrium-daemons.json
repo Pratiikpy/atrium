@@ -1,0 +1,48 @@
+{
+  "name": "Atrium Daemons",
+  "description": "Notifier, Lantern, Vigil-keeper, and Agent tick health",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Daemons",
+      "widgets": [
+        {
+          "title": "Notifier Tick Rate",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT count(*) FROM Transaction WHERE name = 'notifier-tick' TIMESERIES 5 minutes SINCE 6 hours ago" }
+            ]
+          }
+        },
+        {
+          "title": "Lantern Publish Rate",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT count(*) FROM Transaction WHERE name = 'lantern-publish' TIMESERIES 10 minutes SINCE 6 hours ago" }
+            ]
+          }
+        },
+        {
+          "title": "Vigil-Keeper Tick Rate",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT count(*) FROM Transaction WHERE name = 'vigil-keeper-tick' TIMESERIES 5 minutes SINCE 6 hours ago" }
+            ]
+          }
+        },
+        {
+          "title": "Agent Ticks (all)",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT count(*) FROM Transaction WHERE name LIKE 'agent-%' FACET name TIMESERIES 10 minutes SINCE 6 hours ago" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

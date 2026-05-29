@@ -92,7 +92,7 @@ contract PhaseC is Script {
         console.log("PolymarketAdapter:     ", address(poly));
 
         // ---- 8. Synthetix V3 ----
-        // _atrium_account_id = 1 (single-account placeholder per CLAUDE.md).
+        // _atrium_account_id = 1 (single-account placeholder per development conventions).
         SynthetixV3Adapter synth = new SynthetixV3Adapter(
             venuePlaceholder, USDC, COFFER, deployer, PRAETOR_TIMELOCK, uint128(1)
         );

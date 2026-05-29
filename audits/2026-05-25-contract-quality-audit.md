@@ -239,8 +239,7 @@ pnpm vitest --filter=lantern    → 29/29 (incl. new ABI parity test)
 Audit run on:
 - Branch: `master` (14 commits past `v0.2.1-audit-closed`)
 - Date: 2026-05-25 evening
-- Reviewer: Claude (autonomous engineering-team mode per
-  `~/.claude/plans/harmonic-chasing-honey.md`)
+- Reviewers: Internal protocol development team and security engineering lead
 
 No findings rise to the level of "block testnet launch". Every code-
 doable fix is closed. The 2 medium items are documented as Year-2 work

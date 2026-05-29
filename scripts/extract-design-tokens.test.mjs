@@ -82,7 +82,7 @@ describe('CONFIRMED_TOKENS — shape contract for UI scaffolding', () => {
   });
 
   it('typography stack names the Instrument Serif display font', () => {
-    // CLAUDE.md Prototype UI contract: "Preserve the Atrium wordmark
+    // Prototype UI contract: "Preserve the Atrium wordmark
     // treatment: Instrument Serif, italic". A refactor that drops this
     // font would visually drift from the prototype contract.
     assert.ok(CONFIRMED_TOKENS.typography.display.includes('Instrument Serif'));

@@ -2,7 +2,7 @@
 src = "contracts"
 out = "foundry-out"
 libs = ["resources/openzeppelin-contracts/contracts", "resources/account-abstraction/contracts", "resources/chainlink-brownie-contracts/contracts"]
-test = "tests/foundry"
+test = "tests"
 cache_path = ".forge-cache"
 solc = "0.8.28"
 optimizer = true

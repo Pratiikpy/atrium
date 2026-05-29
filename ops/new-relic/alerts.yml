@@ -1,0 +1,82 @@
+# New Relic Alert Policy — Atrium Observability (Phase 12)
+#
+# Import via NerdGraph mutation `alertsPolicyCreate` + `alertsNrqlConditionStaticCreate`,
+# or configure manually in the New Relic UI.
+#
+# Notification channels: Discord #ops-alerts webhook + team email.
+
+policy:
+  name: Atrium Production Alerts
+  incidentPreference: PER_CONDITION
+
+conditions:
+  - name: "p95 latency > 3s for 10 min"
+    type: static
+    nrql:
+      query: "SELECT percentile(duration, 95) FROM Transaction WHERE appName = 'atrium-verify'"
+    critical:
+      threshold: 3
+      thresholdDuration: 600
+      thresholdOccurrences: ALL
+      operator: ABOVE
+    notification:
+      - discord-ops
+      - team-email
+
+  - name: "Error rate > 1% for 5 min"
+    type: static
+    nrql:
+      query: "SELECT percentage(count(*), WHERE error IS true) FROM Transaction WHERE appName = 'atrium-verify'"
+    critical:
+      threshold: 1
+      thresholdDuration: 300
+      thresholdOccurrences: ALL
+      operator: ABOVE
+    notification:
+      - discord-ops
+      - team-email
+
+  - name: "Lantern publish missed for 30 min"
+    type: static
+    nrql:
+      query: "SELECT count(*) FROM Transaction WHERE name = 'lantern-publish' SINCE 30 minutes ago"
+    critical:
+      threshold: 0
+      thresholdDuration: 1800
+      thresholdOccurrences: ALL
+      operator: EQUALS
+    notification:
+      - discord-ops
+
+  - name: "Vigil-keeper tick failure for 30 min"
+    type: static
+    nrql:
+      query: "SELECT count(*) FROM Transaction WHERE name = 'vigil-keeper-tick' SINCE 30 minutes ago"
+    critical:
+      threshold: 0
+      thresholdDuration: 1800
+      thresholdOccurrences: ALL
+      operator: EQUALS
+    notification:
+      - discord-ops
+
+  - name: "Subgraph block lag > 200 for 30 min"
+    type: static
+    nrql:
+      query: "SELECT latest(custom.scribe.blockLag) FROM Metric"
+    critical:
+      threshold: 200
+      thresholdDuration: 1800
+      thresholdOccurrences: ALL
+      operator: ABOVE
+    notification:
+      - discord-ops
+
+channels:
+  - name: discord-ops
+    type: webhook
+    url: "${DISCORD_OPS_WEBHOOK_URL}"
+  - name: team-email
+    type: email
+    recipients:
+      - ops@atrium.fi

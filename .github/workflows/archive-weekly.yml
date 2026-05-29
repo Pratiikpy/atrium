@@ -1,14 +1,7 @@
 name: archive-weekly
 
-# Phase eta.3: weekly research backtest for each registered strategy.
-# Writes apps/verify/public/research/latest.json + commits it back so
-# the landing Jamie hook + /api/research-attestation/latest serve the
-# fresh delta. Pins notebook to IPFS via web3.storage; publishes the
-# attestation on chain via ResearchAttestation.publish().
-
 on:
   schedule:
-    # Sundays 03:00 UTC. Backtest window covers the prior week.
     - cron: '0 3 * * 0'
   workflow_dispatch:
     inputs:
@@ -17,17 +10,24 @@ on:
         required: false
         default: 'mean-reversion-v1'
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   backtest:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
         with:
           python-version: '3.11'
           cache: pip
@@ -42,11 +42,24 @@ jobs:
           RESEARCH_SIGNER_KEY:      ${{ secrets.RESEARCH_SIGNER_KEY }}
           WEB3_STORAGE_TOKEN:       ${{ secrets.WEB3_STORAGE_TOKEN }}
           RESEARCH_CONTRACT_ADDR:   ${{ secrets.RESEARCH_CONTRACT_ADDR }}
+          INPUT_STRATEGY:           ${{ github.event.inputs.strategy || 'mean-reversion-v1' }}
         run: |
-          python -m services.archive.src.research_loop \
-            --strategy "${{ github.event.inputs.strategy || 'mean-reversion-v1' }}"
-      - name: Commit attestation back
-        uses: stefanzweifel/git-auto-commit-action@v5
+          python -m services.archive.src.research_loop --strategy "$INPUT_STRATEGY"
+      - name: Create PR with attestation update
+        uses: peter-evans/create-pull-request@4320041ed380b20e97d388d56a7fb4f9b8c20e79 # v7.0.0
         with:
-          commit_message: 'chore(archive): weekly backtest attestation'
-          file_pattern: 'apps/verify/public/research/latest.json services/archive/notebooks/*.ipynb'
+          branch: ci-data/${{ github.workflow }}
+          title: "ci: ${{ github.workflow }} data update"
+          commit-message: "ci: refresh ${{ github.workflow }} data"
+          delete-branch: true
+          add-paths: |
+            apps/verify/public/research/latest.json
+            services/archive/notebooks/*.ipynb
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

@@ -69,7 +69,7 @@ contract AtriumRouterTest is Test {
             INSTRUMENT
         );
 
-        router = new AtriumRouter(address(plinth), address(coffer), address(registry), praetor);
+        router = new AtriumRouter(address(plinth), address(coffer), address(registry), praetor, timelock);
 
         // Wire the dependencies. Coffer needs Router on its approved-adapters
         // list (real Coffer's Praetor-controlled mapping). Registry needs to
@@ -77,7 +77,7 @@ contract AtriumRouterTest is Test {
         // needs the Router on its authorized-caller list.
         coffer.setApprovedAdapter(address(router), true);
         registry.setAdapter(CURVE_VENUE_ID, address(curve));
-        vm.prank(praetor);
+        vm.prank(timelock);
         curve.setAuthorizedCaller(address(router), true);
 
         // Fund: user owns shares in Coffer (= USDC claim), pool has USDC to
@@ -263,14 +263,14 @@ contract AtriumRouterTest is Test {
 
     // ── setAuthorizedCaller gating ───────────────────────────────────
 
-    function test_setAuthorizedCaller_onlyPraetor() public {
+    function test_setAuthorizedCaller_onlyTimelock() public {
         vm.prank(hostile);
         vm.expectRevert(CurveAdapter.Unauthorized.selector);
         curve.setAuthorizedCaller(makeAddr("other-router"), true);
 
-        // Even timelock can't set this — onlyPraetor (multisig) only, because
-        // routing decisions are emergency-response level, not parameter-class.
-        vm.prank(timelock);
+        // Praetor can't set this — onlyTimelock, because authorization
+        // decisions are parameter-class changes requiring 48h veto window.
+        vm.prank(praetor);
         vm.expectRevert(CurveAdapter.Unauthorized.selector);
         curve.setAuthorizedCaller(makeAddr("other-router"), true);
     }
@@ -281,14 +281,14 @@ contract AtriumRouterTest is Test {
         vm.expectEmit(true, false, false, true, address(curve));
         emit CurveAdapter.AuthorizedCallerUpdated(newRouter, true);
 
-        vm.prank(praetor);
+        vm.prank(timelock);
         curve.setAuthorizedCaller(newRouter, true);
         assertTrue(curve.is_authorized_caller(newRouter));
 
         vm.expectEmit(true, false, false, true, address(curve));
         emit CurveAdapter.AuthorizedCallerUpdated(newRouter, false);
 
-        vm.prank(praetor);
+        vm.prank(timelock);
         curve.setAuthorizedCaller(newRouter, false);
         assertFalse(curve.is_authorized_caller(newRouter));
     }
@@ -297,22 +297,22 @@ contract AtriumRouterTest is Test {
 
     function test_router_constructor_revertsOnZeroPlinth() public {
         vm.expectRevert(bytes("zero plinth"));
-        new AtriumRouter(address(0), address(coffer), address(registry), praetor);
+        new AtriumRouter(address(0), address(coffer), address(registry), praetor, timelock);
     }
 
     function test_router_constructor_revertsOnZeroCoffer() public {
         vm.expectRevert(bytes("zero coffer"));
-        new AtriumRouter(address(plinth), address(0), address(registry), praetor);
+        new AtriumRouter(address(plinth), address(0), address(registry), praetor, timelock);
     }
 
     function test_router_constructor_revertsOnZeroRegistry() public {
         vm.expectRevert(bytes("zero registry"));
-        new AtriumRouter(address(plinth), address(coffer), address(0), praetor);
+        new AtriumRouter(address(plinth), address(coffer), address(0), praetor, timelock);
     }
 
     function test_router_constructor_revertsOnZeroPraetor() public {
         vm.expectRevert(bytes("zero praetor"));
-        new AtriumRouter(address(plinth), address(coffer), address(registry), address(0));
+        new AtriumRouter(address(plinth), address(coffer), address(registry), address(0), timelock);
     }
 
     // ── Audit iteration 50 lock: FIRE78-COF2 actually built now ───────

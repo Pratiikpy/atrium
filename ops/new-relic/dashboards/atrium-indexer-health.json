@@ -1,0 +1,39 @@
+{
+  "name": "Atrium Indexer Health",
+  "description": "Scribe block lag, Lantern publish cadence, Vigil-keeper tick latency",
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Indexer",
+      "widgets": [
+        {
+          "title": "Scribe Block Lag",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT latest(custom.scribe.blockLag) FROM Metric TIMESERIES AUTO SINCE 6 hours ago" }
+            ]
+          }
+        },
+        {
+          "title": "Lantern Publish Cadence",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT count(*) FROM Transaction WHERE name = 'lantern-publish' TIMESERIES 10 minutes SINCE 6 hours ago" }
+            ]
+          }
+        },
+        {
+          "title": "Vigil-Keeper Tick Latency",
+          "visualization": { "id": "viz.line" },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              { "query": "SELECT average(duration) FROM Transaction WHERE name = 'vigil-keeper-tick' TIMESERIES AUTO SINCE 6 hours ago" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

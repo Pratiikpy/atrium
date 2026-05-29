@@ -35,7 +35,7 @@
 set -euo pipefail
 
 MODE="${1:-deploy}"
-DEPLOY_FILE="deploy/arbitrum-sepolia.json"
+DEPLOY_FILE="deployments/arbitrum_sepolia.json"
 
 if [ ! -f "${DEPLOY_FILE}" ]; then
     echo "ERROR: ${DEPLOY_FILE} not found."
@@ -47,42 +47,10 @@ fi
 
 cd subgraph
 
-# Patch addresses. The manifest currently has 0x000…0 placeholders for every
-# `source.address` field. The substitution is keyed off the `name:` field
-# immediately before each `source:` block.
-python3 - <<'PY'
-import json, re, sys, pathlib
-
-manifest_path = pathlib.Path("subgraph.yaml")
-deploy_path = pathlib.Path("../deploy/arbitrum-sepolia.json")
-deploy = json.loads(deploy_path.read_text())
-start_blocks = deploy.pop("_startBlocks", {})
-
-src = manifest_path.read_text()
-
-def patch(name, contract_addr, start_block):
-    global src
-    # Find the `- name: <name>` block, then the next `source:` and patch
-    # the address + startBlock lines inside that block.
-    pattern = re.compile(
-        r"(- (?:name|kind): " + re.escape(name) + r"\n[\s\S]*?source:\n[\s\S]*?)"
-        r'address: "0x0+"\n([\s\S]*?startBlock: )\d+',
-        re.MULTILINE,
-    )
-    def repl(m):
-        return m.group(1) + f'address: "{contract_addr}"\n' + m.group(2) + str(start_block)
-    new, n = pattern.subn(repl, src, count=1)
-    if n == 0:
-        print(f"WARN: no patch site found for {name} (placeholder may already be filled)")
-    src = new
-
-for name, addr in deploy.items():
-    sb = start_blocks.get(name, 0)
-    patch(name, addr, sb)
-
-manifest_path.write_text(src)
-print("Manifest patched.")
-PY
+# Phase 4 (SD-13): replaced inline Python patcher with the canonical
+# update-subgraph-addresses.mjs script that reads the registry's slug-based
+# keys and patches subgraph.yaml addresses + startBlocks.
+node ../scripts/update-subgraph-addresses.mjs
 
 pnpm codegen
 pnpm build

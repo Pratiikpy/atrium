@@ -1,31 +1,30 @@
 name: Atrium loadtest — nightly k6 + gas
 
-# Runs nightly at 02:00 UTC. Fires k6 against the deployed verify-app
-# + viem gas estimation against Arbitrum Sepolia, then commits the
-# resulting JSON to apps/verify/public/loadtest/latest.json so the
-# loadtest page renders fresh numbers within the next page load.
-#
-# Mirrors the kani-status commit-back pattern from ci.yml so the
-# dashboard's data lives in git as an auditable artifact.
-
 on:
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   loadtest:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     permissions:
       contents: write
+      pull-requests: write
     env:
       BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://verify.atrium.fi' }}
       FORK_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC || 'https://arbitrum-sepolia.publicnode.com' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: 20
           cache: pnpm
@@ -46,24 +45,30 @@ jobs:
       - name: build report
         working-directory: services/loadtest
         run: node scripts/build-report.mjs
-      - name: commit latest.json back to master
-        if: github.ref == 'refs/heads/master'
-        run: |
-          git config user.name "atrium-loadtest[bot]"
-          git config user.email "loadtest@atrium.fi"
-          git add apps/verify/public/loadtest/latest.json
-          if ! git diff --staged --quiet; then
-            git commit -m "loadtest: refresh latest.json ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
-            git push
-          else
-            echo "no metric changes; skipping commit"
-          fi
+      - name: Create PR with loadtest data
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        uses: peter-evans/create-pull-request@4320041ed380b20e97d388d56a7fb4f9b8c20e79 # v7.0.0
+        with:
+          branch: ci-data/${{ github.workflow }}
+          title: "ci: ${{ github.workflow }} data update"
+          commit-message: "ci: refresh ${{ github.workflow }} data"
+          delete-branch: true
+          add-paths: |
+            apps/verify/public/loadtest/latest.json
       - name: upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
         with:
           name: loadtest-${{ github.run_id }}
           path: |
             services/loadtest/summary.export.json
             services/loadtest/gas-report.json
             apps/verify/public/loadtest/latest.json
+      - name: Notify ops on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
+            $DISCORD_OPS_WEBHOOK
+        env:
+          DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

@@ -114,7 +114,7 @@ contract AaveHorizonAdapterV11Test is Test {
         address router_ = makeAddr("router-iter60");
         vm.expectEmit(true, false, false, true, address(adapter));
         emit AuthorizedCallerUpdated(router_, true);
-        vm.prank(praetor);
+        vm.prank(timelock);
         adapter.setAuthorizedCaller(router_, true);
         assertTrue(adapter.is_authorized_caller(router_));
     }
@@ -239,15 +239,15 @@ contract AaveHorizonAdapterV11Test is Test {
         assertEq(view_.owner, address(0));
     }
 
-    function test_closeV11_lossPath() public {
+    function test_closeV11_lossPath_revertsOnShortfall() public {
         vm.prank(coffer);
         uint256 id = adapter.open_position_v11(user, TBILL_3M, int256(1_000e6), hex"");
 
         pool.setWithdrawReturn(995e6);
 
         vm.prank(coffer);
-        int256 pnl = adapter.close_position_v11(user, id, hex"");
-        assertEq(pnl, int256(-5e6));
+        vm.expectRevert(AaveHorizonAdapterV11.InsufficientAaveLiquidity.selector);
+        adapter.close_position_v11(user, id, hex"");
     }
 
     function test_closeV11_withdrawsToCoffer() public {

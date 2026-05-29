@@ -1,185 +1,90 @@
-# Atrium Deploy Plan — Arbitrum Sepolia
+# Deployment registry — Arbitrum Sepolia
 
-Deployer: `<set per deploy via DEPLOYER_PRIVATE_KEY env>` · the 2026-05-24 incident rotated the bootstrap EOA; the address in use today is read from the funded keystore at deploy time, never hardcoded.
-Generated: 2026-05-23 · last updated 2026-05-23 (post launch session 2)
+> This file is generated from `deployments/arbitrum_sepolia.json` by `scripts/generate-deployment-doc.mjs`. Do not edit by hand.
 
-## Live URLs (production)
+| Field | Value |
+|-------|-------|
+| Network | Arbitrum Sepolia |
+| Chain ID | 421614 |
+| RPC | `https://arbitrum-sepolia.publicnode.com` |
+| Last updated | 2026-05-24T22:00:00.000Z |
 
-| Surface | URL | Notes |
-|---|---|---|
-| **Landing + full app** | `https://verify-n7xoe20z3-pratiikpys-projects.vercel.app/` | New visual landing at `/`, full app at `/app/*`, 7-step Verifier at `/verify/[1-7]`, public pages at `/docs`, `/security`, `/brand`, `/learn`, `/manifesto`, `/team`, `/cohort`, `/lantern`, `/changelog`, `/agents/marketplace`, `/rostrum`, `/benchmarks`, `/legal/privacy`, `/legal/terms`. |
-| **Codex API** | `https://atrium-codex.prtk8899.workers.dev/` | x402-payable gateway on Cloudflare Workers. D1 database live. |
-| **Tablet (tax)** | `https://tablet-jd321k29d-pratiikpys-projects.vercel.app/` | Python FastAPI on Vercel. SSO-wall-on (toggle off in dashboard). |
-| **Lantern cron** | `https://lantern-attestor-blqvhote1-pratiikpys-projects.vercel.app/api/cron` | Daily POR cron (hobby tier limit). CRON_SECRET-gated; not for direct browser use. |
-| **3 reference agents** | DigitalOcean droplet `157.245.201.53` | Augur + Haruspex + Auspex in Docker compose, idle until Plinth deploys. |
-| **Subgraph (Scribe)** | `https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.1` | 38 entities indexing, zero errors. |
+## Stylus contracts
 
-## Status snapshot
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| coffer | [`0xd169554c…`](https://sepolia.arbiscan.io/address/0xd169554caf920f1fbcffbafcff3068a84892b0d8) | [`0x07ae5e44…`](https://sepolia.arbiscan.io/tx/0x07ae5e44df7b6ada1a390af825389c8b37804421031f18f71490c2dee3a0e04b) | 270800974 | stylus | — | 🟢 live | ⚠️ Stylus | Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentra… |
+| sigil | [`0xc9933ebe…`](https://sepolia.arbiscan.io/address/0xc9933ebe7dc8c4849a1720b2e5b33e381442c873) | [`0x1f7e8e32…`](https://sepolia.arbiscan.io/tx/0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371) | 270801710 | stylus | — | 🟢 live | ⚠️ Stylus | Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentra… |
+| vigil | [`0x08f3d3a8…`](https://sepolia.arbiscan.io/address/0x08f3d3a878a75aa454be6bd07f0b74d3e6e46dc8) | [`0xd573e52e…`](https://sepolia.arbiscan.io/tx/0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e) | 270802353 | stylus | — | 🟢 live | ⚠️ Stylus | Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentra… |
+| plinth-math | [`0xc53dbfc0…`](https://sepolia.arbiscan.io/address/0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab) | [`0x27a07432…`](https://sepolia.arbiscan.io/tx/0x27a07432f7834f3e83bd7452137572a46a10833e73a80692dd42ad31ae4e7e3b) | 270678961 | stylus | — | 🟢 live | ⚠️ Stylus | SPAN compute extracted from Plinth (Phase A.7) to fit EIP-170 24 KB cap |
+| plinth-oracle | [`0x66064d18…`](https://sepolia.arbiscan.io/address/0x66064d18722f50e055d74daf51a13fd8e331f0b7) | [`0xad2928f7…`](https://sepolia.arbiscan.io/tx/0xad2928f777e608c1108032a0148025e781a759c6655d5c0e0bc9e8d06560d4ea) | 270688421 | stylus | — | 🟢 live | ⚠️ Stylus | Dual-oracle price reader extracted from Plinth (Phase A.7) — Chainlink + Pyth + … |
+| plinth | [`0xef31b4b7…`](https://sepolia.arbiscan.io/address/0xef31b4b75badc0faf323e3448248585b57a78ecd) | [`0x1fe8101f…`](https://sepolia.arbiscan.io/tx/0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0) | 270803107 | stylus | — | 🟢 live | ⚠️ Stylus | Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentra… |
 
-| Group | Count | Status |
-|---|---|---|
-| Standalone Solidity contracts | 7 / 7 | **LIVE on Arbitrum Sepolia**, all verifications submitted to Sourcify |
-| Missing UI features | 4 / 4 | **BUILT**, all 585 tests passing |
-| Vercel deploys | 3 / 3 | verify + tablet + lantern all live, env vars wired |
-| DigitalOcean droplet | 1 / 1 | hardened, Docker, 3 agents running |
-| Cloudflare Workers | 1 / 1 | Codex API live |
-| Subgraph | 1 / 1 | indexing, 0 errors |
-| Sentry | 1 / 1 | wired into Next.js prod |
-| Stylus contracts (Coffer, Plinth, Sigil, Vigil) | 0 / 4 | **BLOCKED** on stylus-sdk const-eval bug under Rust 1.92 |
-| Stylus-dependent Solidity (Aqueduct, Router, Postern, Rostrum) | 0 / 5 | Blocked behind Stylus |
-| Venue adapters | 0 / 10 | Phase N+1 |
+## Solidity core
 
-## Launch-ready user-only blockers
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| praetor-timelock | [`0x0dad24d7…`](https://sepolia.arbiscan.io/address/0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4) | [`0xa05cfa1c…`](https://sepolia.arbiscan.io/tx/0xa05cfa1caa5cfd7f1b743c34ea546349c6220d1a9652836a75ba5c96db89fe33) | 270408443 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4?chainId=421614) |  |
+| portico-registry | [`0x9a9af6e5…`](https://sepolia.arbiscan.io/address/0x9a9af6e50491cd4694699d48564bbff18f9b40bc) | [`0x8371174f…`](https://sepolia.arbiscan.io/tx/0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505) | 270408449 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x9a9af6e50491cd4694699d48564bbff18f9b40bc?chainId=421614) |  |
+| curator | [`0x21c5ecc5…`](https://sepolia.arbiscan.io/address/0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d) | [`0xb0386fce…`](https://sepolia.arbiscan.io/tx/0xb0386fceceaaa2db9022913d7a4b169f1bb5018fa27940cd5037374097c5a4b5) | 270408461 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d?chainId=421614) |  |
+| edict | [`0x66577042…`](https://sepolia.arbiscan.io/address/0x66577042b4d47312e554bbfa5e29ae20f55dd631) | [`0xf208cc99…`](https://sepolia.arbiscan.io/tx/0xf208cc99c46de4b7a26c1d3efc1f006ccf809c06a93374b6195f77495e7af140) | 270408469 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x66577042b4d47312e554bbfa5e29ae20f55dd631?chainId=421614) |  |
+| research-attestation | [`0xfabc1fee…`](https://sepolia.arbiscan.io/address/0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba) | [`0xc5aa317c…`](https://sepolia.arbiscan.io/tx/0xc5aa317ca635282de65dca0a116100cdcbd3535df74279b3bf9efdb66713705c) | 270408474 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba?chainId=421614) |  |
+| stoa | [`0x6d655803…`](https://sepolia.arbiscan.io/address/0x6d655803bac4bf61ad5ad26fd3b88429671cb5db) | [`0x4b74f245…`](https://sepolia.arbiscan.io/tx/0x4b74f2454e4fbaf5319f45360979d28d95f8d675d4a29e9bcf32b0ed99270b42) | 270408479 | — | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x6d655803bac4bf61ad5ad26fd3b88429671cb5db?chainId=421614) |  |
+| atrium-router | [`0xf134127c…`](https://sepolia.arbiscan.io/address/0xf134127cc2762d3ebc5645aba6c99cd5a8b82717) | [`0x3e96234b…`](https://sepolia.arbiscan.io/tx/0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac) | 270726101 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xf134127cc2762d3ebc5645aba6c99cd5a8b82717?chainId=421614) |  |
+| rostrum | [`0xbaf348e6…`](https://sepolia.arbiscan.io/address/0xbaf348e61fb555844973398b51332d93f674b0af) | [`0x0106d5cb…`](https://sepolia.arbiscan.io/tx/0x0106d5cbe7852a6877678161e32fb99abc5639942bad95efd49aa45285a49a33) | 270726103 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xbaf348e61fb555844973398b51332d93f674b0af?chainId=421614) |  |
 
-1. **Disable Vercel SSO on `tablet` + `lantern-attestor` projects** (verify already public). Open https://vercel.com/pratiikpys-projects/tablet/settings/deployment-protection and https://vercel.com/pratiikpys-projects/lantern-attestor/settings/deployment-protection — toggle "Vercel Authentication" off, save.
-2. **Claim domain from GitHub Student Pack** (atrium.tech via .TECH, or .app / .dev / .live from Name.com). Then paste name to me — I wire DNS via Vercel.
-3. **Approve Stylus migration** to unlock deposit/trade/kill switch (30-50h code job).
-4. **Cohort partner outreach** (zero today).
-5. **Rotate exposed testnet keys** after launch (deployer pk, CF token, Sentry DSN — all visible in this chat history).
+## Portico adapters
 
-## Live contracts (Arbitrum Sepolia, chain 421614)
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| adapter-aave-horizon | [`0x826dc4FE…`](https://sepolia.arbiscan.io/address/0x826dc4FE429d0Df6454E11dAeA10f2975b551042) | [`0x08d4d069…`](https://sepolia.arbiscan.io/tx/0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a) | — | solidity | v1.1.1 | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x826dc4FE429d0Df6454E11dAeA10f2975b551042?chainId=421614) | Redeployed 2026-05-25 (Phase zeta.3). Same AaveHorizonAdapterV11 bytecode, but p… |
+| adapter-aave-horizon-v1.1-pool-placeholder | [`0xa68361cC…`](https://sepolia.arbiscan.io/address/0xa68361cCBd819F4A38a31501D399888F9187d0b9) | [`0xe15ce592…`](https://sepolia.arbiscan.io/tx/0xe15ce5928dc27fc6e4906c86125548d6db094344d7492b18db447790b4b71583) | — | solidity | v1.1 | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xa68361cCBd819F4A38a31501D399888F9187d0b9?chainId=421614) | v1.1 with deployer-EOA pool placeholder. Superseded by the MockAavePool-backed v… |
+| adapter-aave-horizon-v1.0-deprecated | [`0xe991ec98…`](https://sepolia.arbiscan.io/address/0xe991ec988a62bcc38740f8b8c549e5400ded8d5d) | [`0xdff77222…`](https://sepolia.arbiscan.io/tx/0xdff7722214573f3a27dc832875b6d30b456df0e88173944feb9edc086f64c8e8) | 270727659 | solidity | — | 🔴 deprecated | [✓](https://sourcify.dev/#/lookup/0xe991ec988a62bcc38740f8b8c549e5400ded8d5d?chainId=421614) | DEPRECATED v1.0 (uses tx.origin, no ReentrancyGuard). Kept for reference; was ne… |
+| adapter-curve | [`0xf3da25f3…`](https://sepolia.arbiscan.io/address/0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682) | [`0x2d6d5a2a…`](https://sepolia.arbiscan.io/tx/0x2d6d5a2ad389fa5ec11b6793fb8144fbde6039773f9fd7c32e3f5c5d98acf5e7) | 270727666 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682?chainId=421614) |  |
+| adapter-gmx | [`0x2531af9f…`](https://sepolia.arbiscan.io/address/0x2531af9f7596d74f412bfab7d3b84ee7a32cd2d4) | [`0x7a47f5d8…`](https://sepolia.arbiscan.io/tx/0x7a47f5d89f54d80f06131f7140522c83361bfb2af7a3b46cd2c1f053f95b24c9) | 270727672 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x2531af9f7596d74f412bfab7d3b84ee7a32cd2d4?chainId=421614) |  |
+| adapter-hyperliquid | [`0x87014fba…`](https://sepolia.arbiscan.io/address/0x87014fbace9ade49bf923bcfae74b4c858cf371e) | [`0xab0a7b44…`](https://sepolia.arbiscan.io/tx/0xab0a7b44445194087a9c019793bbfaa42372aa5110c6e660bd93d6b33b98fda0) | 270727679 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x87014fbace9ade49bf923bcfae74b4c858cf371e?chainId=421614) | Shared by HIP-3 + HIP-4. Bridge placeholder = deployer. |
+| adapter-morpho | [`0xfabe2b0d…`](https://sepolia.arbiscan.io/address/0xfabe2b0d1c66bc2976ed3b0c58f3cdcb7878344e) | [`0x139d0cc7…`](https://sepolia.arbiscan.io/tx/0x139d0cc7e9bb47101eea1a341ca70152f8f4986deef3f0cd307e5a47147a9cd0) | 270727682 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xfabe2b0d1c66bc2976ed3b0c58f3cdcb7878344e?chainId=421614) |  |
+| adapter-pendle | [`0x54a1bc2c…`](https://sepolia.arbiscan.io/address/0x54a1bc2c5c73cc531035b0f008c8a252a02daf7d) | [`0xfb7ccf36…`](https://sepolia.arbiscan.io/tx/0xfb7ccf368fc5e9f802e27cab10dd4c7cd2bad3792bda0b35f97346aef1eb6b5f) | 270727686 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x54a1bc2c5c73cc531035b0f008c8a252a02daf7d?chainId=421614) |  |
+| adapter-polymarket | [`0x98a68872…`](https://sepolia.arbiscan.io/address/0x98a688723c47ab6909be04fd0aa3eca5ee8b08db) | [`0x5e5686ac…`](https://sepolia.arbiscan.io/tx/0x5e5686ac5371703f09625a691ddf876204f5ad2e5d30234a943439f1b981d6c0) | 270727693 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x98a688723c47ab6909be04fd0aa3eca5ee8b08db?chainId=421614) | Routes via Aqueduct to Polygon Amoy testnet (CCIP selector 16281711391670634445) |
+| adapter-synthetix | [`0x62b3b34f…`](https://sepolia.arbiscan.io/address/0x62b3b34ffa76fb62245702c0b7efd37832eb39b8) | [`0x3e72aa7e…`](https://sepolia.arbiscan.io/tx/0x3e72aa7ee5ef0da71b516022edcfddef178536d12d2aa6e6983bdb30bbd10632) | 270727698 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x62b3b34ffa76fb62245702c0b7efd37832eb39b8?chainId=421614) |  |
+| adapter-trade-xyz | [`0xf34c38d9…`](https://sepolia.arbiscan.io/address/0xf34c38d9e61a1b1beafffbb681b07e489c36a1ce) | [`0xac4298a2…`](https://sepolia.arbiscan.io/tx/0xac4298a2ab96e2c88d22b3677153835558323208019539145381345b672b1a64) | 270727704 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xf34c38d9e61a1b1beafffbb681b07e489c36a1ce?chainId=421614) |  |
 
-| Slug | Address | Block |
-|---|---|---|
-| praetor-timelock | `0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4` | 270408443 |
-| portico-registry | `0x9a9af6e50491cd4694699d48564bbff18f9b40bc` | 270408449 |
-| lantern-attestor | `0x900a9fb4bab7576fc11e4bb3c002d89dbe261168` | 270408455 |
-| curator | `0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d` | 270408461 |
-| edict | `0x66577042b4d47312e554bbfa5e29ae20f55dd631` | 270408469 |
-| research-attestation | `0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba` | 270408474 |
-| stoa | `0x6d655803bac4bf61ad5ad26fd3b88429671cb5db` | 270408479 |
+## Aqueduct family
 
-Source verified on Sourcify (job IDs in conversation log). Source visible at https://sourcify.dev/server/files/421614/ once Sourcify finishes processing.
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| aqueduct | [`0x6139449b…`](https://sepolia.arbiscan.io/address/0x6139449bf43f44385d08640b2e6fd2b82cb87ec2) | [`0x057918f2…`](https://sepolia.arbiscan.io/tx/0x057918f272f61d6992350b8b7da9f6ad2ef0bcaa30947c829a4e8672af69f9a1) | 270683155 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x6139449bf43f44385d08640b2e6fd2b82cb87ec2?chainId=421614) |  |
+| aqueduct-receiver | [`0x9a66c9cb…`](https://sepolia.arbiscan.io/address/0x9a66c9cb43dcfafa696cec66b33bec74c94ddc70) | [`0x19610811…`](https://sepolia.arbiscan.io/tx/0x196108115a52f667d03232d3e8a691e62754cd5c7014f885d07159ddb3e1fd28) | 270683161 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x9a66c9cb43dcfafa696cec66b33bec74c94ddc70?chainId=421614) |  |
+| aqueduct-claimback | [`0x4d441fca…`](https://sepolia.arbiscan.io/address/0x4d441fca986d51d17c71f979814e2a492a429382) | [`0x5776f1bd…`](https://sepolia.arbiscan.io/tx/0x5776f1bd0e66c366f5b95cdaa214fe4cb3f3f5d3f37ff79e369380d494d60787) | 270683165 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x4d441fca986d51d17c71f979814e2a492a429382?chainId=421614) |  |
 
-## UI features built this session
+## Postern family
 
-| Feature | Files |
-|---|---|
-| Risk Preview modal (first-trade gate) | `apps/verify/src/components/trade/risk-preview-modal.tsx` + wired into `order-form.tsx` |
-| Top-up flow (buffer-low banner + pre-filled modal) | `apps/verify/src/components/portfolio/top-up-banner.tsx` + wired into portfolio page |
-| Emergency close (no-liquidity path) | `apps/verify/src/components/portfolio/emergency-close-banner.tsx` + `apps/verify/src/lib/use-emergency-close.ts` + wired into open-positions-table |
-| Per-row Revoke button | `apps/verify/src/components/agents/my-mandates-panel.tsx` (rewritten) + `apps/verify/src/lib/use-revoke-mandate.ts` |
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| postern-key-registry | [`0x28c9fd50…`](https://sepolia.arbiscan.io/address/0x28c9fd500d2d8e3b56259a1054e9da05dec747d8) | [`0xacf2cbc0…`](https://sepolia.arbiscan.io/tx/0xacf2cbc0431449283efd496ccdd4bf235830ed1b0530a203b0af8fa61ac81ee4) | 270683171 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x28c9fd500d2d8e3b56259a1054e9da05dec747d8?chainId=421614) |  |
+| postern-kill-switch | [`0xb90a51a7…`](https://sepolia.arbiscan.io/address/0xb90a51a726740065bd0dbc20cd79306b30d8b676) | [`0x3f6ef96a…`](https://sepolia.arbiscan.io/tx/0x3f6ef96a4c24f3408c811b688e158ba55b9fd1cb39d4d470776de90ec90885e3) | 270683177 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xb90a51a726740065bd0dbc20cd79306b30d8b676?chainId=421614) |  |
 
-Tests added: `emergency-close-banner.test.ts` (4 tests), `risk-preview-modal.test.ts` (4 tests). Total suite: **585 passed, 0 failed**.
+## Lantern + test infrastructure
 
-## Blockers found
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| lantern-attestor | [`0xF0B90b94…`](https://sepolia.arbiscan.io/address/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888) | [`0x9ddd82d3…`](https://sepolia.arbiscan.io/tx/0x9ddd82d326fae6210b04146efaca45c333e8c5d46906f784ce0956a19a0f7ef4) | 270918668 | solidity | v2 | 🟢 live | [✓](https://sourcify.dev/#/lookup/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888?chainId=421614) | Redeployed 2026-05-25 (Phase zeta.1, audit TT-17 fix). AttestationPublished even… |
+| lantern-attestor-v1-pre-event-extension | [`0x900a9fb4…`](https://sepolia.arbiscan.io/address/0x900a9fb4bab7576fc11e4bb3c002d89dbe261168) | [`0x2343d14a…`](https://sepolia.arbiscan.io/tx/0x2343d14a743cef74768ec818de86d9154409d13ef3c97c987a8b79d1ca56a53c) | 270408455 | — | — | 🔴 deprecated | [✓](https://sourcify.dev/#/lookup/0x900a9fb4bab7576fc11e4bb3c002d89dbe261168?chainId=421614) | DEPRECATED v1 (3-field event). Replaced by v2 above on 2026-05-25. Kept for tx h… |
+| mock-aave-pool | [`0x2e1360fa…`](https://sepolia.arbiscan.io/address/0x2e1360faE80c7937e684067450202D921F72555B) | [`0x3dd459b7…`](https://sepolia.arbiscan.io/tx/0x3dd459b7fca1838e20ba85bed173d7d538bc3bb46057b29406ca55aa03ce52c9) | — | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x2e1360faE80c7937e684067450202D921F72555B?chainId=421614) | Testnet stub for Aave V3 Pool. Round-trips USDC 1:1 with a 5-bps-per-call drifti… |
 
-1. **Cyclic init in Stylus contracts.** Coffer needs Plinth's address; Plinth needs Coffer/Vigil/Sigil; Sigil needs Plinth + PosternKillSwitch; Vigil needs Plinth + Coffer. No post-init setters on any Stylus contract. Same cycle in Solidity between `PosternKillSwitch` and `PosternKeyRegistry`.
-2. **Workspace Cargo.lock out of date.** `cargo stylus check` fails on Coffer with `lock file needs to be updated but --locked was passed`. Needs a workspace `cargo update` before any Stylus build.
-3. **No deploy script exists.** No `script/Deploy.s.sol`, no Stylus deploy orchestration, no `deployments/arbitrum_sepolia.json` writer.
+## Faucet + utility
 
-## Resolution path
+| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |
+|------|---------|-----|-------|------|---------|--------|----------|-------|
+| faucet | [`0x7f3a714c…`](https://sepolia.arbiscan.io/address/0x7f3a714c824c0926ae98ecfb2e59513e78d82bbc) | [`0x269cdc4c…`](https://sepolia.arbiscan.io/tx/0x269cdc4cb11280422c9d36096f26829e07166851e2673f529923c60fa696724d) | 270742814 | solidity | — | 🟢 live | [✓](https://sourcify.dev/#/lookup/0x7f3a714c824c0926ae98ecfb2e59513e78d82bbc?chainId=421614) | 5 USDC + 0.0005 ETH per claim, 24h cooldown. Stocked with 40 USDC + 0.04 ETH (8 … |
+| faucet-deprecated-v1 | [`0xb982c46d…`](https://sepolia.arbiscan.io/address/0xb982c46d7a4aa7f1ebef91ca4cc0a34be1cf8549) | [`0x0ef3e327…`](https://sepolia.arbiscan.io/tx/0x0ef3e3271b2243dcb6ad9411222ac2cdd331b05bd06bcc28d1e04bf1ae48e001) | 270691652 | solidity | — | 🔴 deprecated | [✓](https://sourcify.dev/#/lookup/0xb982c46d7a4aa7f1ebef91ca4cc0a34be1cf8549?chainId=421614) | DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence.… |
 
-**Cycle**: pre-compute every contract address from deployer nonce (deployer fresh, nonce 0, deterministic CREATE address = `keccak256(rlp([deployer, nonce]))[12:]`). Init each contract with the pre-computed addresses of its dependencies. **No contract changes.**
+---
 
-**Lockfile**: run `cargo update` at workspace root once, verify Stylus check passes on one contract before continuing.
+### Sourcify verification
 
-**Script**: build it in three layers (Solidity forge script + shell glue for Stylus + deployments-registry writer in Node).
+Solidity contracts are verified on [Sourcify](https://sourcify.dev) (full match). Stylus WASM contracts (Plinth, Coffer, Sigil, Vigil, Plinth-Math, Plinth-Oracle) are not yet supported by Sourcify — verification is done via `cargo stylus verify` against the Arbitrum Stylus verifier.
 
-## Testnet constant addresses (Arbitrum Sepolia)
+---
 
-| Service | Address | Source |
-|---|---|---|
-| USDC | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` | Circle docs |
-| LINK | `0xb1D4538B4571d411F07960EF2838Ce337FE1E80E` | Chainlink docs |
-| CCIP Router | `0x2a9C5afB0d0e4BAb2BCdaE109EC4b0c4Be15a165` | Chainlink CCIP docs |
-| Chainlink ETH/USD feed | `0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165` | Chainlink docs |
-| Pyth | `0x4374e5a8b9C22271E9EB878A2AA31DE97DF15DAF` | Pyth docs |
-| EntryPoint v0.7 (ERC-4337) | `0x0000000071727De22E5E9d8BAf0edAc6f37da032` | eth-infinitism canonical |
-
-All six need a sanity verification (cast code call) before the deploy fires.
-
-## Deploy order (every step writes to the registry)
-
-```
-nonce 0  → PraetorTimelock(deployer)         [Solidity, no deps]
-nonce 1  → PosternKeyRegistry(predicted PKS) [Solidity, needs PKS addr]
-nonce 2  → PosternKillSwitch(predicted Sigil, EntryPoint, KeyRegistry)
-nonce 3  → PorticoRegistry(deployer, Timelock)
-nonce 4  → LanternAttestor(signing_key, deployer, Timelock)
-nonce 5  → Curator(deployer, Timelock, USDC)
-nonce 6  → Edict(deployer, Timelock, address(0))
-nonce 7  → ResearchAttestation(Timelock)
-nonce 8  → StoaBlackScholes()                [no constructor]
-nonce 9  → Rostrum(predicted Plinth, deployer, Timelock)
-nonce 10 → Coffer (Stylus) init(USDC, predicted Plinth, deployer, Timelock, caps)
-nonce 11 → Plinth (Stylus) init(Coffer, predicted Vigil, predicted Sigil, PorticoRegistry, chainlink, pyth, deployer, Timelock)
-nonce 12 → Sigil  (Stylus) init(deployer, Timelock, Plinth, address(0) erc8004, PosternKillSwitch)
-nonce 13 → Vigil  (Stylus) init(Plinth, Coffer, PorticoRegistry, deployer, Timelock)
-nonce 14 → Aqueduct(CCIP_Router, USDC, LINK, Coffer, deployer, Timelock)
-nonce 15 → AtriumRouter(Plinth, Coffer, PorticoRegistry, deployer)
-```
-
-Adapters defer to a second phase (10 separate adapter deploys, each into PorticoRegistry).
-
-## Stylus deploy reality check
-
-`cargo stylus deploy` uses CREATE under the hood. **Need to verify the activation step doesn't consume an extra nonce** before we trust the pre-compute. If activation is a separate tx from a different sender (Stylus activator), no extra deployer nonce. If activation is from the deployer, nonce drifts and the script must account for it. Phase 0 step 3 below validates this.
-
-## Execution phases
-
-### Phase 0 — Environment
-- [ ] `cargo update` at workspace root, commit lockfile (?check with founder)
-- [ ] `cargo stylus check` passes on Coffer
-- [ ] `cargo stylus check` passes on Plinth, Sigil, Vigil
-- [ ] Verify Stylus deploy uses exactly 1 deployer nonce per contract (test on Anvil or read Stylus 0.5 docs)
-- [ ] Verify all 6 testnet addresses with `cast code`
-
-### Phase 1 — Deploy script
-- [ ] `script/Deploy.s.sol` — Solidity contracts in nonce order with pre-computed Stylus addresses passed as constructor args
-- [ ] `scripts/deploy-stylus.sh` — sequential cargo stylus deploys with init args, each validated against pre-computed address
-- [ ] `scripts/predict-addresses.mjs` — deterministic CREATE-address pre-computer (input: deployer + start-nonce; output: full address table)
-- [ ] `scripts/save-deployments.mjs` — write `deployments/arbitrum_sepolia.json` after each phase
-
-### Phase 2 — Dry-run on local Anvil fork
-- [ ] Launch `anvil --fork-url https://arbitrum-sepolia.publicnode.com`
-- [ ] Run Solidity portion against Anvil
-- [ ] (Stylus can't run on Anvil — accept this as a real testnet risk)
-- [ ] Sanity-check: every constructor arg resolves to the right address
-
-### Phase 3 — Real deploy
-- [ ] Run `forge script script/Deploy.s.sol --broadcast --rpc-url $ARB_SEPOLIA --verify --etherscan-api-key $ARBISCAN_API_KEY`
-- [ ] Run `scripts/deploy-stylus.sh` interleaved at correct nonces
-- [ ] Validate every deployed address matches the pre-computed table; abort on any mismatch
-- [ ] Verify each Stylus contract is `cargo stylus activated` (or activate explicitly)
-
-### Phase 4 — Registry + UI wake-up
-- [ ] Write `deployments/arbitrum_sepolia.json` with all 16 addresses + block numbers
-- [ ] Confirm `apps/verify` reads it (the `loadDeploymentRegistry()` call returns non-null)
-- [ ] Smoke-test: open the deposit page, see the button enabled
-
-### Phase 5 — Verify on Arbiscan
-- [ ] Auto-verification via `--verify` for Solidity
-- [ ] Manual verification for Stylus via `cargo stylus verify`
-- [ ] Confirm each address shows source code on arbiscan
-
-## Adapters (separate later phase)
-
-Each of the 10 venue adapters needs its own constructor args (venue contracts, vault, oracle). Not load-bearing for the demo. Deploy after the core 16 are live and one happy-path trade works on at least one venue.
-
-## Risk register
-
-| Risk | Mitigation |
-|---|---|
-| Nonce drifts mid-deploy (any tx fails) | Abort on first failure; print state; do not continue |
-| Stylus activation is a second deployer tx | Phase 0 step verifies this before committing |
-| Predicted address mismatch on deploy | Abort on first mismatch; do not save partial registry |
-| Lock file conflicts after `cargo update` | Founder decision — accept the diff or pin versions |
-| Arbitrum Sepolia RPC rate-limit | Use multiple public RPCs in rotation; or switch to Alchemy |
-| Run out of ETH mid-deploy | We have 0.19; each Solidity contract ≈ 0.005 ETH on Arb, Stylus more. Budget 0.10 total. |
-
-## Definition of done
-
-- `deployments/arbitrum_sepolia.json` exists with 16 entries
-- `loadDeploymentRegistry()` returns non-null in the UI
-- Deposit page renders an enabled button
-- One smoke-test deposit transaction lands successfully
-- All addresses verified on Arbiscan
-- Deploy script is re-runnable (idempotent: skips already-deployed contracts based on registry)
-
-## What's explicitly out of scope (Phase N+1)
-
-- 10 venue adapters (separate phase)
-- Subgraph deploy (separate phase)
-- Services: Lantern cron, Codex API, Tablet, agents (separate phase)
-- Mainnet anything (this is testnet)
+Generated at 2026-05-28T14:35:06Z from `deployments/arbitrum_sepolia.json`.
