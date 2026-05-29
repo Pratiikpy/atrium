@@ -8,7 +8,7 @@ type Mode = 'baseline' | 'atrium';
  * Renders a live number sourced from on-chain ResearchAttestation. If the
  * source has not committed a number yet, shows the placeholder.
  *
- * Per CLAUDE.md red lines: never invent a number, never show aspirational
+ * Per database conventions: never invent a number, never show aspirational
  * data as live. Audit D-26: the baseline number was previously hardcoded
  * to $2M; now both sides come from the attestation feed.
  */
@@ -48,7 +48,7 @@ export function LiveQuote({
   // carry the honesty flag; useResearchAttestation pulls it from the
   // IPFS-pinned JSON behind ipfsHash. If isPublishable is false (or the
   // IPFS gateway couldn't confirm it), surface that explicitly rather
-  // than rendering the synthetic figure. Per CLAUDE.md "Never invent a
+  // than rendering the synthetic figure. Per internal rules "Never invent a
   // number" — a synthetic-pairs backtest's savings figure is structurally
   // wrong by 5-10x, so silently rendering it would inflate Atrium's
   // claimed performance on the landing-page hook.

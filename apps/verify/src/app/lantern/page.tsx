@@ -1,8 +1,6 @@
-import { Wordmark } from '@/components/wordmark';
 import { LanternDashboard } from '@/components/lantern-dashboard';
 import { WagmiProviders } from '@/components/wagmi-providers';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
-import Link from 'next/link';
 
 export default function LanternPage() {
   return (

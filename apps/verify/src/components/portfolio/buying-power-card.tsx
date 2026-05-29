@@ -33,9 +33,8 @@ export function BuyingPowerCard() {
         <div>
           <p className="eyebrow">Buying power · 30 days</p>
           <p
-            className="mt-1 font-medium text-ink"
+            className="mt-1 font-sans font-medium text-ink"
             style={{
-              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
               fontSize: 28,
               letterSpacing: '-0.02em',
               fontVariantNumeric: 'tabular-nums lining-nums',

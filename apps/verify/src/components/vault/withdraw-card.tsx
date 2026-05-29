@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
 /**
  * Vault · Withdraw. Audit U-15 follow-on to deposit-card.tsx: previously
@@ -132,8 +133,5 @@ function ArbiscanLink({ hash }: { hash: `0x${string}` }) {
 }
 
 function humanizeReason(reason: string): string {
-  if (reason === 'wallet_not_connected') return 'connect wallet first';
-  if (reason === 'coffer_not_deployed') return 'Coffer is not deployed on this network';
-  if (reason === 'invalid_amount') return 'enter a positive amount';
-  return reason.slice(0, 140);
+  return humanizeWalletError(reason).message;
 }

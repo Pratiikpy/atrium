@@ -20,8 +20,8 @@ export function PositionsFilter() {
     <div>
       <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
         <h2
-          className="font-medium tracking-[-0.02em] text-ink"
-          style={{ fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif', fontSize: 24 }}
+          className="font-sans font-medium tracking-[-0.02em] text-ink"
+          style={{ fontSize: 24 }}
         >
           Open positions
         </h2>

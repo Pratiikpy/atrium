@@ -109,7 +109,7 @@ describe('GET /api/portfolio/positions — Q64.64 entry-price extraction', () =>
     const json = await (await GET()).json();
     // Pre-U-21 the route shipped `markPrice = entryPrice` and
     // `pnlUsd = '$0.00'` — both presented as measured truth even though
-    // no oracle reads or P&L settlement existed. CLAUDE.md red line:
+    // no oracle reads or P&L settlement existed. Protocol integrity rule:
     // "never display a placeholder number that looks real." Now null so
     // the UI renders "—" with a named pending caption.
     expect(json.positions[0].entryPrice).toBe('$1,234');

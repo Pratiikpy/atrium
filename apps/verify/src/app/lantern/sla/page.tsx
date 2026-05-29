@@ -1,4 +1,3 @@
-import { Wordmark } from '@/components/wordmark';
 import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 

@@ -32,7 +32,7 @@ export function EmergencyCloseBanner({
     <>
       <div className="mt-2 rounded-md border border-testnet/40 bg-testnet/5 px-4 py-3 text-xs">
         <p className="font-medium text-testnet">
-          Normal close failed for {instrument} — venue likely has no liquidity for the full size.
+          Normal close failed for {instrument}. Venue likely has no liquidity for the full size.
         </p>
         <p className="mt-1 text-ink-soft">
           You can use the emergency partial close: this closes you at whatever price the venue

@@ -1,5 +1,11 @@
-import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
+import { buildMetadata } from '@/lib/build-metadata';
+
+export const metadata = buildMetadata({
+  title: 'Benchmarks',
+  description: 'Side-by-side comparison against closest comparables. Honest numbers from competitor docs and on-chain reads.',
+  canonical: '/benchmarks',
+});
 
 export default function BenchmarksPage() {
   return (

@@ -74,7 +74,7 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
       const seen = new Set<string>();
       agents = [];
       for (const m of j.mandates ?? []) {
-        const a = (m.agent ?? '').toLowerCase();
+        const a = (m.agent ?? '').toLowerCase(); // lowercase for set-membership dedup; Scribe stores lowercase
         if (!/^0x[0-9a-f]{40}$/.test(a)) continue;
         if (seen.has(a)) continue;
         seen.add(a);

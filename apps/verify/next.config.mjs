@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { securityHeaders } from './src/lib/security-headers.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -30,15 +31,7 @@ const nextConfig = {
   headers: async () => [
     {
       source: '/(.*)',
-      headers: [
-        { key: 'X-Content-Type-Options', value: 'nosniff' },
-        { key: 'X-Frame-Options', value: 'DENY' },
-        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        // Permissions-Policy disabled here for the landing bundle; the
-        // page uses fonts.googleapis.com + blob: URLs from its inline
-        // bundler. The full policy still lives on the rest of the site.
-        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-      ],
+      headers: securityHeaders,
     },
   ],
 };
@@ -55,6 +48,10 @@ export default withSentryConfig(nextConfig, {
   widenClientFileUpload: false,
   // Route browser -> /monitoring -> Sentry to bypass ad blockers that
   // block direct *.sentry.io calls.
+  // PERF-08 / F15: The CSP connect-src directive in security-headers.mjs
+  // must include 'self' (which covers /monitoring). If tunnelRoute changes,
+  // update the CSP accordingly. The tunnel proxies to o<id>.ingest.sentry.io
+  // so no external Sentry domain is needed in connect-src.
   tunnelRoute: '/monitoring',
   hideSourceMaps: true,
   disableLogger: true,

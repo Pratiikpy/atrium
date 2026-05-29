@@ -52,5 +52,5 @@ export function readinessMessage(status: DeploymentStatus | undefined, action: s
   if (!status) return null; // loading → render nothing under the disabled button
   if (status.ready) return null;
   if (status.missing.length === 0) return `${action} is wired but the deployment registry is empty. F1 deploys Month 1 W2.`;
-  return `${action} waits on ${status.missing.join(', ')} to deploy. See docs/ROADMAP.md Month 1 W2.`;
+  return `${action} waits on ${status.missing.join(', ')} to deploy. See docs/MASTER_PLAN.md Phase 2.`;
 }

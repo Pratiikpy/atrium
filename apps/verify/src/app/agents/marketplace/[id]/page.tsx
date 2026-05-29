@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
+import type { Metadata } from 'next';
 import { Card, RecessedCard, Tag } from '@/components/ui';
 import { AgentProfileLive } from '@/components/agents/agent-profile-live';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
@@ -79,6 +79,17 @@ const AGENTS: Record<string, ReferenceAgent> = {
 
 export function generateStaticParams() {
   return Object.keys(AGENTS).map((id) => ({ id }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const agent = AGENTS[id];
+  if (!agent) return {};
+  return {
+    title: `${agent.name} · Agent`,
+    description: agent.intro,
+    alternates: { canonical: `/agents/marketplace/${id}` },
+  };
 }
 
 export const dynamic = 'force-dynamic';

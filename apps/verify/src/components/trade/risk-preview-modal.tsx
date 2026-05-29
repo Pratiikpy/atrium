@@ -75,6 +75,10 @@ export function RiskPreviewModal({
             money.</strong> A 100-trade daily cap is enforced — but if each trade is a bad call,
           the cap doesn't save you. Read the agent's profile before approving.
         </li>
+        <li>
+          <strong>Sequencer ordering.</strong> Arbitrum's sequencer orders transactions. Large
+          trades may experience price impact from other pending orders.
+        </li>
       </ol>
 
       <div className="mt-5 rounded-md border border-divider bg-parchment-light p-3 font-mono text-xs">

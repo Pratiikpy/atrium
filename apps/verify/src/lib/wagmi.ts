@@ -1,4 +1,5 @@
 import { createConfig, http } from 'wagmi';
+import { fallback } from 'viem';
 import { arbitrumSepolia } from 'wagmi/chains';
 import { coinbaseWallet } from 'wagmi/connectors';
 
@@ -26,8 +27,10 @@ export const wagmiConfig = createConfig({
     }),
   ],
   transports: {
-    [arbitrumSepolia.id]: http(
-      process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com'
-    ),
+    [arbitrumSepolia.id]: fallback([
+      http(process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com'),
+      http('https://arbitrum-sepolia.publicnode.com'),
+      http('https://sepolia-rollup.arbitrum.io/rpc'),
+    ]),
   },
 });

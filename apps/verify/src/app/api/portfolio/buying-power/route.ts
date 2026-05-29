@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { gql } from '@/lib/scribe-helpers';
 import { parseTsOrNull } from '@/lib/format-time';
 import { formatUsd } from '@/lib/format-usd';
+import { requireWalletMatch } from '@/lib/auth-session';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +30,11 @@ export async function GET(req?: Request) {
       : process.env.DEMO_WALLET_ADDRESS ?? null;
   // Note: the stale `url`/`walletParam` block below is fully replaced
   // by the single-line walletParam above; tsc sees no dangling refs.
+  // Phase 2c: lock to authenticated session
+  if (req && wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
   if (!wallet) {
     return NextResponse.json({ currentUsd: null, series: [], windowDays: 30, source: 'pending' });
   }
@@ -61,7 +68,7 @@ export async function GET(req?: Request) {
       series,
       windowDays: 30,
       source: 'plinth' as const,
-    });
+    }, { headers: noCacheHeaders });
   } catch {
     return NextResponse.json({ currentUsd: null, series: [], windowDays: 30, source: 'pending' });
   }

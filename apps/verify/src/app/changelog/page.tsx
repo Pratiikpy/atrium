@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { Card, RecessedCard, Tag } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 

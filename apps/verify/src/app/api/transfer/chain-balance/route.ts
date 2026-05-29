@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ARB_SEPOLIA_USDC } from '@/lib/testnet-tokens';
+import { requireWalletMatch } from '@/lib/auth-session';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +24,11 @@ export async function GET(req: NextRequest) {
     walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
       ? walletParam
       : process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Phase 2c: lock to authenticated session
+  if (wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
   if (!wallet) {
     return NextResponse.json({ tokenSymbol: token, balanceFormatted: null, source: 'pending' });
   }
@@ -72,7 +79,7 @@ export async function GET(req: NextRequest) {
       client.readContract({ address: tokenAddrChecksummed, abi: erc20Abi, functionName: 'decimals', args: [] }) as Promise<number>,
     ]);
     const formatted = parseFloat(formatUnits(raw, decimals)).toLocaleString('en-US');
-    return NextResponse.json({ tokenSymbol: token, balanceFormatted: formatted, source: 'rpc' as const });
+    return NextResponse.json({ tokenSymbol: token, balanceFormatted: formatted, source: 'rpc' as const }, { headers: noCacheHeaders });
   } catch {
     return NextResponse.json({ tokenSymbol: token, balanceFormatted: null, source: 'pending' });
   }

@@ -25,9 +25,8 @@ export function ClosingSection() {
           Testnet · now open
         </p>
         <h2
-          className="mx-auto mt-5 max-w-3xl font-medium leading-[1.04] tracking-[-0.03em]"
+          className="mx-auto mt-5 max-w-3xl font-sans font-medium leading-[1.04] tracking-[-0.03em]"
           style={{
-            fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
             color: 'oklch(0.96 0.003 60)',
             fontSize: 'clamp(36px, 6vw, 64px)',
           }}
@@ -37,7 +36,7 @@ export function ClosingSection() {
           The testnet is open.
         </h2>
         <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-[oklch(0.72_0.004_60)]">
-          Faucet drops $10,000 test USDC and $5,000 rAAPL on landing. Three minutes from passkey login to first cross-margin trade.
+          Faucet drops 5 test USDC + 0.0005 ETH per claim (24h cooldown). Three minutes from passkey login to first cross-margin trade.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">

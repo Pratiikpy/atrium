@@ -1,0 +1,9 @@
+# Placeholder — replace with real PGP public key
+#
+# Generate per: runbooks/pgp-key-generation.md
+# Rename this file to pgp.asc after replacing content with the real armored public key.
+#
+# Expected format:
+# -----BEGIN PGP PUBLIC KEY BLOCK-----
+# ...
+# -----END PGP PUBLIC KEY BLOCK-----

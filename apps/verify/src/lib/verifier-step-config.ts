@@ -57,7 +57,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     title: 'Open a hedged position on Plinth',
     action: { kind: 'plinth-open-position', pending: true },
     pendingReason:
-      'Plinth Stylus contract not deployed yet (Month 1 W2 per docs/ROADMAP.md).',
+      'Plinth Stylus contract not deployed yet (see docs/MASTER_PLAN.md Phase 2).',
   },
   3: {
     step: 3,
@@ -71,11 +71,11 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     title: 'Inject chaos: oracle drift',
     action: { kind: 'chaos-inject' },
     // Wired live by U-27. /api/chaos/inject already returns honest 503
-    // until PRAETOR_CHAOS_URL is set (Month 9 per docs/ROADMAP.md); the
+    // until PRAETOR_CHAOS_URL is set (per docs/MASTER_PLAN.md Phase 9); the
     // hook surfaces that 503 as a typed error so the button shows the
     // named blocker without faking a successful inject.
     pendingReason:
-      'PRAETOR_CHAOS_URL not configured. Chaos agent deploys Month 9 per docs/ROADMAP.md.',
+      'PRAETOR_CHAOS_URL not configured. Chaos agent deploys per docs/MASTER_PLAN.md Phase 9.',
   },
   5: {
     step: 5,
@@ -90,7 +90,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     // Wired live by audit U-26. The action is a read-only inclusion-
     // proof check — no contract deploy needed. It fails honestly with
     // `no_attestation_yet` until the Lantern attestor cron publishes
-    // its first attestation (Month 6 per docs/ROADMAP.md), at which
+    // its first attestation (per docs/MASTER_PLAN.md Phase 6), at which
     // point the same code path succeeds with the real Merkle inclusion
     // result.
     pendingReason:
@@ -105,7 +105,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     // deployment-status gate (which reads `?step=7`) keeps the button
     // disabled and renders this banner instead.
     pendingReason:
-      'PosternKillSwitch not deployed yet. Sigil + Postern key registry land Month 1 W2 per docs/ROADMAP.md.',
+      'PosternKillSwitch not deployed yet. Sigil + Postern key registry land per docs/MASTER_PLAN.md Phase 2.',
   },
 };
 

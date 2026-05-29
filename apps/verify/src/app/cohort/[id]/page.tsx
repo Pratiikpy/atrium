@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Wordmark } from '@/components/wordmark';
 import { Card, Stat, RecessedCard, Tag } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
  * /cohort/[id] — detail page for an individual cohort partner.
  *
- * Per CLAUDE.md "no inflated numbers" rule: until partners actually sign and
+ * Per the "no inflated numbers" rule: until partners actually sign and
  * Scribe indexes their data, the partner list is empty. This page is the
  * template that renders when a real partner exists.
  */
@@ -79,7 +78,7 @@ export default async function CohortPartnerPage({ params }: Params) {
       <section className="mt-16 rounded-md border border-testnet/30 bg-testnet/5 p-6">
         <p className="text-sm font-medium text-testnet">Honest empty state</p>
         <p className="mt-2 text-sm text-ink-soft">
-          Per CLAUDE.md "no inflated numbers" rule, every field on this page reads from
+          Per the "no inflated numbers" rule, every field on this page reads from
           Scribe / live RPC. When a partner has not signed and deposited, the page renders
           empty values. We never invent activity to fill space.
         </p>

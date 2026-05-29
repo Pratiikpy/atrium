@@ -46,6 +46,31 @@ export default defineConfig({
       // Only critical journeys run on mobile to keep CI under 90s.
       grep: /@mobile/,
     },
+    // BrowserStack cross-browser project. Requires BROWSERSTACK_USERNAME +
+    // BROWSERSTACK_ACCESS_KEY env vars. See runbooks/browserstack-setup.md.
+    ...(process.env.BROWSERSTACK_USERNAME
+      ? [
+          {
+            name: 'browserstack',
+            use: {
+              connectOptions: {
+                wsEndpoint: `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(
+                  JSON.stringify({
+                    browser: 'chrome',
+                    browser_version: 'latest',
+                    os: 'Windows',
+                    os_version: '11',
+                    'browserstack.username': process.env.BROWSERSTACK_USERNAME,
+                    'browserstack.accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
+                    project: 'Atrium Verify',
+                    build: `ci-${process.env.GITHUB_RUN_ID ?? 'local'}`,
+                  })
+                )}`,
+              },
+            },
+          },
+        ]
+      : []),
   ],
 
   // Auto-start dev server in local mode. CI/sepolia modes assume a deployment

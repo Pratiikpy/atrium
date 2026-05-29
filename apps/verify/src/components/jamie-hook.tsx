@@ -44,7 +44,7 @@ export function JamieHook() {
 
       <p className="mt-8 text-sm text-muted">
         Numbers source from the on-chain ResearchAttestation feed. Until the Q1-2026 backtest
-        publishes (target Day +7 per <code className="font-mono">docs/ROADMAP.md</code>) both
+        publishes (target per <code className="font-mono">docs/MASTER_PLAN.md</code> Phase 6) both
         panels show "pending backtest" rather than invented numbers.
       </p>
     </section>

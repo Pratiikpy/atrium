@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
+import { useBalanceAware } from '@/lib/use-balance-aware';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { ARB_SEPOLIA_USDC, USDC_DECIMALS } from '@/lib/testnet-tokens';
 
 /**
  * Vault · Deposit. Audit U-15: previously the submit button had
@@ -28,9 +31,14 @@ export function VaultDeposit() {
   const { data: deployment } = useDeploymentStatus(1);
   const { data: cofferAddress } = useContractAddress('coffer');
   const { status, deposit, reset } = useVaultDeposit(cofferAddress ?? null);
+  const { max, disabledReason } = useBalanceAware({
+    token: ARB_SEPOLIA_USDC,
+    decimals: USDC_DECIMALS,
+    inputAmount: amount,
+  });
 
   const helper = readinessMessage(deployment, 'Deposit');
-  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0;
+  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !disabledReason;
   const busy =
     status.kind === 'checking' || status.kind === 'approving' || status.kind === 'depositing';
 
@@ -49,7 +57,14 @@ export function VaultDeposit() {
         }}
       >
         <label className="block">
-          <span className="text-[10px] uppercase tracking-wider text-muted">Amount</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-muted">Amount</span>
+            {max && (
+              <button type="button" onClick={() => setAmount(max)} className="text-[10px] text-muted hover:text-ink">
+                Max
+              </button>
+            )}
+          </div>
           <input
             type="number"
             inputMode="decimal"
@@ -59,6 +74,9 @@ export function VaultDeposit() {
             disabled={busy}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-lg text-ink min-h-[44px] focus:border-ink/40 focus:outline-none"
           />
+          {disabledReason && (
+            <p className="mt-1 text-[10px] text-neg">{disabledReason}</p>
+          )}
         </label>
         <button
           type="submit"
@@ -153,8 +171,5 @@ function ArbiscanLink({ hash }: { hash: `0x${string}` }) {
 }
 
 function humanizeReason(reason: string): string {
-  if (reason === 'wallet_not_connected') return 'connect wallet first';
-  if (reason === 'coffer_not_deployed') return 'Coffer is not deployed on this network';
-  if (reason === 'invalid_amount') return 'enter a positive amount';
-  return reason.slice(0, 140);
+  return humanizeWalletError(reason).message;
 }

@@ -4,9 +4,8 @@ import type { MetadataRoute } from 'next';
  * sitemap.xml — every public-facing URL. Excludes /app/* (wallet-gated),
  * /api/* (server endpoints), /monitoring (Sentry tunnel).
  *
- * Keep this list in sync with the routes in apps/verify/src/app/. When
- * we add a new public page, add a row here so search engines + judges
- * can find it.
+ * SEO-04: Added /docs/honesty, /docs/api, /team, /security, /changelog,
+ * /manifesto, /learn to ensure completeness.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl =
@@ -17,10 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const lastModified = new Date();
 
-  // Public routes that visitors can land on directly.
   const publicRoutes = [
     '',
     '/docs',
+    '/docs/honesty',
+    '/docs/api',
     '/security',
     '/brand',
     '/learn',

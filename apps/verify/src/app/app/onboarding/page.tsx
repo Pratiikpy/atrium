@@ -1,7 +1,14 @@
-import { OnboardingFlow } from '@/components/onboarding/onboarding-flow';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+/* PERF-04: OnboardingFlow is only needed on this route — dynamic import */
+const OnboardingFlow = dynamic(
+  () => import('@/components/onboarding/onboarding-flow').then((m) => m.OnboardingFlow),
+  { loading: () => <Skeleton className="h-96 w-full" /> },
+);
 
 export const metadata = {
-  title: 'Atrium · onboarding',
+  title: 'Onboarding',
   description:
     'Passkey, faucet, first cross-margin position. Ninety-second onboarding to the open testnet.',
 };
@@ -11,12 +18,6 @@ export const metadata = {
  *
  * Surface matches `design/Atrium App.standalone.html` (file5.js Onboarding):
  * Welcome → Authenticator → Faucet → Margin posted → Done.
- *
- * The stepper carries local state, so the entire flow lives in a single
- * client component. This page is the server wrapper that sets metadata
- * and renders the flow without the standard sidebar chrome — the prototype
- * intentionally drops the sidebar during onboarding so the user focuses
- * on the linear flow.
  */
 export default function OnboardingPage() {
   return <OnboardingFlow />;

@@ -60,9 +60,8 @@ export function SectionShell({
               wraps the headline so callers can pass an `accent` string that
               gets appended in the design's emphasis style. */}
           <h2
-            className="mt-5 font-medium leading-[1.08] tracking-[-0.02em]"
+            className="mt-5 font-sans font-medium leading-[1.08] tracking-[-0.02em]"
             style={{
-              fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
               fontSize: 'clamp(30px, 4vw, 48px)',
               color: isDark ? 'oklch(0.96 0.003 60)' : 'oklch(0.13 0.008 60)',
             }}

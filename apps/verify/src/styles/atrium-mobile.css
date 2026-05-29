@@ -10,8 +10,10 @@
   --bg-elev:   oklch(17% 0.008 60);
   --ink:       oklch(97% 0.003 60);
   --ink-soft:  oklch(82% 0.005 60);
-  --muted:     oklch(58% 0.005 60);
-  --faint:     oklch(40% 0.005 60);
+  /* A11Y-01: OKLCH lightness on dark bg — 62% on oklch(8%) ≈ 5.5:1;
+     52% on oklch(8%) ≈ 4.5:1. Both pass WCAG AA. */
+  --muted:     oklch(62% 0.005 60);
+  --faint:     oklch(52% 0.005 60);
   --line:      color-mix(in oklch, white 12%, transparent);
   --hairline:  color-mix(in oklch, white 6%, transparent);
   --accent:    oklch(72% 0.14 28);
@@ -1447,4 +1449,14 @@
 .atrium-m-root .iphone-screen { border-radius: 0; }
 .atrium-m-root .iphone-notch { display: none; }
 .atrium-m-root .status-bar { padding-top: calc(16px + var(--safe-top)); }
+}
+
+/* A11Y-11: Reduced motion — defense-in-depth for mobile sub-stylesheet */
+@media (prefers-reduced-motion: reduce) {
+  .atrium-m-root *,
+  .atrium-m-root *::before,
+  .atrium-m-root *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

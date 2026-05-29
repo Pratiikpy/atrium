@@ -48,7 +48,7 @@ export function useChaosInject() {
         // The route's pending shape is `{ error, detail }` with 503; treat
         // detail as the reason so the user sees the named blocker (e.g.
         // "PRAETOR_CHAOS_URL not configured. Praetor chaos agent deploys
-        // in Month 9 per docs/ROADMAP.md.").
+        // per docs/MASTER_PLAN.md Phase 9.").
         const reason: string =
           body?.detail || body?.error || `chaos_inject_${r.status}`;
         setStatus({ kind: 'error', fault, reason });

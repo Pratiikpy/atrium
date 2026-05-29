@@ -489,3 +489,12 @@
   .atrium-desktop-only .dash-stats { grid-template-columns: 1fr 1fr; }
   .atrium-desktop-only .lantern-grid { grid-template-columns: 1fr 1fr; }
 }
+
+
+/* A11Y-11: Reduced motion — defense-in-depth for landing sub-stylesheet */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

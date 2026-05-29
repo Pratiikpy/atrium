@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,5 +42,5 @@ export async function GET(req: NextRequest) {
     totalUsd: `$${totalUsd.toLocaleString('en-US')}`,
     pctUsed: null,
     source: 'pending',
-  });
+  }, { headers: noCacheHeaders });
 }

@@ -14,26 +14,18 @@ const USDC_DECIMALS = 6;
  */
 export async function GET() {
   try {
-    // Iteration 36 audit note: `first: 1000` is The Graph's default page
-    // cap. For testnet (target hundreds of users) the cap is comfortable.
-    // Beyond ~1000 margin accounts the TVL would silently undercount —
-    // the same shape of silent-failure the rest of this session has been
-    // hunting. Tracked as a known scaling gap; the right fix at that
-    // point is pagination via `skip`, or a Counter @entity in the subgraph
-    // (already TODO'd in indexing-todo.md). Leaving the cap because adding
-    // pagination today is over-scope for the current user count.
+    // Phase 4: Read from Counter entity directly instead of paginating
+    // MarginAccount + positions. Counter is maintained by subgraph handlers.
     const data = await gql<{
-      marginAccounts: Array<{ collateralValueWei: string }>;
-      positions: Array<{ id: string }>;
+      counter: { openPositionsCount: string; totalTvlWei: string; activeAgentsCount: string } | null;
     }>(`
       query Metrics {
-        marginAccounts(first: 1000) { collateralValueWei }
-        positions(first: 1000, where: { closedAtBlock: null }) { id }
+        counter(id: "global") { openPositionsCount totalTvlWei activeAgentsCount }
       }
     `);
 
-    let tvlWei = 0n;
-    for (const m of data.marginAccounts ?? []) tvlWei += BigInt(m.collateralValueWei);
+    const counter = data.counter;
+    const tvlWei = counter ? BigInt(counter.totalTvlWei) : 0n;
 
     const venuesDeployed = await countDeployedAdapters();
 

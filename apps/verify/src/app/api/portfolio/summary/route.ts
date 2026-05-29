@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { tryGetPlinth } from '@/lib/portfolio-source';
 import { formatUsd } from '@/lib/format-usd';
+import { requireWalletMatch } from '@/lib/auth-session';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +15,11 @@ export async function GET(req?: Request) {
     walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
       ? walletParam
       : process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Phase 2c: lock to authenticated session
+  if (req && wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
   const plinth = await tryGetPlinth();
   if (!plinth || !wallet) {
     return NextResponse.json({
@@ -43,7 +50,7 @@ export async function GET(req?: Request) {
       pnl24hDirection: null,
       paused,
       source: 'plinth' as const,
-    });
+    }, { headers: noCacheHeaders });
   } catch {
     return NextResponse.json({
       totalAccountValueUsd: null,

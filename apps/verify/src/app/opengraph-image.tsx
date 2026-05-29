@@ -17,7 +17,7 @@ import { ImageResponse } from 'next/og';
  * file under the route segment; this top-level one is the fallback.
  */
 export const runtime = 'edge';
-export const alt = 'Atrium — cross-venue portfolio margin on Arbitrum Sepolia';
+export const alt = 'Atrium · cross-venue portfolio margin on Arbitrum Sepolia';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -26,6 +26,21 @@ const INK = '#1A1714';
 const AMBER = 'rgb(207, 156, 67)';
 
 export default async function OpengraphImage() {
+  // SEO-09 / L-27: Load Instrument Serif for the wordmark.
+  // Phase 11 task: add InstrumentSerif-Italic.woff2 to public/fonts/.
+  // Until then, the edge runtime falls back to generic serif.
+  let fonts: { name: string; data: ArrayBuffer; style: 'italic' }[] = [];
+  try {
+    const fontData = await fetch(
+      new URL('../../public/fonts/InstrumentSerif-Italic.woff2', import.meta.url),
+    ).then((r) => (r.ok ? r.arrayBuffer() : null));
+    if (fontData) {
+      fonts = [{ name: 'Instrument Serif', data: fontData, style: 'italic' }];
+    }
+  } catch {
+    // Font not available — fall through to generic serif
+  }
+
   return new ImageResponse(
     (
       <div
@@ -102,6 +117,6 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size },
+    { ...size, ...(fonts.length > 0 && { fonts }) },
   );
 }

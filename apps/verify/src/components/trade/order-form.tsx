@@ -1,10 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useDeferredValue, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useOpenPosition } from '@/lib/use-open-position';
-import { RiskPreviewModal } from '@/components/trade/risk-preview-modal';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { SlippageSelect } from '@/components/trade/slippage-select';
+import { HelpTip } from '@/components/ui/help-tip';
+
+/* PERF-04: Dynamic import — RiskPreviewModal only renders on first trade */
+const RiskPreviewModal = dynamic(
+  () => import('@/components/trade/risk-preview-modal').then((m) => m.RiskPreviewModal),
+  { ssr: false },
+);
 
 const RISK_ACK_KEY = 'atrium.risk-preview.ack.v1';
 
@@ -57,16 +67,16 @@ export function OrderForm({
 }) {
   const [side, setSide] = useState<'long' | 'short'>('long');
   const [leverage, setLeverage] = useState(3);
-  // Slippage is a static default for v1. The Portico adapter doesn't yet
-  // expose a per-tx slippage tolerance param — once the v1.1 ABI freeze
-  // lands (see IPorticoAdapterV11.sol), this becomes a user-controllable
-  // input. Labeled "default" in the UI so the user isn't misled.
-  const slippage = 0.10;
+  const [slippage, setSlippage] = useState(0.10);
+  const { address } = useAccount();
+
+  // Debounce size for margin-impact queries
+  const deferredSize = useDeferredValue(size);
 
   const { data: impact } = useQuery({
-    queryKey: ['order-form-impact', size, venue],
-    queryFn: () => fetchImpact(size, venue),
-    enabled: size.length > 0,
+    queryKey: ['order-form-impact', deferredSize, venue],
+    queryFn: () => fetchImpact(deferredSize, venue),
+    enabled: deferredSize.length > 0,
     refetchInterval: 10_000,
   });
   const { data: deployment } = useDeploymentStatus(2);
@@ -160,7 +170,7 @@ export function OrderForm({
 
       <div className="mt-4">
         <div className="flex items-baseline justify-between">
-          <span className="text-[10px] uppercase tracking-wider text-muted">Leverage</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted flex items-center gap-1">Leverage <HelpTip term="leverage" /></span>
           <span className="font-mono text-xs text-ink">{leverage}×</span>
         </div>
         <input
@@ -170,6 +180,7 @@ export function OrderForm({
           value={leverage}
           onChange={(e) => setLeverage(parseInt(e.target.value, 10))}
           className="mt-2 w-full accent-ink"
+          aria-label={`Leverage: ${leverage}×`}
         />
         <div className="mt-1 flex justify-between text-[9px] text-muted">
           <span>1×</span>
@@ -180,7 +191,10 @@ export function OrderForm({
       <dl className="mt-5 space-y-1.5 border-t border-divider-soft pt-4 font-mono text-xs">
         <Row label="Maintenance margin" value={impact?.maintenanceMarginUsd ?? '—'} />
         <Row label="Initial margin" value={impact?.initialMarginUsd ?? '—'} />
-        <Row label="Slippage tolerance" value={`${slippage.toFixed(2)}% · default`} />
+        <div className="flex items-center justify-between">
+          <dt className="text-muted flex items-center gap-1">Slippage tolerance <HelpTip term="slippage" /></dt>
+          <dd><SlippageSelect value={slippage} onChange={setSlippage} walletAddress={address} /></dd>
+        </div>
       </dl>
       <p className="mt-2 text-[9px] uppercase tracking-wider text-muted">
         {impact?.source === 'plinth' ? 'from Plinth.update_margin · simulated' : 'plinth pending · figures populate after deploy'}
@@ -199,7 +213,8 @@ export function OrderForm({
       )}
       <OpenStatusLine status={openStatus} onReset={resetOpen} />
       <p className="mt-3 text-center text-[9px] uppercase tracking-wider text-muted">
-        By opening you agree to portico-wired adapters
+        Your trade routes through a Portico-registered venue adapter.{' '}
+        <a href="/docs/api" className="underline">See adapter docs</a>.
       </p>
       <RiskPreviewModal
         open={showRiskPreview}
@@ -264,11 +279,7 @@ function OpenStatusLine({
 }
 
 function humanizeOpenReason(reason: string): string {
-  if (reason === 'wallet_not_connected') return 'connect wallet first';
-  if (reason === 'invalid_size') return 'enter a positive size';
-  if (reason === 'adapter_not_deployed')
-    return 'venue adapter is not deployed on this network yet';
-  return reason.slice(0, 140);
+  return humanizeWalletError(reason).message;
 }
 
 function Row({ label, value }: { label: string; value: string }) {

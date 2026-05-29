@@ -6,10 +6,10 @@ import path from 'node:path';
  * GET /api/audit-findings
  *
  * Phase eta.16 (2026-05-25): the audit-findings register is parsed from
- * docs/AUDIT_FINDINGS.md so /security can render it as a live table.
+ * docs/plan-tracker.md so /security can render it as a live table.
  *
  * Phase theta.2 (2026-05-25): pre-fix this route called fs.readFile on
- * `../../docs/AUDIT_FINDINGS.md` at request time. On Vercel the
+ * `../../docs/plan-tracker.md` at request time. On Vercel the
  * serverless bundle does not package files outside the Next.js project
  * root, so every production request returned `findings: []` with
  * `source: 'pending'` — silently displaying "no audit findings".

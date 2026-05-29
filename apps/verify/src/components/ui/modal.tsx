@@ -150,7 +150,6 @@ export function Modal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur"
       onClick={onClose}
-      aria-hidden="true"
     >
       <div
         ref={dialogRef}

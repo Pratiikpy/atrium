@@ -16,7 +16,7 @@ interface Allowance {
 // Audit RRR-5 fix: the catch block previously hardcoded `usedUsd: '$0'`,
 // `remainingUsd: '$3,820'`, `totalUsd: '$3,820'`, `pctUsed: 0`. UI then
 // rendered "$0 used / $3,820 total · 0% used" *as if real*, even though
-// the user may have already used part of their allowance. CLAUDE.md red
+// the user may have already used part of their allowance. Protocol safety rule:
 // line: "never display a placeholder number that looks real". Now: API
 // failure returns user-specific values as null + source='pending'; the
 // component renders honest "—" sentinels + a pending notice.

@@ -1,24 +1,61 @@
-// Sentry browser-side init. Loaded by instrumentation-client.ts on every
-// client render. The DSN itself is non-sensitive (it's an ingestion-only
-// public identifier per Sentry docs), so NEXT_PUBLIC_ is intentional.
+// Sentry browser-side init — Phase 3 hardened.
+// Gated on user consent; scrubs wallet addresses from all telemetry.
 import * as Sentry from '@sentry/nextjs';
+import { hasConsent } from './src/lib/consent';
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-if (dsn) {
+/** Scrub 0x-prefixed hex addresses/hashes from a string. */
+function scrubPii(value: string | undefined): string | undefined {
+  if (!value) return value;
+  return value
+    .replace(/0x[0-9a-fA-F]{64}/g, '0x[HASH-REDACTED]')
+    .replace(/0x[0-9a-fA-F]{40}/g, '0x[REDACTED]');
+}
+
+if (dsn && hasConsent('analytics')) {
   Sentry.init({
     dsn,
     environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? 'development',
-    // 10% performance traces by default — enough to spot regressions,
-    // light enough on free-tier quota.
     tracesSampleRate: 0.1,
-    // Capture session replays only on errors. Replay is a paid feature
-    // beyond a quota — sample at 0 normally and 1.0 on error so the
-    // student-pack tier (500 replays/month) is reserved for actual bugs.
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 1.0,
-    // Don't ship sourcemaps that include user wallet addresses; the
-    // verify app already redacts on the server side.
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 0.5,
     sendDefaultPii: false,
+    integrations: [
+      Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
+    ],
+    initialScope: {
+      tags: {
+        chain_id: process.env.NEXT_PUBLIC_CHAIN_ID ?? '421614',
+        route_kind: 'browser',
+      },
+    },
+    beforeSend(event) {
+      if (event.message) event.message = scrubPii(event.message);
+      if (event.request?.url) event.request.url = scrubPii(event.request.url)!;
+      if (event.request?.query_string) {
+        event.request.query_string = scrubPii(
+          typeof event.request.query_string === 'string'
+            ? event.request.query_string
+            : undefined,
+        );
+      }
+      if (event.breadcrumbs) {
+        for (const bc of event.breadcrumbs) {
+          if (bc.message) bc.message = scrubPii(bc.message);
+          if (bc.data?.url) bc.data.url = scrubPii(bc.data.url as string);
+        }
+      }
+      // Phase 12: add wallet_truncated_first_4 tag from localStorage
+      try {
+        const wallet = typeof window !== 'undefined'
+          ? localStorage.getItem('atrium_connected_wallet')
+          : null;
+        if (wallet) {
+          event.tags = { ...event.tags, wallet_truncated_first_4: wallet.slice(0, 6) };
+        }
+      } catch { /* noop */ }
+      return event;
+    },
   });
 }

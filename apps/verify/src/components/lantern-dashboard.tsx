@@ -112,7 +112,7 @@ export function LanternDashboard() {
       <div className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
         <p className="text-sm font-medium text-ink">No attestation published yet</p>
         <p className="mt-2 text-sm text-ink-soft">
-          Lantern publishes hourly. The first attestation lands after Coffer has at least one deposit.
+          Lantern publishes every ≤10 minutes. The first attestation lands after Coffer has at least one deposit.
         </p>
       </div>
     );

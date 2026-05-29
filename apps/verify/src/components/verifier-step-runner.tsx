@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAccount, useConnect } from 'wagmi';
-import { Check, ExternalLink, Info, Loader2, Triangle } from 'lucide-react';
+import { Check, ExternalLink, Info, Triangle } from 'lucide-react';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 import { getStepConfig } from '@/lib/verifier-step-config';
 import { useContractAddress } from '@/lib/use-coffer-address';
@@ -10,6 +10,7 @@ import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useKillSwitch } from '@/lib/use-kill-switch';
 import { useLanternVerify } from '@/lib/use-lantern-verify';
 import { useChaosInject } from '@/lib/use-chaos-inject';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 
 interface RunState {
   status: 'idle' | 'connecting' | 'pending' | 'success' | 'error';
@@ -35,17 +36,20 @@ export function VerifierStepRunner({ step }: { step: number }) {
   const { address, isConnected, chain } = useAccount();
   const { connect, connectors, status: connectStatus } = useConnect();
   const [run, setRun] = useState<RunState>({ status: 'idle' });
+  // A11Y-13: Kill Switch confirmation via accessible modal instead of window.confirm
+  const [showKillConfirm, setShowKillConfirm] = useState(false);
   // Audit J-C2 fix: detect whether the step contract is deployed on Sepolia.
-  // The prior code unconditionally threw "Step contract not yet deployed",
-  // which presented a half-feature as a working button. Now we surface the
-  // deployment status above the button and disable the action honestly.
   const [deploymentReady, setDeploymentReady] = useState<boolean | null>(null);
+  const [deploymentBlocker, setDeploymentBlocker] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     fetch('/api/deployments/status?step=' + step)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status_${r.status}`))))
-      .then((j: { ready?: boolean }) => {
-        if (!cancelled) setDeploymentReady(Boolean(j.ready));
+      .then((j: { ready?: boolean; blocker?: string | null }) => {
+        if (!cancelled) {
+          setDeploymentReady(Boolean(j.ready));
+          setDeploymentBlocker(j.blocker ?? null);
+        }
       })
       .catch(() => {
         if (!cancelled) setDeploymentReady(false);
@@ -54,6 +58,64 @@ export function VerifierStepRunner({ step }: { step: number }) {
       cancelled = true;
     };
   }, [step]);
+
+  const config = getStepConfig(step);
+
+  // All hooks called unconditionally at the top (rules-of-hooks compliance)
+  const { data: cofferAddress } = useContractAddress('coffer');
+  const { data: killSwitchAddress } = useContractAddress('postern-kill-switch');
+  const vaultDeposit = useVaultDeposit(cofferAddress ?? null);
+  const killSwitch = useKillSwitch(killSwitchAddress ?? null);
+  const lantern = useLanternVerify();
+  const chaos = useChaosInject();
+
+  // Bridge each hook's status into this component's RunState
+  useEffect(() => {
+    const s = vaultDeposit.status;
+    if (s.kind === 'idle') return;
+    if (s.kind === 'checking') setRun({ status: 'pending' });
+    else if (s.kind === 'approving' || s.kind === 'depositing') setRun({ status: 'pending' });
+    else if (s.kind === 'success') setRun({ status: 'success', txHash: s.depositHash });
+    else if (s.kind === 'error') setRun({ status: 'error', errorMessage: s.reason });
+  }, [vaultDeposit.status]);
+  useEffect(() => {
+    const s = killSwitch.status;
+    if (s.kind === 'idle') return;
+    if (s.kind === 'submitting') setRun({ status: 'pending' });
+    else if (s.kind === 'success') setRun({ status: 'success', txHash: s.hash });
+    else if (s.kind === 'error') setRun({ status: 'error', errorMessage: s.reason });
+  }, [killSwitch.status]);
+  useEffect(() => {
+    const s = lantern.status;
+    if (s.kind === 'idle') return;
+    if (s.kind === 'reading-attestation' || s.kind === 'verifying') {
+      setRun({ status: 'pending' });
+    } else if (s.kind === 'success') {
+      if (s.result.ok) {
+        setRun({ status: 'success' });
+      } else {
+        setRun({
+          status: 'error',
+          errorMessage:
+            s.result.reason ||
+            'Wallet not found in the latest Lantern attestation tree.',
+        });
+      }
+    } else if (s.kind === 'error') {
+      setRun({ status: 'error', errorMessage: s.reason });
+    }
+  }, [lantern.status]);
+  useEffect(() => {
+    const s = chaos.status;
+    if (s.kind === 'idle') return;
+    if (s.kind === 'submitting') {
+      setRun({ status: 'pending' });
+    } else if (s.kind === 'success') {
+      setRun({ status: 'success' });
+    } else if (s.kind === 'error') {
+      setRun({ status: 'error', errorMessage: s.reason });
+    }
+  }, [chaos.status]);
 
   // Empty state: no wallet
   if (!isConnected) {
@@ -67,11 +129,12 @@ export function VerifierStepRunner({ step }: { step: number }) {
           type="button"
           onClick={() => connector && connect({ connector })}
           disabled={!connector || connectStatus === 'pending'}
+          aria-disabled={!connector || connectStatus === 'pending'}
           className="mt-4 inline-flex items-center gap-2 rounded-md bg-ink px-4 py-3 text-sm min-h-[44px] font-medium text-parchment hover:bg-ink/90 disabled:opacity-60"
         >
           {connectStatus === 'pending' ? (
             <>
-              <Loader2 className="size-4 animate-spin" aria-hidden /> Connecting
+              <span className="inline-block size-4 animate-pulse rounded-full bg-parchment/60" aria-hidden /> Connecting…
             </>
           ) : (
             'Connect with Postern'
@@ -93,75 +156,6 @@ export function VerifierStepRunner({ step }: { step: number }) {
     );
   }
 
-  const config = getStepConfig(step);
-  // Step-specific wagmi wiring. Address-gated hooks return no-op state
-  // machines until the contract is deployed; only the matching step
-  // actually invokes its hook on click.
-  const { data: cofferAddress } = useContractAddress('coffer');
-  const { data: killSwitchAddress } = useContractAddress('postern-kill-switch');
-  const vaultDeposit = useVaultDeposit(cofferAddress ?? null);
-  const killSwitch = useKillSwitch(killSwitchAddress ?? null);
-  const lantern = useLanternVerify();
-  const chaos = useChaosInject();
-
-  // Bridge each hook's status into this component's RunState so the
-  // existing success/error/loading UI keeps working without per-step UI
-  // rewrites.
-  useEffect(() => {
-    const s = vaultDeposit.status;
-    if (s.kind === 'idle') return;
-    if (s.kind === 'checking') setRun({ status: 'pending' });
-    else if (s.kind === 'approving' || s.kind === 'depositing') setRun({ status: 'pending' });
-    else if (s.kind === 'success') setRun({ status: 'success', txHash: s.depositHash });
-    else if (s.kind === 'error') setRun({ status: 'error', errorMessage: s.reason });
-  }, [vaultDeposit.status]);
-  useEffect(() => {
-    const s = killSwitch.status;
-    if (s.kind === 'idle') return;
-    if (s.kind === 'submitting') setRun({ status: 'pending' });
-    else if (s.kind === 'success') setRun({ status: 'success', txHash: s.hash });
-    else if (s.kind === 'error') setRun({ status: 'error', errorMessage: s.reason });
-  }, [killSwitch.status]);
-  // Audit U-26: bridge useLanternVerify's status into the runner's
-  // RunState. Lantern verify is read-only (no tx hash) — the success
-  // payload carries the inclusion-proof result, which surfaces via the
-  // error message slot when the user is not in the tree (honest negative).
-  useEffect(() => {
-    const s = lantern.status;
-    if (s.kind === 'idle') return;
-    if (s.kind === 'reading-attestation' || s.kind === 'verifying') {
-      setRun({ status: 'pending' });
-    } else if (s.kind === 'success') {
-      if (s.result.ok) {
-        setRun({ status: 'success' });
-      } else {
-        setRun({
-          status: 'error',
-          errorMessage:
-            s.result.reason ||
-            'Wallet not found in the latest Lantern attestation tree.',
-        });
-      }
-    } else if (s.kind === 'error') {
-      setRun({ status: 'error', errorMessage: s.reason });
-    }
-  }, [lantern.status]);
-  // Audit U-27: bridge useChaosInject's status. Off-chain action — no tx
-  // hash. The success payload optionally carries a `recoveredInMs`
-  // measurement we forward into the error-message slot (used as a generic
-  // "details" line by the runner UI).
-  useEffect(() => {
-    const s = chaos.status;
-    if (s.kind === 'idle') return;
-    if (s.kind === 'submitting') {
-      setRun({ status: 'pending' });
-    } else if (s.kind === 'success') {
-      setRun({ status: 'success' });
-    } else if (s.kind === 'error') {
-      setRun({ status: 'error', errorMessage: s.reason });
-    }
-  }, [chaos.status]);
-
   const handleRun = async () => {
     if (!deploymentReady) return; // button is disabled in this case; guard anyway
     if (!config) {
@@ -171,11 +165,14 @@ export function VerifierStepRunner({ step }: { step: number }) {
     // Kill Switch (step 7) is irreversible. Per ui.md §Verifier Mode rules
     // and audit D-29: require explicit confirm before firing.
     if (step === 7) {
-      const ok = window.confirm(
-        'Kill Switch: revoke every Sigil mandate AND cancel every active session key for this wallet. This cannot be undone with the same keys. Continue?',
-      );
-      if (!ok) return;
+      setShowKillConfirm(true);
+      return;
     }
+    executeStep();
+  };
+
+  const executeStep = async () => {
+    if (!config) return;
     setRun({ status: 'pending' });
     try {
       // Audit U-16: dispatch the real action per step config. Step 1
@@ -223,11 +220,14 @@ export function VerifierStepRunner({ step }: { step: number }) {
       {deploymentReady === false && (
         <div className="rounded-md border border-testnet/30 bg-testnet/5 p-4">
           <p className="flex items-center gap-2 text-sm font-medium text-testnet">
-            <Info className="size-4" aria-hidden /> Step not wired yet
+            <Info className="size-4" aria-hidden /> Step not ready
           </p>
           <p className="mt-1 text-sm text-ink-soft">
-            The contract for step {step} is not registered in this network&apos;s deployment
-            file. The button is disabled until F1 lands the wiring (Month 2 W1 per docs/ROADMAP.md).
+            {deploymentBlocker
+              ? `Blocker: ${deploymentBlocker.replace(/-/g, ' ')}. `
+              : ''}
+            The contract for step {step} is not fully wired on this network.
+            The button is disabled until the on-chain state is ready.
           </p>
         </div>
       )}
@@ -240,7 +240,7 @@ export function VerifierStepRunner({ step }: { step: number }) {
       >
         {run.status === 'pending' ? (
           <>
-            <Loader2 className="size-4 animate-spin" aria-hidden /> Submitting
+            <span className="inline-block size-4 animate-pulse rounded-full bg-parchment/60" aria-hidden /> Submitting…
           </>
         ) : (
           `Run step ${step}`
@@ -281,6 +281,17 @@ export function VerifierStepRunner({ step }: { step: number }) {
           </button>
         </div>
       )}
+
+      {/* A11Y-13: Accessible kill-switch confirmation */}
+      <ConfirmModal
+        open={showKillConfirm}
+        onConfirm={() => { setShowKillConfirm(false); executeStep(); }}
+        onCancel={() => setShowKillConfirm(false)}
+        title="Kill Switch"
+        description="Revoke every Sigil mandate AND cancel every active session key for this wallet. This cannot be undone with the same keys. Continue?"
+        confirmLabel="Activate Kill Switch"
+        destructive
+      />
     </div>
   );
 }

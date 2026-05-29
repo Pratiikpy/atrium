@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium — security',
+  title: 'Atrium · security',
   description: 'Atrium security posture, disclosure policy, and audit-findings register.',
 };
 

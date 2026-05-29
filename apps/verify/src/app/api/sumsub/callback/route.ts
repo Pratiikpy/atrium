@@ -130,8 +130,11 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, wallet, tx, arbiscan: `https://sepolia.arbiscan.io/tx/${tx}` });
   } catch (err) {
+    // Phase 3: Log full context to Sentry but never echo wallet in HTTP response
+    const Sentry = await import('@sentry/nextjs');
+    Sentry.captureException(err, { extra: { wallet, applicantId: event.applicantId } });
     return NextResponse.json(
-      { ok: false, wallet, error: 'tier_assign_failed', detail: err instanceof Error ? err.message : String(err) },
+      { ok: false, error: 'tier_assign_failed', detail: err instanceof Error ? err.message : String(err) },
       { status: 502 },
     );
   }

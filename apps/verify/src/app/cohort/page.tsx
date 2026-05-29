@@ -1,6 +1,12 @@
-import { Wordmark } from '@/components/wordmark';
 import { CohortGrid } from '@/components/cohort-grid';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
+import { buildMetadata } from '@/lib/build-metadata';
+
+export const metadata = buildMetadata({
+  title: 'Cohort',
+  description: 'Named design partners using Atrium on Arbitrum Sepolia. Numbers from on-chain Scribe queries.',
+  canonical: '/cohort',
+});
 
 export default function CohortPage() {
   return (

@@ -44,7 +44,7 @@ export function VerifyMyBalanceButton() {
 
   const noAttestation = data?.exists === false || !data?.root;
   const tip = noAttestation
-    ? 'No attestation published yet — Lantern cron runs hourly.'
+    ? 'No attestation published yet — Lantern cron runs every ≤10 minutes.'
     : `Latest root has ${data?.leafCount ?? '?'} leaves. Click to verify your own.`;
 
   return (

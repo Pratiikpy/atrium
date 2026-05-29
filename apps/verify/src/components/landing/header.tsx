@@ -18,9 +18,8 @@ export function LandingHeader() {
       <div className="mx-auto grid max-w-[1240px] grid-cols-[auto_1fr_auto] items-center gap-6 px-6 py-4 md:px-14">
         <Link
           href="/"
-          className="text-2xl italic"
+          className="text-2xl font-serif italic"
           style={{
-            fontFamily: '"Instrument Serif", "Times New Roman", serif',
             color: 'oklch(0.96 0.003 60)',
           }}
         >

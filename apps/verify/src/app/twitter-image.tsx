@@ -4,4 +4,5 @@
 //
 // Per-page override is allowed by placing a per-route opengraph-image
 // file (e.g. apps/verify/src/app/security/opengraph-image.tsx).
-export { default, runtime, alt, size, contentType } from './opengraph-image';
+export { default, alt, size, contentType } from './opengraph-image';
+export const runtime = 'edge';

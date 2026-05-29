@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { gql } from '@/lib/scribe-helpers';
 import { venueLabel } from '@/lib/venues';
 import { formatUsd, formatShares } from '@/lib/format-usd';
+import { requireWalletMatch } from '@/lib/auth-session';
+import { noCacheHeaders } from '@/lib/no-cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +27,11 @@ export async function GET(req?: Request) {
     walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
       ? walletParam
       : process.env.DEMO_WALLET_ADDRESS ?? null;
+  // Phase 2c: lock to authenticated session
+  if (req && wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
   if (!wallet) {
     return NextResponse.json({ positions: [], source: 'pending' });
   }
@@ -130,7 +137,7 @@ export async function GET(req?: Request) {
         markSource: 'pending' as const,
       };
     });
-    return NextResponse.json({ positions, source: 'scribe' as const });
+    return NextResponse.json({ positions, source: 'scribe' as const }, { headers: noCacheHeaders });
   } catch {
     return NextResponse.json({ positions: [], source: 'pending' });
   }

@@ -28,7 +28,7 @@ async function fetchFindings(): Promise<Response> {
 
 /**
  * Live audit findings register on /security. Source of truth is
- * docs/AUDIT_FINDINGS.md; the /api/audit-findings route deserializes
+ * docs/plan-tracker.md; the /api/audit-findings route deserializes
  * the markdown table into JSON. Phase eta.16.
  */
 export function AuditFindingsTable() {
@@ -63,7 +63,7 @@ export function AuditFindingsTable() {
             <strong className="font-mono">{summary.pending}</strong> pending
           </span>
           <span className="text-muted">
-            . source: <code className="font-mono">docs/AUDIT_FINDINGS.md</code>
+            . source: <code className="font-mono">docs/plan-tracker.md</code>
           </span>
         </div>
       )}
@@ -118,7 +118,7 @@ export function AuditFindingsTable() {
           {findings.length > 40 && (
             <p className="border-t border-divider bg-parchment-soft px-3 py-2 text-center text-[11px] text-muted">
               showing first 40 of {findings.length} . see{' '}
-              <code className="font-mono">docs/AUDIT_FINDINGS.md</code> for the full register
+              <code className="font-mono">docs/plan-tracker.md</code> for the full register
             </p>
           )}
         </div>

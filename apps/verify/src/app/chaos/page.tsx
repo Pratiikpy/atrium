@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 type Fault =

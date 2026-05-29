@@ -12,6 +12,18 @@ const WagmiProviders = dynamic(
   { ssr: false },
 );
 
+const KillSwitchFAB = dynamic(
+  () => import('@/components/mobile/panels/kill-switch-mobile').then((m) => m.KillSwitchFAB),
+  { ssr: false },
+);
+
 export default function AppSegmentLayout({ children }: { children: React.ReactNode }) {
-  return <WagmiProviders>{children}</WagmiProviders>;
+  return (
+    <WagmiProviders>
+      <main id="main-content">
+        {children}
+      </main>
+      <KillSwitchFAB />
+    </WagmiProviders>
+  );
 }

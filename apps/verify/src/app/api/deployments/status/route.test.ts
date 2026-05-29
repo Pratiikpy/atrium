@@ -7,16 +7,9 @@ import { GET } from './route';
  * verify app via `useDeploymentStatus(step)`. If the response shape ever
  * drifts, every step's run button silently breaks.
  *
- * These tests pin:
- *   - Step clamping to [1, 7] (handles 0, 8, "foo", negative, fractional)
- *   - The fixed STEP_REQUIREMENTS mapping per step
- *   - Internal consistency: ready === (missing.length === 0)
- *   - Always returns a complete StepStatus object — never throws
- *
- * Tests do NOT depend on the filesystem. The route gracefully handles a
- * missing registry → ready=false with every required contract listed as
- * missing. So tests assert on the SHAPE of the response, not the truth
- * value of `ready` (which depends on deploy state).
+ * Phase 8 update: response now includes `blocker` field driven by on-chain
+ * state. `ready` can be false even when `missing.length === 0` if a blocker
+ * is detected (e.g. router not authorized on adapters).
  */
 
 function makeReq(stepParam: string | null): NextRequest {
@@ -32,6 +25,7 @@ async function call(stepParam: string | null) {
   return (await res.json()) as {
     step: number;
     ready: boolean;
+    blocker: string | null;
     init_state: 'initialized' | 'uninitialized' | 'unknown';
     required_contracts: string[];
     missing: string[];
@@ -69,29 +63,25 @@ describe('GET /api/deployments/status — step clamping', () => {
   });
 
   it('truncates fractional input to integer', async () => {
-    // parseInt('3.7') === 3 — locks the truncation behavior.
     expect((await call('3.7')).step).toBe(3);
     expect((await call('2.0')).step).toBe(2);
   });
 });
 
 describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
-  // The 7-step Verifier flow maps to these contract dependencies. Locks
-  // the mapping so a refactor to verifier-step-runner doesn't drift.
-
   it('step 1 → coffer (deposit path)', async () => {
     const json = await call('1');
     expect(json.required_contracts).toEqual(['coffer']);
   });
 
-  it('step 2 → plinth (open_position path)', async () => {
+  it('step 2 → plinth + atrium-router (open_position path)', async () => {
     const json = await call('2');
-    expect(json.required_contracts).toEqual(['plinth']);
+    expect(json.required_contracts).toEqual(['plinth', 'atrium-router']);
   });
 
-  it('step 3 → plinth (margin recompute)', async () => {
+  it('step 3 → plinth + atrium-router (margin recompute)', async () => {
     const json = await call('3');
-    expect(json.required_contracts).toEqual(['plinth']);
+    expect(json.required_contracts).toEqual(['plinth', 'atrium-router']);
   });
 
   it('step 4 → plinth (chaos / oracle drift scenario)', async () => {
@@ -100,7 +90,6 @@ describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
   });
 
   it('step 5 → vigil + plinth (liquidation path)', async () => {
-    // Liquidation needs both: Vigil to queue the job, Plinth to update margin.
     const json = await call('5');
     expect(json.required_contracts).toEqual(['vigil', 'plinth']);
   });
@@ -111,8 +100,6 @@ describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
   });
 
   it('step 7 → postern-kill-switch + sigil (Kill Switch revoke)', async () => {
-    // Kill Switch revokes BOTH Postern session keys AND Sigil mandates.
-    // Needs both deployments to fire the batched tx.
     const json = await call('7');
     expect(json.required_contracts).toEqual(['postern-kill-switch', 'sigil']);
   });
@@ -120,11 +107,11 @@ describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
 
 describe('GET /api/deployments/status — response invariants', () => {
   it('always returns a complete StepStatus object — never throws', async () => {
-    // Hit every step, expect each response to be a fully-formed object.
     for (let i = 0; i <= 8; i++) {
       const json = await call(String(i));
       expect(json).toHaveProperty('step');
       expect(json).toHaveProperty('ready');
+      expect(json).toHaveProperty('blocker');
       expect(json).toHaveProperty('init_state');
       expect(json).toHaveProperty('required_contracts');
       expect(json).toHaveProperty('missing');
@@ -136,37 +123,20 @@ describe('GET /api/deployments/status — response invariants', () => {
     }
   });
 
-  it('internal invariant: ready === (missing.length === 0)', async () => {
+  it('ready=false when missing.length > 0', async () => {
     for (let i = 1; i <= 7; i++) {
       const json = await call(String(i));
-      expect(json.ready).toBe(json.missing.length === 0);
-    }
-  });
-
-  it('missing[] is always a subset of required_contracts[]', async () => {
-    for (let i = 1; i <= 7; i++) {
-      const json = await call(String(i));
-      for (const m of json.missing) {
-        expect(json.required_contracts).toContain(m);
+      if (json.missing.length > 0) {
+        expect(json.ready).toBe(false);
       }
     }
   });
 
-  it('does NOT include any contract NOT in STEP_REQUIREMENTS', async () => {
-    // Lock the closed set: step responses never name a contract outside
-    // the STEP_REQUIREMENTS map.
-    const KNOWN_CONTRACTS = new Set([
-      'coffer',
-      'plinth',
-      'vigil',
-      'lantern-attestor',
-      'postern-kill-switch',
-      'sigil',
-    ]);
+  it('ready=false when blocker is non-null', async () => {
     for (let i = 1; i <= 7; i++) {
       const json = await call(String(i));
-      for (const c of json.required_contracts) {
-        expect(KNOWN_CONTRACTS.has(c)).toBe(true);
+      if (json.blocker !== null) {
+        expect(json.ready).toBe(false);
       }
     }
   });

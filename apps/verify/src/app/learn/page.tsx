@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium — learn',
+  title: 'Atrium · learn',
   description: 'How Atrium nets cross-venue collateral with one margin number.',
+  alternates: { canonical: '/learn' },
 };
 
 export default function LearnPage() {

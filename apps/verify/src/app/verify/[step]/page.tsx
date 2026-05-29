@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Route } from 'next';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Wordmark } from '@/components/wordmark';
+import type { Metadata } from 'next';
+import { ArrowRight } from 'lucide-react';
 import { VerifierStepRunner } from '@/components/verifier-step-runner';
 import { WagmiProviders } from '@/components/wagmi-providers';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
@@ -70,6 +70,17 @@ const STEP_CONFIG = {
     nextStep: null,
   },
 } as const;
+
+export async function generateMetadata({ params }: { params: Promise<{ step: string }> }): Promise<Metadata> {
+  const { step } = await params;
+  const cfg = STEP_CONFIG[step as keyof typeof STEP_CONFIG];
+  if (!cfg) return {};
+  return {
+    title: `Step ${step}: ${cfg.title}`,
+    description: cfg.body,
+    alternates: { canonical: `/verify/${step}` },
+  };
+}
 
 export default async function VerifyStepPage({
   params,
