@@ -9,6 +9,6 @@
   ],
   "env": {
     "SCRIBE_URL": "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/version/latest",
-    "CODEX_URL": "https://codex-8y7umy7c2-pratiikpys-projects.vercel.app"
+    "CODEX_URL": ""
   }
 }

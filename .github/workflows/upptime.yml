@@ -1,0 +1,33 @@
+name: Upptime
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: upptime
+  cancel-in-progress: false
+
+jobs:
+  upptime:
+    name: Monitor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: upptime/uptime-monitor@75b0413ab8fd16c2c9be1048818805d67f53ac2f # v1.38.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      # Discord notification on failure
+      - name: Notify Discord on failure
+        if: failure()
+        uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9 # v0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
+        with:
+          args: "Upptime monitor workflow failed - check https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
