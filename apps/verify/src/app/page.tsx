@@ -4,40 +4,33 @@ import { Footer } from '@/components/atrium/Footer';
 import { BlueprintGrid, Vignette } from '@/components/atrium/HeroChrome';
 import { Impluvium } from '@/components/atrium/Impluvium';
 import { Card, SectionHead, Tag } from '@/components/atrium/primitives';
-import { MobileLanding } from '@/components/atrium/mobile/MobileLanding';
-import {
-  Feature,
-  PortfolioMock,
-  AqueductMock,
-  SigilMock,
-  LanternMock,
-} from '@/components/atrium/landing/Features';
-import { Numbers } from '@/components/atrium/landing/Numbers';
+import { Feature } from '@/components/atrium/landing/Feature';
 import { FloorPlanSection } from '@/components/atrium/landing/FloorPlan';
-import { VENUES, SUBSYSTEMS, PARTNERS, fmtUSD } from '@/lib/atrium/mock';
+import { VENUES, SUBSYSTEMS, TECHNOLOGY_STACK } from '@/lib/atrium/static';
+import { JsonLd, ATRIUM_ORG_SCHEMA, ATRIUM_APP_SCHEMA } from '@/components/json-ld';
 
 export const metadata = {
-  title: 'Atrium — one wallet, every venue, one buying-power number',
+  title: 'Atrium · one wallet, every venue, one buying-power number',
   description:
     'Unified margin prime brokerage for the EVM. Deposit USDC once. Trade across perps, lending, yield, and prediction markets with one buying-power number. Testnet-first.',
   openGraph: {
-    title: 'Atrium — unified margin prime brokerage',
+    title: 'Atrium · unified margin prime brokerage',
     description:
       'Deposit once. Net cross-venue hedges. One buying-power number across every venue. Built testnet-first on Arbitrum Sepolia.',
   },
+  alternates: { canonical: '/' },
 };
 
 /**
- * Landing page (Lovable port, 2026-05-28).
- * Single-route dual-render: MobileLanding for ≤768px, the full
- * desktop tree for the rest. CSS media query in globals.css drives
- * the visibility switch via `.atrium-mobile-only` / `.atrium-desktop-only`.
+ * Landing page (2026-05-28).
+ * Responsive single-tree render. No dual-render with separate mobile component.
  */
 export default function LandingPage() {
   return (
     <>
-      <div className="atrium-mobile-only"><MobileLanding /></div>
-      <div className="atrium-desktop-only min-h-screen">
+      <JsonLd schema={ATRIUM_ORG_SCHEMA} />
+      <JsonLd schema={ATRIUM_APP_SCHEMA} />
+      <div className="min-h-screen" id="main-content">
         <PublicNav heroId="hero" />
 
         {/* ============== HERO MONUMENT ============== */}
@@ -71,7 +64,7 @@ export default function LandingPage() {
                 <Link href="/app" className="btn light">
                   Open testnet <span className="arrow">↗</span>
                 </Link>
-                <Link href="/verify" className="btn ghost-light">
+                <Link href="/verify/1" className="btn ghost-light">
                   View verifier walk →
                 </Link>
               </div>
@@ -99,7 +92,7 @@ export default function LandingPage() {
                 <p className="mt-3 text-[15px] leading-[1.65] text-[var(--ink-soft)]">
                   Post collateral on Hyperliquid for your perp. Post collateral on Aave for
                   your lending. Post collateral on Pendle for your yield. The venues don&apos;t
-                  know about each other — every one demands full margin. Your money is
+                  know about each other. Every one demands full margin. Your money is
                   split across four sandboxes. If one congests, you withdraw, bridge, and
                   redeposit by hand.
                 </p>
@@ -126,7 +119,7 @@ export default function LandingPage() {
             <SectionHead
               num="II"
               title={<>Eight venues. One margin engine.</>}
-              sub="Live testnet adapters today. RH-Chain ships within 14 days of the Robinhood SDK going public."
+              sub="Whitelisted Portico adapters on Arbitrum Sepolia testnet. RH-Chain ships within 14 days of the Robinhood SDK going public."
             />
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {VENUES.map((v) => (
@@ -140,15 +133,23 @@ export default function LandingPage() {
                         {v.short}
                       </div>
                     </div>
-                    {v.pending ? <Tag variant="amber">Pending</Tag> : <Tag variant="green">Live</Tag>}
+                    {/* Audit honesty fix (#11/#13): tag was "Live" on every
+                        venue, and the footer rendered a fabricated "Test
+                        collateral" dollar figure from static.ts under it -
+                        contradicting the honesty page's promise to render "—"
+                        for anything not from a live read. The adapters ARE
+                        registered in PorticoRegistry, so "Registered" is the
+                        honest tag; and we show the real collateral-asset types
+                        (a factual venue attribute) instead of a fake TVL. */}
+                    {v.pending ? <Tag variant="amber">Pending</Tag> : <Tag variant="green">Registered</Tag>}
                   </div>
                   <div className="text-[13px] text-[var(--ink-soft)]">{v.type}</div>
                   <div className="hairline" />
                   <div className="flex items-end justify-between">
                     <div>
-                      <div className="cap">Test collateral</div>
-                      <div className="num mt-1 text-[16px] font-medium text-[var(--ink)]">
-                        {v.pending ? '—' : fmtUSD(v.collateral, { compact: true })}
+                      <div className="cap">Collateral asset</div>
+                      <div className="mono mt-1 text-[12px] font-medium text-[var(--ink)]">
+                        {v.asset}
                       </div>
                     </div>
                     <div className="text-right">
@@ -162,7 +163,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ============== FEATURE MOCKS ============== */}
+        {/* ============== FEATURE SECTIONS ============== */}
         <Feature
           id="portfolio-feature"
           eyebrow="Plinth · margin engine"
@@ -170,7 +171,11 @@ export default function LandingPage() {
           accent="mathematically."
           sub="Plinth computes a SPAN-style cross-product margin number in Rust, deployed as Stylus. The same math costs 10–100× more gas in equivalent Solidity."
         >
-          <PortfolioMock />
+          <div className="product-frame">
+            <div className="product-body" style={{ padding: 32 }}>
+              <p className="mono cap muted">Design preview · live data renders in /app/portfolio</p>
+            </div>
+          </div>
         </Feature>
 
         <Feature
@@ -180,7 +185,11 @@ export default function LandingPage() {
           accent="one transaction."
           sub="Aqueduct routes assets through Chainlink CCIP. Collateral on Robinhood Chain becomes Plinth credit on Arbitrum in under ten seconds."
         >
-          <AqueductMock />
+          <div className="product-frame">
+            <div className="product-body" style={{ padding: 32 }}>
+              <p className="mono cap muted">Design preview · live transfers in /app/transfer</p>
+            </div>
+          </div>
         </Feature>
 
         <Feature
@@ -189,9 +198,13 @@ export default function LandingPage() {
           eyebrow="Sigil · ERC-8004 mandates"
           title="Agents trade with"
           accent="bounded mandates."
-          sub="You sign one Intent Sigil — an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves."
+          sub="You sign one Intent Sigil, an EIP-712 mandate authorising one agent, for one strategy, for a finite window. Postern issues a session key. Your master key never moves."
         >
-          <SigilMock />
+          <div className="product-frame">
+            <div className="product-body" style={{ padding: 32 }}>
+              <p className="mono cap muted">Design preview · live mandates in /app/agents</p>
+            </div>
+          </div>
         </Feature>
 
         <Feature
@@ -199,12 +212,15 @@ export default function LandingPage() {
           eyebrow="Lantern · proof-of-reserves"
           title="Every dollar,"
           accent="on the public record."
-          sub="Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally — without trusting Atrium."
+          sub="Lantern publishes a signed Merkle attestation every ten minutes. Anyone can verify a balance against it locally, without trusting Atrium."
         >
-          <LanternMock />
+          <div className="product-frame">
+            <div className="product-body" style={{ padding: 32 }}>
+              <p className="mono cap muted">Design preview · live attestations in /app/reserves</p>
+            </div>
+          </div>
         </Feature>
 
-        <Numbers />
         <FloorPlanSection />
 
         {/* ============== SUBSYSTEMS ============== */}
@@ -297,10 +313,10 @@ export default function LandingPage() {
         {/* ============== TRUST STRIP ============== */}
         <section className="border-y border-[var(--hairline)]">
           <div className="container py-10">
-            <div className="cap mb-5 text-center">Building with</div>
+            <div className="cap mb-5 text-center">Building on</div>
             <div className="mono flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[12.5px] text-[var(--ink-soft)]">
-              {PARTNERS.map((p) => (
-                <span key={p}>{p}</span>
+              {TECHNOLOGY_STACK.map((t) => (
+                <span key={t}>{t}</span>
               ))}
             </div>
           </div>
@@ -316,7 +332,7 @@ export default function LandingPage() {
             </h2>
             <div className="mt-10 flex flex-wrap justify-center gap-3">
               <Link href="/app" className="btn light lg">Open testnet ↗</Link>
-              <Link href="/verify" className="btn ghost-light lg">See how it works</Link>
+              <Link href="/verify/1" className="btn ghost-light lg">See how it works</Link>
             </div>
             <div className="mono mt-8 text-[11px] uppercase tracking-[0.14em]"
               style={{ color: 'color-mix(in oklch, var(--dark-ink) 50%, transparent)' }}>
