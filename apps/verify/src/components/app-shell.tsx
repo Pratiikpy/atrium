@@ -3,6 +3,7 @@ import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
 import { WrongChainBanner } from './wrong-chain-banner';
 import { MobileBottomNav } from './mobile/mobile-bottom-nav';
+import { CommandPalette } from './command-palette';
 
 /**
  * AppShell (2026-05-28).
@@ -110,11 +111,9 @@ export function AppShell({
             </span>
           </div>
 
-          <div className="side-search">
-            <SearchIcon />
-            <span>Search · positions, agents</span>
-            <kbd className="kbd">⌘K</kbd>
-          </div>
+          {/* Audit fix (#46): was a decorative div with a fake ⌘K kbd and no
+              handler. Now a real command palette (⌘K / click to open). */}
+          <CommandPalette />
 
           {NAV_GROUPS.map((group) => (
             <div key={group.heading} className="side-section">
@@ -203,12 +202,4 @@ function NavIcon({ kind }: { kind: string }) {
     default:
       return null;
   }
-}
-function SearchIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="M10.5 10.5l3 3" />
-    </svg>
-  );
 }
