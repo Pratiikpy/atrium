@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { ConnectWallet } from '@/components/connect-wallet';
 
 interface Wallet {
   address: string;
@@ -53,6 +54,12 @@ export function WalletDetailCard() {
           {ready ? 'ERC-4337 · 7702 ready' : 'Postern pending'}
         </span>
       </header>
+
+      {/* Real connect/disconnect entry (blocker fix): the app had no working
+          wallet-connect anywhere in /app/* - this is the canonical one. */}
+      <div className="mt-4">
+        <ConnectWallet variant="button" />
+      </div>
 
       <dl className="mt-5 divide-y divide-divider-soft">
         <RowLine label="Address" value={data?.address ?? '—'} mono />
