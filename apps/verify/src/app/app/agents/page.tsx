@@ -1,8 +1,14 @@
+import nextDynamic from 'next/dynamic';
 import { AppShell } from '@/components/app-shell';
 import { AgentsStatRow } from '@/components/agents/stat-row';
 import { AgentsView } from '@/components/agents/agents-view';
-import { NewMandateButton } from '@/components/agents/new-mandate-button';
 import { AgentsMobile } from '@/components/mobile/panels/agents-mobile';
+
+/* PERF-04: NewMandateButton is heavy (EIP-712 signing logic) — dynamic */
+const NewMandateButton = nextDynamic(
+  () => import('@/components/agents/new-mandate-button').then((m) => m.NewMandateButton),
+  { loading: () => <span className="inline-block h-10 w-32 animate-pulse rounded-md bg-ink/10" /> },
+);
 
 export const metadata = {
   title: 'Atrium · Agents',
@@ -21,7 +27,7 @@ export default function AgentsPage() {
       active="/app/agents"
       breadcrumb={[
         { label: 'Agents' },
-        { label: 'Sigil & Rostrum' },
+        { label: 'Mandates · Sigil & Rostrum' },
       ]}
     >
       <AgentsMobile />

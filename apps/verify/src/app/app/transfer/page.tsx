@@ -3,6 +3,7 @@ import { TransferForm } from '@/components/transfer/transfer-form';
 import { TransferTimeline } from '@/components/transfer/transfer-timeline';
 import { RecentTransfers } from '@/components/transfer/recent-transfers';
 import { TransferMobile } from '@/components/mobile/panels/transfer-mobile';
+import { TestnetPill } from '@/components/ui/testnet-pill';
 
 export const metadata = {
   title: 'Atrium · Transfer',
@@ -15,12 +16,14 @@ export default function TransferPage() {
       active="/app/transfer"
       breadcrumb={[
         { label: 'Transfer' },
-        { label: 'Aqueduct · Chainlink CCIP' },
+        { label: 'Cross-chain · Aqueduct' },
       ]}
     >
       <TransferMobile />
       <div className="hidden md:block">
       <header>
+        <div className="flex items-start justify-between">
+        <div>
         <p className="eyebrow">Transfer · Aqueduct</p>
         <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
           Move collateral between chains
@@ -28,6 +31,9 @@ export default function TransferPage() {
         <p className="mt-2 max-w-prose text-sm text-muted">
           Aqueduct routes through Chainlink CCIP. Posted collateral becomes Plinth credit on arrival.
         </p>
+        </div>
+        <TestnetPill />
+        </div>
       </header>
 
       <section className="mt-8 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">

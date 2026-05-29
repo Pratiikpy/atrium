@@ -16,7 +16,7 @@ export default function SettingsPage() {
       active="/app/settings"
       breadcrumb={[
         { label: 'Settings' },
-        { label: 'Postern · wallet' },
+        { label: 'Wallet · Postern' },
       ]}
     >
       <SettingsMobile />

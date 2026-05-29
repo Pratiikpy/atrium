@@ -43,7 +43,7 @@ export default function PortfolioPage() {
       active="/app/portfolio"
       breadcrumb={[
         { label: 'Portfolio' },
-        { label: 'Plinth · unified margin' },
+        { label: 'Unified margin · Plinth' },
       ]}
     >
       {/* Mobile (< md): canonical Mobile App Home panel (hero buying-power
