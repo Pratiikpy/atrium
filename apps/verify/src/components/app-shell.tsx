@@ -1,9 +1,40 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
 import { WrongChainBanner } from './wrong-chain-banner';
 import { MobileBottomNav } from './mobile/mobile-bottom-nav';
 import { CommandPalette } from './command-palette';
+
+/**
+ * Audit fix (#44): render {children} ONCE.
+ *
+ * Pre-fix AppShell rendered {children} in BOTH the mobile `<main>` and the
+ * desktop `.view`, toggling the wrappers with CSS display:none. But display:none
+ * hides without unmounting, so every page's component tree (mobile panel +
+ * desktop block) mounted twice and every useQuery/refetchInterval poller ran
+ * duplicated on every viewport - up to 4x the API/RPC calls. A viewport-gated
+ * `enabled` cannot fix this (both copies see the same viewport).
+ *
+ * This hook picks the active branch so {children} mounts in exactly one. It
+ * defaults to desktop on SSR AND the first client render (so the hydrated HTML
+ * matches - no React 19 hydration mismatch), then resolves the real viewport in
+ * an effect. On mobile that costs one reflow on first load, invisible on these
+ * skeleton-first, client-data pages.
+ */
+function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return isMobile;
+}
 
 /**
  * AppShell (2026-05-28).
@@ -71,11 +102,13 @@ export function AppShell({
   active?: string;
   breadcrumb?: TopbarProps['breadcrumb'];
 }) {
+  // Audit fix (#44): mount {children} in exactly one branch (see useIsMobile).
+  const isMobile = useIsMobile();
   return (
     <>
       {/* Mobile branch: minimal chrome wrapping the
-          actual page content. Renders `{children}` directly — every
-          /app/* route shows its own real-data content on mobile. */}
+          actual page content. Renders `{children}` only when the viewport is
+          mobile so the tree mounts once. */}
       <div className="atrium-mobile-only" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
         <header
           className="atrium-nav"
@@ -89,7 +122,7 @@ export function AppShell({
             testnet
           </span>
         </header>
-        <main style={{ padding: '16px', paddingBottom: '80px' }}>{children}</main>
+        <main style={{ padding: '16px', paddingBottom: '80px' }}>{isMobile ? children : null}</main>
         {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
             never rendered one - the built MobileBottomNav was orphaned, leaving
             mobile users with no in-app navigation between screens. Now wired. */}
@@ -162,8 +195,9 @@ export function AppShell({
             </div>
           </div>
 
-          {/* View content */}
-          <div className="view">{children}</div>
+          {/* View content. Audit fix (#44): mounted only on the desktop
+              viewport so {children} renders once across both branches. */}
+          <div className="view">{!isMobile ? children : null}</div>
         </div>
       </div>
     </>

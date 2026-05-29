@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { StrategyCombos } from '@/components/markets/strategy-combos';
+import { MarketsMobile } from '@/components/mobile/panels/markets-mobile';
 
 export const metadata = {
   title: 'Atrium · Markets',
@@ -87,6 +88,10 @@ const VENUES = [
 export default function MarketsPage() {
   return (
     <AppShell active="/app/markets">
+      {/* Audit fix (#74): mobile gets the thumb-friendly venue browser (was the
+          cramped desktop list). Desktop unchanged below. */}
+      <MarketsMobile />
+      <div className="hidden md:block">
       <section>
         <p className="text-xs uppercase tracking-wider text-muted">Markets</p>
         <h1 className="mt-2 font-display text-4xl text-ink">Whitelisted venues</h1>
@@ -151,6 +156,7 @@ export default function MarketsPage() {
           Read the adapter spec
         </Link>
       </section>
+      </div>
     </AppShell>
   );
 }

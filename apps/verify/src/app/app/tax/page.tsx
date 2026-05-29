@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/app-shell';
 import { TaxView } from '@/components/tax/tax-view';
+import { TaxMobile } from '@/components/mobile/panels/tax-mobile';
 
 export const metadata = {
   title: 'Atrium · Tax',
@@ -15,12 +16,16 @@ export default function TaxPage() {
         { label: 'Tablet · exports' },
       ]}
     >
+      {/* Audit fix (#74): mobile gets the thumb-friendly tax dashboard panel. */}
+      <TaxMobile />
+      <div className="hidden md:block">
       <TaxView />
 
       <p className="mt-8 text-[10px] uppercase tracking-wider text-muted">
         Atrium is not a tax advisor. Export is a calculation aid intended for review by a qualified accountant.
         Signed Merkle root proves the export was produced from the same dataset that Lantern attested for the relevant block.
       </p>
+      </div>
     </AppShell>
   );
 }

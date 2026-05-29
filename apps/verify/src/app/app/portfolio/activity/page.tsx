@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/app-shell';
 import { ActivityFeedFull } from '@/components/portfolio/activity-feed-full';
+import { ActivityMobile } from '@/components/mobile/panels/activity-mobile';
 
 export const metadata = {
   title: 'Atrium · Portfolio activity',
@@ -21,6 +22,9 @@ export default function ActivityPage() {
         { label: 'Activity' },
       ]}
     >
+      {/* Audit fix (#74/#45): mobile gets the thumb-friendly activity timeline. */}
+      <ActivityMobile />
+      <div className="hidden md:block">
       <header>
         <p className="eyebrow">Activity</p>
         <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
@@ -34,6 +38,7 @@ export default function ActivityPage() {
       <section className="mt-8">
         <ActivityFeedFull />
       </section>
+      </div>
     </AppShell>
   );
 }

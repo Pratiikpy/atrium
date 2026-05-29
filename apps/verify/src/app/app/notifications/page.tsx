@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/app-shell';
 import { NotificationsList } from '@/components/notifications/list';
+import { NotificationsMobile } from '@/components/mobile/panels/notifications-mobile';
 
 export const metadata = {
   title: 'Atrium · Notifications',
@@ -20,6 +21,9 @@ export default function NotificationsPage() {
         { label: 'Notifications' },
       ]}
     >
+      {/* Audit fix (#74): mobile gets the thumb-friendly inbox panel. */}
+      <NotificationsMobile />
+      <div className="hidden md:block">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <p className="eyebrow">Notifications</p>
@@ -36,6 +40,7 @@ export default function NotificationsPage() {
       <section className="mt-8">
         <NotificationsList />
       </section>
+      </div>
     </AppShell>
   );
 }
