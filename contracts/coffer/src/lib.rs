@@ -163,6 +163,16 @@ sol_storage! {
         // any external call, cleared on return. Plinth has the same
         // pattern (see `contracts/plinth/src/lib.rs`).
         bool is_updating;
+
+        // Audit fix (#36): internally-accounted deposited assets, used ONLY for
+        // the deposit-cap gate. Incremented on a successful deposit, decremented
+        // on withdraw / adapter_pull. total_assets() still reads the live USDC
+        // balance for ERC-4626 share math, but the cap must not be drivable by a
+        // direct USDC donation (anyone could `USDC.transfer(coffer, X)` to push
+        // total_assets() over deposit_cap_wei and block ALL further deposits).
+        // Appended at the end of the struct to keep the storage layout
+        // upgrade-safe. Starts at 0 on a fresh deploy and accumulates.
+        uint256 tracked_assets_wei;
     }
 
     pub struct AdapterBudget {
@@ -174,7 +184,11 @@ sol_storage! {
 
 #[public]
 impl Coffer {
-    pub fn initialize(
+    /// Phase 2a: migrated from initialize() to #[constructor] per Plinth pattern.
+    /// Invoked exactly once at deploy time by the Stylus deployer factory.
+    /// Cannot be front-run since the factory is the immediate caller.
+    #[constructor]
+    pub fn constructor(
         &mut self,
         asset: Address,
         plinth: Address,
@@ -182,24 +196,10 @@ impl Coffer {
         praetor_timelock: Address,
         deposit_cap_wei: U256,
         per_user_cap_wei: U256,
-    ) -> Result<(), CofferError> {
-        if !self.praetor_multisig.get().is_zero() {
-            return Err(CofferError::Unauthorized(UnauthorizedCaller {
-                caller: self.vm().msg_sender(),
-            }));
-        }
-        // Audit A-4 fix: bind to deployer EOA so front-runners can't claim init.
-        if self.vm().msg_sender().is_zero() {
-            return Err(CofferError::Unauthorized(UnauthorizedCaller {
-                caller: self.vm().msg_sender(),
-            }));
-        }
+    ) {
         // Audit F-G fix: zero-address admin args would brick the contract.
-        if praetor.is_zero() || praetor_timelock.is_zero() {
-            return Err(CofferError::Unauthorized(UnauthorizedCaller {
-                caller: praetor,
-            }));
-        }
+        assert!(!praetor.is_zero(), "praetor zero");
+        assert!(!praetor_timelock.is_zero(), "timelock zero");
         self.asset.set(asset);
         self.plinth_address.set(plinth);
         self.praetor_multisig.set(praetor);
@@ -207,7 +207,6 @@ impl Coffer {
         self.deposit_cap_wei.set(deposit_cap_wei);
         self.per_user_cap_wei.set(per_user_cap_wei);
         self.tvl_drop_threshold_bps.set(Uint::<16, 1>::from(3_000u16));
-        Ok(())
     }
 
     fn assert_timelock(&self) -> Result<(), CofferError> {
@@ -327,7 +326,10 @@ impl Coffer {
         }
 
         // Check global cap
-        let new_tvl = self.total_assets().saturating_add(assets);
+        // Audit fix (#36): gate on tracked_assets_wei (internal accounting), NOT
+        // total_assets() (live balance), so a direct USDC donation cannot push
+        // the contract over deposit_cap_wei and DoS all further deposits.
+        let new_tvl = self.tracked_assets_wei.get().saturating_add(assets);
         if new_tvl > self.deposit_cap_wei.get() {
             return Err(CofferError::DepositCap(DepositCapExceeded {
                 requested: assets,
@@ -389,6 +391,9 @@ impl Coffer {
         self.share_balances.setter(receiver).set(prev_balance.saturating_add(shares));
         self.total_shares.set(self.total_shares.get().saturating_add(shares));
         self.per_user_deposits.setter(receiver).set(user_new);
+
+        // Audit fix (#36): track deposited assets for the cap gate (post-transfer).
+        self.tracked_assets_wei.set(self.tracked_assets_wei.get().saturating_add(assets));
 
         self.vm().log(Deposit {
             sender,
@@ -505,6 +510,9 @@ impl Coffer {
             }));
         }
 
+        // Audit fix (#36): keep tracked assets in sync on the way out.
+        self.tracked_assets_wei.set(self.tracked_assets_wei.get().saturating_sub(assets));
+
         self.vm().log(Withdraw {
             sender,
             receiver,
@@ -547,17 +555,20 @@ impl Coffer {
             return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
         }
 
+        // Phase 2a fix: gate adapter_pull behind withdrawals pause.
+        // Adapter pulls are economically equivalent to withdrawals — if
+        // withdrawals are paused (e.g. during incident response), adapter
+        // pulls must also be blocked to prevent collateral drain.
+        if self.is_withdrawals_paused.get() {
+            return Err(CofferError::WithdrawalsPaused(WithdrawalsPausedError {}));
+        }
+
         // Agent A / Agent F audit fix: block adapter_pull when the user account
         // is paused for pending liquidation. Without this an adapter could drain
         // collateral while Vigil is mid-liquidation.
         //
         // Audit KKK-3 fix: pre-fix used `if let Ok((..., is_paused))` which
         // silently dropped the entire pause-check on any Plinth call failure.
-        // Stylus view-cross-contract calls rarely error (no state mutation,
-        // gas-bounded), but "rarely" isn't "never" — a malicious Plinth
-        // upgrade or RPC hiccup would let adapter_pull bypass the liquidation
-        // pause. Propagate the failure as a real revert; same direction as
-        // the Wave-ZZ/AAA/BBB unwrap_or(default) hardening.
         let plinth_check = IPlinth::new(self.plinth_address.get());
         let (_, _, _, is_paused) = plinth_check
             .get_account(self.vm(), Call::new(), from_user)
@@ -589,9 +600,11 @@ impl Coffer {
         budget.used_this_block_wei.set(used + amount);
 
         // Bookkeeping: subtract from user's share via implicit accounting
-        // (positions held with adapter; tracked off-vault)
+        // Phase 2a fix: use convert_to_shares_ceil (round UP) so the vault
+        // never under-charges share burns on adapter pulls. Same rationale
+        // as the ERC-4626 withdraw path (FIRE78-COF1).
         let user_shares = self.share_balances.getter(from_user).get();
-        let shares_to_burn = self.convert_to_shares(amount);
+        let shares_to_burn = self.convert_to_shares_ceil(amount);
         if user_shares < shares_to_burn {
             return Err(CofferError::InsufficientShares(InsufficientShares {
                 requested: shares_to_burn,
@@ -602,12 +615,6 @@ impl Coffer {
         self.total_shares.set(self.total_shares.get().saturating_sub(shares_to_burn));
 
         // Send USDC to adapter destination
-        //
-        // AUDIT ZZ-6 (CRITICAL money-loss fix): same pattern as ZZ-5 in
-        // withdraw(). Prior `let _ = usdc.transfer(...)` discarded failures
-        // after the share burn. Adapter would receive Ok(()) thinking the
-        // pull succeeded; trade against phantom collateral; user's shares
-        // still burned.
         let usdc = IUsdc::new(self.asset.get());
         let ctx = Call::new_mutating(self);
         let transfer_ok = usdc.transfer(self.vm(), ctx, to, amount).unwrap_or(false);
@@ -618,6 +625,9 @@ impl Coffer {
                 amount,
             }));
         }
+
+        // Audit fix (#36): keep tracked assets in sync on adapter pulls too.
+        self.tracked_assets_wei.set(self.tracked_assets_wei.get().saturating_sub(amount));
 
         Ok(())
     }
