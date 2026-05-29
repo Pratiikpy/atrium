@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createHmac, timingSafeEqual as cryptoTimingSafeEqual } from 'node:crypto';
 
 /**
  * GET/POST /api/settings/notifications
@@ -92,13 +93,17 @@ function requireBearer(req: Request): NextResponse | null {
   return null;
 }
 
+// Audit fix (#78): the prior hand-rolled comparator early-returned on a length
+// mismatch, leaking whether the presented token matched the secret's length,
+// and compared raw strings rather than fixed-length digests. Compare HMAC-SHA256
+// digests instead - always 32 bytes, so the length check inside node's
+// timingSafeEqual is non-revealing. Mirrors the audited-primitive pattern in
+// auth-session.ts and sumsub/callback/route.ts.
 function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return diff === 0;
+  const salt = 'atrium-bearer-compare';
+  const da = createHmac('sha256', salt).update(a).digest();
+  const db = createHmac('sha256', salt).update(b).digest();
+  return cryptoTimingSafeEqual(da, db);
 }
 
 export async function GET(req: Request) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { safeErrorDetail } from '@/lib/safe-error';
 import { loadDeploymentRegistry } from '@/lib/deployments-registry';
+import { isAllowedOriginStrict } from '@/lib/allowed-origins';
 
 /**
  * POST /api/chaos/inject
@@ -64,26 +65,14 @@ const CHAOS_MIN_INTERVAL_MS = 30_000;
 
 /**
  * Year-1 testnet Origin allowlist for the chaos surface.
- * Returns true if the request is from a permitted origin.
- *
- * Pre-fix: chaos route accepted any Origin (or none). A drive-by
- * fetch from any browser tab could pause Plinth. We now restrict to
- * the production verify host + dev localhost. Server-to-server calls
- * (no Origin header) are allowed since they can't be forged from a
- * browser; the CHAOS_PRIVATE_KEY env still gates signing on those.
+ * Phase 3 hardening: replaced loose `*.vercel.app` wildcard with strict
+ * regex-based allowlist via shared helper.
  */
 function isOriginAllowed(req: NextRequest): boolean {
-  const origin = req.headers.get('origin');
-  if (!origin) return true; // server-to-server or curl; let CHAOS_PRIVATE_KEY gate decide
-  const allowed = [
-    'https://verify.atrium.fi',
-    'https://atrium.fi',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-  ];
-  // Allow any preview deployment under atrium.fi for cohort dry-runs.
-  if (origin.endsWith('.atrium.fi') || origin.endsWith('.vercel.app')) return true;
-  return allowed.includes(origin);
+  // Audit fix (#77): strict - a missing Origin must not auto-pass on a route
+  // that signs on-chain pauses (a no-Origin curl would otherwise clear the
+  // allowlist and reach the pause path). The browser Chaos UI always sends one.
+  return isAllowedOriginStrict(req.headers.get('origin'));
 }
 
 async function viem() {

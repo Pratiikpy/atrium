@@ -69,13 +69,35 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function makeReq(body: unknown): NextRequest {
+// Audit fix (#77): the chaos write routes now reject a MISSING Origin (a
+// no-Origin curl/server-to-server POST must not auto-pass the allowlist on a
+// route that signs on-chain pauses). The browser Chaos UI always sends an
+// Origin, so the default here mirrors that. Pass `null` to exercise the
+// no-Origin rejection path.
+function makeReq(body: unknown, origin: string | null = 'http://localhost:3000'): NextRequest {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (origin) headers['origin'] = origin;
   return new Request('http://localhost/api/chaos/inject', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: typeof body === 'string' ? body : JSON.stringify(body),
   }) as unknown as NextRequest;
 }
+
+/* ============ Origin gate ============ */
+
+describe('POST /api/chaos/inject - origin gate (#77)', () => {
+  it('rejects a request with no Origin header (403, no auto-pass)', async () => {
+    const res = await POST(makeReq({ fault: 'oracle_drift' }, null));
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe('origin_not_allowed');
+  });
+
+  it('rejects a disallowed Origin (403)', async () => {
+    const res = await POST(makeReq({ fault: 'oracle_drift' }, 'https://evil.example.com'));
+    expect(res.status).toBe(403);
+  });
+});
 
 /* ============ Auth gate ============ */
 

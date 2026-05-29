@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { safeErrorDetail } from '@/lib/safe-error';
 import { loadDeploymentRegistry } from '@/lib/deployments-registry';
+import { isAllowedOriginStrict } from '@/lib/allowed-origins';
 
 /**
  * POST /api/chaos/restore
@@ -35,16 +36,9 @@ const chaosRestoreLastCall = new Map<string, number>();
 const CHAOS_MIN_INTERVAL_MS = 30_000;
 
 function isOriginAllowed(req: NextRequest): boolean {
-  const origin = req.headers.get('origin');
-  if (!origin) return true;
-  const allowed = [
-    'https://verify.atrium.fi',
-    'https://atrium.fi',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-  ];
-  if (origin.endsWith('.atrium.fi') || origin.endsWith('.vercel.app')) return true;
-  return allowed.includes(origin);
+  // Audit fix (#77): strict - a missing Origin must not auto-pass on this
+  // on-chain restore (un-pause) route. Browser Chaos UI always sends an Origin.
+  return isAllowedOriginStrict(req.headers.get('origin'));
 }
 
 async function viem() {
