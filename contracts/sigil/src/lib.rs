@@ -604,7 +604,7 @@ fn ecrecover_via_precompile(
     Some(recovered)
 }
 
+// Host-level unit tests (real TestVM mock host via stylus-sdk/stylus-test).
+// External file so the lib body stays focused on the on-chain contract.
 #[cfg(test)]
-mod tests {
-    // proptest harnesses land Wave 1 alongside the full EIP-712 verifier.
-}
+mod tests;

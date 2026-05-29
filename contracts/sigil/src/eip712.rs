@@ -473,6 +473,11 @@ mod kani_proofs {
 #[cfg(test)]
 mod tests {
     use super::*;
+    // The `address!` macro is not re-exported by `super::*`; pull it in
+    // directly so the fixture constructors below compile. `vec!` comes from
+    // the crate-level `extern crate alloc` prelude already in scope.
+    use alloy_primitives::address;
+    use alloc::vec;
 
     #[test]
     fn day_index_basic() {

@@ -26,6 +26,11 @@ keccak-const = "0.2"
 [dev-dependencies]
 proptest = "1.5"
 k256 = { version = "0.13", features = ["ecdsa", "alloc"], default-features = false }
+# Audit fix (#391 follow-up): stylus-sdk 0.10.7 exposes a `stylus-test` feature
+# that swaps the WasmVM host for a native TestVM mock, so host-level unit tests
+# (validate_action signature recovery / auth / revocation / credit-line) link
+# and run natively via `cargo test`. Verified working for plinth on this box.
+stylus-sdk = { version = "0.10", features = ["stylus-test"] }
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]
