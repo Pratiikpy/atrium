@@ -30,8 +30,12 @@ export default function LandingPage() {
     <>
       <JsonLd schema={ATRIUM_ORG_SCHEMA} />
       <JsonLd schema={ATRIUM_APP_SCHEMA} />
-      <div className="min-h-screen" id="main-content">
+      <div className="min-h-screen">
         <PublicNav heroId="hero" />
+        {/* a11y: primary-content landmark. The nav above and footer below are
+            siblings, so "Skip to content" (-> #main-content) jumps past the nav
+            into <main>, and screen-reader landmark nav has a real main region. */}
+        <main id="main-content">
 
         {/* ============== HERO MONUMENT ============== */}
         <section id="hero" className="hero-monument">
@@ -342,6 +346,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        </main>
 
         <Footer />
       </div>
