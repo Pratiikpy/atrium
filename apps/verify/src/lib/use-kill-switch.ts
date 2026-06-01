@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'wagmi/actions';
 
 /**
  * Postern Kill Switch — the single button that revokes every Sigil mandate
@@ -42,6 +43,7 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<KillSwitchStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  const config = useConfig();
 
   async function activate() {
     if (!account) {
@@ -101,6 +103,13 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
         functionName: 'activate',
         args: [agents],
       });
+      // Emergency revoke must be CONFIRMED before we tell the user they're
+      // safe. Gate success on the mined receipt, never bare submit.
+      const receipt = await waitForTransactionReceipt(config, { hash });
+      if (receipt.status !== 'success') {
+        setStatus({ kind: 'error', reason: 'transaction_reverted' });
+        return;
+      }
       setStatus({ kind: 'success', hash, agentCount: agents.length });
     } catch (e) {
       setStatus({

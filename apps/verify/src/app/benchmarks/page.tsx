@@ -29,12 +29,12 @@ export default function BenchmarksPage() {
           </thead>
           <tbody className="text-ink-soft">
             <Row dim="Chain" a="Arbitrum + RH-Chain (when SDK)" c="Solana" b="Solana" />
-            <Row dim="Margin compute" a="Stylus (Rust, 10–100× cheaper for compute-heavy ops)" c="Native Solana programs" b="N/A" />
+            <Row dim="Margin compute" a="Stylus (Rust, ~10-100x cheaper compute-heavy ops, per Arbitrum Stylus)" c="Native Solana programs" b="N/A" />
             <Row dim="Open adapter standard" a="IPorticoAdapter v1.0 (MIT)" c="Closed" b="Closed" />
             <Row dim="Agent integration" a="Sigil EIP-712 + Postern session keys + ERC-8004" c="Limited" b="None" />
             <Row dim="Formal verification" a="5 Kani+proptest invariants in CI" c="Audit only" b="Audit only" />
-            <Row dim="UX polish today" a="Foundation — Verifier Mode complete, app surfaces in progress" c="More mature" b="More mature" />
-            <Row dim="Mainnet live" a="No — testnet build phase" c="Yes" b="Yes" />
+            <Row dim="UX polish today" a="Foundation: Verifier Mode complete, app surfaces in progress" c="More mature" b="More mature" />
+            <Row dim="Mainnet live" a="No, testnet build phase" c="Yes" b="Yes" />
           </tbody>
         </table>
       </section>

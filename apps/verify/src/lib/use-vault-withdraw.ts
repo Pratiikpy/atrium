@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
 import { USDC_DECIMALS } from '@/lib/testnet-tokens';
 
@@ -49,6 +50,7 @@ export function useVaultWithdraw(cofferAddress: `0x${string}` | null) {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<WithdrawStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  const config = useConfig();
 
   async function withdraw(assetsHuman: string) {
     if (!account) {
@@ -79,6 +81,12 @@ export function useVaultWithdraw(cofferAddress: `0x${string}` | null) {
         functionName: 'withdraw',
         args: [parsed, account, account],
       });
+      setStatus({ kind: 'pending', hash });
+      const receipt = await waitForTransactionReceipt(config, { hash });
+      if (receipt.status !== 'success') {
+        setStatus({ kind: 'error', reason: 'transaction_reverted' });
+        return;
+      }
       setStatus({ kind: 'success', hash });
     } catch (e) {
       setStatus({

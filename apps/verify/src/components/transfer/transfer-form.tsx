@@ -4,7 +4,7 @@ import { useDeferredValue, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useScopedWallet } from '@/lib/use-scoped-wallet';
-import { useTransfer } from '@/lib/use-transfer';
+import { useTransfer, isDestChainSupported } from '@/lib/use-transfer';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
 /**
@@ -92,8 +92,15 @@ export function TransferForm() {
     refetchInterval: 15_000,
   });
   const { data: deployment } = useDeploymentStatus(1);
-  const helper = readinessMessage(deployment, 'Transfer');
-  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !preflight;
+  // Robinhood Chain has no live CCIP lane on testnet (selector 0): the hook
+  // refuses a 0-selector send, so the CTA must disable + say why honestly,
+  // never submit a dead tx (persona-sweep cross-chain fix).
+  const destSupported = isDestChainSupported(to);
+  const helper = !destSupported
+    ? `Cross-chain transfer to ${CHAINS.find((c) => c.id === to)?.label ?? to} is pending its CCIP lane on testnet; pick a supported destination.`
+    : readinessMessage(deployment, 'Transfer');
+  const ready =
+    destSupported && deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !preflight;
   const busy = txStatus.kind === 'submitting' || txStatus.kind === 'pending';
 
   return (

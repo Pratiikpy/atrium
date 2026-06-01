@@ -8,7 +8,7 @@ export default function LanternPage() {
       <div className="mx-auto max-w-4xl">
       <h1 className="font-display text-5xl text-ink">Proof of reserves</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
-        Lantern publishes a Merkle root of every Coffer balance once per hour.
+        Lantern publishes a Merkle root of every Coffer balance every 10 minutes.
         The root is signed and committed on Arbitrum Sepolia. The full tree is
         pinned to IPFS so anyone can verify their own balance with an inclusion proof.
       </p>

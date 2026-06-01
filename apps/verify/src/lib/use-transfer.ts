@@ -42,8 +42,19 @@ const TRANSFER_EXPIRES_AT_WINDOW_SECONDS = 24 * 60 * 60;
 // CCIP chain selectors for testnet
 const CHAIN_SELECTORS: Record<string, bigint> = {
   'arb-sepolia': 3478487238524512106n,
-  'rh-chain': 0n, // placeholder until RH-Chain ships
+  'rh-chain': 0n, // placeholder until RH-Chain CCIP lane ships
 };
+
+/**
+ * A destination is supported only if it has a real (non-zero) CCIP selector.
+ * Robinhood Chain has no CCIP lane on testnet yet (selector 0), so the UI must
+ * NOT let a user submit Aqueduct.send_collateral with a 0 selector (it would
+ * broadcast a dead tx). The transfer form gates the CTA on this.
+ */
+export function isDestChainSupported(destChain: string): boolean {
+  const s = CHAIN_SELECTORS[destChain];
+  return s !== undefined && s !== 0n;
+}
 
 /**
  * Transfer hook wrapping Aqueduct.send_collateral. Pre-flight checks: balance,
@@ -67,6 +78,9 @@ export function useTransfer() {
       if (parsed <= 0n) return;
 
       const selector = CHAIN_SELECTORS[params.destChain] ?? 0n;
+      // Never broadcast a 0-selector send (an unwired CCIP lane like RH-Chain).
+      // The form disables the CTA for these, so this is defense-in-depth.
+      if (selector === 0n) return;
       const dest = params.destUser ?? address;
       const expiresAt = BigInt(
         Math.floor(Date.now() / 1000) + TRANSFER_EXPIRES_AT_WINDOW_SECONDS,

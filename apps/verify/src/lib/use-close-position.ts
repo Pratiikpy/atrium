@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'wagmi/actions';
 import { VENUES } from '@/lib/venues';
 
 /**
@@ -52,6 +53,7 @@ export function useClosePosition() {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<CloseStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  const config = useConfig();
 
   async function close(params: {
     venueId: number;
@@ -123,6 +125,12 @@ export function useClosePosition() {
         functionName: 'close_position_via_adapter',
         args: [params.venueId, parsedPlinthId, parsedVenueId, '0x'],
       });
+      // Gate success on the MINED receipt, not bare submit (fake-green fix).
+      const receipt = await waitForTransactionReceipt(config, { hash });
+      if (receipt.status !== 'success') {
+        setStatus({ kind: 'error', positionId: params.venuePositionId, reason: 'transaction_reverted' });
+        return;
+      }
       setStatus({ kind: 'success', positionId: params.venuePositionId, hash });
     } catch (e) {
       setStatus({

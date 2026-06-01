@@ -1,42 +1,38 @@
 /**
- * /team — founder slots with placeholder identities.
- *
- * TODO: Replace with real founder identities when sign-off lands.
- * Keep the 'work is the credential' philosophy but surface named contributors.
+ * /team — workstreams, not invented people. We do not ship placeholder founder
+ * identities or dead GitHub links (CLAUDE.md red line: never invent a person or
+ * relationship). The founding team is named in person at the Founder House; until
+ * then the open repository is the credential.
  */
 import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Team',
-  description: 'The founding team behind Atrium and how they work.',
+  description: 'How the team behind Atrium works, and the workstreams shipping in public.',
 };
 
-interface Founder {
-  name: string;
-  role: string;
-  github: string;
+interface Workstream {
+  title: string;
+  scope: string;
   background: string;
 }
 
-const FOUNDERS: Founder[] = [
+const WORKSTREAMS: Workstream[] = [
   {
-    name: 'Founder — Contracts',
-    role: 'Plinth margin engine · Vigil liquidations · Sigil mandates · Coffer vault · Kani proofs',
-    github: 'https://github.com/placeholder-f1',
-    background: 'Stylus/Rust smart contract engineer. Formal verification.',
+    title: 'Contracts',
+    scope: 'Plinth margin engine · Vigil liquidations · Sigil mandates · Coffer vault · Kani proofs',
+    background: 'Stylus/Rust smart contracts and formal verification.',
   },
   {
-    name: 'Founder — Product',
-    role: 'apps/verify · Verifier Mode · Lantern dashboard · brand and design system',
-    github: 'https://github.com/placeholder-f2',
-    background: 'Full-stack engineer. DeFi frontend and data pipelines.',
+    title: 'Product',
+    scope: 'apps/verify · Verifier Mode · Lantern dashboard · brand and design system',
+    background: 'Full-stack engineering, DeFi frontend, and data pipelines.',
   },
   {
-    name: 'Founder — Operations',
-    role: 'Cohort programme · runbooks · ResearchAttestation · audit cadence · partnerships',
-    github: 'https://github.com/placeholder-f3',
-    background: 'DevOps and protocol operations. Security and compliance.',
+    title: 'Operations',
+    scope: 'Cohort programme · runbooks · ResearchAttestation · audit cadence · partnerships',
+    background: 'DevOps, protocol operations, security and compliance.',
   },
 ];
 
@@ -47,29 +43,19 @@ export default function TeamPage() {
         <section>
           <h1 className="font-display text-5xl text-ink">Team</h1>
           <p className="mt-4 max-w-prose text-ink-soft">
-            Atrium is built by a small team of founders shipping in public on Arbitrum
-            Sepolia. Code, commits, audits, and incident post-mortems all live in the
-            open GitHub repository — the work is the credential.
+            Atrium is built by a small team shipping in public on Arbitrum Sepolia.
+            Code, commits, audits, and incident post-mortems all live in the open
+            repository; the work is the credential. The founders are named in person
+            at the Arbitrum Founder House.
           </p>
         </section>
 
         <section className="mt-12 grid gap-6 md:grid-cols-3">
-          {FOUNDERS.map((f) => (
-            <article key={f.name} className="rounded-md border border-divider bg-parchment p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink/5 text-lg text-ink">
-                {f.name.charAt(0)}
-              </div>
-              <p className="mt-4 font-display text-xl text-ink">{f.name}</p>
-              <p className="mt-1 text-xs text-muted">{f.background}</p>
-              <p className="mt-4 text-sm text-ink-soft">{f.role}</p>
-              <a
-                href={f.github}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-block text-xs text-ink underline-offset-2 hover:underline"
-              >
-                GitHub →
-              </a>
+          {WORKSTREAMS.map((w) => (
+            <article key={w.title} className="rounded-md border border-divider bg-parchment p-6">
+              <p className="font-display text-xl text-ink">{w.title}</p>
+              <p className="mt-1 text-xs text-muted">{w.background}</p>
+              <p className="mt-4 text-sm text-ink-soft">{w.scope}</p>
             </article>
           ))}
         </section>

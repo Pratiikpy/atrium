@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'wagmi/actions';
 import { useContractAddress } from '@/lib/use-coffer-address';
 
 /**
@@ -43,6 +44,7 @@ export function useRevokeMandate() {
   const { data: sigilAddress } = useContractAddress('sigil');
   const [status, setStatus] = useState<RevokeStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  const config = useConfig();
 
   async function revoke(intentHash: string) {
     if (!account) {
@@ -65,6 +67,11 @@ export function useRevokeMandate() {
         functionName: 'revoke',
         args: [intentHash as `0x${string}`],
       });
+      const receipt = await waitForTransactionReceipt(config, { hash });
+      if (receipt.status !== 'success') {
+        setStatus({ kind: 'error', intentHash, reason: 'transaction_reverted' });
+        return;
+      }
       setStatus({ kind: 'success', intentHash, hash });
     } catch (e) {
       setStatus({

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
 import { VENUES } from '@/lib/venues';
 import { instrumentIdForVenue } from '@/lib/instruments';
@@ -73,6 +74,7 @@ export function useOpenPosition() {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<OpenStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  const config = useConfig();
 
   async function open(params: { venue: string; side: 'long' | 'short'; sizeUsd: string }) {
     if (!account) {
@@ -142,6 +144,14 @@ export function useOpenPosition() {
           '0x', // venue_payload: per-venue specifics land Year-2
         ],
       });
+      // Stay in `submitting` (button disabled, no double-submit) until the tx
+      // is MINED. Only paint success on a status==='success' receipt; a revert
+      // shows red, never a fake green (the persona-sweep fake-green fix).
+      const receipt = await waitForTransactionReceipt(config, { hash });
+      if (receipt.status !== 'success') {
+        setStatus({ kind: 'error', reason: 'transaction_reverted' });
+        return;
+      }
       setStatus({ kind: 'success', hash, side: params.side, sizeUsd: params.sizeUsd });
     } catch (e) {
       setStatus({

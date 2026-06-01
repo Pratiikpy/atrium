@@ -1,7 +1,7 @@
 import { createConfig, http } from 'wagmi';
 import { fallback } from 'viem';
 import { arbitrumSepolia } from 'wagmi/chains';
-import { coinbaseWallet, mock } from 'wagmi/connectors';
+import { coinbaseWallet, injected, mock } from 'wagmi/connectors';
 import { e2eKeyConnector } from './e2e-key-connector';
 
 /**
@@ -48,11 +48,15 @@ const e2eConnectors =
  * the Connect button stayed permanently disabled. The full Verifier-Mode
  * connect flow was structurally broken before any contract deploy.
  *
- * The connector is `coinbaseWallet` with `preference: 'smartWalletOnly'` —
- * this is the Postern path: passkey-bound smart wallets (ERC-4337 + EIP-7702)
- * that work without a browser extension. Per TDD §15.1 + PRD §22.7 the only
- * connector we need for Year-1 testnet. Additional connectors (WalletConnect,
- * MetaMask) belong behind a Year-2 ADR.
+ * Two real connectors, both Year-1:
+ *  - `injected()` — any browser-extension EVM wallet (MetaMask, Rabby, Brave).
+ *    This is what most users + buildathon judges actually have, and it is what
+ *    @tenkeylabs/dappwright drives for the real-wallet E2E. Added after the
+ *    persona sweep flagged that a plain MetaMask user could not connect at all.
+ *  - `coinbaseWallet` with `preference: 'smartWalletOnly'` — the Postern path:
+ *    passkey-bound smart wallets (ERC-4337 + EIP-7702), no extension needed.
+ * The connect UI offers both; injected is primary so a MetaMask/Rabby user
+ * connects in one click.
  */
 export const wagmiConfig = createConfig({
   chains: [arbitrumSepolia],
@@ -61,6 +65,7 @@ export const wagmiConfig = createConfig({
     // E2E mock first (when gated on) so the connect-wallet control's
     // connectors[0] resolves to it; empty in every real build.
     ...e2eConnectors,
+    injected({ shimDisconnect: true }),
     coinbaseWallet({
       appName: 'Atrium',
       preference: 'smartWalletOnly',

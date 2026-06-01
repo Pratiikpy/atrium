@@ -350,8 +350,12 @@ body {
 /* =====================================================================
  * Typography utilities (Lovable canon)
  * ===================================================================== */
-.serif    { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
-.serif-i  { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
+/* Serif display moments use Instrument Serif per the brand contract (CLAUDE.md
+ * UI rules: display = Instrument Serif). The Lovable port had aliased these to
+ * sans, which rendered serif-named headings as skewed faux-italic sans (the
+ * AI-slop tell the persona sweep flagged). .serif-i is genuine serif italic. */
+.serif    { font-family: var(--serif); font-style: normal; letter-spacing: -0.01em; }
+.serif-i  { font-family: var(--serif); font-style: italic; letter-spacing: -0.01em; }
 .text-accent { font-weight: 500; letter-spacing: -0.012em; color: var(--ink); }
 .num, .mono {
   font-family: var(--mono);
@@ -926,7 +930,7 @@ input[type="range"] { cursor: ew-resize; }
   font-feature-settings: var(--num-feature);
   font-variant-numeric: tabular-nums lining-nums;
 }
-.atrium-app .serif-i { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.012em; }
+.atrium-app .serif-i { font-family: var(--serif); font-style: italic; letter-spacing: -0.01em; }
 .atrium-app .mono.cap, .atrium-app .cap {
   font-family: var(--mono); font-weight: 500; font-size: 10.5px;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
