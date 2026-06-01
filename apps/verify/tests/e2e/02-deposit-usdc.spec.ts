@@ -20,15 +20,29 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('Journey 2 — Deposit USDC', () => {
   test('Vault page loads with Deposit and Withdraw cards @critical @mobile', async ({ page }) => {
-    await page.goto('/app/vault');
+    await page.goto('/app/vault', { waitUntil: 'load' });
 
-    // The mobile-safari project renders VaultMobile (md:hidden on desktop),
-    // which surfaces a deposit/withdraw toggle + submit rather than the desktop
-    // "USDC vault" heading. Lock that both deposit and withdraw are present
-    // (case-insensitive: the mobile toggle DOM text is lowercase, CSS-capitalized).
-    await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText(/deposit/i).first()).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText(/withdraw/i).first()).toBeVisible({ timeout: 15_000 });
+    // The mobile-safari project renders VaultMobile (the AppShell mobile slot),
+    // which surfaces a deposit/withdraw toggle + submit. Two harness realities:
+    //   1. The /app subtree streams (RSC) after the root shell, and under the
+    //      iPhone project that stream can abort (net::ERR_ABORTED), leaving only
+    //      the root shell. Reload once if the AppShell hasn't attached.
+    //   2. AppShell SSRs the desktop slot, then swaps to the mobile slot after
+    //      hydration — so scope to `.atrium-mobile-only` and use toContainText
+    //      (retries the whole subtree) to target VaultMobile's deposit/withdraw,
+    //      not the transient CSS-hidden SSR desktop slot.
+    // (Product verified: a direct iPhone-viewport dump shows "USDC BALANCE …
+    // Deposit Withdraw … Connect wallet first".)
+    const mobilePanel = page.locator('.atrium-mobile-only');
+    try {
+      await mobilePanel.waitFor({ state: 'attached', timeout: 12_000 });
+    } catch {
+      await page.reload({ waitUntil: 'load' });
+      await mobilePanel.waitFor({ state: 'attached', timeout: 20_000 });
+    }
+    await expect(mobilePanel).toContainText(/usdc balance|connect wallet first/i, { timeout: 20_000 });
+    await expect(mobilePanel).toContainText(/deposit/i, { timeout: 15_000 });
+    await expect(mobilePanel).toContainText(/withdraw/i, { timeout: 15_000 });
   });
 
   test('Deposit submit is disabled pre-deployment (honest pending) @critical', async ({ page }) => {
