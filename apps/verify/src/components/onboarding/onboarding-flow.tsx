@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { useFaucetClaim } from '@/lib/use-faucet-claim';
 import { VENUES, VENUE_COUNT } from '@/lib/venues';
 
 /**
@@ -422,6 +423,11 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
   const wallet = useScopedWallet();
   const [status, setStatus] = useState<FaucetStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { status: claimStatus, claim } = useFaucetClaim();
+  const claimBusy =
+    claimStatus.kind === 'resolving' ||
+    claimStatus.kind === 'submitting' ||
+    claimStatus.kind === 'claiming';
 
   useEffect(() => {
     // Phase theta audit follow-up: scope to the connected wallet so the
@@ -467,7 +473,7 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
                 <td className="px-3 py-2.5 font-mono text-xs text-ink-soft">{d.chain}</td>
                 <td className="px-3 py-2.5 text-right">
                   <span className="inline-flex items-center gap-1 rounded-full border border-divider bg-parchment px-2 py-0.5 text-[11px] text-muted">
-                    pending
+                    {claimStatus.kind === 'success' ? 'claimed' : 'pending'}
                   </span>
                 </td>
               </tr>
@@ -477,9 +483,16 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
       </div>
 
       <div className="mt-8 flex gap-2.5">
-        {status?.available ? (
+        {claimStatus.kind === 'success' ? (
           <PrimaryButton onClick={onNext} className="flex-1 justify-center">
-            Claim faucet
+            Continue →
+          </PrimaryButton>
+        ) : status?.available ? (
+          <PrimaryButton
+            onClick={() => { if (!claimBusy) claim(); }}
+            className="flex-1 justify-center"
+          >
+            {claimBusy ? 'Claiming…' : 'Claim faucet'}
           </PrimaryButton>
         ) : (
           <button
@@ -498,6 +511,22 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
           Skip →
         </button>
       </div>
+      {(claimStatus.kind === 'claiming' || claimStatus.kind === 'success') && (
+        <p className="mt-3 text-center text-xs text-live">
+          {claimStatus.kind === 'success' ? 'Claimed · ' : 'Claim submitted · '}
+          <a
+            href={`https://sepolia.arbiscan.io/tx/${claimStatus.hash}`}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono underline"
+          >
+            {claimStatus.hash.slice(0, 8)}…{claimStatus.hash.slice(-4)}
+          </a>
+        </p>
+      )}
+      {claimStatus.kind === 'error' && (
+        <p className="mt-3 text-center text-xs text-neg">Claim failed · {claimStatus.reason}</p>
+      )}
       <p className="mt-3 text-center text-[11px] uppercase tracking-wider text-muted">
         {error
           ? `Faucet status unavailable · ${error}`

@@ -190,6 +190,28 @@ async function deployStylusNoConstructor(name, contractDir, pk) {
   return { address, tx: txMatch?.[1] ?? null };
 }
 
+async function deployStylusCtor(name, contractDir, ctorArgs, pk) {
+  console.log(`\n### Deploying ${name} (constructor) ###`);
+  const result = cargoStylus(contractDir, [
+    'deploy',
+    '--endpoint', RPC,
+    '--private-key', pk,
+    '--no-verify',
+    '--max-fee-per-gas-gwei', MAX_FEE_GWEI,
+    '--constructor-args', ...ctorArgs.map(String),
+  ]);
+  process.stdout.write(result.stdout);
+  const combined = (result.stdout ?? '') + '\n' + (result.stderr ?? '');
+  // eslint-disable-next-line no-control-regex
+  const clean = combined.replace(/\x1b\[[0-9;]*m/g, '');
+  const addrMatch = clean.match(/deployed (?:code at address|contract|to)\s*:?\s*(0x[a-fA-F0-9]{40})/i)
+    ?? clean.match(/contract address\s*:?\s*(0x[a-fA-F0-9]{40})/i);
+  if (!addrMatch) throw new Error(`failed to parse ${name} address from output:\n${clean.slice(-1500)}`);
+  console.log(`-> ${name}: ${addrMatch[1]}`);
+  const txMatch = clean.match(/(?:deployment tx hash|tx hash|deployment tx)\s*:?\s*(0x[a-fA-F0-9]{64})/i);
+  return { address: addrMatch[1], tx: txMatch?.[1] ?? null };
+}
+
 async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, registry, pk, deployer) {
   console.log(`\n### Deploying Plinth (constructor + multi-fragment factory) ###`);
   // Arbitrum Sepolia well-known oracle addresses per DEPLOY_PLAN.md.
@@ -251,21 +273,44 @@ async function main() {
   // Pre-flight: confirm USDC address known.
   const usdc = registry.contracts['usdc']?.address ?? '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
   console.log(`USDC: ${usdc}`);
+  const ZERO = '0x0000000000000000000000000000000000000000';
+  const timelock = registry.contracts['praetor-timelock'].address;
+  const portico = registry.contracts['portico-registry'].address;
+  // Year-1 testnet caps: 100k USDC global, 5k USDC per user.
+  const depositCap = (100_000n * 10n ** 6n).toString();
+  const perUserCap = (5_000n * 10n ** 6n).toString();
 
-  // Step 1-3: deploy Coffer, Sigil, Vigil.
-  for (const [name, dir] of [
-    ['coffer', 'contracts/coffer'],
-    ['sigil', 'contracts/sigil'],
-    ['vigil', 'contracts/vigil'],
-  ]) {
-    if (!stepsToRun.includes(name)) continue;
-    if (checkpoint[name]?.address) {
-      console.log(`\n${name} already deployed in checkpoint: ${checkpoint[name].address}`);
-      continue;
-    }
-    const { address, tx } = await deployStylusNoConstructor(name, dir, pk);
-    checkpoint[name] = { address, tx, deployed_at: new Date().toISOString() };
+  // Step 1: Coffer — #[constructor](asset, plinth, praetor, timelock, deposit_cap, per_user_cap).
+  // Plinth is deployed AFTER Coffer (circular dep), so pass the zero placeholder
+  // and wire the real Plinth via set_plinth() once it exists (see Step 5).
+  if (stepsToRun.includes('coffer') && !checkpoint.coffer?.address) {
+    const { address, tx } = await deployStylusCtor('coffer', 'contracts/coffer',
+      [usdc, ZERO, deployer, timelock, depositCap, perUserCap], pk);
+    checkpoint.coffer = { address, tx, deployed_at: new Date().toISOString() };
     await saveCheckpoint(checkpoint);
+  } else if (checkpoint.coffer?.address) {
+    console.log(`\ncoffer already deployed in checkpoint: ${checkpoint.coffer.address}`);
+  }
+
+  // Step 2: Sigil — still initialize()-based (no #[constructor]); deploy no-arg.
+  if (stepsToRun.includes('sigil') && !checkpoint.sigil?.address) {
+    const { address, tx } = await deployStylusNoConstructor('sigil', 'contracts/sigil', pk);
+    checkpoint.sigil = { address, tx, deployed_at: new Date().toISOString() };
+    await saveCheckpoint(checkpoint);
+  } else if (checkpoint.sigil?.address) {
+    console.log(`\nsigil already deployed in checkpoint: ${checkpoint.sigil.address}`);
+  }
+
+  // Step 3: Vigil — #[constructor](plinth, coffer, portico, praetor, timelock).
+  // Coffer is already deployed above; plinth is the zero placeholder (set_plinth in Step 7).
+  if (stepsToRun.includes('vigil') && !checkpoint.vigil?.address) {
+    const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
+    const { address, tx } = await deployStylusCtor('vigil', 'contracts/vigil',
+      [ZERO, cofferAddr, portico, deployer, timelock], pk);
+    checkpoint.vigil = { address, tx, deployed_at: new Date().toISOString() };
+    await saveCheckpoint(checkpoint);
+  } else if (checkpoint.vigil?.address) {
+    console.log(`\nvigil already deployed in checkpoint: ${checkpoint.vigil.address}`);
   }
 
   // Step 4: deploy Plinth with new Coffer/Sigil/Vigil addresses.
@@ -287,29 +332,24 @@ async function main() {
     }
   }
 
-  // Steps 5-7: initialize() on each.
+  // Steps 5-7: wire Plinth into the #[constructor] peers via the one-time
+  // set_plinth() (they were constructed with a zero plinth to break the
+  // coffer<->plinth cycle), and initialize() the still-initialize-based Sigil.
   const plinthAddr = checkpoint.plinth?.address ?? registry.contracts.plinth.address;
-  const timelock = registry.contracts['praetor-timelock'].address;
 
-  if (stepsToRun.includes('init-coffer') && !checkpoint.coffer?.initialized) {
+  if (stepsToRun.includes('init-coffer') && !checkpoint.coffer?.wired) {
     const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
-    // initialize(asset, plinth, praetor, praetor_timelock, deposit_cap_wei, per_user_cap_wei)
-    // Year-1 testnet caps: 100k USDC global, 5k USDC per user.
-    const depositCap = (100_000n * 10n ** 6n).toString();
-    const perUserCap = (5_000n * 10n ** 6n).toString();
-    console.log(`\n### initialize Coffer @ ${cofferAddr} ###`);
-    castSend(cofferAddr, 'initialize(address,address,address,address,uint256,uint256)', [
-      usdc, plinthAddr, deployer, timelock, depositCap, perUserCap,
-    ], pk);
-    checkpoint.coffer.initialized = true;
+    console.log(`\n### set_plinth Coffer @ ${cofferAddr} -> ${plinthAddr} ###`);
+    castSend(cofferAddr, 'setPlinth(address)', [plinthAddr], pk);
+    checkpoint.coffer.wired = true;
     await saveCheckpoint(checkpoint);
   }
 
   if (stepsToRun.includes('init-sigil') && !checkpoint.sigil?.initialized) {
     const sigilAddr = checkpoint.sigil?.address ?? registry.contracts.sigil.address;
     // initialize(praetor, praetor_timelock, plinth, erc8004_registry, postern_kill_switch)
-    const erc8004 = registry.contracts['erc8004-registry']?.address ?? '0x0000000000000000000000000000000000000000';
-    const postern = registry.contracts['postern-kill-switch']?.address ?? '0x0000000000000000000000000000000000000000';
+    const erc8004 = registry.contracts['erc8004-registry']?.address ?? ZERO;
+    const postern = registry.contracts['postern-kill-switch']?.address ?? ZERO;
     console.log(`\n### initialize Sigil @ ${sigilAddr} ###`);
     castSend(sigilAddr, 'initialize(address,address,address,address,address)', [
       deployer, timelock, plinthAddr, erc8004, postern,
@@ -318,16 +358,11 @@ async function main() {
     await saveCheckpoint(checkpoint);
   }
 
-  if (stepsToRun.includes('init-vigil') && !checkpoint.vigil?.initialized) {
+  if (stepsToRun.includes('init-vigil') && !checkpoint.vigil?.wired) {
     const vigilAddr = checkpoint.vigil?.address ?? registry.contracts.vigil.address;
-    const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;
-    const portico = registry.contracts['portico-registry'].address;
-    // initialize(plinth, coffer, portico_registry, praetor, praetor_timelock)
-    console.log(`\n### initialize Vigil @ ${vigilAddr} ###`);
-    castSend(vigilAddr, 'initialize(address,address,address,address,address)', [
-      plinthAddr, cofferAddr, portico, deployer, timelock,
-    ], pk);
-    checkpoint.vigil.initialized = true;
+    console.log(`\n### set_plinth Vigil @ ${vigilAddr} -> ${plinthAddr} ###`);
+    castSend(vigilAddr, 'setPlinth(address)', [plinthAddr], pk);
+    checkpoint.vigil.wired = true;
     await saveCheckpoint(checkpoint);
   }
 
@@ -340,7 +375,7 @@ async function main() {
         address: checkpoint[name].address,
         tx: checkpoint[name].tx ?? registry.contracts[name].tx,
         deployed_at: checkpoint[name].deployed_at,
-        note: `Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, ${name === 'sigil' || name === 'vigil' ? 'pause(bytes32) emergency-pause hook, ' : ''}and ${name === 'plinth' ? 'multi-fragment factory deploy via cargo-stylus 0.10.7.' : 'initialize() was called immediately after deploy.'}`,
+        note: `Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7).`,
       };
     }
   }

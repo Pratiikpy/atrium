@@ -236,11 +236,38 @@ impl Vigil {
         self.praetor_timelock.set(praetor_timelock);
 
         self.params.keeper_min_stake_wei.set(keeper_min_stake_default());
+        // P0-5: the `testnet-stake` feature lowers keeper min-stake from 1000 ETH
+        // to 0.01 ETH so keepers can stake on Arbitrum Sepolia. It MUST NOT run on
+        // mainnet. Stylus contracts run only on Arbitrum, so enforce at deploy
+        // time that a testnet-stake build aborts construction on Arbitrum One
+        // (42161) — the low-stake config can never silently go live with real funds.
+        #[cfg(feature = "testnet-stake")]
+        {
+            assert!(
+                self.vm().chain_id() != 42161,
+                "testnet-stake build must not deploy to Arbitrum One mainnet"
+            );
+        }
         self.params.keeper_reward_bps.set(Uint::<16, 1>::from(50u16));
         self.params.slash_window_blocks.set(Uint::<32, 1>::from(7_200u32));
         self.params.max_misses_per_window.set(Uint::<16, 1>::from(3u16));
         self.params.liquidation_window_blocks.set(Uint::<16, 1>::from(30u16));
         self.params.partial_liquidation_max_bps.set(Uint::<16, 1>::from(1_000u16));
+    }
+
+    /// One-time deploy wiring: set the Plinth address exactly once, while
+    /// still unset, gated to the praetor. Breaks the construct-time peer
+    /// cycle. Locked after the first successful set.
+    pub fn set_plinth(&mut self, plinth: Address) -> Result<(), VigilError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_multisig.get()
+            || !self.plinth_address.get().is_zero()
+            || plinth.is_zero()
+        {
+            return Err(VigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.plinth_address.set(plinth);
+        Ok(())
     }
 
     /// Called by Plinth.update_margin when an account becomes under-collateralized.
@@ -873,6 +900,9 @@ mod tests {
     /// Builds a fully constructed Vigil bound to `vm`. The `#[constructor]` runs
     /// as a normal method under TestVM, seeding all admin slots + params.
     fn deploy(vm: &TestVM) -> Vigil {
+        // TestVM defaults to chain id 42161 (Arbitrum One); the P0-5 testnet-stake
+        // guard rejects mainnet, so pin the test host to Arbitrum Sepolia.
+        vm.set_chain_id(421614);
         let mut c = Vigil::from(vm);
         // Constructor has no auth gate (it only asserts non-zero praetor/timelock).
         c.constructor(
@@ -883,6 +913,31 @@ mod tests {
             timelock_addr(),
         );
         c
+    }
+
+    // Deploy wiring (circular-dep fix): set_plinth wires Plinth exactly once,
+    // praetor-only, rejects zero, locked after the first set.
+    #[test]
+    fn set_plinth_wires_once_and_is_guarded() {
+        let vm = TestVM::new();
+        vm.set_chain_id(421614); // Arbitrum Sepolia (P0-5 testnet-stake guard)
+        let mut c = Vigil::from(&vm);
+        // Construct with an unset (zero) plinth, as the circular-dep deploy does.
+        c.constructor(Address::ZERO, coffer_addr(), portico_addr(), praetor_addr(), timelock_addr());
+
+        // A stranger cannot wire Plinth.
+        vm.set_sender(stranger_addr());
+        assert!(matches!(c.set_plinth(plinth_addr()), Err(VigilError::Unauthorized(_))));
+
+        // The praetor cannot wire it to zero.
+        vm.set_sender(praetor_addr());
+        assert!(matches!(c.set_plinth(Address::ZERO), Err(VigilError::Unauthorized(_))));
+
+        // The praetor wires it exactly once.
+        assert!(c.set_plinth(plinth_addr()).is_ok(), "praetor wires plinth once");
+
+        // Locked: even the praetor cannot rewire it (proves it was set non-zero).
+        assert!(matches!(c.set_plinth(stranger_addr()), Err(VigilError::Unauthorized(_))));
     }
 
     /// Mocks Plinth.getUserPositions(user) -> positions as a STATICCALL.

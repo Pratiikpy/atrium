@@ -220,6 +220,33 @@ contract AtriumRouterTest is Test {
         router.close_position_via_adapter(CURVE_VENUE_ID, plinthId, venueId, empty);
     }
 
+    /// 027-SC6: closing a position re-credits the user's Coffer shares for the
+    /// collateral the adapter returns. Pre-fix the Router never called back
+    /// into Coffer on close, so returned collateral sat in the pool raising
+    /// assets-per-share for every OTHER holder while the originating user kept
+    /// zero shares for it — permanent loss of their own collateral.
+    function test_close_via_router_reCreditsUserShares_027SC6() public {
+        bytes memory empty = hex"";
+        uint256 sharesBefore = coffer.shares(user);
+
+        // Open 1,000 USDC notional → adapter_pull burns 1,000e6 of user shares
+        // (fallback path: zero margin-delta → abs(notional)).
+        vm.prank(user, user);
+        (uint256 plinthId, uint256 venueId) =
+            router.open_position_via_adapter(CURVE_VENUE_ID, INSTRUMENT, int256(1_000e6), empty, empty, empty);
+        assertEq(coffer.shares(user), sharesBefore - 1_000e6, "open burns the user's margin shares");
+
+        // Close: CurveAdapter withdraws 1,000e6 USDC and transfers it to Coffer.
+        vm.prank(user, user);
+        router.close_position_via_adapter(CURVE_VENUE_ID, plinthId, venueId, empty);
+
+        // The fix: Router re-credited the user via Coffer.adapterReturn for the
+        // exact returned collateral, so the user is made whole.
+        assertEq(coffer.lastAdapterReturnUser(), user, "re-credit goes to the originating user");
+        assertEq(coffer.lastAdapterReturnAmount(), 1_000e6, "re-credit equals the returned collateral");
+        assertEq(coffer.shares(user), sharesBefore, "user's shares fully restored on close");
+    }
+
     function test_close_via_router_revertsOnUnregisteredVenue_iter87() public {
         bytes memory empty = hex"";
 
@@ -442,6 +469,10 @@ contract AtriumRouterTest is Test {
     ) public {
         vm.assume(marginDelta > 0 && marginDelta <= 10_000_000e6); // bounded
         vm.assume(notional != 0);
+        // int64::MIN has no positive counterpart, so the `-notional`
+        // normalization below overflows. Exclude it (pre-existing harness
+        // guard; unrelated to the close-path 027-SC6 change).
+        vm.assume(notional != type(int64).min);
         if (notional < 0) notional = -int64(int128(int256(uint256(uint64(-notional)))));
 
         plinth.setMarginIncreasePerOpen(uint256(marginDelta));
@@ -484,6 +515,27 @@ contract AtriumRouterTest is Test {
             2_500e6,
             "iter58 fallback: zero-margin instruments pull abs(notional)"
         );
+    }
+
+    /// 101-OPS3.1: the post-key-leak Safe handoff needs a real admin-transfer.
+    function test_updatePraetor_transfersAdmin_andRejectsNonPraetor_101OPS3() public {
+        address newSafe = makeAddr("safe-3of5");
+        // Non-praetor cannot transfer.
+        vm.prank(hostile);
+        vm.expectRevert(AtriumRouter.Unauthorized.selector);
+        router.updatePraetor(newSafe);
+        // Current praetor hands the role to the Safe.
+        vm.prank(praetor);
+        router.updatePraetor(newSafe);
+        assertEq(router.praetor_multisig(), newSafe, "praetor role moved to the Safe");
+        // Old praetor can no longer transfer (role really moved).
+        vm.prank(praetor);
+        vm.expectRevert(AtriumRouter.Unauthorized.selector);
+        router.updatePraetor(hostile);
+        // Zero address refused.
+        vm.prank(newSafe);
+        vm.expectRevert(bytes("zero praetor"));
+        router.updatePraetor(address(0));
     }
 }
 
@@ -599,6 +651,24 @@ contract FakeCoffer {
         lastAdapterPullAmount = amount;
         lastAdapterPullTo = to;
         lastAdapterPullUser = from_user;
+    }
+
+    // 027-SC6: production Coffer re-credits shares for collateral returned on
+    // close. The fake mirrors that: shares track USDC 1:1 here, so the mint
+    // equals the returned amount. Tracks the last call for assertions.
+    uint256 public lastAdapterReturnAmount;
+    address public lastAdapterReturnUser;
+
+    function asset() external view returns (address) {
+        return address(usdc);
+    }
+
+    function adapterReturn(uint256 amount, address to_user) external returns (uint256) {
+        require(approvedAdapters[msg.sender], "not approved adapter");
+        shares[to_user] += amount;
+        lastAdapterReturnAmount = amount;
+        lastAdapterReturnUser = to_user;
+        return amount;
     }
 }
 

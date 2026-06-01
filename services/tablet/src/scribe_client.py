@@ -153,15 +153,39 @@ async def fetch_trades_for_year(
             quantity=qty,
             price=price,
         ))
-        # Also synthesize the close as the opposite side
+        # Also synthesize the close as the opposite side.
         if p.get("closedAtTimestamp"):
             close_ts = datetime.fromtimestamp(int(p["closedAtTimestamp"]))
+            # 086-BE13 fix: the close leg must price at the real EXIT, not the
+            # entry. Pre-fix it reused `price` (entry) for the close leg, so
+            # buy@entry + sell@entry netted ~zero realized gain on every closed
+            # position and `realizedPnlSigned` (queried above) was discarded.
+            # Derive the exit price from the on-chain realized PnL:
+            #   long  (opened buy):  gain = qty*(exit-entry) => exit = entry + pnl/qty
+            #   short (opened sell): gain = qty*(entry-exit)  => exit = entry - pnl/qty
+            # realizedPnlSigned is in the same value unit as notionalSigned, so
+            # pnl/qty is a per-unit price delta. Clamp at 0 (a position cannot
+            # settle at a negative unit price).
+            raw_pnl = p.get("realizedPnlSigned")
+            if raw_pnl is None:
+                _log.warning(
+                    "closed position id=%s has no realizedPnlSigned; "
+                    "exit priced at entry (gain will read as zero)",
+                    p.get("id"),
+                )
+                pnl_d = Decimal(0)
+            else:
+                pnl_d = Decimal(str(raw_pnl))
+            pnl_per_unit = pnl_d / qty_d
+            exit_price_d = price_d + pnl_per_unit if side == "buy" else price_d - pnl_per_unit
+            if exit_price_d < 0:
+                exit_price_d = Decimal(0)
             trades.append(Trade(
                 timestamp=close_ts,
                 venue_id=int(p["venueId"]),
                 instrument_id=p["instrumentId"],
                 side="sell" if side == "buy" else "buy",
                 quantity=qty,
-                price=price,
+                price=float(exit_price_d),
             ))
     return trades

@@ -196,7 +196,11 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
         return { success: true, meta: { rows_written: 1 } };
       }
 
-      // INSERT payment (id, wallet, path, amount, tx_hash, facResp, receivedAt)
+      // INSERT payment — bind order MUST match the x402 middleware INSERT
+      // (src/middleware/x402.ts): 6 columns, omitting the nullable
+      // facilitator_response: (id, wallet_address, path, amount_usdc_wei,
+      // tx_hash, received_at). Destructuring 7 mis-read received_at into
+      // facilitator_response and left received_at undefined.
       // UNIQUE constraint on tx_hash enforced via SETNX. Duplicate returns
       // false so the caller can surface the replay attempt.
       if (trimmed.startsWith('INSERT') && trimmed.includes('INTO payments')) {
@@ -206,14 +210,12 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
           path,
           amount,
           txHash,
-          facResp,
           receivedAt,
         ] = bound as [
           string,
           string,
           string,
           string,
-          string | null,
           string | null,
           number,
         ];
@@ -223,7 +225,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
           path,
           amount_usdc_wei: amount,
           tx_hash: txHash,
-          facilitator_response: facResp,
+          facilitator_response: null,
           received_at: receivedAt,
         };
         const rowJson = JSON.stringify(row);

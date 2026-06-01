@@ -3,6 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IPorticoAdapter} from "../../portico-registry/src/IPorticoAdapter.sol";
 import {IPorticoAdapterV11} from "../../portico-registry/src/IPorticoAdapterV11.sol";
+import {ReentrancyGuard} from "../../portico-registry/src/ReentrancyGuard.sol";
 
 /// Plinth (Stylus) is callable from Solidity via standard call ABI.
 /// Stylus 0.10 auto-converts snake_case Rust fn names to camelCase selectors,
@@ -41,6 +42,21 @@ interface IPlinth {
 /// Stylus exports it as `adapterPull(uint256,address,address)`.
 interface ICoffer {
     function adapterPull(uint256 amount, address from_user, address to) external;
+    /// 027-SC6: re-credit the originating user's vault shares for collateral
+    /// the adapter returned to Coffer on close. Without this, returned
+    /// collateral raises assets-per-share for every OTHER holder while the
+    /// user keeps zero shares for it. Stylus exports as
+    /// adapterReturn(uint256,address)(uint256).
+    function adapterReturn(uint256 amount, address to_user) external returns (uint256);
+    /// The vault's underlying asset (USDC) — used to measure the exact amount
+    /// the adapter returned this tx. Stylus exports as asset()(address).
+    function asset() external view returns (address);
+}
+
+/// Minimal ERC-20 balance read for measuring the collateral an adapter
+/// transfers back into Coffer during a close.
+interface IERC20Balance {
+    function balanceOf(address account) external view returns (uint256);
 }
 
 /// PorticoRegistry tells the Router which adapter handles a given venue.
@@ -93,11 +109,11 @@ interface ICofferApprovedQuery {
 ///           See `CurveAdapter` for the canonical migration; remaining
 ///           adapters (Pendle, Aave V11, TradeXyz, Polymarket, Hyperliquid)
 ///           follow the same one-line pattern.
-contract AtriumRouter {
+contract AtriumRouter is ReentrancyGuard {
     IPlinth public immutable plinth;
     ICoffer public immutable coffer;
     IPorticoRegistry public immutable registry;
-    address public immutable praetor_multisig;
+    address public praetor_multisig;
     address public immutable praetor_timelock;
 
     bool public is_paused;
@@ -145,6 +161,20 @@ contract AtriumRouter {
         _;
     }
 
+    /// 101-OPS3.1 fix: real admin-transfer for the post-key-leak Safe handoff.
+    /// Pre-fix praetor_multisig was immutable and no setter existed, so the
+    /// documented ceremony (scripts/transfer-admin.s.sol -> updatePraetor)
+    /// reverted on a missing selector and admin stayed on the compromised
+    /// deployer EOA. The current praetor calls this once to hand the role to
+    /// the 3-of-5 Safe.
+    event PraetorUpdated(address indexed previousPraetor, address indexed newPraetor);
+
+    function updatePraetor(address newPraetor) external onlyPraetor {
+        require(newPraetor != address(0), "zero praetor");
+        emit PraetorUpdated(praetor_multisig, newPraetor);
+        praetor_multisig = newPraetor;
+    }
+
     modifier onlyTimelock() {
         if (msg.sender != praetor_timelock) revert Unauthorized();
         _;
@@ -186,7 +216,7 @@ contract AtriumRouter {
         bytes calldata action_sigil,
         bytes calldata intent_sigil,
         bytes calldata venue_payload
-    ) external returns (uint256 plinth_position_id, uint256 venue_position_id) {
+    ) external nonReentrant returns (uint256 plinth_position_id, uint256 venue_position_id) {
         if (is_paused) revert RouterPausedError();
         address user = msg.sender;
 
@@ -290,7 +320,7 @@ contract AtriumRouter {
         uint256 plinth_position_id,
         uint256 venue_position_id,
         bytes calldata venue_payload
-    ) external returns (int256 realized_pnl_signed) {
+    ) external nonReentrant returns (int256 realized_pnl_signed) {
         if (is_paused) revert RouterPausedError();
         address user = msg.sender;
 
@@ -313,6 +343,15 @@ contract AtriumRouter {
             revert AdapterAlsoApprovedAsOrchestrator(adapter_addr);
         }
 
+        // 027-SC6 fix: measure the collateral the adapter returns to Coffer so
+        // we can re-credit the user's vault shares for it. The adapter
+        // transfers closing proceeds into Coffer during close_position; pre-fix
+        // that USDC sat in the pool raising assets-per-share for every OTHER
+        // holder while the originating user kept zero shares for it — their own
+        // collateral was permanently transferred away.
+        address usdc = coffer.asset();
+        uint256 cofferUsdcBefore = IERC20Balance(usdc).balanceOf(address(coffer));
+
         // Step 1: adapter closes the venue-side position and returns PnL.
         // The adapter transfers received USDC to Coffer in its own
         // close_position (per audit JJJ-9 + JJJ-12 patterns — the redeemed
@@ -333,6 +372,16 @@ contract AtriumRouter {
 
         // Step 2: Plinth closes the margin-side row.
         plinth.closePosition(plinth_position_id);
+
+        // Step 3 (027-SC6): re-credit the user's shares for the exact USDC the
+        // adapter returned into Coffer. balanceOf only increased this atomic tx
+        // (the adapter's transfer is the sole balance change), so the delta is
+        // the returned collateral. Coffer.adapterReturn mints shares against
+        // the pre-return total so it is the exact inverse of the open burn.
+        uint256 returnedCollateral = IERC20Balance(usdc).balanceOf(address(coffer)) - cofferUsdcBefore;
+        if (returnedCollateral > 0) {
+            coffer.adapterReturn(returnedCollateral, user);
+        }
 
         emit PositionClosedViaRouter(
             user, venue_id, plinth_position_id, venue_position_id, realized_pnl_signed
@@ -365,6 +414,7 @@ contract AtriumRouter {
     /// across both legs by inlining the calls rather than using this.external().
     function openHedgedPair(HedgedLeg calldata legA, HedgedLeg calldata legB)
         external
+        nonReentrant
         returns (
             uint256 plinth_id_a, uint256 venue_id_a,
             uint256 plinth_id_b, uint256 venue_id_b

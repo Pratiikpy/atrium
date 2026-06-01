@@ -98,14 +98,18 @@ function makeStatement(sql: string): D1Statement {
       }
       // ---- INSERT payment ----
       if (trimmed.startsWith('INSERT') && trimmed.includes('INTO payments')) {
-        // Column order per src/db/schema.sql:
-        //   id, wallet_address, path, amount_usdc_wei, tx_hash, facilitator_response, received_at
-        const [id, wallet, path, amount, txHash, facResp, receivedAt] = bound as [
-          string, string, string, string, string | null, string | null, number,
+        // Bind order MUST match the x402 middleware INSERT
+        // (src/middleware/x402.ts), which inserts 6 columns and omits the
+        // nullable facilitator_response:
+        //   id, wallet_address, path, amount_usdc_wei, tx_hash, received_at
+        // Destructuring 7 here mis-read received_at into facilitator_response
+        // and left received_at undefined on every stored row.
+        const [id, wallet, path, amount, txHash, receivedAt] = bound as [
+          string, string, string, string, string | null, number,
         ];
         const row: D1Row = {
           id, wallet_address: wallet, path, amount_usdc_wei: amount,
-          tx_hash: txHash, facilitator_response: facResp, received_at: receivedAt,
+          tx_hash: txHash, facilitator_response: null, received_at: receivedAt,
         };
         paymentsById.set(id, row);
         if (txHash) {

@@ -5,7 +5,8 @@ import "forge-std/Test.sol";
 import {
     AqueductReceiver,
     CCIPReceiverBase,
-    IAny2EVMMessageReceiver
+    IAny2EVMMessageReceiver,
+    IERC165
 } from "../../contracts/aqueduct/src/AqueductReceiver.sol";
 
 /// @title AqueductReceiver foundry test suite
@@ -37,6 +38,22 @@ contract AqueductReceiverTest is Test {
         usdc = new MockUSDC();
         // coffer_or_zero = 0 → receiver forwards via plain `transfer` (no Coffer path).
         receiver = new AqueductReceiver(router, address(usdc), address(0), praetor, timelock);
+    }
+
+    // ── 041-SC20: IERC165 supportsInterface (CCIP offRamp delivery gate) ──
+
+    function test_supportsInterface_iAny2EVM_and_erc165_041SC20() public view {
+        // The CCIP OffRamp probes supportsInterface(IAny2EVMMessageReceiver)
+        // before delivering. Pre-fix it was missing, so the probe failed, the
+        // offRamp skipped ccipReceive, and dest_user was never credited.
+        assertTrue(
+            receiver.supportsInterface(type(IAny2EVMMessageReceiver).interfaceId),
+            "must advertise IAny2EVMMessageReceiver so the CCIP offRamp delivers"
+        );
+        assertTrue(receiver.supportsInterface(type(IERC165).interfaceId), "must advertise IERC165");
+        // ERC165 spec: 0xffffffff must return false.
+        assertFalse(receiver.supportsInterface(0xffffffff), "0xffffffff must be false (ERC165 spec)");
+        assertFalse(receiver.supportsInterface(0xdeadbeef), "unrelated interface id is false");
     }
 
     // ── onlyRouter / onlyTimelock gates ──────────────────────────────

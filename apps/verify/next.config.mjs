@@ -19,10 +19,12 @@ const nextConfig = {
       // `design/Mobile Landing.html`. Anyone can hit /mobile directly to
       // preview the mobile experience.
       { source: '/mobile', destination: '/mobile-landing.html' },
-      // Mobile app shell (5-tab Home/Trade/Move/Agents/More): design
-      // preview until the React /app/* routes are made responsive
-      // (Phase delta.2 of the 2026-05-24 fix plan).
-      { source: '/mobile/app', destination: '/mobile-app.html' },
+      // Mobile app shell: the React /app/* routes are now fully responsive
+      // (every page ships a `md:hidden <X>Mobile` panel + MobileBottomNav +
+      // KillSwitchFAB on real data), so /mobile/app serves the REAL app rather
+      // than the old static mock, which shipped fabricated numbers
+      // ($12,374,820 buying power etc.) — a no-fake-data / no-misleading-info fix.
+      { source: '/mobile/app', destination: '/app' },
     ],
     afterFiles: [],
     fallback: [],

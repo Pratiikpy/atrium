@@ -12,14 +12,6 @@ interface Attestation {
   ipfsCid: string;
 }
 
-// Audit UUU-2 fix: mirror the server-side CID_REGEX from
-// /api/lantern/verify-inclusion (Wave-R-1). Without this, a malicious CID
-// like `evil.com#` would resolve to `https://evil.com#.ipfs.dweb.link/...`
-// which the browser fetches as `evil.com` (the `#` becomes a fragment).
-// Server-side validation alone is not enough — this client also makes a
-// direct fetch to the IPFS gateway and must validate the CID too.
-const CID_REGEX = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{58,127})$/;
-
 async function fetchLatest(): Promise<Attestation | null> {
   const r = await fetch('/api/lantern/latest');
   if (!r.ok) return null;
@@ -37,24 +29,23 @@ export function LanternDashboard() {
   const [proofResult, setProofResult] = useState<'idle' | 'verified' | 'absent' | 'error'>('idle');
 
   async function verifyMyInclusion() {
-    if (!address || !data?.ipfsCid) return;
-    // Audit UUU-2 fix: reject anything that isn't a clean CID before any
-    // string interpolation into the gateway URL. Same regex as the server
-    // path so the two sides agree on what counts as a valid CID.
-    if (!CID_REGEX.test(data.ipfsCid)) {
-      setProofResult('error');
-      return;
-    }
+    if (!address || !data?.ipfsCid || !data?.root) return;
     setProofResult('idle');
     try {
-      const r = await fetch(`https://${data.ipfsCid}.ipfs.dweb.link/tree.json`);
-      if (!r.ok) {
-        setProofResult('error');
-        return;
-      }
-      const tree = (await r.json()) as { leaves: Array<{ user: string }> };
-      const found = tree.leaves.some((l) => l.user.toLowerCase() === address.toLowerCase());
-      setProofResult(found ? 'verified' : 'absent');
+      // 079-BE6 fix: route through the server verifier, which recomputes the
+      // Merkle root from the published tree, compares it to the on-chain
+      // attested root, and checks the wallet's inclusion proof. The previous
+      // tree.leaves.some(user == address) was a bare membership scan with no
+      // root comparison and no proof — a "Verified" backed by nothing.
+      const r = await fetch('/api/lantern/verify-inclusion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ root: data.root, ipfsCid: data.ipfsCid, wallet: address }),
+      });
+      const json = (await r.json()) as { ok?: boolean; reason?: string };
+      if (json.ok) setProofResult('verified');
+      else if (json.reason?.includes('not found')) setProofResult('absent');
+      else setProofResult('error');
     } catch {
       setProofResult('error');
     }
@@ -154,13 +145,16 @@ export function LanternDashboard() {
             Verify my inclusion
           </button>
           {proofResult === 'verified' && (
-            <p className="mt-3 text-sm text-live">Your balance is included in the attested tree.</p>
+            <p className="mt-3 text-sm text-live">
+              Verified — the published tree hashes to the on-chain attested root and your wallet&apos;s
+              inclusion proof reproduces it.
+            </p>
           )}
           {proofResult === 'absent' && (
             <p className="mt-3 text-sm text-testnet">No balance found for your wallet in this attestation.</p>
           )}
           {proofResult === 'error' && (
-            <p className="mt-3 text-sm text-neg">IPFS fetch failed. Retry in a moment.</p>
+            <p className="mt-3 text-sm text-neg">Could not verify — the attestation tree is unavailable or did not match the attested root.</p>
           )}
         </div>
       ) : (

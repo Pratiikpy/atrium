@@ -63,6 +63,10 @@ describe('GET /api/deployments/address — input gating', () => {
       'portico-registry',
       'rostrum',
       'lantern-attestor',
+      // 114-PM3 regression: the trade open/close hooks resolve the
+      // router via slug=atrium-router. A missing allowlist entry 400'd
+      // both money paths before the wallet was reached.
+      'atrium-router',
       // Audit U-18: Postern slugs added for Kill Switch wiring.
       'postern-kill-switch',
       'postern-key-registry',
@@ -93,6 +97,20 @@ describe('GET /api/deployments/address — input gating', () => {
       const res = await GET(makeReq(`adapter-${slug}`));
       expect(res.status).toBe(200);
     }
+  });
+
+  it('accepts atrium-router and forwards its address (114-PM3 trade open/close regression)', async () => {
+    // The Trade "Open position" + "Close" hooks resolve the router via
+    // slug=atrium-router. Pre-fix this slug was absent from ALLOWED_SLUGS,
+    // so the route 400'd and both trade money paths threw `address_400`
+    // before touching the wallet. The router is deployed, so the route
+    // must accept the slug and forward the real address.
+    const router = '0xf1341270dd64Aa6c0b76b06a0F0F0f0f0F0f2717';
+    mockLoadContractAddress.mockResolvedValueOnce(router);
+    const res = await GET(makeReq('atrium-router'));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ slug: 'atrium-router', address: router });
   });
 });
 

@@ -58,6 +58,8 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
     error ZeroNotional();
     error PositionNotOwned();
     error V10NotSupported();
+    /// 032-SC11: the Router delivered no USDC to the adapter for this open.
+    error NoCollateralFunded();
 
     // Audit EEEE-1 fix (`human_left.md` #31): orchestrator-list pattern.
     mapping(address => bool) public is_authorized_caller;
@@ -116,7 +118,18 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         if (!is_supported_instrument[instrument_id]) revert UnsupportedInstrument(instrument_id);
         if (notional_signed == 0) revert ZeroNotional();
 
-        uint256 amount = uint256(notional_signed > 0 ? notional_signed : -notional_signed);
+        // 032-SC11 fix (team-tracked #430): the Router funds the adapter with
+        // the Plinth margin DELTA (a fraction of notional for leveraged
+        // instruments), not abs(notional). Supply min(notional, delivered):
+        // when the delivered margin is below notional (leveraged), supply the
+        // margin — supplying abs(notional) reverted at pool.supply for
+        // under-funding on every leveraged open. When the adapter is fully
+        // funded, supply exactly the notional. notional_signed is retained for
+        // Plinth's margin accounting + direction.
+        uint256 notionalAbs = uint256(notional_signed > 0 ? notional_signed : -notional_signed);
+        uint256 funded = IERC20(usdc).balanceOf(address(this));
+        if (funded == 0) revert NoCollateralFunded();
+        uint256 amount = funded < notionalAbs ? funded : notionalAbs;
         IERC20(usdc).approve(address(pool), amount);
         pool.supply(usdc, amount, address(this), 0);
 

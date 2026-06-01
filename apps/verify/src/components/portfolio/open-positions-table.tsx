@@ -230,11 +230,16 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
           })}
         </tbody>
       </table>
-      {erroredPosition && (
+      {erroredPosition && erroredPosition.venueId != null && erroredPosition.venuePositionId && (
         <div className="border-t border-divider-soft p-3">
           <EmergencyCloseBanner
             instrument={erroredPosition.instrument}
             reason={status.kind === 'error' ? status.reason : 'unknown'}
+            position={{
+              venueId: erroredPosition.venueId,
+              plinthPositionId: erroredPosition.plinthPositionId ?? erroredPosition.venuePositionId,
+              venuePositionId: erroredPosition.venuePositionId,
+            }}
             onClose={() => {
               setEmergencyForId(null);
               reset();

@@ -1,93 +1,125 @@
 'use client';
 
-import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useEffect, useState } from 'react';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
 /**
- * Emergency partial close via Vigil's safety-bot path. Used when the
- * venue's regular adapter has no liquidity for a normal close and the
- * user accepts a worse fill in exchange for getting out.
+ * Emergency close — force-close a position at market through the real deployed
+ * close path: AtriumRouter.close_position_via_adapter.
  *
- * Vigil caps each emergency close at 10% of the position per block so a
- * single block can't dump the venue. The user signs once; subsequent
- * partials are fired by the keeper bots until the position is fully
- * closed (or the user revokes).
- *
- * Honest failure modes:
- *  - Vigil contract not deployed → 'vigil_not_deployed'
- *  - Wallet rejects → wallet error message
- *
- * Spec: ATRIUM_FULL_FLOW_DESIGN.md "Emergency close (when the venue has
- * no liquidity)".
+ * 057-FE2 fix (2026-05-30): pre-fix this called Vigil.queueLiquidation from the
+ * user's EOA. That function is gated to plinth_address (contracts/vigil/src/
+ * lib.rs:253), so every click reverted Unauthorized — and the hook reported
+ * success on bare submit, painting a green "queued" for a guaranteed-revert tx.
+ * Vigil's liquidation queue is NOT user-callable (only Plinth queues, only a
+ * staked keeper executes). The only close path a user wallet can drive is the
+ * Router, so this hook routes there and reports success ONLY once the on-chain
+ * receipt confirms.
  */
 
-// Phase theta audit follow-up (2026-05-25): selector audit — Vigil is a
-// Stylus contract; Stylus 0.10 auto-converts snake_case Rust fn names
-// to camelCase Solidity selectors. The ABI name MUST be the exported
-// camelCase form or the selector hash mismatches and the tx reverts
-// with empty data. Same class as the original Coffer.adapter_pull →
-// adapterPull bug from audit task #333. Pre-fix this hook used the
-// snake form and every emergency-close click reverted at the Vigil
-// dispatch table.
-const VIGIL_EMERGENCY_ABI = [
+// Mirrors AtriumRouter.close_position_via_adapter (same as use-close-position).
+export const ROUTER_CLOSE_ABI = [
   {
     type: 'function',
-    name: 'queueLiquidation',
+    name: 'close_position_via_adapter',
     stateMutability: 'nonpayable',
     inputs: [
-      { name: 'user', type: 'address' },
-      { name: 'margin_version', type: 'uint256' },
+      { name: 'venue_id', type: 'uint8' },
+      { name: 'plinth_position_id', type: 'uint256' },
+      { name: 'venue_position_id', type: 'uint256' },
+      { name: 'venue_payload', type: 'bytes' },
     ],
-    outputs: [{ name: 'job_id', type: 'uint256' }],
+    outputs: [{ name: 'realized_pnl_signed', type: 'int256' }],
   },
 ] as const;
+
+export interface EmergencyClosePosition {
+  venueId: number;
+  plinthPositionId: string;
+  venuePositionId: string;
+}
 
 export type EmergencyCloseStatus =
   | { kind: 'idle' }
   | { kind: 'resolving' }
   | { kind: 'submitting' }
+  | { kind: 'closing'; hash: `0x${string}` }
   | { kind: 'success'; hash: `0x${string}` }
   | { kind: 'error'; reason: string };
+
+/**
+ * Pure receipt → status decision. Success requires a mined receipt with
+ * status === 'success'; an unmined tx stays `closing` (never a fake success).
+ */
+export function emergencyCloseReceiptStatus(
+  closingHash: `0x${string}` | undefined,
+  receipt: { data?: { status: 'success' | 'reverted' } | undefined; error?: Error | null },
+): EmergencyCloseStatus | null {
+  if (!closingHash) return null;
+  if (receipt.data) {
+    return receipt.data.status === 'success'
+      ? { kind: 'success', hash: closingHash }
+      : { kind: 'error', reason: 'close_reverted' };
+  }
+  if (receipt.error) return { kind: 'error', reason: receipt.error.message };
+  return null;
+}
 
 export function useEmergencyClose() {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<EmergencyCloseStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
 
-  async function emergencyClose() {
+  const closingHash = status.kind === 'closing' ? status.hash : undefined;
+  const receipt = useWaitForTransactionReceipt({
+    hash: closingHash,
+    query: { enabled: Boolean(closingHash) },
+  });
+  useEffect(() => {
+    const next = emergencyCloseReceiptStatus(closingHash, {
+      data: receipt.data,
+      error: receipt.error,
+    });
+    if (next) setStatus(next);
+  }, [closingHash, receipt.data, receipt.error]);
+
+  async function emergencyClose(position: EmergencyClosePosition) {
     if (!account) {
       setStatus({ kind: 'error', reason: 'wallet_not_connected' });
       return;
     }
-    setStatus({ kind: 'resolving' });
-    let vigil: `0x${string}` | null;
+    let plinthId: bigint;
+    let venuePosId: bigint;
     try {
-      const r = await fetch('/api/deployments/address?slug=vigil');
-      if (!r.ok) throw new Error(`address_${r.status}`);
-      const j = await r.json();
-      vigil = j.address ?? null;
-    } catch (e) {
-      setStatus({ kind: 'error', reason: e instanceof Error ? e.message : 'vigil_lookup_failed' });
+      plinthId = BigInt(position.plinthPositionId);
+      venuePosId = BigInt(position.venuePositionId);
+    } catch {
+      setStatus({ kind: 'error', reason: 'invalid_position_id' });
       return;
     }
-    if (!vigil) {
-      setStatus({ kind: 'error', reason: 'vigil_not_deployed' });
+    setStatus({ kind: 'resolving' });
+    let router: `0x${string}` | null;
+    try {
+      const r = await fetch('/api/deployments/address?slug=atrium-router');
+      if (!r.ok) throw new Error(`address_${r.status}`);
+      router = (await r.json()).address ?? null;
+    } catch (e) {
+      setStatus({ kind: 'error', reason: e instanceof Error ? e.message : 'router_lookup_failed' });
+      return;
+    }
+    if (!router) {
+      setStatus({ kind: 'error', reason: 'router_not_deployed' });
       return;
     }
     setStatus({ kind: 'submitting' });
     try {
-      // margin_version is fetched by Vigil itself from Plinth — we pass 0 as
-      // the "use current" sentinel. The contract increments and validates
-      // internally; see Vigil's queue_liquidation implementation. If/when
-      // the ABI requires the caller to supply the real version, this hook
-      // should fetch it from /api/portfolio/margin-health first.
       const hash = await writeContractAsync({
-        address: vigil,
-        abi: VIGIL_EMERGENCY_ABI,
-        functionName: 'queueLiquidation',
-        args: [account, 0n],
+        address: router,
+        abi: ROUTER_CLOSE_ABI,
+        functionName: 'close_position_via_adapter',
+        args: [position.venueId, plinthId, venuePosId, '0x'],
       });
-      setStatus({ kind: 'success', hash });
+      setStatus({ kind: 'closing', hash });
     } catch (e) {
       setStatus({ kind: 'error', reason: e instanceof Error ? e.message : 'submit_failed' });
     }

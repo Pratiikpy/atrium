@@ -43,19 +43,31 @@ export function MerkleStructureCard() {
         <line x1="60" y1="70" x2="90" y2="100" stroke="currentColor" strokeWidth="0.4" className="text-muted" />
         <line x1="180" y1="70" x2="150" y2="100" stroke="currentColor" strokeWidth="0.4" className="text-muted" />
         <line x1="180" y1="70" x2="210" y2="100" stroke="currentColor" strokeWidth="0.4" className="text-muted" />
-        {[15, 75, 135, 195].map((x, i) => (
-          <g key={i}>
-            <rect x={x} y="100" width="30" height="20" rx="4" fill="var(--color-parchment)" stroke="var(--color-divider)" />
-            <text x={x + 15} y="114" textAnchor="middle" fontSize="8" fontFamily="Geist Mono" className="fill-ink-soft">0x{(i + 1).toString(16).padStart(2, '0')}…</text>
-          </g>
-        ))}
+        {[15, 75, 135, 195].map((x, i) => {
+          // 065-FE10 fix: never synthesize hash-shaped labels from the map
+          // index. Render the real attested leaf hash when the API surfaces
+          // one in sampleNodes; otherwise show a neutral, clearly-illustrative
+          // 'leaf' marker. The boxes are a schematic of tree shape, not a
+          // claim about specific attested leaves.
+          const node = data?.sampleNodes?.[i];
+          return (
+            <g key={i}>
+              <rect x={x} y="100" width="30" height="20" rx="4" fill="var(--color-parchment)" stroke="var(--color-divider)" />
+              <text x={x + 15} y="114" textAnchor="middle" fontSize="8" fontFamily="Geist Mono" className="fill-ink-soft">
+                {node ? `${node.hash.slice(0, 6)}…` : 'leaf'}
+              </text>
+            </g>
+          );
+        })}
         <text x="120" y="148" textAnchor="middle" fontSize="9" fontFamily="Geist Mono" className="fill-muted">
           ⋯ {data?.leafCount ? `${data.leafCount.toLocaleString('en-US')} leaves` : 'pending'} ⋯
         </text>
       </svg>
 
       <p className="mt-3 text-[11px] text-muted">
-        OpenZeppelin Merkle-tree compatible. Inclusion proof is verifiable in any wallet.
+        Schematic of the attested tree — the boxes show its shape, not specific leaves (real
+        leaves are per-account balance hashes). Leaf count and depth above are read live from the
+        latest on-chain Lantern attestation. Use Verify my balance to check your own inclusion.
       </p>
     </section>
   );

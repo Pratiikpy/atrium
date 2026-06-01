@@ -288,6 +288,37 @@ contract RouterAaveFillE2E is Test {
         (, uint256 requiredAfter,,) = plinth.getAccount(user);
         assertEq(requiredAfter, 2_500e6, "Plinth required-margin advanced (delta-read coupled)");
     }
+
+    /// 032-SC11 (#430): a LEVERAGED open must not revert at pool.supply. Plinth
+    /// approves only a fraction of notional as margin; pre-fix the adapter
+    /// supplied abs(notional) while funded with only the margin delta, so
+    /// pool.supply reverted (adapter under-funded) on every leveraged open.
+    /// Now the adapter supplies exactly what the Router delivered.
+    function test_open_via_router_aave_leveraged_suppliesFundedAmountNotNotional_032SC11() public {
+        bytes memory empty = hex"";
+        int256 notional = int256(1_000e6);
+        // 20x leverage: 50 USDC margin delta for a 1,000 USDC notional.
+        plinth.setMarginIncreasePerOpen(50e6);
+
+        vm.prank(user, user);
+        (uint256 plinthId, uint256 venueId) =
+            router.open_position_via_adapter(AAVE_VENUE_ID, INSTRUMENT, notional, empty, empty, empty);
+
+        // The open SUCCEEDS (pre-fix it reverted under-funded at pool.supply),
+        // and the adapter supplied exactly the funded margin, not abs(notional).
+        assertEq(coffer.lastAdapterPullAmount(), 50e6, "pull == margin delta");
+        assertEq(pool.supplied(address(usdc), address(aave)), 50e6, "supply == funded margin, not abs(notional)");
+        assertEq(usdc.balanceOf(address(aave)), 0, "adapter retains no USDC after supply");
+        // The full notional is still recorded for Plinth's margin accounting.
+        IPorticoAdapter.PositionView memory v = aave.get_position(venueId);
+        assertEq(v.notional_signed, notional, "notional recorded for margin accounting");
+
+        // Close withdraws exactly the supplied principal back to Coffer.
+        uint256 cofferAfterOpen = usdc.balanceOf(address(coffer));
+        vm.prank(user, user);
+        router.close_position_via_adapter(AAVE_VENUE_ID, plinthId, venueId, empty);
+        assertEq(usdc.balanceOf(address(coffer)), cofferAfterOpen + 50e6, "supplied principal returns to Coffer");
+    }
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -357,6 +388,14 @@ contract FakeCoffer {
         lastAdapterPullAmount = amount;
         lastAdapterPullTo = to;
         lastAdapterPullUser = from_user;
+    }
+
+    // 027-SC6: re-credit shares for collateral returned on close.
+    function asset() external view returns (address) { return address(usdc); }
+    function adapterReturn(uint256 amount, address to_user) external returns (uint256) {
+        require(approvedAdapters[msg.sender], "not approved adapter");
+        shares[to_user] += amount;
+        return amount;
     }
 }
 

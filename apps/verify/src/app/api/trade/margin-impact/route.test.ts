@@ -169,3 +169,29 @@ describe('GET /api/trade/margin-impact — valid input passes JJ-1, falls to pen
     expect(json.notes).toContain('aave-v3');
   });
 });
+
+
+
+describe('GET /api/trade/margin-impact — P0-4 IDOR gate', () => {
+  // The route reads wallet-scoped Plinth collateral/margin, so ?wallet= must be
+  // locked to the authenticated session. In tests (NODE_ENV !== 'production')
+  // getSession falls back to DEMO_WALLET_ADDRESS — set it to simulate the
+  // session wallet and request a different one.
+  it('denies a ?wallet= that does not match the session wallet (403)', async () => {
+    vi.stubEnv('DEMO_WALLET_ADDRESS', '0x' + 'a'.repeat(40));
+    const res = await GET(makeRequest('size=1000&wallet=0x' + 'b'.repeat(40)));
+    expect(res.status).toBe(403);
+  });
+
+  it('allows a ?wallet= matching the session wallet (falls to pending, not 403)', async () => {
+    const w = '0x' + 'a'.repeat(40);
+    vi.stubEnv('DEMO_WALLET_ADDRESS', w);
+    const res = await GET(makeRequest('size=1000&wallet=' + w));
+    // Gate passes -> route proceeds (200 with live 'plinth' data when the
+    // test Plinth is available, or 'pending' otherwise). The point is it is
+    // NOT blocked (401/403) for the matching wallet.
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(['plinth', 'pending']).toContain(json.source);
+  });
+});

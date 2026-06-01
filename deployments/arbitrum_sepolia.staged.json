@@ -1,0 +1,246 @@
+{
+  "network": "arbitrum_sepolia",
+  "chainId": 421614,
+  "contracts": {
+    "praetor-timelock": {
+      "address": "0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4",
+      "tx": "0xa05cfa1caa5cfd7f1b743c34ea546349c6220d1a9652836a75ba5c96db89fe33",
+      "block": 270408443
+    },
+    "portico-registry": {
+      "address": "0x9a9af6e50491cd4694699d48564bbff18f9b40bc",
+      "tx": "0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505",
+      "block": 270408449
+    },
+    "lantern-attestor": {
+      "address": "0xF0B90b94C0B8a52c545768bFf06a3932c67d5888",
+      "tx": "0x9ddd82d326fae6210b04146efaca45c333e8c5d46906f784ce0956a19a0f7ef4",
+      "block": 270918668,
+      "deployed_at": "2026-05-25T20:00:00.000Z",
+      "kind": "solidity",
+      "version": "v2",
+      "signing_key": "0x8ab93A583eD711A6ecDb9776F171578AFe4bc97b",
+      "note": "Redeployed 2026-05-25 (Phase zeta.1, audit TT-17 fix). AttestationPublished event now carries (root, block_number, timestamp, leafCount, ipfsCid) so /api/lantern/verify-inclusion (Verifier Step 6) can look up the pinned Merkle tree without an extra on-chain read. publish() signature extended to match. Constructor signing_key = 0x8ab93A... (dedicated Lantern key, not deployer EOA); founder must update Vercel env LANTERN_KEY_ENVELOPE_JSON to wrap lantern-key.json instead of lantern-key-deployer.json + LANTERN_ATTESTOR_ADDRESS to this address. Subgraph manifest also needs the new event signature - re-deploy as v0.0.6."
+    },
+    "lantern-attestor-v1-pre-event-extension": {
+      "address": "0x900a9fb4bab7576fc11e4bb3c002d89dbe261168",
+      "tx": "0x2343d14a743cef74768ec818de86d9154409d13ef3c97c987a8b79d1ca56a53c",
+      "block": 270408455,
+      "note": "DEPRECATED v1 (3-field event). Replaced by v2 above on 2026-05-25. Kept for tx history."
+    },
+    "curator": {
+      "address": "0x21c5ecc5b3ad6b066ef32145a06ed1b688d3103d",
+      "tx": "0xb0386fceceaaa2db9022913d7a4b169f1bb5018fa27940cd5037374097c5a4b5",
+      "block": 270408461
+    },
+    "edict": {
+      "address": "0x66577042b4d47312e554bbfa5e29ae20f55dd631",
+      "tx": "0xf208cc99c46de4b7a26c1d3efc1f006ccf809c06a93374b6195f77495e7af140",
+      "block": 270408469
+    },
+    "research-attestation": {
+      "address": "0xfabc1fee1342be58996fec74cfc3612d4ac8a0ba",
+      "tx": "0xc5aa317ca635282de65dca0a116100cdcbd3535df74279b3bf9efdb66713705c",
+      "block": 270408474
+    },
+    "stoa": {
+      "address": "0x6d655803bac4bf61ad5ad26fd3b88429671cb5db",
+      "tx": "0x4b74f2454e4fbaf5319f45360979d28d95f8d675d4a29e9bcf32b0ed99270b42",
+      "block": 270408479
+    },
+    "coffer": {
+      "address": "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3",
+      "tx": "0x07ae5e44df7b6ada1a390af825389c8b37804421031f18f71490c2dee3a0e04b",
+      "block": 270800974,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:17:02.917Z",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "sigil": {
+      "address": "0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9",
+      "tx": "0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371",
+      "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
+      "block": 270801710,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:21:15.358Z",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "vigil": {
+      "address": "0x5ccd3422f430f6d034ff46715b41509de9d0deed",
+      "tx": "0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e",
+      "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
+      "block": 270802353,
+      "kind": "stylus",
+      "deployed_at": "2026-05-24T15:24:46.090Z",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "plinth-math": {
+      "address": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
+      "tx": "0x27a07432f7834f3e83bd7452137572a46a10833e73a80692dd42ad31ae4e7e3b",
+      "activationTx": "0xfdb99e333ba8dbc4273b27dfa0a12ec2bbc41d788a35fe4ade6974fe595e7bd7",
+      "block": 270678961,
+      "kind": "stylus",
+      "note": "SPAN compute extracted from Plinth (Phase A.7) to fit EIP-170 24 KB cap"
+    },
+    "plinth-oracle": {
+      "address": "0x66064d18722f50e055d74daf51a13fd8e331f0b7",
+      "tx": "0xad2928f777e608c1108032a0148025e781a759c6655d5c0e0bc9e8d06560d4ea",
+      "activationTx": "0x69bff2c17e520de5a7ebe2081d01821eadf42922508c4a49d946c898b6cb7248",
+      "block": 270688421,
+      "kind": "stylus",
+      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) — Chainlink + Pyth + median + 50bps tolerance"
+    },
+    "plinth": {
+      "address": "0xd86f579ec880eaab27dfa698ae056d1893ec7553",
+      "tx": "0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0",
+      "block": 270803107,
+      "kind": "stylus",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror.",
+      "deployed_at": "2026-05-24T15:28:58.569Z"
+    },
+    "atrium-router": {
+      "address": "0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0",
+      "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
+      "block": 270726101,
+      "kind": "solidity",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "rostrum": {
+      "address": "0xbaf348e61fb555844973398b51332d93f674b0af",
+      "tx": "0x0106d5cbe7852a6877678161e32fb99abc5639942bad95efd49aa45285a49a33",
+      "block": 270726103,
+      "kind": "solidity"
+    },
+    "adapter-aave-horizon": {
+      "address": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1",
+      "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
+      "deployed_at": "2026-05-25T19:25:00.000Z",
+      "kind": "solidity",
+      "version": "v1.1.1",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "mock-aave-pool": {
+      "address": "0x2e1360faE80c7937e684067450202D921F72555B",
+      "tx": "0x3dd459b7fca1838e20ba85bed173d7d538bc3bb46057b29406ca55aa03ce52c9",
+      "deployed_at": "2026-05-25T19:20:00.000Z",
+      "kind": "solidity",
+      "note": "Testnet stub for Aave V3 Pool. Round-trips USDC 1:1 with a 5-bps-per-call drifting liquidity index. No real Aave V3 on Arb Sepolia. See tripwires/2026-05-25-mock-aave-pool.md."
+    },
+    "adapter-aave-horizon-v1.1-pool-placeholder": {
+      "address": "0xa68361cCBd819F4A38a31501D399888F9187d0b9",
+      "tx": "0xe15ce5928dc27fc6e4906c86125548d6db094344d7492b18db447790b4b71583",
+      "deployed_at": "2026-05-24T15:36:00.000Z",
+      "kind": "solidity",
+      "version": "v1.1",
+      "note": "v1.1 with deployer-EOA pool placeholder. Superseded by the MockAavePool-backed v1.1.1 above on 2026-05-25. Kept in registry for tx history. PorticoRegistry will deregister this address on 2026-05-27."
+    },
+    "adapter-aave-horizon-v1.0-deprecated": {
+      "address": "0xe991ec988a62bcc38740f8b8c549e5400ded8d5d",
+      "tx": "0xdff7722214573f3a27dc832875b6d30b456df0e88173944feb9edc086f64c8e8",
+      "block": 270727659,
+      "kind": "solidity",
+      "note": "DEPRECATED v1.0 (uses tx.origin, no ReentrancyGuard). Kept for reference; was never live on Coffer or PorticoRegistry."
+    },
+    "adapter-curve": {
+      "address": "0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682",
+      "tx": "0x2d6d5a2ad389fa5ec11b6793fb8144fbde6039773f9fd7c32e3f5c5d98acf5e7",
+      "block": 270727666,
+      "kind": "solidity"
+    },
+    "adapter-gmx": {
+      "address": "0x2531af9f7596d74f412bfab7d3b84ee7a32cd2d4",
+      "tx": "0x7a47f5d89f54d80f06131f7140522c83361bfb2af7a3b46cd2c1f053f95b24c9",
+      "block": 270727672,
+      "kind": "solidity"
+    },
+    "adapter-hyperliquid": {
+      "address": "0x87014fbace9ade49bf923bcfae74b4c858cf371e",
+      "tx": "0xab0a7b44445194087a9c019793bbfaa42372aa5110c6e660bd93d6b33b98fda0",
+      "block": 270727679,
+      "kind": "solidity",
+      "note": "Shared by HIP-3 + HIP-4. Bridge placeholder = deployer."
+    },
+    "adapter-morpho": {
+      "address": "0xfabe2b0d1c66bc2976ed3b0c58f3cdcb7878344e",
+      "tx": "0x139d0cc7e9bb47101eea1a341ca70152f8f4986deef3f0cd307e5a47147a9cd0",
+      "block": 270727682,
+      "kind": "solidity"
+    },
+    "adapter-pendle": {
+      "address": "0x54a1bc2c5c73cc531035b0f008c8a252a02daf7d",
+      "tx": "0xfb7ccf368fc5e9f802e27cab10dd4c7cd2bad3792bda0b35f97346aef1eb6b5f",
+      "block": 270727686,
+      "kind": "solidity"
+    },
+    "adapter-polymarket": {
+      "address": "0x98a688723c47ab6909be04fd0aa3eca5ee8b08db",
+      "tx": "0x5e5686ac5371703f09625a691ddf876204f5ad2e5d30234a943439f1b981d6c0",
+      "block": 270727693,
+      "kind": "solidity",
+      "note": "Routes via Aqueduct to Polygon Amoy testnet (CCIP selector 16281711391670634445)"
+    },
+    "adapter-synthetix": {
+      "address": "0x62b3b34ffa76fb62245702c0b7efd37832eb39b8",
+      "tx": "0x3e72aa7ee5ef0da71b516022edcfddef178536d12d2aa6e6983bdb30bbd10632",
+      "block": 270727698,
+      "kind": "solidity"
+    },
+    "adapter-trade-xyz": {
+      "address": "0xf34c38d9e61a1b1beafffbb681b07e489c36a1ce",
+      "tx": "0xac4298a2ab96e2c88d22b3677153835558323208019539145381345b672b1a64",
+      "block": 270727704,
+      "kind": "solidity"
+    },
+    "aqueduct": {
+      "address": "0x6139449bf43f44385d08640b2e6fd2b82cb87ec2",
+      "tx": "0x057918f272f61d6992350b8b7da9f6ad2ef0bcaa30947c829a4e8672af69f9a1",
+      "block": 270683155,
+      "kind": "solidity"
+    },
+    "aqueduct-receiver": {
+      "address": "0x49Bd2AF2d2ee1844235bb6500Ba4EC6F24704b42",
+      "tx": "0x196108115a52f667d03232d3e8a691e62754cd5c7014f885d07159ddb3e1fd28",
+      "block": 270683161,
+      "kind": "solidity",
+      "note": "2026-05-30 critical-fix redeploy. STAGED: live only after the 6 timelock ops execute (~48h) + this file is copied over root+mirror."
+    },
+    "aqueduct-claimback": {
+      "address": "0x4d441fca986d51d17c71f979814e2a492a429382",
+      "tx": "0x5776f1bd0e66c366f5b95cdaa214fe4cb3f3f5d3f37ff79e369380d494d60787",
+      "block": 270683165,
+      "kind": "solidity"
+    },
+    "postern-key-registry": {
+      "address": "0x28c9fd500d2d8e3b56259a1054e9da05dec747d8",
+      "tx": "0xacf2cbc0431449283efd496ccdd4bf235830ed1b0530a203b0af8fa61ac81ee4",
+      "block": 270683171,
+      "kind": "solidity"
+    },
+    "postern-kill-switch": {
+      "address": "0xb90a51a726740065bd0dbc20cd79306b30d8b676",
+      "tx": "0x3f6ef96a4c24f3408c811b688e158ba55b9fd1cb39d4d470776de90ec90885e3",
+      "block": 270683177,
+      "kind": "solidity"
+    },
+    "faucet": {
+      "address": "0x7f3a714c824c0926ae98ecfb2e59513e78d82bbc",
+      "tx": "0x269cdc4cb11280422c9d36096f26829e07166851e2673f529923c60fa696724d",
+      "block": 270742814,
+      "kind": "solidity",
+      "stockTxs": {
+        "usdc": "0xcf33df8d9d9a46528ee0319dbceabe059df83209429a96124461a1ada093581c",
+        "eth": "0xbc414270e6fbba3bd7a1d9cdb0d3802cd0546811f9f5ce027a09f9c082d31e45"
+      },
+      "note": "5 USDC + 0.0005 ETH per claim, 24h cooldown. Stocked with 40 USDC + 0.04 ETH (8 full claims). Sourcify exact_match. Replaced 0xb982 which used 100-USDC drop incompatible with the Circle testnet drip cadence."
+    },
+    "faucet-deprecated-v1": {
+      "address": "0xb982c46d7a4aa7f1ebef91ca4cc0a34be1cf8549",
+      "tx": "0x0ef3e3271b2243dcb6ad9411222ac2cdd331b05bd06bcc28d1e04bf1ae48e001",
+      "block": 270691652,
+      "kind": "solidity",
+      "note": "DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence. Kept for reference; do not point UI at it."
+    }
+  },
+  "lastUpdated": "2026-05-30T12:34:21.142Z",
+  "_staged": "Staged for the 2026-05-30 cutover. Root+mirror stay on OLD addresses until the timelock ops in .forge-cache/timelock-ops.json execute, then copy this over root+mirror and redeploy verify-app + subgraph."
+}

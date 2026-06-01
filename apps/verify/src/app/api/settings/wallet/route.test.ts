@@ -97,7 +97,7 @@ describe('GET /api/settings/wallet — wallet set, Postern NOT deployed (NN-2)',
 });
 
 describe('GET /api/settings/wallet — Postern deployed branch', () => {
-  it('lights up Postern fields when contract is in deployment registry', async () => {
+  it('reports honest wallet state (no fabricated Pimlico/4337) when registry is deployed', async () => {
     const wallet = '0x' + 'c'.repeat(40);
     process.env.DEMO_WALLET_ADDRESS = wallet;
     (loadContractAddress as any).mockResolvedValue('0x' + '1'.repeat(40));
@@ -105,12 +105,18 @@ describe('GET /api/settings/wallet — Postern deployed branch', () => {
     const { GET } = await import('./route');
     const json = await (await GET()).json();
     expect(json.address).toBe(wallet);
-    expect(json.authenticator).toBe('Postern passkey · WebAuthn');
-    expect(json.bundler).toBe('Pimlico · testnet');
-    expect(json.paymaster).toBe('Pimlico verifying paymaster');
-    expect(json.erc4337Ready).toBe(true);
-    expect(json.erc7702Ready).toBe(true);
+    // The app's only connector is the Coinbase Smart Wallet (lib/wagmi.ts).
+    expect(json.authenticator).toBe('Coinbase Smart Wallet · passkey');
+    // 063-FE8: no Pimlico bundler/paymaster exists; AA is NOT ready.
+    expect(json.bundler).toBeNull();
+    expect(json.paymaster).toBeNull();
+    expect(json.erc4337Ready).toBe(false);
+    expect(json.erc7702Ready).toBe(false);
+    // What IS real: the on-chain session-key registry address.
+    expect(json.sessionKeyRegistry).toBe('0x' + '1'.repeat(40));
     expect(json.source).toBe('postern');
+    // Anti-regression: the fabricated Pimlico/bundler strings must never leak.
+    expect(JSON.stringify(json)).not.toMatch(/Pimlico/i);
   });
 
   it('queries postern-key-registry slug from deployments registry', async () => {

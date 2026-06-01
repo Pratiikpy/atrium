@@ -23,6 +23,23 @@ contract PorticoRegistryTest is Test {
         adapter = new MockAdapter();
     }
 
+    /// 101-OPS3.1: the post-key-leak Safe handoff needs a real admin-transfer.
+    function test_updatePraetor_transfersAdmin_andRejectsNonPraetor_101OPS3() public {
+        address newSafe = makeAddr("safe-3of5");
+        vm.prank(hostile);
+        vm.expectRevert(PorticoRegistry.Unauthorized.selector);
+        registry.updatePraetor(newSafe);
+        vm.prank(praetor);
+        registry.updatePraetor(newSafe);
+        assertEq(registry.praetor_multisig(), newSafe, "praetor role moved to the Safe");
+        vm.prank(praetor);
+        vm.expectRevert(PorticoRegistry.Unauthorized.selector);
+        registry.updatePraetor(hostile);
+        vm.prank(newSafe);
+        vm.expectRevert(bytes("zero praetor"));
+        registry.updatePraetor(address(0));
+    }
+
     function test_registerAdapter_rejectsNonTimelock() public {
         bytes32 codehash = address(adapter).codehash;
         vm.prank(praetor);

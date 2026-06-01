@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, erc20Abi } from 'viem';
 // Audit U-39: shared testnet-token constants. Pre-fix this file
@@ -52,6 +52,27 @@ export type DepositStatus =
   | { kind: 'success'; depositHash: `0x${string}` }
   | { kind: 'error'; reason: string };
 
+/**
+ * Pure receipt → status decision for the deposit tx (058-FE3 regression
+ * surface). A deposit is `success` ONLY when the mined receipt reports
+ * status === 'success'. While the tx is unmined (no data, no error) this
+ * returns null so the hook stays in `depositing` and never jumps to success
+ * on submit. A reverted receipt or a watcher error maps to `error`.
+ */
+export function depositReceiptStatus(
+  depositingHash: `0x${string}` | undefined,
+  receipt: { data?: { status: 'success' | 'reverted' } | undefined; error?: Error | null },
+): DepositStatus | null {
+  if (!depositingHash) return null;
+  if (receipt.data) {
+    return receipt.data.status === 'success'
+      ? { kind: 'success', depositHash: depositingHash }
+      : { kind: 'error', reason: 'deposit_reverted' };
+  }
+  if (receipt.error) return { kind: 'error', reason: receipt.error.message };
+  return null;
+}
+
 export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<DepositStatus>({ kind: 'idle' });
@@ -71,10 +92,25 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
   // pending and the hook tells us when it's mined.
   const pendingHash =
     status.kind === 'approving' || status.kind === 'depositing' ? status.hash : undefined;
-  useWaitForTransactionReceipt({
+  const receipt = useWaitForTransactionReceipt({
     hash: pendingHash,
     query: { enabled: Boolean(pendingHash) },
   });
+
+  // 058-FE3 fix: writeContractAsync resolves the instant the wallet SUBMITS,
+  // not when the tx mines. Pre-fix the hook set `success` immediately after
+  // submit, so a reverted deposit (per-user cap, global cap, paused USDC)
+  // still painted a green "Deposited." with a tx link. Promote depositing →
+  // success/error ONLY when the on-chain receipt confirms, so the UI never
+  // claims a success the chain did not actually produce.
+  const depositingHash = status.kind === 'depositing' ? status.hash : undefined;
+  useEffect(() => {
+    const next = depositReceiptStatus(depositingHash, {
+      data: receipt.data,
+      error: receipt.error,
+    });
+    if (next) setStatus(next);
+  }, [depositingHash, receipt.data, receipt.error]);
 
   async function deposit(amountUsdc: string) {
     if (!account) {
@@ -122,8 +158,9 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
         args: [parsed, account],
       });
       setStatus({ kind: 'depositing', hash: depositHash });
-      // Receipt watching handles the success transition (component re-reads).
-      setStatus({ kind: 'success', depositHash });
+      // Do NOT mark success here: writeContractAsync resolved on submit, not
+      // on mining. The receipt effect above promotes depositing → success
+      // once the tx confirms, or → error if it reverted.
     } catch (e) {
       setStatus({
         kind: 'error',

@@ -262,6 +262,14 @@ contract FakeCoffer {
         shares[from_user] -= amount;
         MockERC20(usdc).transfer(to, amount);
     }
+
+    // 027-SC6: re-credit shares for collateral returned on close.
+    function asset() external view returns (address) { return usdc; }
+    function adapterReturn(uint256 amount, address to_user) external returns (uint256) {
+        require(approvedAdapters[msg.sender], "not approved adapter");
+        shares[to_user] += amount;
+        return amount;
+    }
 }
 
 contract FakeRegistry {

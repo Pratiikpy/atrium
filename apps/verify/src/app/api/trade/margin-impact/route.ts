@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tryGetPlinth } from '@/lib/portfolio-source';
+import { requireWalletMatch } from '@/lib/auth-session';
 import { formatUsd } from '@/lib/format-usd';
 import { VENUES } from '@/lib/venues';
 
@@ -31,6 +32,14 @@ export async function GET(req: NextRequest) {
     walletParam && /^0x[0-9a-fA-F]{40}$/.test(walletParam)
       ? walletParam
       : process.env.DEMO_WALLET_ADDRESS ?? null;
+  // P0-4 (IDOR fix): lock wallet-scoped margin data to the authenticated
+  // session. Every sibling portfolio route enforces this; this one was
+  // missed, letting any caller read any wallet's collateral/margin ratio
+  // via ?wallet=. Mirrors api/portfolio/margin-health/route.ts.
+  if (wallet) {
+    const denied = await requireWalletMatch(req, wallet);
+    if (denied) return denied;
+  }
   const plinth = await tryGetPlinth();
   const sizeUsd = parseSizeUsdOrNull(req.nextUrl.searchParams.get('size'));
   // Default to a real VENUES id (was 'hl-hip3', which is not a valid id).

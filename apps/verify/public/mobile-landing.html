@@ -185,7 +185,7 @@
       padding: 6px 12px; border-radius: 999px;
       background: var(--ink); color: var(--bg);
       font-family: var(--sans); font-size: 11.5px; font-weight: 500;
-      border: none; cursor: pointer;
+      border: none; cursor: pointer; text-decoration: none;
       display: inline-flex; align-items: center; gap: 4px;
     }
     .topnav .menu {
@@ -271,7 +271,7 @@
       color: var(--bg);
       font-weight: 500; font-size: 14.5px;
       border: none; cursor: pointer;
-      width: 100%;
+      width: 100%; text-align: center; text-decoration: none;
       box-shadow: 0 6px 18px color-mix(in oklch, var(--ink) 40%, transparent);
     }
     .hero-cta .ghost {
@@ -731,6 +731,7 @@
       background: var(--ink); color: var(--bg);
       font-weight: 500; font-size: 14.5px;
       border: none; cursor: pointer;
+      text-align: center; text-decoration: none;
       box-shadow: 0 8px 22px color-mix(in oklch, var(--accent) 24%, transparent);
     }
     .cta-band .ghost {
@@ -836,7 +837,7 @@
 
             <nav class="topnav" id="topnav">
               <a href="#" class="mark">Atrium</a>
-              <button class="cta">Open testnet ↗</button>
+              <a href="/app" class="cta">Open testnet ↗</a>
             </nav>
 
             <div class="scroll" id="scroll">
@@ -864,7 +865,7 @@
                 </p>
 
                 <div class="hero-cta">
-                  <button class="primary">Open testnet ↗</button>
+                  <a href="/app" class="primary">Open testnet ↗</a>
                   <a href="#product" class="ghost">See how it works</a>
                 </div>
 
@@ -1165,7 +1166,7 @@
                   passkey login to first cross-margin trade.
                 </p>
                 <div class="actions">
-                  <button class="primary">Open testnet ↗</button>
+                  <a href="/app" class="primary">Open testnet ↗</a>
                   <a href="#" class="ghost">Documentation</a>
                 </div>
               </section>

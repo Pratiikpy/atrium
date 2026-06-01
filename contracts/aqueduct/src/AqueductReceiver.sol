@@ -40,6 +40,12 @@ interface IAny2EVMMessageReceiver {
     function ccipReceive(Any2EVMMessage calldata message) external;
 }
 
+/// 041-SC20 fix: the CCIP OffRamp probes the receiver with ERC165
+/// `supportsInterface` before delivering; the receiver must expose it.
+interface IERC165 {
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
+}
+
 interface IERC20 {
     function transfer(address to, uint256 value) external returns (bool);
     function approve(address spender, uint256 value) external returns (bool);
@@ -62,7 +68,7 @@ interface IAqueductSourceAck {
 ///         the source chain via a return CCIP message so claim-back can
 ///         refuse double-spend (audit B-12).
 
-contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, ReentrancyGuard {
+contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, IERC165, ReentrancyGuard {
     address public immutable usdc;
     address public immutable coffer_or_zero;
     address public immutable praetor_multisig;
@@ -123,6 +129,17 @@ contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, Reentran
         coffer_or_zero = _coffer_or_zero;
         praetor_multisig = _praetor;
         praetor_timelock = _praetor_timelock;
+    }
+
+    /// 041-SC20 fix: restore IERC165 supportsInterface. Pre-fix this receiver
+    /// dropped it, so the CCIP OffRamp's ERC165Checker probe for
+    /// IAny2EVMMessageReceiver returned false and the offRamp skipped
+    /// ccipReceive entirely — USDC landed here but dest_user was never
+    /// credited. Returning true for the receiver + ERC165 interface ids makes
+    /// the offRamp deliver the message and call ccipReceive.
+    function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
+        return interfaceId == type(IAny2EVMMessageReceiver).interfaceId
+            || interfaceId == type(IERC165).interfaceId;
     }
 
     function ccipReceive(Any2EVMMessage calldata message) external onlyRouter nonReentrant {

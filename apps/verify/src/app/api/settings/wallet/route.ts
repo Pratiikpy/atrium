@@ -33,6 +33,7 @@ export async function GET(req?: Request) {
       paymaster: null,
       erc4337Ready: false,
       erc7702Ready: false,
+      sessionKeyRegistry: null,
       source: 'pending',
     });
   }
@@ -46,21 +47,28 @@ export async function GET(req?: Request) {
       paymaster: null,
       erc4337Ready: false,
       erc7702Ready: false,
+      sessionKeyRegistry: null,
       source: 'pending',
     });
   }
-  // Postern is deployed → these fields are sourced from the chain.
-  // The strings are intentionally generic descriptions of what Postern
-  // currently uses, not user-specific values; once Postern exposes per-
-  // wallet metadata the route will read that instead.
+  // 063-FE8 fix: pre-fix this branch hardcoded `bundler: 'Pimlico · testnet'`,
+  // `paymaster: 'Pimlico verifying paymaster'`, `erc4337Ready/erc7702Ready:
+  // true` whenever PosternKeyRegistry was deployed. None of that exists: there
+  // is no Pimlico/bundler/paymaster or ERC-4337/7702 SDK in the repo, and
+  // PosternKeyRegistry is a session-key registry whose own
+  // `_isAuthenticatedPosternWallet` returns false with a Year-2 AA TODO.
+  // Report the honest state. What IS real: the app's only connector is the
+  // Coinbase Smart Wallet (passkey) per lib/wagmi.ts, and the session-key
+  // registry is on-chain at `posternDeployed`.
   return NextResponse.json({
     address: wallet,
     ens: process.env.DEMO_WALLET_ENS ?? null,
-    authenticator: 'Postern passkey · WebAuthn',
-    bundler: 'Pimlico · testnet',
-    paymaster: 'Pimlico verifying paymaster',
-    erc4337Ready: true,
-    erc7702Ready: true,
+    authenticator: 'Coinbase Smart Wallet · passkey',
+    bundler: null,
+    paymaster: null,
+    erc4337Ready: false,
+    erc7702Ready: false,
+    sessionKeyRegistry: posternDeployed,
     source: 'postern' as const,
   });
 }

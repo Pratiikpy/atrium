@@ -45,6 +45,9 @@ sol! {
     event WithdrawalsPaused(bytes32 reason);
     event WithdrawalsResumed();
     event AdapterCapHit(address indexed adapter, uint256 attempted_wei, uint256 cap_wei);
+    // 027-SC6: emitted when an approved orchestrator (the Router) re-credits a
+    // user's vault shares for collateral returned on position close.
+    event CollateralReturned(address indexed to_user, address indexed orchestrator, uint256 assets, uint256 shares);
     event CircuitBreakerTripped(bytes32 trigger, uint256 measurement);
     event UsdcPausedDetected();
 }
@@ -207,6 +210,22 @@ impl Coffer {
         self.deposit_cap_wei.set(deposit_cap_wei);
         self.per_user_cap_wei.set(per_user_cap_wei);
         self.tvl_drop_threshold_bps.set(Uint::<16, 1>::from(3_000u16));
+    }
+
+    /// One-time deploy wiring: set the Plinth address exactly once, while
+    /// still unset, gated to the praetor. Breaks the Coffer<->Plinth
+    /// constructor cycle (each constructor needs the other's address, with
+    /// no setter post Phase-2a). Locked after the first successful set.
+    pub fn set_plinth(&mut self, plinth: Address) -> Result<(), CofferError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_multisig.get()
+            || !self.plinth_address.get().is_zero()
+            || plinth.is_zero()
+        {
+            return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        self.plinth_address.set(plinth);
+        Ok(())
     }
 
     fn assert_timelock(&self) -> Result<(), CofferError> {
@@ -632,6 +651,74 @@ impl Coffer {
         Ok(())
     }
 
+    /// 027-SC6 fix: re-credit a user's vault shares for collateral an adapter
+    /// returns to Coffer on position close. `adapter_pull` burns the user's
+    /// shares for the margin sent to a venue on open; without a symmetric
+    /// re-credit on close, the returned collateral raises assets-per-share for
+    /// every OTHER holder while the originating user is left with zero shares
+    /// for it — their own collateral is permanently transferred away.
+    ///
+    /// Called by the AtriumRouter (an approved orchestrator) AFTER the adapter
+    /// has transferred the closing proceeds into Coffer, so `total_assets()`
+    /// (live USDC balance) already includes `amount`. Shares are therefore
+    /// minted against the pre-return total (`total_assets() - amount`) so the
+    /// mint is the exact inverse of the open-path burn at an unchanged ratio.
+    pub fn adapter_return(&mut self, amount: U256, to_user: Address) -> Result<U256, CofferError> {
+        if self.is_updating.get() {
+            return Err(CofferError::Reentrant(CofferReentrant {}));
+        }
+        self.is_updating.set(true);
+        let result = self.adapter_return_inner(amount, to_user);
+        self.is_updating.set(false);
+        result
+    }
+
+    fn adapter_return_inner(&mut self, amount: U256, to_user: Address) -> Result<U256, CofferError> {
+        let caller = self.vm().msg_sender();
+        if !self.approved_adapters.getter(caller).get() {
+            return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        if amount.is_zero() {
+            return Err(CofferError::ZeroAssets(ZeroAssets {}));
+        }
+
+        // The closing proceeds have already been transferred into Coffer, so
+        // the live balance includes `amount`. Mint against the pre-return
+        // total to mirror the open-path burn exactly (floor division — never
+        // over-mint, never dilute other holders).
+        let total_now = self.total_assets();
+        if total_now < amount {
+            // Defensive: the credited amount cannot exceed the vault's live
+            // balance. Never reached in the normal close flow (the proceeds
+            // just arrived); refuse rather than over-mint on a bad input.
+            return Err(CofferError::TransferFailed(TransferFailed {
+                token: self.asset.get(),
+                to: to_user,
+                amount,
+            }));
+        }
+        let total_before = total_now - amount;
+        let virtual_shares = U256::from(1_000_000u64);
+        let virtual_assets = U256::from(1u64);
+        let supply = self.total_shares.get();
+        let shares = amount.saturating_mul(supply.saturating_add(virtual_shares))
+            / total_before.saturating_add(virtual_assets);
+
+        let prev = self.share_balances.getter(to_user).get();
+        self.share_balances.setter(to_user).set(prev.saturating_add(shares));
+        self.total_shares.set(self.total_shares.get().saturating_add(shares));
+        // Keep tracked assets in sync (mirror of the adapter_pull decrement).
+        self.tracked_assets_wei.set(self.tracked_assets_wei.get().saturating_add(amount));
+
+        self.vm().log(CollateralReturned {
+            to_user,
+            orchestrator: caller,
+            assets: amount,
+            shares,
+        });
+        Ok(shares)
+    }
+
     // ===== Admin (timelock for params, multisig for emergency pause) =====
     /// Audit F-32 fix: adapter approval is a parameter change, so timelock-only.
     pub fn set_adapter(
@@ -700,6 +787,25 @@ impl Coffer {
         self.assert_timelock()?;
         self.is_withdrawals_paused.set(false);
         self.vm().log(WithdrawalsResumed {});
+        Ok(())
+    }
+
+    /// 101-OPS3.1 fix: real admin-transfer for the post-key-leak Safe handoff.
+    /// Pre-fix praetor_multisig was set once in the constructor with no setter,
+    /// so the documented ceremony (scripts/transfer-admin.s.sol -> setPraetor)
+    /// reverted on a missing selector and admin stayed on the compromised
+    /// deployer EOA. The CURRENT praetor calls this once to hand the multisig
+    /// role to the 3-of-5 Safe. Stylus exports it as `setPraetor(address)`.
+    pub fn set_praetor(&mut self, new_praetor: Address) -> Result<(), CofferError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_multisig.get() {
+            return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+        // Refuse the zero address — it would brick emergency pause forever.
+        if new_praetor.is_zero() {
+            return Err(CofferError::Unauthorized(UnauthorizedCaller { caller: new_praetor }));
+        }
+        self.praetor_multisig.set(new_praetor);
         Ok(())
     }
 }
@@ -938,6 +1044,120 @@ mod tests {
         let b = c.convert_to_shares(U256::from(200_000_000u64));
         assert!(b > a, "monotonic in seeded vault");
         assert!(a > U256::ZERO);
+    }
+
+    // 027-SC6: adapter_return re-credits the originating user's shares for
+    // collateral an adapter returns on close. Pre-fix there was NO production
+    // re-credit entrypoint, so returned collateral was appropriated by other
+    // holders and the originating user kept zero shares for it.
+    #[test]
+    fn adapter_return_recredits_user_shares_for_returned_collateral() {
+        let vm = TestVM::new();
+        let mut c = fresh(&vm, U256::from(HUGE), U256::from(HUGE));
+        // Approve the orchestrator (the Router, modeled here by `adapter()`).
+        vm.set_sender(timelock());
+        ok(c.set_adapter(adapter(), true, U256::from(HUGE)));
+
+        // Post-open + post-adapter-transfer state: the pool holds 200 USDC of
+        // OTHER holders (200e6 shares, 200 tracked), and the adapter has just
+        // transferred alice's 30 USDC of closing proceeds in, so the live
+        // balance is 230. alice currently holds 0 shares for it.
+        let amount = U256::from(30_000_000u64);        // 30 USDC
+        let pool_shares = U256::from(200_000_000u64);   // other holders' shares
+        seed_vault(&vm, &mut c, pool_shares, U256::from(230_000_000u64), U256::from(200_000_000u64));
+
+        vm.set_sender(adapter());
+        let shares = ok(c.adapter_return(amount, alice()));
+
+        // The fix: the user receives shares for the returned collateral.
+        assert!(shares > U256::ZERO, "user must receive shares for returned collateral");
+        assert_eq!(c.share_balances.getter(alice()).get(), shares);
+        assert_eq!(c.total_shares.get(), pool_shares + shares, "supply grows by the mint");
+        assert_eq!(c.tracked_assets_wei.get(), U256::from(230_000_000u64), "tracked grows by amount");
+
+        // Those shares redeem to ~the returned 30 USDC (not appropriated by
+        // other holders). Virtual-offset rounding keeps it within ~1%.
+        let redeemable = c.convert_to_assets(shares);
+        let lo = amount * U256::from(99u64) / U256::from(100u64);
+        let hi = amount * U256::from(101u64) / U256::from(100u64);
+        assert!(redeemable >= lo && redeemable <= hi, "user recovers ~the returned collateral");
+    }
+
+    #[test]
+    fn adapter_return_rejects_unapproved_caller() {
+        let vm = TestVM::new();
+        let mut c = fresh(&vm, U256::from(HUGE), U256::from(HUGE));
+        seed_vault(&vm, &mut c, U256::from(200_000_000u64), U256::from(230_000_000u64), U256::from(200_000_000u64));
+        vm.set_sender(bob()); // not an approved orchestrator
+        assert!(matches!(
+            c.adapter_return(U256::from(30_000_000u64), alice()),
+            Err(CofferError::Unauthorized(_))
+        ));
+    }
+
+    #[test]
+    fn adapter_return_rejects_zero_amount() {
+        let vm = TestVM::new();
+        let mut c = fresh(&vm, U256::from(HUGE), U256::from(HUGE));
+        vm.set_sender(timelock());
+        ok(c.set_adapter(adapter(), true, U256::from(HUGE)));
+        seed_vault(&vm, &mut c, U256::from(200_000_000u64), U256::from(200_000_000u64), U256::from(200_000_000u64));
+        vm.set_sender(adapter());
+        assert!(matches!(
+            c.adapter_return(U256::ZERO, alice()),
+            Err(CofferError::ZeroAssets(_))
+        ));
+    }
+
+    // 101-OPS3.1: the post-key-leak Safe handoff needs a real admin-transfer.
+    #[test]
+    fn set_praetor_transfers_admin_and_rejects_stranger_101ops3() {
+        let vm = TestVM::new();
+        let mut c = fresh(&vm, U256::from(HUGE), U256::from(HUGE));
+        let new_safe = Address::from([0x5Au8; 20]);
+
+        // A stranger cannot transfer the praetor role.
+        vm.set_sender(bob());
+        assert!(matches!(c.set_praetor(new_safe), Err(CofferError::Unauthorized(_))));
+
+        // The current praetor hands the role to the Safe.
+        vm.set_sender(praetor());
+        ok(c.set_praetor(new_safe));
+        assert_eq!(c.praetor_multisig(), new_safe, "praetor role moved to the Safe");
+
+        // The old praetor can no longer transfer (role really moved).
+        vm.set_sender(praetor());
+        assert!(matches!(c.set_praetor(bob()), Err(CofferError::Unauthorized(_))));
+
+        // Zero address is refused (would brick emergency pause).
+        vm.set_sender(new_safe);
+        assert!(matches!(c.set_praetor(Address::ZERO), Err(CofferError::Unauthorized(_))));
+    }
+
+    // Deploy wiring (circular-dep fix): set_plinth wires Plinth exactly once,
+    // praetor-only, rejects zero, locked after the first set.
+    #[test]
+    fn set_plinth_wires_once_and_is_guarded() {
+        let vm = TestVM::new();
+        vm.set_contract_address(coffer_addr());
+        let mut c = Coffer::from(&vm);
+        c.constructor(usdc_addr(), Address::ZERO, praetor(), timelock(), U256::from(HUGE), U256::from(HUGE));
+        assert_eq!(c.plinth_address(), Address::ZERO, "plinth starts unset");
+
+        // A stranger cannot wire Plinth.
+        vm.set_sender(bob());
+        assert!(matches!(c.set_plinth(plinth_addr()), Err(CofferError::Unauthorized(_))));
+
+        // The praetor cannot wire it to zero.
+        vm.set_sender(praetor());
+        assert!(matches!(c.set_plinth(Address::ZERO), Err(CofferError::Unauthorized(_))));
+
+        // The praetor wires it exactly once.
+        ok(c.set_plinth(plinth_addr()));
+        assert_eq!(c.plinth_address(), plinth_addr(), "plinth wired");
+
+        // Locked: even the praetor cannot rewire it.
+        assert!(matches!(c.set_plinth(bob()), Err(CofferError::Unauthorized(_))));
     }
 
     // =====================================================================

@@ -22,6 +22,13 @@ const ALLOWED_SLUGS = new Set([
   'aqueduct',
   'praetor-timelock',
   'portico-registry',
+  // 114-PM3 fix (2026-05-30): the Trade "Open position" + "Close" hooks
+  // (use-open-position.ts:115, use-close-position.ts:97) resolve the
+  // router via slug=atrium-router. It was absent from this allowlist so
+  // the route returned 400 and BOTH trade money paths threw `address_400`
+  // before reaching the wallet. The router IS deployed (registry key
+  // 'atrium-router'), so this was an allowlist gap, not a missing deploy.
+  'atrium-router',
   'rostrum',
   'lantern-attestor',
   // Audit U-18: added for the Kill Switch (Verifier step 7) wiring.

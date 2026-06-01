@@ -9,7 +9,8 @@ import { arbitrumSepolia } from 'viem/chains';
 
 import { buildTree, rootOf } from './_merkle.js';
 import { loadSigningKey } from './_signer.js';
-import { fetchCofferBalances } from './_scribe.js';
+import { fetchCofferUsers } from './_scribe.js';
+import { buildLeaves } from './_leaves.js';
 import { pinTreeToIpfs } from './_ipfs.js';
 
 // Fail loudly at startup if any required env is missing — otherwise the
@@ -57,12 +58,21 @@ export async function publishOnce(): Promise<void> {
   const startTs = Date.now();
   console.log(`[lantern] tick start ${new Date(startTs).toISOString()}`);
 
-  const balances = await fetchCofferBalances({
-    scribeUrl: SCRIBE_URL,
-    cofferAddress: COFFER_ADDRESS,
-  });
+  const users = await fetchCofferUsers({ scribeUrl: SCRIBE_URL });
+  if (users.length === 0) {
+    console.log('[lantern] no users yet, skipping attestation publish');
+    return;
+  }
+
+  // P0-3: balance authority is on-chain. Read convertToAssets(balanceOf(user))
+  // per user (redeemable value), not the subgraph's net-deposit balanceWei.
+  if (!COFFER_ADDRESS) {
+    console.error('[lantern] COFFER_ADDRESS not set; cannot build leaves from RPC');
+    return;
+  }
+  const balances = await buildLeaves(users, COFFER_ADDRESS);
   if (balances.length === 0) {
-    console.log('[lantern] no balances yet, skipping attestation publish');
+    console.log('[lantern] all balances zero after RPC fanout, skipping');
     return;
   }
 

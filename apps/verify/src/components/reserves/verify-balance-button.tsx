@@ -25,10 +25,10 @@ async function fetchLatest(): Promise<Latest> {
  * affordance. Click flow:
  *   1. Read /api/lantern/latest for the most recent published root.
  *   2. If none, render a clear "no attestation yet" state.
- *   3. If exists, fetch the tree from IPFS via the configured gateway
- *      and search for the connected wallet's leaf.
- *   4. If found, compute the sibling path and verify against the on-chain
- *      root locally — never trusting Atrium.
+ *   3. If exists, POST {root, ipfsCid, wallet} to /api/lantern/verify-inclusion,
+ *      which fetches the tree, recomputes the Merkle root, checks it equals the
+ *      on-chain attested root, and verifies the wallet's inclusion proof
+ *      (079-BE6: real verification, not a bare address match).
  *
  * The verifier UI itself lives in a modal; the button here is just the
  * entry point + an honest "no attestation yet" state when Lantern hasn't
@@ -123,8 +123,8 @@ function VerifyModal({
         <ModalCloseButton onClose={onClose} />
       </header>
       <p className="mt-3 text-sm text-ink-soft">
-        Verify your wallet against the latest Lantern root. The proof is computed locally;
-        Atrium never sees the result.
+        Atrium recomputes the Merkle root from the published tree, confirms it equals the
+        on-chain attested root, and verifies your wallet&apos;s inclusion proof reproduces it.
       </p>
       <p className="mt-3 break-all font-mono text-[10px] text-muted">root: {root.slice(0, 14)}…</p>
       <label className="mt-4 block">

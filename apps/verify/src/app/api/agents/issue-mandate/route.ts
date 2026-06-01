@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { VENUES } from '@/lib/venues';
 import { getSession } from '@/lib/auth-session';
 import { buildSigilTypedData, type IntentSigilEnvelope } from '@/lib/sigil-typed-data';
+import { instrumentIdsForVenues } from '@/lib/instruments';
 import { loadContractAddress } from '@/lib/deployments-registry';
 
 export const dynamic = 'force-dynamic';
@@ -192,7 +193,12 @@ export async function POST(req: NextRequest) {
         owner: session.walletAddress as `0x${string}`,
         agent: body.agent as `0x${string}`,
         venuesAllowedIds: body.venueAllowlist!,
-        instrumentsAllowed: [],
+        // 062-FE7 fix: derive the instrument allowlist from the venues the
+        // same way the client does (lib/instruments), so the server-recomputed
+        // hash matches the client's signed hash. An empty list here would both
+        // mismatch the client signature AND (on-chain) make every agent action
+        // fail Sigil.caps_respected.
+        instrumentsAllowed: instrumentIdsForVenues(body.venueAllowlist!),
         maxNotionalPerActionWei: parseUnits(String(body.perActionCapUsdc), USDC_DECIMALS),
         maxTotalOpenNotionalWei: parseUnits(String(body.totalOpenCapUsdc), USDC_DECIMALS),
         maxActionsPer24h: Math.min(body.actionsPerDay!, 0xffffffff),

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { privateKeyToAccount } from 'viem/accounts';
 import { hashTypedData, parseUnits } from 'viem';
 import { buildSigilTypedData, type IntentSigilEnvelope } from '@/lib/sigil-typed-data';
+import { instrumentIdsForVenues } from '@/lib/instruments';
 
 /**
  * Locks the 2026-05-29 signature-binding fix on /api/agents/issue-mandate.
@@ -52,7 +53,10 @@ async function buildSigned(
     owner: account.address,
     agent: form.agent,
     venuesAllowedIds: form.venueAllowlist,
-    instrumentsAllowed: [],
+    // 062-FE7: instruments are derived from the venue allowlist (same as the
+    // hook + server recompute). An empty list would both fail the server hash
+    // match and brick the mandate on-chain.
+    instrumentsAllowed: instrumentIdsForVenues(form.venueAllowlist),
     maxNotionalPerActionWei: parseUnits(String(form.perActionCapUsdc), USDC),
     maxTotalOpenNotionalWei: parseUnits(String(form.totalOpenCapUsdc), USDC),
     maxActionsPer24h: form.actionsPerDay,

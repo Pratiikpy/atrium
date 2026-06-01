@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useAccount, useWriteContract } from 'wagmi';
-import { keccak256, parseUnits, toBytes } from 'viem';
+import { parseUnits } from 'viem';
 import { VENUES } from '@/lib/venues';
+import { instrumentIdForVenue } from '@/lib/instruments';
 
 /**
  * Open a position end-to-end via AtriumRouter.
@@ -30,18 +31,9 @@ import { VENUES } from '@/lib/venues';
  *   - User unconnected → 'wallet_not_connected'
  */
 
-// Map venue slug → instrument-id seed. Real adapters key off
-// keccak256(symbol). For now we use a stable per-venue symbol so the
-// instrument_id is deterministic from the form.
-const SYMBOL_BY_VENUE: Record<string, string> = {
-  hyperliquid: 'HSLA-PERP',
-  'aave-horizon': 'USDC-LEND',
-  'pendle-v2': 'PT-USDC-DEC25',
-  curve: '3CRV',
-  'trade-xyz': 'rTSLA-PERP',
-  polymarket: 'ELECTION-2026',
-  'hl-hip4': 'HSLA2-PERP',
-};
+// Venue -> instrument-id derivation lives in lib/instruments.ts so the
+// mandate path (use-issue-mandate) authorizes exactly the instrument this
+// open path submits (062-FE7).
 
 // AtriumRouter.open_position_via_adapter signature per
 // contracts/atrium-router/src/AtriumRouter.sol:149. The action_sigil +
@@ -128,8 +120,11 @@ export function useOpenPosition() {
       return;
     }
 
-    const symbol = SYMBOL_BY_VENUE[params.venue] ?? 'HSLA-PERP';
-    const instrumentId = keccak256(toBytes(symbol));
+    const instrumentId = instrumentIdForVenue(params.venue);
+    if (!instrumentId) {
+      setStatus({ kind: 'error', reason: 'unknown_instrument' });
+      return;
+    }
     const notional = params.side === 'long' ? parsed : -parsed;
 
     setStatus({ kind: 'submitting' });

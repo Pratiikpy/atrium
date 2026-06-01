@@ -52,6 +52,9 @@ sol! {
     error MandateRevoked(bytes32 intent_hash);
     error UnauthorizedCaller(address caller);
     error CreditCapExceeded(uint256 attempted_open, uint256 max_credit);
+    /// 031-SC10: a captured signed (intent, action) pair was replayed. Each
+    /// agent-signed ActionSigil is valid exactly once.
+    error ActionReplayed(bytes32 action_hash);
     /// Audit 2026-05-24 (Auditor A C-5): Sigil now exposes pause(bytes32)
     /// for PraetorTimelock.emergencyPause compatibility. Reverts on validate
     /// when the flag is set.
@@ -71,6 +74,7 @@ pub enum SigilError {
     MandateRevoked(MandateRevoked),
     Unauthorized(UnauthorizedCaller),
     CreditCapExceeded(CreditCapExceeded),
+    ActionReplayed(ActionReplayed),
     Paused(SigilPaused),
     Reentrant(SigilReentrant),
 }
@@ -128,6 +132,13 @@ sol_storage! {
         // when post-Wave-1 signature-recovery enables a CALL_EOA path.
         bool is_paused;
         bool is_updating;
+
+        // 031-SC10: consumed action digests for single-use replay protection.
+        // Each agent-signed ActionSigil is valid exactly once; its struct hash
+        // (binding intent_hash + venue + instrument + notional + submitted_at +
+        // action_nonce) is recorded here on first successful validation, so any
+        // replay of the same captured signed action reverts ActionReplayed.
+        mapping(bytes32 => bool) used_action_hash;
     }
 
     pub struct SigilParams {
@@ -230,6 +241,16 @@ impl Sigil {
         intent_bytes: alloc::vec::Vec<u8>,
         action_bytes: alloc::vec::Vec<u8>,
     ) -> Result<bool, SigilError> {
+        // 031-SC10: validate_action is the agent-authorization gate — only
+        // Plinth may invoke it (same trust boundary as record_close). Pre-fix
+        // it had no caller gate, so any address could drive the mandate path;
+        // combined with the missing replay guard below, the authorization
+        // model was broken.
+        let caller = self.vm().msg_sender();
+        if caller != self.plinth_address.get() {
+            return Err(SigilError::Unauthorized(UnauthorizedCaller { caller }));
+        }
+
         // Decode envelopes. Production callers ABI-encode IntentSigil + ActionSigil
         // exactly per the type strings in eip712.rs. Until off-chain SDK lands
         // (Wave-1 Postern agent harness), the decode is best-effort; on any
@@ -374,6 +395,18 @@ impl Sigil {
         if action_signer != intent_envelope.body.agent {
             return Err(SigilError::InvalidSignature(InvalidSignature {}));
         }
+
+        // 8b. (031-SC10) Single-use replay guard. The action struct hash binds
+        //     every field of the signed action (intent_hash, venue, instrument,
+        //     notional, submitted_at, action_nonce). Recorded on first use; any
+        //     replay of the same captured signed pair reverts. Checked only
+        //     AFTER both signatures verify so a forged action cannot poison the
+        //     consumed-set with a hash the agent never signed.
+        let action_key = alloy_primitives::FixedBytes::from(action_struct_hash.0);
+        if self.used_action_hash.getter(action_key).get() {
+            return Err(SigilError::ActionReplayed(ActionReplayed { action_hash: action_key }));
+        }
+        self.used_action_hash.setter(action_key).set(true);
 
         // 9. Persist counters. Only after the signature gate passes — a
         //    malformed envelope should not be able to consume rate-limit

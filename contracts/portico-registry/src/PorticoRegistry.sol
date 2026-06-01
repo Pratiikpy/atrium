@@ -7,11 +7,12 @@ import {IPorticoAdapter} from "./IPorticoAdapter.sol";
 /// @notice Adapter bytecode is checked against an immutable expected hash at
 ///         whitelist time. Upgrade = re-whitelist with 3-reviewer Curator approval.
 contract PorticoRegistry {
-    /// `praetor_multisig` is intentionally read-only via the auto-generated
-    /// `public` getter: UI dashboards (verify.atrium.fi) query it directly to
-    /// display the current Praetor identity. All admin paths inside this
-    /// contract go through `praetor_timelock`, never the multisig.
-    address public immutable praetor_multisig;
+    /// `praetor_multisig` holds the emergency-deregister lever and is shown by
+    /// UI dashboards (verify.atrium.fi) via the auto-generated getter. It is
+    /// transferable via `updatePraetor` (101-OPS3.1) so the post-leak 3-of-5
+    /// Safe handoff can move the role off the deployer EOA. Routine parameter
+    /// changes still go through `praetor_timelock`.
+    address public praetor_multisig;
     address public immutable praetor_timelock;  // F-32 fix
 
     struct AdapterRecord {
@@ -117,6 +118,21 @@ contract PorticoRegistry {
 
     function isRegisteredAdapter(address adapter) external view returns (bool) {
         return is_registered[adapter];
+    }
+
+    /// 101-OPS3.1 fix: real admin-transfer for the post-key-leak Safe handoff.
+    /// Pre-fix praetor_multisig was immutable and no setter existed, so the
+    /// documented ceremony (scripts/transfer-admin.s.sol -> updatePraetor)
+    /// reverted on a missing selector and admin stayed on the compromised
+    /// deployer EOA. The CURRENT praetor calls this once to hand the role to
+    /// the 3-of-5 Safe. Stylus contracts expose the same as set_praetor.
+    event PraetorUpdated(address indexed previousPraetor, address indexed newPraetor);
+
+    function updatePraetor(address newPraetor) external {
+        if (msg.sender != praetor_multisig) revert Unauthorized();
+        require(newPraetor != address(0), "zero praetor");
+        emit PraetorUpdated(praetor_multisig, newPraetor);
+        praetor_multisig = newPraetor;
     }
 
     function getAdapter(uint8 venue_id) external view returns (address) {

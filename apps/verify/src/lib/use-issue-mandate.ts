@@ -5,6 +5,7 @@ import { useAccount, useSignTypedData } from 'wagmi';
 import { hashTypedData, parseUnits } from 'viem';
 import { buildSigilTypedData } from './sigil-typed-data';
 import type { IntentSigilEnvelope } from './sigil-typed-data';
+import { instrumentIdsForVenues } from './instruments';
 
 /**
  * Mandate-issuance state machine. Wires the user's wallet signature into
@@ -66,11 +67,24 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
     // via the intentHash).
     const expiresAt = BigInt(Math.floor(Date.now() / 1000) + input.expiresDays * 86_400);
     const nonce = BigInt(`0x${cryptoRandomHex(32)}`);
+    // 062-FE7 fix: authorize the instrument id for each allowed venue.
+    // An empty list makes Sigil.caps_respected reject every action, so the
+    // mandate must carry the same ids the open path submits (lib/instruments).
+    let instrumentsAllowed: `0x${string}`[];
+    try {
+      instrumentsAllowed = instrumentIdsForVenues(input.venueAllowlist);
+    } catch (e) {
+      setStatus({
+        kind: 'error',
+        reason: e instanceof Error ? e.message : 'instrument_mapping_failed',
+      });
+      return;
+    }
     const envelope: IntentSigilEnvelope = {
       owner: account,
       agent: input.agent,
       venuesAllowedIds: input.venueAllowlist,
-      instrumentsAllowed: [], // form doesn't expose instrument allowlist yet
+      instrumentsAllowed,
       maxNotionalPerActionWei: parseUnits(input.perActionCapUsdc.toString(), USDC_DECIMALS),
       maxTotalOpenNotionalWei: parseUnits(input.totalOpenCapUsdc.toString(), USDC_DECIMALS),
       maxActionsPer24h: Math.min(input.actionsPerDay, 0xffffffff),

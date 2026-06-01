@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from './route';
+import { computeRoot, type RawLeaf } from '@/lib/lantern-merkle';
 
 /**
  * Locks the audit R-1 fix at the unit-test layer.
@@ -178,99 +179,77 @@ describe('POST /api/lantern/verify-inclusion — input validation', () => {
   });
 });
 
-describe('POST /api/lantern/verify-inclusion — happy path', () => {
-  it('returns ok=true with leaf metadata when wallet is in the tree', async () => {
-    const validCid = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
-    const wallet = '0x' + 'a'.repeat(40);
-    (global.fetch as any).mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          leaves: [{ user: wallet, balanceWei: '1000000' }],
-        }),
-        { status: 200 },
-      ),
-    );
-    const res = await POST(
-      makePostRequest({ root: '0x' + 'a'.repeat(64), ipfsCid: validCid, wallet }),
-    );
+describe('POST /api/lantern/verify-inclusion — real verification (079-BE6)', () => {
+  const salt = (n: number) => (`0x${n.toString(16).padStart(64, '0')}`);
+  const VALID_CID = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
+  const walletA = '0x' + 'a'.repeat(40);
+  const walletB = '0x' + 'b'.repeat(40);
+  const leaves: RawLeaf[] = [
+    { user: walletA, balanceWei: '1000000', salt: salt(1) },
+    { user: walletB, balanceWei: '2500000', salt: salt(2) },
+  ];
+  const root = computeRoot(leaves);
+  const treeResponse = () => new Response(JSON.stringify({ leaves }), { status: 200 });
+
+  it('returns ok=true when the tree hashes to the attested root and the wallet is included', async () => {
+    (global.fetch as any).mockResolvedValue(treeResponse());
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: walletA }));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.ok).toBe(true);
-    // Honesty: response names the position of the leaf so the user can
-    // independently verify against the published tree.
-    expect(json.reason).toMatch(/tree\.leaves/);
-    expect(json.reason).toMatch(/balanceWei=1000000/);
+    expect(json.reason).toMatch(/Verified/);
+    expect(json.leafIndex).toBe(0);
+    expect((json.recomputedRoot as string).toLowerCase()).toBe(root.toLowerCase());
   });
 
-  it('returns ok=false when wallet not in the tree', async () => {
-    const validCid = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
-    (global.fetch as any).mockResolvedValue(
-      new Response(JSON.stringify({ leaves: [{ user: '0x' + 'b'.repeat(40) }] }), {
-        status: 200,
-      }),
-    );
-    const res = await POST(
-      makePostRequest({
-        root: '0x' + 'a'.repeat(64),
-        ipfsCid: validCid,
-        wallet: '0x' + 'a'.repeat(40),
-      }),
-    );
-    // 200 with ok=false — the request was well-formed; the leaf just isn't
-    // there. Don't 4xx legitimate "no" answers.
+  it('REJECTS a present wallet when the published tree does not hash to the attested root (the core fix)', async () => {
+    // Pre-fix this returned ok purely on the address match, ignoring the root.
+    (global.fetch as any).mockResolvedValue(treeResponse());
+    const wrongRoot = '0x' + 'd'.repeat(64);
+    const res = await POST(makePostRequest({ root: wrongRoot, ipfsCid: VALID_CID, wallet: walletA }));
+    const json = await res.json();
+    expect(json.ok).toBe(false);
+    expect(json.reason).toMatch(/does not hash to the attested/);
+  });
+
+  it('returns ok=false when the wallet is not in the tree (root matches)', async () => {
+    (global.fetch as any).mockResolvedValue(treeResponse());
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: '0x' + 'c'.repeat(40) }));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.ok).toBe(false);
     expect(json.reason).toMatch(/not found/);
   });
 
-  it('handles case-insensitive wallet comparison', async () => {
-    // Audit detail: tree.leaves may be stored lowercase or checksummed.
-    // The handler lowercases the query wallet before compare.
-    const validCid = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
-    const lowercaseWallet = '0x' + 'a'.repeat(40);
-    const uppercaseWallet = lowercaseWallet.toUpperCase().replace('0X', '0x');
-    (global.fetch as any).mockResolvedValue(
-      new Response(JSON.stringify({ leaves: [{ user: lowercaseWallet }] }), {
-        status: 200,
-      }),
-    );
-    const res = await POST(
-      makePostRequest({
-        root: '0x' + 'a'.repeat(64),
-        ipfsCid: validCid,
-        wallet: uppercaseWallet,
-      }),
-    );
+  it('verifies case-insensitively', async () => {
+    (global.fetch as any).mockResolvedValue(treeResponse());
+    const upper = walletA.toUpperCase().replace('0X', '0x');
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: upper }));
     const json = await res.json();
     expect(json.ok).toBe(true);
   });
 
-  it('returns ok=false when gateway returns non-200', async () => {
-    const validCid = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
-    (global.fetch as any).mockResolvedValue(new Response('', { status: 503 }));
-    const res = await POST(
-      makePostRequest({
-        root: '0x' + 'a'.repeat(64),
-        ipfsCid: validCid,
-        wallet: '0x' + 'a'.repeat(40),
-      }),
+  it('rejects a malformed leaf (missing salt) rather than vouching for it', async () => {
+    (global.fetch as any).mockResolvedValue(
+      new Response(JSON.stringify({ leaves: [{ user: walletA, balanceWei: '1' }] }), { status: 200 }),
     );
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: walletA }));
+    const json = await res.json();
+    expect(json.ok).toBe(false);
+    expect(json.reason).toMatch(/malformed leaf/);
+  });
+
+  it('returns ok=false when gateway returns non-200', async () => {
+    (global.fetch as any).mockResolvedValue(new Response('', { status: 503 }));
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: walletA }));
     const json = await res.json();
     expect(json.ok).toBe(false);
     expect(json.reason).toMatch(/IPFS gateway unreachable/);
   });
 
   it('returns ok=false when gateway throws (timeout / network)', async () => {
-    const validCid = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
     (global.fetch as any).mockRejectedValue(new Error('timeout exceeded'));
-    const res = await POST(
-      makePostRequest({
-        root: '0x' + 'a'.repeat(64),
-        ipfsCid: validCid,
-        wallet: '0x' + 'a'.repeat(40),
-      }),
-    );
+    const res = await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: walletA }));
     const json = await res.json();
     expect(json.ok).toBe(false);
     expect(json.reason).toMatch(/gateway error.*timeout/);

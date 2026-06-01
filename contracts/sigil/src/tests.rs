@@ -76,6 +76,7 @@ fn err_name(e: &SigilError) -> &'static str {
         SigilError::MandateRevoked(_) => "MandateRevoked",
         SigilError::Unauthorized(_) => "Unauthorized",
         SigilError::CreditCapExceeded(_) => "CreditCapExceeded",
+        SigilError::ActionReplayed(_) => "ActionReplayed",
         SigilError::Paused(_) => "Paused",
         SigilError::Reentrant(_) => "Reentrant",
     }
@@ -443,6 +444,40 @@ fn validate_action_happy_path_returns_true() {
         sigil.get_open_notional(agent),
         U256::from(1_000_000u64),
         "open_notional must record the opened size"
+    );
+}
+
+#[test]
+fn validate_action_rejects_replayed_action_031sc10() {
+    // 031-SC10: a captured signed (intent, action) pair must be single-use.
+    let (vm, mut sigil) = setup();
+    let intent = happy_intent();
+    let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
+    vm.set_sender(PLINTH);
+    // First use of the signed action succeeds.
+    assert_ok_true(sigil.validate_action(intent_bytes.clone(), action_bytes.clone()));
+    // Replaying the EXACT same captured pair must revert (pre-fix it succeeded
+    // indefinitely, re-opening positions the user already closed).
+    let res = sigil.validate_action(intent_bytes, action_bytes);
+    assert!(
+        matches!(res, Err(SigilError::ActionReplayed(_))),
+        "replayed signed action must revert ActionReplayed, got {}",
+        res.as_ref().err().map(err_name).unwrap_or("Ok")
+    );
+}
+
+#[test]
+fn validate_action_rejects_non_plinth_caller_031sc10() {
+    // 031-SC10: validate_action is the agent-authorization gate — Plinth-only.
+    let (vm, mut sigil) = setup();
+    let intent = happy_intent();
+    let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
+    vm.set_sender(address!("000000000000000000000000000000000000dEaD"));
+    let res = sigil.validate_action(intent_bytes, action_bytes);
+    assert!(
+        matches!(res, Err(SigilError::Unauthorized(_))),
+        "validate_action must reject non-Plinth callers, got {}",
+        res.as_ref().err().map(err_name).unwrap_or("Ok")
     );
 }
 

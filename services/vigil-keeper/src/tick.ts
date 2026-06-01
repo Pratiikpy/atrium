@@ -23,19 +23,13 @@
  * and the tick falls through to a public-RPC read-only mode.
  */
 
-import { createPublicClient, createWalletClient, http, keccak256, toBytes } from 'viem';
+import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import { fetchPausedAccounts } from './lib/scribe.js';
 import { checkScribeHealth } from './lib/scribe-health.js';
 import { heartbeat } from './heartbeat.js';
-
-// Phase theta.3: precomputed topic0 for the Vigil LiquidationTriggered
-// event. Used to decode job_id from the queueLiquidation receipt and fire
-// executeLiquidation in the same tick.
-const LIQUIDATION_TRIGGERED_TOPIC = keccak256(
-  toBytes('LiquidationTriggered(uint256,uint256,uint64,uint8)'),
-);
+import { jobsToExecute, type QueuedJob } from './liquidation.js';
 
 interface DeploymentRegistry {
   contracts: {
@@ -175,11 +169,11 @@ export async function tickOnce(): Promise<void> {
     return;
   }
 
-  // Per-account: call Vigil.queueLiquidation + executeLiquidation when the
-  // keeper is staked. Phase eta.2 (2026-05-25) added Vigil.set_keeper_min_
-  // stake_emergency so a 0.01 ETH stake is reachable on testnet. Until the
-  // founder completes redeploy + restake, activeKeeperCount stays at 0 and
-  // this path falls through to logs-only.
+  // When the keeper is staked, EXECUTE already-queued jobs (Plinth queued
+  // them in update_margin). Phase eta.2 (2026-05-25) added
+  // Vigil.set_keeper_min_stake_emergency so a 0.01 ETH stake is reachable on
+  // testnet. Until the founder completes redeploy + restake, activeKeeperCount
+  // stays at 0 and this path falls through to logs-only.
   const keeperKey = process.env.KEEPER_PRIVATE_KEY;
   const keeperReady = !!keeperKey && /^0x[0-9a-fA-F]{64}$/.test(keeperKey) && activeKeeperCount > 0;
 
@@ -197,27 +191,28 @@ export async function tickOnce(): Promise<void> {
     return;
   }
 
-  // Real execution path. Each paused account: queue + wait for receipt +
-  // decode job_id from LiquidationTriggered + execute. queueLiquidation is
-  // idempotent (returns existing job_id if one is already queued for this
-  // account+version), so retrying across ticks is safe. executeLiquidation
-  // is wrapped in the Vigil reentrancy + pause guard (audit A C-5 + E).
+  // Real execution path. Plinth (not the keeper) queues liquidations inside
+  // update_margin, so the keeper's job is purely to EXECUTE already-queued
+  // jobs once their deadline block passes.
   //
-  // Phase theta.3 fix (2026-05-25): pre-fix the keeper queued the job and
-  // returned without firing executeLiquidation. The comment claimed "next
-  // tick picks up the queued job via the subgraph" but the subgraph has no
-  // PendingLiquidationJob entity and the next-tick logic was never wired.
-  // Result: queued positions accumulated forever, no liquidation ever fired,
-  // /vigil dashboard reported zero recovered collateral.
-  // Now: wait one receipt per account, decode the LiquidationTriggered event
-  // for job_id, fire executeLiquidation in the same tick. ~6-10s per account
-  // on Sepolia; the cron's 5-min budget covers ~25 liquidations comfortably.
+  // 083-BE10 fix (2026-05-30): pre-fix the keeper called queueLiquidation from
+  // the keeper EOA. Vigil gates queue_liquidation to plinth_address
+  // (contracts/vigil/src/lib.rs:253), so every queue write reverted
+  // Unauthorized and executeLiquidation was never reached — the only on-chain
+  // liquidation path the keeper shipped was non-functional. Now the keeper
+  // discovers queued jobs from the on-chain LiquidationTriggered logs (the
+  // subgraph has no queryable pending-job entity), reads jobs(job_id) for live
+  // completion + deadline, and executes the ones whose deadline has passed for
+  // a confirmed-underwater account.
   const account = privateKeyToAccount(keeperKey as `0x${string}`);
   const walletClient = createWalletClient({ account, chain: arbitrumSepolia, transport: http(rpc) });
-  const publicReadClient = createPublicClient({ chain: arbitrumSepolia, transport: http(rpc) });
   const vigilAbi = [
-    { type: 'function', name: 'queueLiquidation', stateMutability: 'nonpayable',
-      inputs: [{ type: 'address' }, { type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+    { type: 'function', name: 'jobs', stateMutability: 'view',
+      inputs: [{ type: 'uint256' }],
+      outputs: [
+        { type: 'uint256' }, { type: 'address' }, { type: 'uint256' }, { type: 'uint256' },
+        { type: 'uint64' }, { type: 'uint8' }, { type: 'bool' }, { type: 'address' },
+      ] },
     { type: 'function', name: 'executeLiquidation', stateMutability: 'nonpayable',
       inputs: [{ type: 'uint256' }], outputs: [{ type: 'uint256' }] },
     { type: 'event', name: 'LiquidationTriggered', inputs: [
@@ -228,82 +223,82 @@ export async function tickOnce(): Promise<void> {
       ] },
   ] as const;
 
-  // Cap per-tick liquidation throughput so a runaway pause-sweep cannot
-  // burn the keeper's gas budget in one shot. Logged + skipped after the cap.
+  const currentBlock = await publicClient.getBlockNumber();
+  // Bounded getLogs window so the range stays within public-RPC limits. A
+  // queued job's deadline is only a handful of blocks out, so a lookback that
+  // comfortably covers the cron interval + deadline window is enough.
+  const lookback = BigInt(process.env.KEEPER_LOG_LOOKBACK_BLOCKS ?? '10000');
+  const fromBlock = currentBlock > lookback ? currentBlock - lookback : 0n;
+  const triggeredEvent = vigilAbi[2];
+  let triggeredLogs;
+  try {
+    triggeredLogs = await publicClient.getLogs({
+      address: vigilAddr,
+      event: triggeredEvent,
+      fromBlock,
+      toBlock: currentBlock,
+    });
+  } catch (err) {
+    console.log(JSON.stringify({
+      ts: new Date().toISOString(), event: 'skip', reason: 'getlogs_failed',
+      detail: err instanceof Error ? err.message : String(err),
+    }));
+    return;
+  }
+
+  // Read live job state for each discovered job_id, then select executables.
+  const pausedUsers = new Set(validatedPaused.map((a) => a.user.toLowerCase()));
+  const jobs: QueuedJob[] = [];
+  const seenJobIds = new Set<string>();
+  for (const log of triggeredLogs) {
+    const jobId = (log as unknown as { args: { job_id?: bigint } }).args?.job_id;
+    if (jobId === undefined || seenJobIds.has(jobId.toString())) continue;
+    seenJobIds.add(jobId.toString());
+    try {
+      const job = (await publicClient.readContract({
+        address: vigilAddr, abi: vigilAbi, functionName: 'jobs', args: [jobId],
+      })) as readonly [bigint, string, bigint, bigint, bigint, number, boolean, string];
+      jobs.push({ jobId, user: job[1], deadlineBlock: job[4], isComplete: job[6] });
+    } catch {
+      // Skip jobs we can't read this tick; next tick retries.
+    }
+  }
+
+  const executable = jobsToExecute(jobs, currentBlock, pausedUsers);
+  if (executable.length === 0) {
+    console.log(JSON.stringify({
+      ts: new Date().toISOString(), event: 'no_executable_jobs',
+      discoveredJobs: jobs.length, pausedAccounts: validatedPaused.length,
+    }));
+    return;
+  }
+
+  // Cap per-tick liquidation throughput so a runaway sweep cannot burn the
+  // keeper's gas budget in one shot.
   const PER_TICK_CAP = 25;
   let executed = 0;
-
-  for (const acct of validatedPaused) {
+  for (const jobId of executable) {
     if (executed >= PER_TICK_CAP) {
       console.log(JSON.stringify({
-        ts: new Date().toISOString(),
-        event: 'liquidation_skipped_cap_reached',
-        capped_at: PER_TICK_CAP,
-        remaining_accounts: validatedPaused.length - executed,
+        ts: new Date().toISOString(), event: 'liquidation_skipped_cap_reached',
+        capped_at: PER_TICK_CAP, remaining: executable.length - executed,
       }));
       break;
     }
     try {
-      const queueTx = await walletClient.writeContract({
-        address: vigilAddr,
-        abi: vigilAbi,
-        functionName: 'queueLiquidation',
-        args: [acct.user as `0x${string}`, BigInt(acct.marginVersion)],
-      });
-      console.log(JSON.stringify({
-        ts: new Date().toISOString(),
-        event: 'liquidation_queued',
-        user: acct.user,
-        marginVersion: acct.marginVersion,
-        tx: queueTx,
-        arbiscan: `https://sepolia.arbiscan.io/tx/${queueTx}`,
-      }));
-
-      // Wait for the receipt + decode job_id from the LiquidationTriggered log.
-      const receipt = await publicReadClient.waitForTransactionReceipt({
-        hash: queueTx,
-        timeout: 60_000,
-      });
-      const triggeredLog = receipt.logs.find(
-        (l) =>
-          l.address.toLowerCase() === vigilAddr.toLowerCase() &&
-          l.topics[0] === LIQUIDATION_TRIGGERED_TOPIC,
-      );
-      if (!triggeredLog || !triggeredLog.topics[1]) {
-        console.log(JSON.stringify({
-          ts: new Date().toISOString(),
-          event: 'liquidation_jobid_missing',
-          user: acct.user,
-          marginVersion: acct.marginVersion,
-          detail: 'queueLiquidation receipt had no LiquidationTriggered log; skipping execute.',
-        }));
-        continue;
-      }
-      const jobId = BigInt(triggeredLog.topics[1]);
-
       const execTx = await walletClient.writeContract({
-        address: vigilAddr,
-        abi: vigilAbi,
-        functionName: 'executeLiquidation',
-        args: [jobId],
+        address: vigilAddr, abi: vigilAbi, functionName: 'executeLiquidation', args: [jobId],
       });
       executed++;
       console.log(JSON.stringify({
-        ts: new Date().toISOString(),
-        event: 'liquidation_executed',
-        user: acct.user,
-        marginVersion: acct.marginVersion,
-        jobId: jobId.toString(),
-        tx: execTx,
+        ts: new Date().toISOString(), event: 'liquidation_executed',
+        jobId: jobId.toString(), tx: execTx,
         arbiscan: `https://sepolia.arbiscan.io/tx/${execTx}`,
       }));
     } catch (err) {
       console.log(JSON.stringify({
-        ts: new Date().toISOString(),
-        event: 'liquidation_failed',
-        user: acct.user,
-        marginVersion: acct.marginVersion,
-        error: err instanceof Error ? err.message : String(err),
+        ts: new Date().toISOString(), event: 'liquidation_failed',
+        jobId: jobId.toString(), error: err instanceof Error ? err.message : String(err),
       }));
     }
   }

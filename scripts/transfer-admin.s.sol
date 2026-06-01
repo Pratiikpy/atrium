@@ -58,7 +58,16 @@ contract TransferAdmin is Script {
 
         vm.stopBroadcast();
 
-        console.log("All admin transfers attempted. Verify with the script in step 6 of safe-ceremony.md.");
+        // 101-OPS3.1: each contract logs `ok` or `FAIL` above. A FAIL means
+        // that contract does not yet implement the admin-transfer setter
+        // (set_praetor on Stylus, updatePraetor on Solidity) — the role did
+        // NOT move there. The setter is implemented + tested on coffer,
+        // atrium-router, and portico-registry; the same one-line pattern must
+        // be rolled out to the remaining admin-holders at redeploy. Treat any
+        // FAIL line as ceremony-incomplete and verify every contract reads the
+        // new Safe via step 6 of safe-ceremony.md before trusting the handoff.
+        console.log("Admin transfer attempted. Every line above MUST read 'ok'.");
+        console.log("Any 'FAIL' = setter missing on that contract = role NOT moved; verify step 6.");
     }
 
     function _setStylus(string memory slug, address target) internal {
