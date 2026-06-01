@@ -2,7 +2,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Accessibility',
-  description: 'Accessibility statement — WCAG 2.1 AA compliance target.',
+  description: 'Accessibility statement, WCAG 2.1 AA compliance target.',
 };
 
 export default function AccessibilityPage() {
@@ -31,7 +31,7 @@ export default function AccessibilityPage() {
             <li>Color contrast ratios meet or exceed 4.5:1 for normal text, 3:1 for large text.</li>
             <li>All interactive elements have visible <code className="font-mono text-ink">:focus-visible</code> outlines.</li>
             <li>Skip-to-content link on every page for keyboard navigation.</li>
-            <li><code className="font-mono text-ink">prefers-reduced-motion</code> respected — animations disabled when requested.</li>
+            <li><code className="font-mono text-ink">prefers-reduced-motion</code> respected, animations disabled when requested.</li>
             <li>ARIA live regions wrap dynamic content (portfolio updates, toast notifications, transaction status).</li>
             <li>Semantic HTML structure (headings, landmarks, lists) throughout.</li>
             <li>Form inputs have associated labels; error messages are programmatically linked.</li>
@@ -42,7 +42,7 @@ export default function AccessibilityPage() {
         <section>
           <h2 className="font-display text-2xl text-ink">Known gaps</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5">
-            <li>Keyboard arrow navigation in data tables (positions, activity feed) — deferred from E2E-04/E2E-57.</li>
+            <li>Keyboard arrow navigation in data tables (positions, activity feed), deferred from E2E-04/E2E-57.</li>
             <li>Complex chart components (margin engine visualization) lack full screen-reader descriptions.</li>
             <li>Mobile bottom navigation does not yet support swipe gestures for assistive tech.</li>
           </ul>

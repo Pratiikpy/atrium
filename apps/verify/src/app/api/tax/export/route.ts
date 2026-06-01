@@ -6,7 +6,7 @@ const TABLET_URL = process.env.TABLET_URL ?? null;
 export const dynamic = 'force-dynamic';
 
 // Audit LL-1 + LL-2 fix: both `format` and `jurisdiction`/`year` were
-// interpolated directly into (a) the upstream URL — query-injection identical
+// interpolated directly into (a) the upstream URL, query-injection identical
 // to the JJ-5 bug in tax/summary, and (b) the Content-Disposition filename,
 // which is a header-injection sink. A caller passing `?format=csv%0d%0aX:%20evil`
 // could inject extra HTTP headers into the response. Closed-enum gates plus
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     });
     if (!r.ok) throw new Error(`tablet_${r.status}`);
     const body = await r.arrayBuffer();
-    // Be paranoid about the upstream's content-type too — strip CRLF.
+    // Be paranoid about the upstream's content-type too, strip CRLF.
     const contentTypeRaw = r.headers.get('content-type') ?? 'application/octet-stream';
     const contentType = contentTypeRaw.replace(/[\r\n]/g, '');
     return new NextResponse(body, {

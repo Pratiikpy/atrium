@@ -15,7 +15,7 @@ import { gql } from '@/lib/scribe-helpers';
  * Subgraph mappings initialize entity fields to `BigInt.zero()` because
  * AssemblyScript requires every field to be populated at entity-load
  * time. Those zeros propagate through Scribe to routes that format them
- * — and a route that does `formatUsd(zeroBigInt)` ships "$0.00" as if
+ *, and a route that does `formatUsd(zeroBigInt)` ships "$0.00" as if
  * measured. The U-33 audit closed this for /api/portfolio/positions'
  * entryPriceQ64. This test pins the same invariant route-by-route so
  * a new route can't reintroduce the pattern.

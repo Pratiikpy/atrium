@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TaxMobile — Mobile tax dashboard.
+ * TaxMobile, Mobile tax dashboard.
  * Jurisdiction selector, tax year, stats, events list, export buttons.
  * 44px touch targets, 16px body text.
  */
@@ -60,11 +60,11 @@ export function TaxMobile() {
     refetchInterval: 60_000,
   });
 
-  // Error state (distinct from empty — E2E-50)
+  // Error state (distinct from empty, E2E-50)
   if (stats.error || events.error) {
     return (
       <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load — retry</p>
+        <p className="text-[16px] text-neg">Could not load, retry</p>
         <button onClick={() => { stats.refetch(); events.refetch(); }} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
           Retry
         </button>

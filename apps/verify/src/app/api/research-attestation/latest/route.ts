@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * The on-chain attestation only carries (ipfsHash, tradesCount,
  * collateralDeltaBps, timestampSeconds, notebookUrl). The honesty flag
  * lives in the JSON, not the chain, because it's a property of the data
- * methodology (synthetic-pairs vs real-trades) — not something the
+ * methodology (synthetic-pairs vs real-trades), not something the
  * contract should encode.
  *
  * Cache: the attestation is immutable per ipfsHash, so this can be
@@ -81,7 +81,7 @@ export async function GET() {
   }
 
   // Validate the ipfsHash shape before any string interpolation into a
-  // gateway URL — same R-1 SSRF gate as /api/lantern/verify-inclusion.
+  // gateway URL, same R-1 SSRF gate as /api/lantern/verify-inclusion.
   if (!CID_REGEX.test(row.ipfsHash)) {
     return NextResponse.json(
       {
@@ -97,7 +97,7 @@ export async function GET() {
     return NextResponse.json(
       {
         attestation: { ...row, isPublishable: false, dataMode: 'unknown' },
-        warning: 'IPFS_GATEWAY misconfigured; honesty flag cannot be checked — assuming NOT publishable',
+        warning: 'IPFS_GATEWAY misconfigured; honesty flag cannot be checked, assuming NOT publishable',
       },
       { status: 200 },
     );
@@ -114,7 +114,7 @@ export async function GET() {
       ipfsJson = (await r.json()) as IpfsJson;
     }
   } catch {
-    // Gateway down — fall through. We refuse to render the attestation as
+    // Gateway down, fall through. We refuse to render the attestation as
     // publishable without confirming the flag, since the alternative (assume
     // publishable on fetch failure) violates the honesty contract.
   }
@@ -130,7 +130,7 @@ export async function GET() {
     );
   }
 
-  // Schema v1 (pre-honesty-pass) attestations have no is_publishable field —
+  // Schema v1 (pre-honesty-pass) attestations have no is_publishable field -
   // those predate the iteration-28 gate. Per the praetor-cli rule, missing
   // field is treated as not-publishable so synthetic v1 outputs that
   // already shipped on-chain don't masquerade as honest results.

@@ -200,7 +200,7 @@ contract MorphoBlueAdapterTest is Test {
     ///
     /// Without this test, a refactor that accidentally swapped two of
     /// those three mapping writes (or the three function-arg names) would
-    /// pass every existing test — addInstrument's emit + market-id keccak
+    /// pass every existing test, addInstrument's emit + market-id keccak
     /// still hold. But every margin calc Plinth makes on this venue
     /// would silently use the wrong values: e.g., haircut=800 instead of
     /// 100, initial=100 instead of 800. No revert, no event-level

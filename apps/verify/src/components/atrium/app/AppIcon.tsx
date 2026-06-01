@@ -1,4 +1,4 @@
-// Minimal stroke icon set for the desktop app shell — ported from refs.
+// Minimal stroke icon set for the desktop app shell, ported from refs.
 
 export type AppIconName =
   | "portfolio" | "trade" | "transfer" | "agents" | "reserves" | "tax"

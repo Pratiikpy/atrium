@@ -82,7 +82,7 @@ describe('STEP_CONFIG', () => {
     }
   });
 
-  it('action kinds are exhaustive — each step has a distinct kind', () => {
+  it('action kinds are exhaustive, each step has a distinct kind', () => {
     const kinds = Object.values(STEP_CONFIG).map((s) => s.action.kind);
     expect(new Set(kinds).size).toBe(7);
   });

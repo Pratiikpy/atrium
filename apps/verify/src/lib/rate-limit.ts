@@ -1,5 +1,5 @@
 /**
- * Rate limiting — Phase 3 hardening, retuned 2026-06-01 after a QA sweep.
+ * Rate limiting, Phase 3 hardening, retuned 2026-06-01 after a QA sweep.
  *
  * Uses @upstash/ratelimit + @upstash/redis. Falls back to no-op when
  * Upstash env vars are not set (local dev).
@@ -7,7 +7,7 @@
  * Why two buckets (read vs write):
  * A single previous bucket of 60 req/min/IP throttled legitimate use. The
  * authenticated dashboard fires many parallel GETs per page load and polls
- * on an interval, and React Query retries on 429 — so a tight per-IP read
+ * on an interval, and React Query retries on 429, so a tight per-IP read
  * limit self-amplifies into a retry storm after ~3 page loads. Worse, a
  * buildathon demo puts several judges behind ONE venue-WiFi IP, so they
  * collectively share the budget and throttle each other. Reads are cheap,

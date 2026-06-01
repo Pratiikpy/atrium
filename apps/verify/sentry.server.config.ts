@@ -1,4 +1,4 @@
-// Sentry Node.js (server-side) init — Phase 3 hardened.
+// Sentry Node.js (server-side) init, Phase 3 hardened.
 // No consent gate needed server-side; applies PII scrub for wallet addresses.
 import * as Sentry from '@sentry/nextjs';
 

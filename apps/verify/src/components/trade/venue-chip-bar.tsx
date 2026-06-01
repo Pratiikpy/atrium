@@ -8,7 +8,7 @@ import { VENUES } from '@/lib/venues';
  * single-line change there, and every surface that counts venues
  * (landing copy, impluvium diagram, numbers section) stays in sync.
  *
- * Audit U-14: now a controlled component — parent TradeView owns the
+ * Audit U-14: now a controlled component, parent TradeView owns the
  * active venue so OrderForm / OrderBook / MarginImpactPanel re-fetch
  * when the chip changes. Pre-fix the selection lived in local state and
  * had no effect on any sibling component.

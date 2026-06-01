@@ -1,4 +1,4 @@
-"""FX rate layer — ECB Frankfurter API + SQLite cache + CSV fallback.
+"""FX rate layer, ECB Frankfurter API + SQLite cache + CSV fallback.
 
 Provides USD→GBP and USD→EUR historical rates for tax calculations.
 """

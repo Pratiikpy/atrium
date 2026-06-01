@@ -11,7 +11,7 @@ import { gql } from '@/lib/scribe-helpers';
  *
  * - VV-3: pre-fix the route sourced `copiers: count` from a Sigil
  *   validation count and shipped `source: 'rostrum'`. Silent
- *   semantic substitution — sigil validation ("agent acting under a
+ *   semantic substitution, sigil validation ("agent acting under a
  *   mandate") is not the same as Rostrum copier count ("users
  *   following this agent"). Two different concepts conflated.
  *
@@ -29,7 +29,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/agents/leaderboard — VV-3 semantic-substitution prevention', () => {
+describe('GET /api/agents/leaderboard, VV-3 semantic-substitution prevention', () => {
   it('always returns source:pending regardless of Scribe data', async () => {
     // Even when Scribe has plenty of sigilValidations, the route must
     // NOT use them as copier counts. source = pending.

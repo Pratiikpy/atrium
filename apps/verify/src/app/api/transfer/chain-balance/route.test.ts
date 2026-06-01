@@ -30,7 +30,7 @@ import { GET } from './route';
 
 const originalWallet = process.env.DEMO_WALLET_ADDRESS;
 const VALID_WALLET = '0x' + 'a'.repeat(40);
-// A real valid-but-uppercase address — getAddress() should accept lowercase
+// A real valid-but-uppercase address, getAddress() should accept lowercase
 // or matching-checksum, reject mismatched checksums.
 const VALID_USDC = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
 
@@ -52,7 +52,7 @@ function makeReq(params: Record<string, string>): NextRequest {
   return new Request(url.toString()) as unknown as NextRequest;
 }
 
-describe('GET /api/transfer/chain-balance — honest pending when unconfigured', () => {
+describe('GET /api/transfer/chain-balance, honest pending when unconfigured', () => {
   it('returns source:pending when DEMO_WALLET_ADDRESS is unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const res = await GET(makeReq({ chain: 'arb-sepolia', token: 'USDC' }));
@@ -84,7 +84,7 @@ describe('GET /api/transfer/chain-balance — honest pending when unconfigured',
   });
 });
 
-describe('GET /api/transfer/chain-balance — audit R-8: invalid address fails LOUD', () => {
+describe('GET /api/transfer/chain-balance, audit R-8: invalid address fails LOUD', () => {
   it('returns 500 when token address is malformed (audit R-8)', async () => {
     // Operator misconfig: a non-hex string ends up in the token address env.
     // Prior code swallowed this into source:pending, hiding the bug.
@@ -101,7 +101,7 @@ describe('GET /api/transfer/chain-balance — audit R-8: invalid address fails L
   });
 
   it('returns 500 on bad checksum (audit R-8)', async () => {
-    // Mixed-case hex with WRONG checksum — getAddress() rejects this.
+    // Mixed-case hex with WRONG checksum, getAddress() rejects this.
     // (A correct checksum or all-lowercase passes.)
     process.env.CODEX_USDC_ADDRESS = '0x75FAF114EAFB1BDBE2F0316DF893FD58CE46AA4D'; // all-uppercase, no actual checksum
 
@@ -114,7 +114,7 @@ describe('GET /api/transfer/chain-balance — audit R-8: invalid address fails L
     expect((await res2.json()).error).toBe('address_invalid');
 
     delete process.env.CODEX_USDC_ADDRESS;
-    // The all-uppercase case is also valid (treated as no-checksum-claimed) —
+    // The all-uppercase case is also valid (treated as no-checksum-claimed) -
     // so we don't strictly assert on `res` above.
     void res;
   });
@@ -138,7 +138,7 @@ describe('GET /api/transfer/chain-balance — audit R-8: invalid address fails L
   });
 });
 
-describe('GET /api/transfer/chain-balance — RPC failure path is silently pending', () => {
+describe('GET /api/transfer/chain-balance, RPC failure path is silently pending', () => {
   it('returns source:pending when readContract throws (RPC down)', async () => {
     mockReadContract.mockRejectedValue(new Error('ENETUNREACH'));
 
@@ -157,7 +157,7 @@ describe('GET /api/transfer/chain-balance — RPC failure path is silently pendi
   });
 });
 
-describe('GET /api/transfer/chain-balance — happy path', () => {
+describe('GET /api/transfer/chain-balance, happy path', () => {
   it('returns formatted balance + source:rpc on successful read', async () => {
     // balanceOf returns 1_234_560_000 (1234.56 USDC at 6 decimals); decimals=6.
     mockReadContract
@@ -173,7 +173,7 @@ describe('GET /api/transfer/chain-balance — happy path', () => {
   });
 
   it('uses Promise.all for parallel balanceOf + decimals (perf)', async () => {
-    // The route fires both reads in parallel via Promise.all — locks that
+    // The route fires both reads in parallel via Promise.all, locks that
     // pattern so a refactor doesn't sequentialize them (~2x latency hit).
     mockReadContract.mockResolvedValue(1_000_000n);
 
@@ -183,11 +183,11 @@ describe('GET /api/transfer/chain-balance — happy path', () => {
   });
 });
 
-describe('GET /api/transfer/chain-balance — defaults', () => {
+describe('GET /api/transfer/chain-balance, defaults', () => {
   it('defaults chain to arb-sepolia when not specified', async () => {
     mockReadContract.mockResolvedValueOnce(0n).mockResolvedValueOnce(6);
     const res = await GET(makeReq({ token: 'USDC' }));
-    // arb-sepolia is the default — should succeed (status:rpc).
+    // arb-sepolia is the default, should succeed (status:rpc).
     expect((await res.json()).source).toBe('rpc');
   });
 

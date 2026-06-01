@@ -1,5 +1,5 @@
 /**
- * Haruspex — PT/YT spread agent. TS port of agents/haruspex/.
+ * Haruspex, PT/YT spread agent. TS port of agents/haruspex/.
  * Looks at Pendle markets, opens spreads when implied yield deviates
  * from realized.
  */

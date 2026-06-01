@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Yubikey 5C · Touch ID'` whenever a `DEMO_WALLET_ADDRESS` was set. This
  * implied real hardware-authenticator state that didn't exist (Postern
  * isn't deployed). Real-data discipline violation per `docs/conventions/ui.md`
- * "Live data discipline" — "Never display a placeholder number that looks
+ * "Live data discipline", "Never display a placeholder number that looks
  * real."
  *
  * Now the route reports `source: 'postern'` only when PosternKeyRegistry
@@ -26,7 +26,7 @@ export async function GET(req?: Request) {
       : process.env.DEMO_WALLET_ADDRESS ?? null;
   if (!wallet) {
     return NextResponse.json({
-      address: '—',
+      address: '-',
       ens: null,
       authenticator: null,
       bundler: null,

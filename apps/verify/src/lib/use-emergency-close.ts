@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
 /**
- * Emergency close — force-close a position at market through the real deployed
+ * Emergency close, force-close a position at market through the real deployed
  * close path: AtriumRouter.close_position_via_adapter.
  *
  * 057-FE2 fix (2026-05-30): pre-fix this called Vigil.queueLiquidation from the
  * user's EOA. That function is gated to plinth_address (contracts/vigil/src/
- * lib.rs:253), so every click reverted Unauthorized — and the hook reported
+ * lib.rs:253), so every click reverted Unauthorized, and the hook reported
  * success on bare submit, painting a green "queued" for a guaranteed-revert tx.
  * Vigil's liquidation queue is NOT user-callable (only Plinth queues, only a
  * staked keeper executes). The only close path a user wallet can drive is the

@@ -1,5 +1,5 @@
 /**
- * Auth session — Phase 3 (replaces Phase 2c stub).
+ * Auth session, Phase 3 (replaces Phase 2c stub).
  *
  * Reads the HMAC-signed `atrium-session` cookie set by /api/auth/verify.
  * Falls back to DEMO_WALLET_ADDRESS env for local dev without SIWE.

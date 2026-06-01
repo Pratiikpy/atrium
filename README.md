@@ -4,11 +4,11 @@ Cross-venue portfolio margin for the EVM. One wallet posts collateral once and t
 
 Deployed on **Arbitrum Sepolia** and **Robinhood Chain** testnets. The Stylus (Rust) contracts compile and activate natively on both; addresses in [`docs/deployment.md`](./docs/deployment.md) (Sepolia) and [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json) (Robinhood Chain).
 
-**[Run the live demo at verify.atrium.fi →](https://verify.atrium.fi)**
+**Run Verifier Mode locally with `make demo-frontend`.** It reads the live Arbitrum Sepolia contracts directly. A hosted public URL is pending DNS + deploy.
 
 ## Why it matters
 
-A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin on each venue separately. Atrium nets the hedge under one SPAN-style margin calculation, so the same risk frees about half the collateral: the Plinth engine returns ~51% freed on a canonical equal-size hedge, pinned by a unit test (`span::hedge_frees_a_pinned_share_of_the_isolated_margin`, run `cargo test -p atrium-plinth span::`). The dollar amounts above are an illustrative scale, not a live reading. No venue cross-margins across other venues today; Atrium is the substrate that does.
+A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin on each venue separately. Atrium nets the hedge under one SPAN-style margin calculation, so the same risk frees about half the collateral: the Plinth engine returns ~51% freed on a canonical equal-size hedge, reproduced by a unit test that also locks a 40-70% guardrail band (`span::hedge_frees_a_pinned_share_of_the_isolated_margin`, run `cargo test -p atrium-plinth span::`). The dollar amounts above are an illustrative scale, not a live reading. No venue cross-margins across other venues today; Atrium is the substrate that does.
 
 ## How it works
 
@@ -17,7 +17,7 @@ A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as coll
 ## Quick start
 
 ```bash
-git clone <repo-url> atrium
+git clone https://github.com/Pratiikpy/atrium.git atrium
 cd atrium
 make demo            # full stack on Linux/macOS/WSL
 # OR
@@ -80,7 +80,7 @@ atrium/
 
 ## Status
 
-Contracts and core services build green on `master`. The verify-app is deployed to Arbitrum Sepolia at [verify.atrium.fi](https://verify.atrium.fi). Live contract addresses are in [`docs/deployment.md`](./docs/deployment.md). Audit history lives under [`audits/`](./audits/); incident post-mortems under [`incidents/`](./incidents/).
+Contracts and core services build green on `master`. Verifier Mode (the Next.js app) reads the live Arbitrum Sepolia contracts directly; run it locally with `make demo-frontend`. A hosted public URL is pending DNS + deploy. Live contract addresses are in [`docs/deployment.md`](./docs/deployment.md). Audit history lives under [`audits/`](./audits/); incident post-mortems under [`incidents/`](./incidents/).
 
 ## Build commands
 
@@ -106,4 +106,4 @@ See [`SECURITY.md`](./SECURITY.md). Disclose vulnerabilities to `security@atrium
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Grants are available for accepted `IPorticoAdapter` v1.0 implementations and reference agents.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md). The `IPorticoAdapter` interface is open: build an adapter for any venue, or contribute a reference agent. Pass the conformance tests in [`tests/adapter-conformance/`](./tests/adapter-conformance/) and open a PR.

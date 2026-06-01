@@ -125,7 +125,7 @@ export function SessionKeysView() {
           <div>
             <p className="eyebrow">Active session keys</p>
             <p className="mt-1 font-sans text-lg font-medium text-ink">
-              {isLoading ? '—' : keys.length}
+              {isLoading ? '-' : keys.length}
               <span className="ml-2 text-sm font-normal text-muted">
                 of 50 max{expiredCount > 0 ? ` · ${expiredCount} expired` : ''}
               </span>

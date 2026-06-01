@@ -52,5 +52,5 @@ After scoping, trigger a Preview deploy from a PR branch and confirm:
 ## References
 
 - Phase 3 security hardening spec
-- `apps/verify/src/lib/rate-limit.ts` — graceful fallback when Upstash unavailable
-- `apps/verify/src/lib/auth-session.ts` — requires ATRIUM_SESSION_SECRET
+- `apps/verify/src/lib/rate-limit.ts`, graceful fallback when Upstash unavailable
+- `apps/verify/src/lib/auth-session.ts`, requires ATRIUM_SESSION_SECRET

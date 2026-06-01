@@ -9,25 +9,25 @@ import { parseTsOrNull } from '@/lib/format-time';
  * Prior code did `Number(p.joinedAtTimestamp) * 1000` → if Scribe returned
  * a corrupt value (`"NaN"`, `"abc"`, empty), `Number()` produced NaN and
  * `new Date(NaN).toLocaleDateString()` rendered the literal string
- * "Invalid Date" in the partners grid. Now: validate first, render "—" on
+ * "Invalid Date" in the partners grid. Now: validate first, render "-" on
  * any malformed value.
  *
- * Same gate applies to `totalDepositsWei` — a huge Scribe value would lose
+ * Same gate applies to `totalDepositsWei`, a huge Scribe value would lose
  * precision past Number.MAX_SAFE_INTEGER and render a corrupt number.
  */
 function formatScribeDate(s: string | null | undefined): string {
   const ts = parseTsOrNull(s);
-  if (ts == null) return '—';
+  if (ts == null) return '-';
   return new Date(ts * 1000).toLocaleDateString();
 }
 
 function formatScribeUsdc(s: string | null | undefined): string {
-  if (s == null || s === '' || !/^\d+$/.test(s)) return '—';
-  // Locale-format USDC (6 decimals) without the $ sign — caller adds it.
+  if (s == null || s === '' || !/^\d+$/.test(s)) return '-';
+  // Locale-format USDC (6 decimals) without the $ sign, caller adds it.
   // Use string-arithmetic to preserve precision past safe-int.
   const whole = s.length > 6 ? s.slice(0, -6) : '0';
   const wholeNum = Number(whole);
-  if (!Number.isFinite(wholeNum)) return '—';
+  if (!Number.isFinite(wholeNum)) return '-';
   return wholeNum.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 

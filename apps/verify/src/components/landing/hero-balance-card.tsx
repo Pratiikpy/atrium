@@ -11,9 +11,9 @@ interface HeroSummary {
 
 interface ProtocolMetrics {
   // Iteration 35: was `venuesLive: { live, total }`. The count measures
-  // deployment-registry presence, not on-chain `get_venue_health` status —
+  // deployment-registry presence, not on-chain `get_venue_health` status -
   // a deployed-but-broken adapter shouldn't show as "live." Renamed.
-  // Iteration 39: `count` is now nullable — null when registry unreachable.
+  // Iteration 39: `count` is now nullable, null when registry unreachable.
   venuesDeployed: { count: number | null; total: number };
   source: 'scribe' | 'pending';
 }
@@ -31,7 +31,7 @@ async function fetchHero(): Promise<HeroSummary> {
 
 async function fetchMetrics(): Promise<ProtocolMetrics> {
   const r = await fetch('/api/protocol/metrics');
-  // Iteration 39: was `count: 0` — fake-zero on fetch failure. Null = unknown.
+  // Iteration 39: was `count: 0`, fake-zero on fetch failure. Null = unknown.
   if (!r.ok) return { venuesDeployed: { count: null, total: VENUE_COUNT }, source: 'pending' };
   const json = await r.json();
   return {
@@ -41,14 +41,14 @@ async function fetchMetrics(): Promise<ProtocolMetrics> {
 }
 
 /**
- * Hero balance card — visual centerpiece of the landing hero. Matches the
+ * Hero balance card, visual centerpiece of the landing hero. Matches the
  * `$12.3M` wallet preview in design/Atrium.html but renders live data from
  * Plinth via /api/portfolio/summary. When no data is available, shows
- * "pending Month 1 W2" honestly — never a placeholder number.
+ * "pending Month 1 W2" honestly, never a placeholder number.
  *
  * Audit OO-1 + OO-2 + OO-3 fix:
  *   1. Account value fallback was `$0.00`. That looks identical to a real
- *      zero balance and violates the real-data discipline. Switched to '—'
+ *      zero balance and violates the real-data discipline. Switched to '-'
  *      with a "pending" pill so the UI distinguishes "zero balance" from
  *      "we don't know yet".
  *   2. "Venues active" was hardcoded "0/6" with both branches of the
@@ -60,7 +60,7 @@ async function fetchMetrics(): Promise<ProtocolMetrics> {
  *   3. The big number was labeled "Buying power" but actually displayed
  *      `totalAccountValueUsd`. Renamed to "Account value" so the label
  *      matches the underlying field. Real buying power is a derived value
- *      (collateral − required) not implemented yet — flagged honestly.
+ *      (collateral − required) not implemented yet, flagged honestly.
  */
 export function HeroBalanceCard() {
   const { data, isLoading } = useQuery({
@@ -73,8 +73,8 @@ export function HeroBalanceCard() {
     queryFn: fetchMetrics,
     refetchInterval: 60_000,
   });
-  // Iteration 39: was `count: 0` — fake-zero. Null = unknown when registry
-  // unreachable; the render below switches to "— / N" instead of "0 / N".
+  // Iteration 39: was `count: 0`, fake-zero. Null = unknown when registry
+  // unreachable; the render below switches to "- / N" instead of "0 / N".
   const venuesDeployed = metrics?.venuesDeployed ?? { count: null as number | null, total: VENUE_COUNT };
 
   return (
@@ -91,7 +91,7 @@ export function HeroBalanceCard() {
       <p className="mt-1 font-mono text-4xl text-ink md:text-5xl">
         {isLoading
           ? <span className="skeleton inline-block h-12 w-48 rounded" />
-          : data?.totalAccountValueUsd ?? '—'}
+          : data?.totalAccountValueUsd ?? '-'}
       </p>
 
       <dl className="mt-6 grid grid-cols-2 gap-4 text-sm">
@@ -100,20 +100,20 @@ export function HeroBalanceCard() {
           <dd className="mt-1 font-mono text-ink">
             {isLoading
               ? <span className="skeleton inline-block h-5 w-24 rounded" />
-              : data?.totalRequiredMarginUsd ?? '—'}
+              : data?.totalRequiredMarginUsd ?? '-'}
           </dd>
         </div>
         <div>
-          {/* Iteration 35: relabeled from "Venues active" — the underlying
+          {/* Iteration 35: relabeled from "Venues active", the underlying
               count measures deployed adapters, not operationally healthy
               ones. "Active" implied liveness this metric doesn't verify. */}
           <dt className="text-[10px] uppercase tracking-wider text-muted">Venues deployed</dt>
           <dd className="mt-1 font-mono text-ink">
-            {/* Iteration 39: render "—/7" not "0/7" when count is null.
+            {/* Iteration 39: render "-/7" not "0/7" when count is null.
                 Pre-fix the registry-unreachable state silently displayed
-                "0/7 deployed" — a user during a registry-fetch outage
+                "0/7 deployed", a user during a registry-fetch outage
                 would read it as a confirmed zero deployments. */}
-            {venuesDeployed.count != null ? venuesDeployed.count : '—'}/{venuesDeployed.total}
+            {venuesDeployed.count != null ? venuesDeployed.count : '-'}/{venuesDeployed.total}
           </dd>
         </div>
       </dl>

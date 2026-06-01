@@ -8,7 +8,7 @@ type WindowKey = (typeof WINDOWS)[number];
 
 /**
  * Recent-attestations section wrapper. Owns the window tab state so the
- * "24h / 7d / 30d" toggle actually drives the table query — previously
+ * "24h / 7d / 30d" toggle actually drives the table query, previously
  * these were dead `<span>` elements with no handler (audit U-11).
  */
 export function RecentAttestationsSection() {

@@ -109,7 +109,7 @@ contract AqueductTest is Test {
         router.setChainSupported(1, true);
 
         // Audit V-C1 fix: Aqueduct calls `coffer.adapterPull(amount, user, aqueduct)`.
-        // MockCoffer.adapterPull does `usdc.transferFrom(user, aqueduct, amount)` —
+        // MockCoffer.adapterPull does `usdc.transferFrom(user, aqueduct, amount)` -
         // so the allowance check is `allowance[user][coffer]`, not [user][aqueduct].
         // Prior test only approved aqueduct, so even the FIRST send_collateral
         // call hit "allowance" before reaching the replay check. Approve coffer
@@ -151,7 +151,7 @@ contract AqueductTest is Test {
         usdc.approve(address(coffer), 1_000_000);
         usdc.approve(address(aqueduct), 1_000_000);
 
-        // 1 second past now — well below the 1-hour minimum
+        // 1 second past now, well below the 1-hour minimum
         uint256 tooSoon = block.timestamp + 1;
         uint256 expectedMin = block.timestamp + aqueduct.MIN_EXPIRES_AT_DELTA();
         vm.expectRevert(abi.encodeWithSelector(Aqueduct.ExpiresAtTooSoon.selector, tooSoon, expectedMin));
@@ -202,7 +202,7 @@ contract AqueductTest is Test {
     //
     // Pre-CCCCC-1 the setter silently flipped storage. Operators tracking
     // who is authorized to flip is_settled had no event log to bind
-    // alerts to — they had to poll storage. Now the rotation is a first-
+    // alerts to, they had to poll storage. Now the rotation is a first-
     // class observable event (subgraph + UI dashboards).
 
     event ClaimbackRegistryUpdated(address indexed previous, address indexed next);
@@ -218,7 +218,7 @@ contract AqueductTest is Test {
         aqueduct.setClaimbackRegistry(first);
 
         // Rotation: previous = first, next = second. The pre-CCCCC-1 bug
-        // would have left the rotation invisible — this assertion catches
+        // would have left the rotation invisible, this assertion catches
         // a future regression that drops the emit.
         vm.expectEmit(true, true, false, false, address(aqueduct));
         emit ClaimbackRegistryUpdated(first, second);
@@ -456,7 +456,7 @@ contract AqueductTest is Test {
     //
     // Pre-iter-89 these events were emitted but no test used expectEmit
     // against them. Subgraph mappings depend on the CrossChainCredit
-    // signature for cross-chain credit indexing — a dropped emit would
+    // signature for cross-chain credit indexing, a dropped emit would
     // silently desync every Scribe-fed dashboard.
 
     event CrossChainCredit(
@@ -513,7 +513,7 @@ contract AqueductTest is Test {
 
     function test_setAqueductOnDest_emitsRotationEvent_iter89() public {
         address dest = makeAddr("destAq");
-        // Event has chain_selector indexed but dest in data — adjust the
+        // Event has chain_selector indexed but dest in data, adjust the
         // topic mask: (true=topic1, false=topic2, false=topic3, true=data).
         vm.expectEmit(true, false, false, true, address(aqueduct));
         emit AqueductOnDestSet(7, dest);
@@ -545,7 +545,7 @@ contract AqueductTest is Test {
     /// rolling-30d accumulator and emits LinkUsage30dUpdated. Pre-iter-
     /// 59 the MockRouter returned fee=0 unconditionally, so the
     /// accumulator path at Aqueduct.sol:248-257 was reachable but
-    /// total_link_burned_30d_wei never advanced — meaning the
+    /// total_link_burned_30d_wei never advanced, meaning the
     /// LinkBalanceLow alert (line 260-262) could never fire in tests.
     /// Without this test, a refactor stripping the accumulator update
     /// would slip past CI with zero signal.
@@ -712,7 +712,7 @@ contract MockERC20 {
     }
 }
 
-/// MockRouter — matches the real IRouterClient interface in `Aqueduct.sol`
+/// MockRouter, matches the real IRouterClient interface in `Aqueduct.sol`
 /// (struct EVM2AnyMessage, struct EVMTokenAmount). Audit U-1 fix: the
 /// previous mock used `bytes calldata` which produced a different selector
 /// and silently never matched the contract's call.

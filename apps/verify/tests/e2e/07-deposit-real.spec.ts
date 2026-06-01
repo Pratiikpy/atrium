@@ -12,7 +12,7 @@ async function cofferShares(addr: `0x${string}`): Promise<bigint> {
 }
 
 /**
- * Journey 7 — REAL deposit through the UI (funded-key connector).
+ * Journey 7, REAL deposit through the UI (funded-key connector).
  *
  * Runs only against a build started with NEXT_PUBLIC_E2E=1 +
  * NEXT_PUBLIC_E2E_PRIVATE_KEY (a throwaway testnet key funded with USDC + ETH).
@@ -37,7 +37,7 @@ test.describe('Real deposit (funded-key connector)', () => {
     await page.getByRole('button', { name: /connect wallet/i }).first().click();
     await expect(page.getByText(new RegExp(ADDR_PREFIX, 'i')).first()).toBeVisible({ timeout: 20_000 });
 
-    // Record on-chain Coffer shares BEFORE the deposit — the definitive
+    // Record on-chain Coffer shares BEFORE the deposit, the definitive
     // success signal. (The funded-key connector is a simplified injected
     // provider that does not emit block events, so the UI's
     // useWaitForTransactionReceipt success render lags; the on-chain share
@@ -54,8 +54,8 @@ test.describe('Real deposit (funded-key connector)', () => {
 
     // Exercise the real-tx path once: clicking Deposit signs + broadcasts a
     // real approve (and, when the allowance is already set, the deposit) via
-    // the funded-key connector. We then read the on-chain result directly — the
-    // ground truth — rather than re-driving the connector-limited 2-step loop
+    // the funded-key connector. We then read the on-chain result directly, the
+    // ground truth, rather than re-driving the connector-limited 2-step loop
     // (repeated signing destabilises the simplified injected provider).
     const deposit = page.getByRole('button', { name: /deposit\b.*usdc/i }).first();
     await expect(deposit).toBeEnabled({ timeout: 20_000 });

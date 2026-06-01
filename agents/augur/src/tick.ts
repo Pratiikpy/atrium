@@ -1,5 +1,5 @@
 /**
- * Augur tick — mean-reversion agent (Phase 6).
+ * Augur tick, mean-reversion agent (Phase 6).
  *
  * Invoked by GHA cron. Reads 24h price series, computes z-score vs 30d mean.
  * If |z| > 2: open opposite-direction position at 10% of available margin.
@@ -72,7 +72,7 @@ async function tick() {
     if (Math.abs(z) > 2) {
       const direction = z > 2 ? 'short' : 'long';
       console.log(`[augur] signal: open ${direction} (z=${z.toFixed(3)})`);
-      // Encode position data — adapter-specific, placeholder encoding
+      // Encode position data, adapter-specific, placeholder encoding
       const data = `0x${Buffer.from(JSON.stringify({ instrument: 'ETH-USD', direction, sizePct: 10 })).toString('hex')}`;
       await client.writeContract({
         address: ROUTER_ADDRESS as `0x${string}`,

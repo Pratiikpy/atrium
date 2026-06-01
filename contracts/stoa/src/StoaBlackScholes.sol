@@ -2,9 +2,9 @@
 pragma solidity ^0.8.28;
 
 /// @title StoaBlackScholes
-/// @notice Atrium options pricing engine — Black-Scholes-Merton + Greeks.
+/// @notice Atrium options pricing engine, Black-Scholes-Merton + Greeks.
 ///
-///         **Status:** Phase-2 conditional per PRD §17 / TDD §13 — Months 6–9
+///         **Status:** Phase-2 conditional per PRD §17 / TDD §13, Months 6–9
 ///         ship contingent on Trailblazer AI grant landing by Month 5. This
 ///         scaffold freezes the public interface so Codex's `/v1/options/price`
 ///         endpoint and Plinth's options-margin call site can target stable
@@ -23,14 +23,14 @@ pragma solidity ^0.8.28;
 ///         Plinth before the call, not here.
 contract StoaBlackScholes {
     /// Phase-2 sentinel. Real impl will return real price; scaffold returns
-    /// 0. Callers detect scaffold state via the `module_status()` view —
+    /// 0. Callers detect scaffold state via the `module_status()` view -
     /// see iter-32 Codex /v1/options route which reads it server-side and
     /// surfaces `live: false` to consumers. Inputs are 1e18-fixed-point.
     ///
     /// Iter 52 audit fix: pre-fix this file declared
     ///   event StoaPhase2NotLive()
     ///   error StoaPhase2NotLive_StaticCallContext()
-    /// — neither was ever emitted or reverted. The docstring claimed
+    ///, neither was ever emitted or reverted. The docstring claimed
     /// emission as the detection mechanism but the code never built it.
     /// `module_status()` view is the actual detection surface and is
     /// already wired end-to-end (Codex → verify-app → LiveQuote refuse-
@@ -47,7 +47,7 @@ contract StoaBlackScholes {
         uint256 rate_e18,
         uint256 time_to_expiry_seconds
     ) external pure returns (uint256 call_price_e18) {
-        // Scaffold input validation — gives callers a real revert reason instead
+        // Scaffold input validation, gives callers a real revert reason instead
         // of a silent zero so the integration tests on the Phase-2 release can
         // exercise the boundary cases before the math is wired up.
         if (spot_e18 == 0) revert InvalidInput("spot");

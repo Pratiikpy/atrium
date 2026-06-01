@@ -1,10 +1,10 @@
-# Incident — oracle drift / staleness
+# Incident, oracle drift / staleness
 
 Trigger: `plinth.oracle.disagreement.count` > 5/hour, or any `OracleStaleError` on Plinth.
 
 ## Response (in order)
 
-1. **Verify the alert is real.** Open `loadtest.atrium.fi`. If both Chainlink and Pyth show fresh prices, the alert is a false positive — silence and document.
+1. **Verify the alert is real.** Open `loadtest.atrium.fi`. If both Chainlink and Pyth show fresh prices, the alert is a false positive, silence and document.
 2. **Identify the disagreeing instrument.** Look at the most recent `OracleDisagreement` event on Plinth.
 3. **Compare with public oracle dashboards.**
    - Chainlink: https://data.chain.link/

@@ -1,6 +1,6 @@
 # Honeybadger Setup
 
-Phase 12 observability — heartbeat monitoring for all Atrium daemons.
+Phase 12 observability, heartbeat monitoring for all Atrium daemons.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ For each, note the check-in URL (format: `https://api.honeybadger.io/v1/check_in
 The heartbeat helper uses a single env var with a `<NAME>` placeholder:
 
 ```bash
-# Template URL — each daemon replaces <NAME> at runtime
+# Template URL, each daemon replaces <NAME> at runtime
 doppler secrets set HONEYBADGER_HEARTBEAT_URL="https://api.honeybadger.io/v1/check_in/<TOKEN_FOR_NAME>"
 ```
 

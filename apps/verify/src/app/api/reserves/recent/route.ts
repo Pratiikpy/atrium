@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 // Audit U-11 fix: previously this route always returned the top 24 rows,
 // while the UI surfaced "24h / 7d / 30d" tabs as if they filtered the
-// data. They didn't — the tabs were dead `<span>` elements with no
+// data. They didn't, the tabs were dead `<span>` elements with no
 // handlers. The window param lets the client choose how many hourly
 // attestation rows to fetch, so the tabs can drive real queries.
 // Lantern publishes hourly so 24/168/720 rows ≈ 24h/7d/30d.

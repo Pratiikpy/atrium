@@ -22,7 +22,7 @@ export default function ScribeHealthPage() {
   }, []);
 
   // Poll /api/scribe/health on the codebase-standard TanStack Query
-  // refetchInterval — not a raw setInterval (see the no-fake-latency
+  // refetchInterval, not a raw setInterval (see the no-fake-latency
   // invariant; setInterval is reserved for fake-latency simulation).
   const { data: health, error, dataUpdatedAt } = useQuery<HealthData, Error>({
     queryKey: ['scribe-health-internal'],

@@ -253,7 +253,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Incident 2026-05-24 follow-up (incidents/2026-05-24-deployer-key-leaked-to-local-temp-log.md):
-      # required backstop to gitleaks — fail if a raw private-key literal is
+      # required backstop to gitleaks, fail if a raw private-key literal is
       # committed in a key context (the leak was `--private-key 0x<64hex>` on a
       # cast / cargo-stylus command line). Context-aware so it does NOT false-fail
       # on tx/block hashes, event topic0, or Pyth feed/instrument ids (also 0x+64hex).

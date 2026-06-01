@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import "forge-std/Test.sol";
 import {AtriumRouter} from "../../contracts/atrium-router/src/AtriumRouter.sol";
 
-/// @title AtriumRouter — v1.0 vs v1.1 adapter ABI auto-detection
+/// @title AtriumRouter, v1.0 vs v1.1 adapter ABI auto-detection
 /// @notice Phase theta.1 fix verification. Pre-fix the Router unconditionally
 ///         called the IPorticoAdapter (v1.0) selectors. AaveHorizonAdapterV11,
 ///         the only v1.1-only adapter deployed today, refused the v1.0
@@ -78,7 +78,7 @@ contract RouterV11RoutingTest is Test {
     }
 
     function test_close_routesV11_whenAdapterIsV11() public {
-        // (sender, tx.origin) so FakePlinth records `user` as the owner —
+        // (sender, tx.origin) so FakePlinth records `user` as the owner -
         // matches AtriumRouter.t.sol FIRE76-1 pattern. Without the second
         // arg tx.origin is the test contract, and the Router's ownership
         // check at close_position_via_adapter would revert NotPositionOwner.
@@ -204,7 +204,7 @@ contract FakeAdapterV10 {
     }
 }
 
-// ── Adapter missing version() — for the AdapterMissingVersion branch ──
+// ── Adapter missing version(), for the AdapterMissingVersion branch ──
 
 contract NoVersionAdapter {
     function open_position(bytes32, int256, bytes calldata) external pure returns (uint256) {

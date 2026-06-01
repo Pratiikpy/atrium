@@ -5,7 +5,7 @@ import { safeErrorDetail } from '../lib/error-safe';
 export const riskRouter = new Hono<{ Bindings: { SCRIBE_URL: string; ENV?: string } }>();
 
 // Audit FFF-7 fix: same EEE-1 address-validation gap. Heaviest endpoint by
-// data volume — un-validated address means burning Scribe credit on each garbage
+// data volume, un-validated address means burning Scribe credit on each garbage
 // call (max 100 positions returned per query in the worst-case).
 const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
 
@@ -54,7 +54,7 @@ riskRouter.get('/snapshot/:address', async (c) => {
 });
 
 /**
- * Audit Month-1 #160 — Codex endpoint 8 of 8 (PRD §17 Day-180 target).
+ * Audit Month-1 #160, Codex endpoint 8 of 8 (PRD §17 Day-180 target).
  *
  * GET /v1/risk/correlations?ids=BTC-PERP,ETH-PERP,…
  *

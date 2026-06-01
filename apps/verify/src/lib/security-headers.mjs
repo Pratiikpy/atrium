@@ -1,5 +1,5 @@
 /**
- * Browser security headers — Phase 3 hardening.
+ * Browser security headers, Phase 3 hardening.
  *
  * Applied to every response via next.config.mjs `headers()`.
  */

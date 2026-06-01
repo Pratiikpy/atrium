@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * NotificationsMobile — Mobile notification inbox.
+ * NotificationsMobile, Mobile notification inbox.
  * Error state is distinct from empty state (E2E-15, E2E-49 fix).
  * 44px touch targets, 80px items, severity color stripe.
  */
@@ -41,11 +41,11 @@ export function NotificationsMobile() {
     refetch();
   }
 
-  // Error state (distinct from empty — E2E-15, E2E-49)
+  // Error state (distinct from empty, E2E-15, E2E-49)
   if (error) {
     return (
       <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load — retry</p>
+        <p className="text-[16px] text-neg">Could not load, retry</p>
         <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
           Retry
         </button>

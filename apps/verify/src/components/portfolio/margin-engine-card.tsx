@@ -56,7 +56,7 @@ export function MarginEngineCard() {
       ) : error ? (
         // Audit TTT-3 fix: pre-fix the error path fell through to
         // `defaultEmptyBars` which rendered "USDC vault 0.0% / HIP-3 perp
-        // 0.0% / T-bill 0.0%" as if real — making a user with actual
+        // 0.0% / T-bill 0.0%" as if real, making a user with actual
         // collateral think their margin account was empty. Error must be
         // explicit; null bars + "pending" sub copy keeps the UI shape
         // without lying about the underlying state.
@@ -80,7 +80,7 @@ export function MarginEngineCard() {
                   <span className="font-mono">
                     {data?.source === 'plinth'
                       ? `${(bar.widthBps / 100).toFixed(1)}%`
-                      : '—'}
+                      : '-'}
                   </span>
                 </div>
                 <div className="mt-1 h-1.5 overflow-hidden rounded-pill bg-divider-soft">
@@ -103,7 +103,7 @@ export function MarginEngineCard() {
               </p>
               <p className="font-mono text-2xl text-ink">
                 {data?.liquidationBufferBps == null
-                  ? '—'
+                  ? '-'
                   : `${(data.liquidationBufferBps / 100).toFixed(1)}%`}
               </p>
             </div>
@@ -119,7 +119,7 @@ export function MarginEngineCard() {
 }
 
 // Audit TTT-3 fix: renamed `defaultEmptyBars` → `defaultPendingBars` and
-// the consumer now suppresses the percentage display (renders "—") when
+// the consumer now suppresses the percentage display (renders "-") when
 // the source isn't 'plinth'. The label set remains so the UI shape stays
 // stable, but no fake-zero percentages get presented as real readings.
 const defaultPendingBars = [

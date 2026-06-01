@@ -62,7 +62,7 @@ for (const file of files) {
   for (let i = 0; i < lines.length; i++) {
     for (const { pattern, word } of BANNED_PATTERNS) {
       if (pattern.test(lines[i])) {
-        console.log(`${file}:${i + 1}: banned word "${word}" — ${lines[i].trim().slice(0, 80)}`);
+        console.log(`${file}:${i + 1}: banned word "${word}", ${lines[i].trim().slice(0, 80)}`);
         hits++;
       }
     }

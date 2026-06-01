@@ -1,4 +1,4 @@
-//! `praetor seed` — seed the local Sepolia fork with demo state.
+//! `praetor seed`, seed the local Sepolia fork with demo state.
 //!
 //! Closes `human_left.md` #30 (YYY-7). The `make demo` golden path
 //! (PRD §26.2 + TDD Tenet 8: ≤90s from clone to running stack) routes
@@ -51,7 +51,7 @@ pub async fn run(network: &str) -> Result<()> {
     // Resolve the seed script path from the workspace root. The CLI may run
     // from `services/praetor-cli/` so we walk up if needed.
     let script_path = find_workspace_relative("scripts/seed.s.sol")
-        .context("scripts/seed.s.sol not found — run `make install` from the repo root first")?;
+        .context("scripts/seed.s.sol not found, run `make install` from the repo root first")?;
 
     info!(rpc_url, "running forge script seed");
     let status = Command::new("forge")
@@ -66,7 +66,7 @@ pub async fn run(network: &str) -> Result<()> {
             "--slow",
         ])
         .status()
-        .context("failed to invoke `forge script` — is foundry installed?")?;
+        .context("failed to invoke `forge script`, is foundry installed?")?;
 
     if !status.success() {
         warn!("forge script exited non-zero; check the demo state by hand");

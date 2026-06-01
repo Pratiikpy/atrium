@@ -5,7 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {AtriumRouter} from "../contracts/atrium-router/src/AtriumRouter.sol";
 import {Rostrum} from "../contracts/rostrum/src/Rostrum.sol";
 
-/// @title Atrium Phase-B.2 deploy — contracts that depend on Plinth
+/// @title Atrium Phase-B.2 deploy, contracts that depend on Plinth
 /// @notice Plinth is now live (Stylus, deployed via cargo-stylus 0.10.7
 ///         multi-fragment factory at 0x485218e340d1e3b272bed337ec59ffe0a3dc4781).
 ///         This script deploys AtriumRouter and Rostrum which both need

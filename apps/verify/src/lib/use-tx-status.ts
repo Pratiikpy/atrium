@@ -28,7 +28,7 @@ export function useTxStatus() {
   const { writeContractAsync } = useWriteContract();
   const { ok: chainOk } = useChainGuard();
 
-  // Receipt watcher — only active when we have a pending hash.
+  // Receipt watcher, only active when we have a pending hash.
   const pendingHash = state.kind === 'pending' ? state.hash : undefined;
   const receipt = useWaitForTransactionReceipt({
     hash: pendingHash,

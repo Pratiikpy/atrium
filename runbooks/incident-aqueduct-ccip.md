@@ -2,7 +2,7 @@
 
 Aqueduct is the cross-chain collateral bridge (Arbitrum Sepolia ⇄
 Polygon Amoy via Chainlink CCIP). When CCIP messages stall, users see
-either pending CrossChainCredit forever, or — worse — a double-spend
+either pending CrossChainCredit forever, or, worse, a double-spend
 window per the claim-then-ack race (TDD §7.6).
 
 ## Severity
@@ -26,13 +26,13 @@ window per the claim-then-ack race (TDD §7.6).
 
 ## Triage (20 min target)
 
-1. CCIP Explorer (https://ccip.chain.link) — paste the `message_id`
+1. CCIP Explorer (https://ccip.chain.link), paste the `message_id`
    from the source-side `CrossChainCredit` event. Confirm whether the
    message is `committed`, `blessed`, or stuck at `pending`.
 2. Check Aqueduct LINK balance on BOTH chains:
    `cast call $AQUEDUCT_ADDR "linkBalance()(uint256)"`
 3. Check `seen_messages` map on the destination Aqueduct for the
-   message_id; if true, the delivery already happened — UI is stale.
+   message_id; if true, the delivery already happened, UI is stale.
 4. Check `ExpiresAtTooSoon` patterns: a user trying to claim-back
    before the minimum-window has elapsed.
 
@@ -44,7 +44,7 @@ window per the claim-then-ack race (TDD §7.6).
 | CCIP message stuck > 24h | Open CCIP support ticket; advise user to wait or claim-back after `expires_at` | yes |
 | Replay-guard misfire (false positive) | Investigate `seen_messages` state; root-cause in code; do NOT manually clear the mapping | yes |
 | Double-spend window observed | Praetor multisig emergencyPause Aqueduct on BOTH chains immediately; quantify exposure | yes |
-| Reorg-induced ack lost | Wait for finality + retry — handler is idempotent per the ack-registry fix (B-12) | yes |
+| Reorg-induced ack lost | Wait for finality + retry, handler is idempotent per the ack-registry fix (B-12) | yes |
 
 ## Resolution checklist
 

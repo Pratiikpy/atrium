@@ -15,7 +15,7 @@ database_id = "8b12341f-c7a7-4b22-a5bf-28e5dc131bf1"
 ENV = "production"
 # Iteration 41/42 audit fix: PLACEHOLDER values must be obviously non-hex /
 # non-URL so the server's runtime validation rejects them. Pre-fix
-# CODEX_PAY_TO_ADDRESS defaulted to 0x000...0 — structurally valid hex,
+# CODEX_PAY_TO_ADDRESS defaulted to 0x000...0, structurally valid hex,
 # truthy in JS, and accepted by the original `if (!expectedPayTo)` check.
 # An attacker burning USDC to 0x0 would satisfy payment verification.
 # Now: the placeholders fail format-validation outright so a deploy that
@@ -29,7 +29,7 @@ ARBITRUM_SEPOLIA_RPC = "https://sepolia-rollup.arbitrum.io/rpc"
 # Arbitrum Sepolia USDC (verified at https://docs.circle.com/stablecoins/usdc-on-test-networks).
 CODEX_USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"
 # Phase theta audit follow-up (2026-05-25): pre-fix this value was the
-# deployer EOA 0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42 — leaked on
+# deployer EOA 0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42, leaked on
 # 2026-05-24 (see incidents/). Any wrangler deploy that forgot to override
 # would route x402 payments to the leaked address. Following the comment
 # above (placeholders must be obviously non-hex), the placeholder now

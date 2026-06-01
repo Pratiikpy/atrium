@@ -22,8 +22,8 @@ The public Hyperliquid endpoint at /info exposes CANDLES (OHLC bars), NOT
 per-trader trade history. Pre-fix the script silently synthesized 1:1
 perfectly-hedged trade pairs from each candle and published the resulting
 "savings_bps" on-chain as a real backtest. That output was structurally
-fake — a perfectly-hedged pair trivially shows SPAN savings, but no real
-trader's portfolio looks like that — and committing it via
+fake, a perfectly-hedged pair trivially shows SPAN savings, but no real
+trader's portfolio looks like that, and committing it via
 ResearchAttestation.publish would make the chain itself an attestation
 of fake methodology.
 
@@ -32,7 +32,7 @@ founder's paid Hyperliquid archive key + a real per-trader fetch path,
 which is Wave-1 engineering. `synthetic-pairs` (testnet harness sanity
 check) is the legacy path, but the JSON output gets `data_mode:
 "synthetic-pairs"` and the verify-app refuses to render such results
-as a published backtest claim. There is no default — operators must
+as a published backtest claim. There is no default, operators must
 choose explicitly so nobody accidentally publishes synthetic numbers.
 """
 
@@ -98,7 +98,7 @@ def atrium_span_margin_required(positions: list[Trade]) -> float:
     by_class = defaultdict(list)
     for p in positions:
         # Audit fix (iteration 28): pre-fix this divided by `p.entry_price`
-        # in the pnl calc below — a zero-priced position (stub data, unset
+        # in the pnl calc below, a zero-priced position (stub data, unset
         # entry, bad source row) would raise ZeroDivisionError mid-loop,
         # leaving the per-class loss partially summed and the total margin
         # silently undercounting. Skip with a structural warning so the
@@ -140,7 +140,7 @@ def fetch_synthetic_pairs_from_candles(start: datetime, end: datetime, limit: in
     a hedged-pair portfolio at each candle close so the SPAN math has
     something to chew on for harness sanity checks.
 
-    Renamed from `fetch_hyperliquid_trades` (pre-fix name) — the old name
+    Renamed from `fetch_hyperliquid_trades` (pre-fix name), the old name
     falsely implied "real Hyperliquid trade history" to anyone reading the
     main() flow. Output downstream MUST flag `data_mode: synthetic-pairs`
     so the on-chain ResearchAttestation consumer can refuse to render this
@@ -202,7 +202,7 @@ def fetch_real_trades(start: datetime, end: datetime, limit: int) -> list[Trade]
     _ = (start, end, limit)  # silence unused-arg lint
     raise NotImplementedError(
         "real-trades data mode not wired (requires paid Hyperliquid archive API). "
-        "Use --data-mode synthetic-pairs for harness testing only — its results "
+        "Use --data-mode synthetic-pairs for harness testing only, its results "
         "must not be published as a real backtest claim."
     )
 
@@ -220,7 +220,7 @@ def main() -> int:
     ap.add_argument("--end", required=True)
     ap.add_argument("--limit", type=int, default=500)
     ap.add_argument("--output", required=True)
-    # Audit fix (iteration 28): the data-mode gate is REQUIRED — no
+    # Audit fix (iteration 28): the data-mode gate is REQUIRED, no
     # default. Pre-fix `fetch_hyperliquid_trades` silently synthesized
     # hedged pairs from candle data, but the result was published on-chain
     # as a real "Q1 2026 backtest" via ResearchAttestation. Now operators
@@ -232,7 +232,7 @@ def main() -> int:
         choices=["real-trades", "synthetic-pairs"],
         help=(
             "real-trades: paid HL archive (Wave-1, not yet wired). "
-            "synthetic-pairs: harness sanity check — output tagged "
+            "synthetic-pairs: harness sanity check, output tagged "
             "synthetic; MUST NOT be published as a real backtest."
         ),
     )
@@ -276,7 +276,7 @@ def main() -> int:
         "schema_version": 2,
         # Audit fix: pre-fix used `datetime.utcnow().isoformat() + "Z"`
         # which is deprecated in Python 3.12+. `now(timezone.utc)` carries
-        # tzinfo and ISO-formats with "+00:00" — equivalent semantics,
+        # tzinfo and ISO-formats with "+00:00", equivalent semantics,
         # future-proof.
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "period_start": args.start,

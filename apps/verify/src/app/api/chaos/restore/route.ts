@@ -12,7 +12,7 @@ import { requireChaosBearer } from '@/lib/chaos-auth';
  * Verifier walk Step 4 self-heals within ~30 s. Idempotent: calling
  * restore on a non-paused contract is a no-op rather than a revert.
  *
- * Same posture + same gates as /inject — Origin allowlist + per-IP
+ * Same posture + same gates as /inject, Origin allowlist + per-IP
  * rate limit. Phase theta audit follow-up (2026-05-25): pre-fix this
  * comment claimed "Same Bearer-token gate as /inject" but neither
  * route enforced a Bearer header. Aligned both files with what they

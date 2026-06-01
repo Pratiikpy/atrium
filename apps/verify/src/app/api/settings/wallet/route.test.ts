@@ -21,7 +21,7 @@ import { loadContractAddress } from '@/lib/deployments-registry';
  *   sensitive field null.
  *
  * Three branches:
- *   - No wallet → address:"—", all nulls, pending.
+ *   - No wallet → address:"-", all nulls, pending.
  *   - Wallet but no Postern deployment → address+ens, all other nulls, pending.
  *   - Wallet + Postern deployed → fully-populated metadata, source:postern.
  */
@@ -44,11 +44,11 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ENS = ORIGINAL_ENS;
 });
 
-describe('GET /api/settings/wallet — no wallet branch', () => {
-  it('returns address:"—" + every-field-null + source:pending', async () => {
+describe('GET /api/settings/wallet, no wallet branch', () => {
+  it('returns address:"-" + every-field-null + source:pending', async () => {
     const { GET } = await import('./route');
     const json = await (await GET()).json();
-    expect(json.address).toBe('—');
+    expect(json.address).toBe('-');
     expect(json.ens).toBeNull();
     expect(json.authenticator).toBeNull();
     expect(json.bundler).toBeNull();
@@ -65,7 +65,7 @@ describe('GET /api/settings/wallet — no wallet branch', () => {
   });
 });
 
-describe('GET /api/settings/wallet — wallet set, Postern NOT deployed (NN-2)', () => {
+describe('GET /api/settings/wallet, wallet set, Postern NOT deployed (NN-2)', () => {
   it('returns wallet+ens but every Postern-derived field null', async () => {
     const wallet = '0x' + 'a'.repeat(40);
     process.env.DEMO_WALLET_ADDRESS = wallet;
@@ -96,7 +96,7 @@ describe('GET /api/settings/wallet — wallet set, Postern NOT deployed (NN-2)',
   });
 });
 
-describe('GET /api/settings/wallet — Postern deployed branch', () => {
+describe('GET /api/settings/wallet, Postern deployed branch', () => {
   it('reports honest wallet state (no fabricated Pimlico/4337) when registry is deployed', async () => {
     const wallet = '0x' + 'c'.repeat(40);
     process.env.DEMO_WALLET_ADDRESS = wallet;

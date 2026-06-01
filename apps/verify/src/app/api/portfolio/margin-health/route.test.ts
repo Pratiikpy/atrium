@@ -48,7 +48,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/portfolio/margin-health — LL-7 (no +1n bias)', () => {
+describe('GET /api/portfolio/margin-health, LL-7 (no +1n bias)', () => {
   it('returns 10_000 bar width when required=0 (special-case)', async () => {
     (tryGetPlinth as any).mockResolvedValue(fakePlinth(100_000n, 0n));
     const { GET } = await import('./route');
@@ -85,7 +85,7 @@ describe('GET /api/portfolio/margin-health — LL-7 (no +1n bias)', () => {
   });
 });
 
-describe('GET /api/portfolio/margin-health — LL-8 (BigInt-to-Number clamp)', () => {
+describe('GET /api/portfolio/margin-health, LL-8 (BigInt-to-Number clamp)', () => {
   it('clamps marginHealthBps at 1_000_000 on absurd ratio', async () => {
     // collateral 1e30 wei vs required 1 wei → ratio = 1e34, way past
     // Number.MAX_SAFE_INTEGER. LL-8 clamp keeps the output bounded
@@ -126,7 +126,7 @@ describe('GET /api/portfolio/margin-health — LL-8 (BigInt-to-Number clamp)', (
   });
 });
 
-describe('GET /api/portfolio/margin-health — pending paths', () => {
+describe('GET /api/portfolio/margin-health, pending paths', () => {
   it('returns pending when plinth is unavailable', async () => {
     (tryGetPlinth as any).mockResolvedValue(null);
     const { GET } = await import('./route');

@@ -37,7 +37,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/notifications — S-6 unix sort', () => {
+describe('GET /api/notifications, S-6 unix sort', () => {
   it('sorts inbox by numeric tsUnix desc, not by lexical ago() string', async () => {
     // Pre-S-6: sort would compare "10m ago" < "2m ago" alphabetically,
     // putting older items above newer ones whenever the ago-unit count
@@ -81,7 +81,7 @@ describe('GET /api/notifications — S-6 unix sort', () => {
   });
 });
 
-describe('GET /api/notifications — II-1 bad-timestamp drop', () => {
+describe('GET /api/notifications, II-1 bad-timestamp drop', () => {
   it('drops liquidations with NaN timestamp', async () => {
     (gql as any).mockResolvedValue({
       liquidationEvents: [
@@ -140,7 +140,7 @@ describe('GET /api/notifications — II-1 bad-timestamp drop', () => {
   });
 });
 
-describe('GET /api/notifications — T-6/U-7 wire safety', () => {
+describe('GET /api/notifications, T-6/U-7 wire safety', () => {
   it('strips tsUnix from wire response', async () => {
     (gql as any).mockResolvedValue({
       liquidationEvents: [
@@ -174,7 +174,7 @@ describe('GET /api/notifications — T-6/U-7 wire safety', () => {
   });
 });
 
-describe('GET /api/notifications — severity + meta semantics', () => {
+describe('GET /api/notifications, severity + meta semantics', () => {
   it('marks liquidations as severity:danger', async () => {
     (gql as any).mockResolvedValue({
       liquidationEvents: [
@@ -214,7 +214,7 @@ describe('GET /api/notifications — severity + meta semantics', () => {
   });
 });
 
-describe('GET /api/notifications — pending paths', () => {
+describe('GET /api/notifications, pending paths', () => {
   it('returns pending when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');

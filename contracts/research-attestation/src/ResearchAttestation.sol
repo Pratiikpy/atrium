@@ -25,7 +25,7 @@ contract ResearchAttestation {
     error InvalidIpfsHash();
 
     constructor(address _praetor_timelock) {
-        // Audit DDD-5 fix: zero timelock bricks the contract — only the
+        // Audit DDD-5 fix: zero timelock bricks the contract, only the
         // timelock can publish backtests; no attestation could ever land.
         require(_praetor_timelock != address(0), "zero timelock");
         praetor_timelock = _praetor_timelock;

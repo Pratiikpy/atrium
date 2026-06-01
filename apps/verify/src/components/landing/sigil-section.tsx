@@ -31,7 +31,7 @@ export function SigilSection() {
 function MandateCard() {
   // Audit P-9 fix: card uses `--color-dark-bg` (rgb(16,16,16)) so it matches
   // the section ground exactly. Previously this used `bg-ink-darkest`
-  // (oklch(0.11 0.008 60)) which is ~rgb(28,25,23) — visibly lighter than
+  // (oklch(0.11 0.008 60)) which is ~rgb(28,25,23), visibly lighter than
   // the section, so the card looked like it floated on a slightly darker
   // canvas. Both surfaces now share the same flat slab.
   // We also use a subtle border-soft outline so the card is still legible.

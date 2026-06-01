@@ -1,5 +1,5 @@
 /**
- * Shared types for /app/tax — the jurisdiction enum mirrors the
+ * Shared types for /app/tax, the jurisdiction enum mirrors the
  * `/api/tax/*` route gates (which accept only uk/us/eu/other).
  */
 // Audit U-30 follow-up: the upstream Tablet service (services/tablet/

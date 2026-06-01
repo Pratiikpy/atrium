@@ -3,7 +3,7 @@
  *
  * Triggered by the schedule in vercel.json. Re-uses publishOnce() from the
  * core attestor so the logic is identical to local dev (`pnpm dev`) and
- * any future non-Vercel host (Fly machine, $5 VPS) — only the wrapper
+ * any future non-Vercel host (Fly machine, $5 VPS), only the wrapper
  * differs.
  *
  * Auth: Vercel cron requests carry the `Authorization: Bearer <CRON_SECRET>`
@@ -14,7 +14,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { publishOnce } from './_publish-once.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Cron-only — anyone else gets 401. Vercel injects this header.
+  // Cron-only, anyone else gets 401. Vercel injects this header.
   const expected = process.env.CRON_SECRET;
   if (!expected) {
     res.status(500).json({ error: 'CRON_SECRET not configured' });

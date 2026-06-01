@@ -11,7 +11,7 @@ import { instrumentIdsForVenues } from './instruments';
  * Mandate-issuance state machine. Wires the user's wallet signature into
  * the IntentSigil flow that Plinth/Sigil read at action time.
  *
- * Architecture: Sigil does NOT have an `issueIntent` on-chain function —
+ * Architecture: Sigil does NOT have an `issueIntent` on-chain function -
  * intents live off-chain until an agent's first action references them
  * (Sigil.validate_action recovers the owner from the signature on every
  * call). So the issuance path is:
@@ -20,7 +20,7 @@ import { instrumentIdsForVenues } from './instruments';
  *   2. Build the EIP-712 envelope (lib/sigil-typed-data.ts)
  *   3. User signs via wallet (useSignTypedData)
  *   4. POST {envelope, signature, intentHash} to /api/agents/issue-mandate
- *      — server stores in Codex so the agent + future sessions can look
+ *     , server stores in Codex so the agent + future sessions can look
  *      up the signed bytes by hash.
  *
  * Honest failure modes:
@@ -91,7 +91,7 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
       expiresAt,
       nonce,
       // Read via Sigil.get_agent_revocation_nonce(owner, agent) when the
-      // contract is deployed. Default to 0 today — the contract treats 0
+      // contract is deployed. Default to 0 today, the contract treats 0
       // as "no revocations yet" so signatures still verify after Sigil
       // ships, as long as the user hasn't pre-revoked.
       agentRevocationNonceAtSigning: 0n,
@@ -151,7 +151,7 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
       if (j.ok) {
         setStatus({ kind: 'success', intentHash, signature });
       } else {
-        // Server validated but storage isn't wired yet — still honest
+        // Server validated but storage isn't wired yet, still honest
         // because the signature exists locally and the user can present
         // it to the agent directly.
         setStatus({
@@ -161,7 +161,7 @@ export function useIssueMandate(sigilAddress: `0x${string}` | null, chainId: num
         });
       }
     } catch (e) {
-      // Network error — signature is still valid. Promote to success so
+      // Network error, signature is still valid. Promote to success so
       // the user doesn't lose the work; the storage layer can be retried.
       setStatus({ kind: 'success', intentHash, signature });
     }

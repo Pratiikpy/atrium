@@ -14,7 +14,7 @@ import { NextRequest } from 'next/server';
  *   HTTP headers into the response.
  * - 503 on TABLET_URL unset: the export surface is a file download.
  *   A "no data" download would silently ship an empty file labeled
- *   "atrium-tax-uk-2026.csv" — confusing for users + bad audit
+ *   "atrium-tax-uk-2026.csv", confusing for users + bad audit
  *   trail. 503 forces the consumer to surface "Tablet pending"
  *   instead.
  */
@@ -36,7 +36,7 @@ afterEach(() => {
   else process.env.TABLET_URL = ORIGINAL_TABLET_URL;
 });
 
-describe('GET /api/tax/export — 503 when Tablet undeployed', () => {
+describe('GET /api/tax/export, 503 when Tablet undeployed', () => {
   it('returns 503 + tablet_pending when TABLET_URL unset', async () => {
     const { GET } = await import('./route');
     const res = await GET(makeRequest(''));
@@ -58,7 +58,7 @@ describe('GET /api/tax/export — 503 when Tablet undeployed', () => {
   });
 });
 
-describe('GET /api/tax/export — LL-1 closed-enum format gate', () => {
+describe('GET /api/tax/export, LL-1 closed-enum format gate', () => {
   it('clamps invalid format to csv in upstream URL', async () => {
     let captured: string | undefined;
     process.env.TABLET_URL = 'http://tablet-mock';
@@ -89,7 +89,7 @@ describe('GET /api/tax/export — LL-1 closed-enum format gate', () => {
   });
 });
 
-describe('GET /api/tax/export — LL-2 filename + Content-Type sanitization', () => {
+describe('GET /api/tax/export, LL-2 filename + Content-Type sanitization', () => {
   it('renders sanitized Content-Disposition filename', async () => {
     process.env.TABLET_URL = 'http://tablet-mock';
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
@@ -145,7 +145,7 @@ describe('GET /api/tax/export — LL-2 filename + Content-Type sanitization', ()
       new Response(new ArrayBuffer(8), { status: 200, headers: { 'content-type': 'application/json' } }),
     );
     const { GET } = await import('./route');
-    // Injection attempt — these would-be CRLF injectors get clamped by
+    // Injection attempt, these would-be CRLF injectors get clamped by
     // the enum/range gates BEFORE reaching the filename builder.
     const res = await GET(makeRequest('format=csv%0d%0aX:%20bad&jurisdiction=evilcorp&year=NaN'));
     const disposition = res.headers.get('content-disposition');

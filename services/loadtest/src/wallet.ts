@@ -1,5 +1,5 @@
 /**
- * Loadtest wallet — uses dedicated LOADTEST_EOA_KEY (Phase 6, FULL_AUDIT #68).
+ * Loadtest wallet, uses dedicated LOADTEST_EOA_KEY (Phase 6, FULL_AUDIT #68).
  *
  * NEVER uses the deployer key. Fails loudly if not configured.
  */
@@ -13,7 +13,7 @@ export function getLoadtestWallet() {
   if (!key || key.trim() === '') {
     throw new Error(
       '[loadtest] FATAL: LOADTEST_EOA_KEY not set. ' +
-        'This must be a dedicated testnet EOA — never the deployer key. ' +
+        'This must be a dedicated testnet EOA, never the deployer key. ' +
         'See services/loadtest/.env.example and runbooks/loadtest-eoa.md.',
     );
   }

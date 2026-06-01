@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * generate-lantern-key.mjs — one-shot Lantern signing-key bootstrap
+ * generate-lantern-key.mjs, one-shot Lantern signing-key bootstrap
  *
  * Generates a fresh secp256k1 key, encrypts it with a user-chosen passphrase
- * (AES-256-GCM keyed by scrypt — same envelope shape that services/lantern-
+ * (AES-256-GCM keyed by scrypt, same envelope shape that services/lantern-
  * attestor/api/_signer.ts expects), and writes the envelope to a path
  * OUTSIDE the repo tree.
  *
@@ -23,7 +23,7 @@
  * # After running this
  *
  *  1. Take note of the printed ETH address.
- *  2. Authorise that address as the Lantern signing key on-chain — call
+ *  2. Authorise that address as the Lantern signing key on-chain, call
  *     LanternAttestor.setSigner(address) from the deployer wallet.
  *  3. Set the following env vars in Vercel:
  *       LANTERN_KEY_PATH       = /var/task/lantern-key.json (or wherever you upload it)
@@ -72,14 +72,14 @@ function parseArgs() {
 }
 
 function help() {
-  console.log(`generate-lantern-key — bootstrap a Lantern attestation signer
+  console.log(`generate-lantern-key, bootstrap a Lantern attestation signer
 
 required:
   --out PATH                where to write the encrypted envelope JSON
 
 optional:
   --address-out PATH        also write the public ETH address here
-  --passphrase TEXT         supply passphrase as a flag (skip prompt — CI use)
+  --passphrase TEXT         supply passphrase as a flag (skip prompt, CI use)
   -h, --help                this message
 `);
 }
@@ -124,7 +124,7 @@ async function main() {
     exit(2);
   }
 
-  // Refuse to write inside the repo tree — same guard the signer enforces.
+  // Refuse to write inside the repo tree, same guard the signer enforces.
   const outAbs = resolve(args.out);
   const scriptDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = await realpath(resolve(scriptDir, '..'));

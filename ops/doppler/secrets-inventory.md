@@ -1,9 +1,9 @@
-# Secrets inventory — Doppler config mapping
+# Secrets inventory, Doppler config mapping
 
 Every env var used across the project, organized by Doppler config.
 
 Source files walked: `.env.example` (root), `agents/.env.example`.
-No per-service `.env.example` files exist yet — services inherit from root.
+No per-service `.env.example` files exist yet, services inherit from root.
 
 ---
 

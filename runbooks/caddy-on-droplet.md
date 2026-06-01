@@ -76,4 +76,4 @@ curl -I https://tablet.atrium.fi/healthz
 
 1. Add a new block to `/etc/caddy/Caddyfile`.
 2. Add DNS A record for the new subdomain.
-3. `systemctl reload caddy` — Caddy auto-provisions the cert.
+3. `systemctl reload caddy`, Caddy auto-provisions the cert.

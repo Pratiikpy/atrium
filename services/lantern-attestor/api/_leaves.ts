@@ -1,8 +1,8 @@
 /**
- * Lantern leaf builder (Vercel api/ path) — share-redemption-aware.
+ * Lantern leaf builder (Vercel api/ path), share-redemption-aware.
  *
  * Mirror of src/leaves.ts. Every leaf's balance is sourced on-chain via
- * Coffer.convertToAssets(balanceOf(user)) — NOT the subgraph's net-deposit
+ * Coffer.convertToAssets(balanceOf(user)), NOT the subgraph's net-deposit
  * `balanceWei`. Scribe only provides the user list; balance authority is the
  * EVM. Batches of 100 users, 5 concurrent multicalls.
  */

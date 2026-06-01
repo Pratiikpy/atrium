@@ -12,7 +12,7 @@ import path from 'node:path';
  * `../../docs/plan-tracker.md` at request time. On Vercel the
  * serverless bundle does not package files outside the Next.js project
  * root, so every production request returned `findings: []` with
- * `source: 'pending'` — silently displaying "no audit findings".
+ * `source: 'pending'`, silently displaying "no audit findings".
  * Now we ship a pre-generated `public/audit-findings.json` (produced
  * by scripts/build-audit-findings.mjs at build time) and the route is
  * a thin deserializer over that file.

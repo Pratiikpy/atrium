@@ -2,7 +2,7 @@
  * Scribe health check for notifier.
  *
  * Phase 2c added inline health check; this refactors to a shared helper.
- * If lagBlocks > 200, skip the tick — alerts from a stale indexer would
+ * If lagBlocks > 200, skip the tick, alerts from a stale indexer would
  * be delayed anyway and could fire duplicates on catch-up.
  */
 

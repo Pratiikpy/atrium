@@ -11,7 +11,7 @@ import { PortfolioMobile } from '@/components/mobile/panels/portfolio-mobile';
 import { TestnetPill } from '@/components/ui/testnet-pill';
 
 /**
- * /app/portfolio — Atrium "Unified margin" view.
+ * /app/portfolio, Atrium "Unified margin" view.
  *
  * Layout matches `design/Atrium App.standalone.html#portfolio` exactly:
  *  - 4-stat row across the top (TVL · req margin · notional · 24h PnL)
@@ -22,7 +22,7 @@ import { TestnetPill } from '@/components/ui/testnet-pill';
  *
  * Each card is its own component that reads live data via /api/portfolio/*.
  * Until contracts deploy on Sepolia (Month 1 W2), every numeric value renders
- * "—" with a per-card source caption ("from Plinth", "from Scribe", etc).
+ * "-" with a per-card source caption ("from Plinth", "from Scribe", etc).
  */
 
 export const metadata = {
@@ -32,7 +32,7 @@ export const metadata = {
 
 // Audit U-21: open-positions table now has per-row Close buttons that call
 // wagmi's useWriteContract via useClosePosition. Same WagmiProvider-required
-// concern as vault/agents/trade — force-dynamic prevents prerender from
+// concern as vault/agents/trade, force-dynamic prevents prerender from
 // throwing WagmiProviderNotFoundError. Portfolio state is wallet-specific
 // anyway.
 export const dynamic = 'force-dynamic';
@@ -83,7 +83,7 @@ export default function PortfolioPage() {
           </p>
         </div>
         {/* Header CTAs match the prototype's view-actions ("Open position",
-            "Deposit"). Routing to the existing real pages — no fake handlers. */}
+            "Deposit"). Routing to the existing real pages, no fake handlers. */}
         <div className="flex flex-wrap gap-2">
           <TestnetPill />
           <Link
@@ -103,7 +103,7 @@ export default function PortfolioPage() {
 
       {/* Audit-pinned: Top-up banner only renders when bufferBps is below the
           warning threshold AND source is live (not "pending"). Hidden no-op
-          otherwise — does not push the stat row down for healthy accounts. */}
+          otherwise, does not push the stat row down for healthy accounts. */}
       <section className="mt-6">
         <TopUpBanner />
       </section>

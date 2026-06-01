@@ -1,4 +1,4 @@
-"""UK Capital Gains Tax — same-day → bed-and-breakfasting → s.104 pool.
+"""UK Capital Gains Tax, same-day → bed-and-breakfasting → s.104 pool.
 
 References:
   - HMRC HS284 "Shares and Capital Gains Tax"
@@ -77,7 +77,7 @@ def calculate_uk_cgt(trades: Iterable[Trade]) -> CgtReport:
     Audit I-7 fix: the prior single-pass implementation appended buys to
     `acquisitions[key]` as it walked the chronological trade list, so when
     a disposal was processed the BnB filter could only see buys that had
-    ALREADY been appended — future buys within the 30-day post-disposal
+    ALREADY been appended, future buys within the 30-day post-disposal
     window were invisible. HMRC HS284 requires looking forward 30 days,
     not just backward.
 

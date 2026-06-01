@@ -1,4 +1,4 @@
-// EIP-712 typed-data hashing + ECDSA signature recovery — pure module.
+// EIP-712 typed-data hashing + ECDSA signature recovery, pure module.
 //
 // The security boundary for the entire agent layer. Plinth calls
 // Sigil.validate_action before every agent-driven position open; this module
@@ -9,7 +9,7 @@
 // AUDIT WW-1 WATCH-ITEM: the EIP-712 type string declares `venues_allowed`
 // as `bytes32[]`. The Rust struct uses `Vec<u8>` and encodes each venue id
 // as a single byte in the LOW byte of a 32-byte word (right-padded zero).
-// This is the EQUIVALENT bytes32 encoding for small uint8 values — verified
+// This is the EQUIVALENT bytes32 encoding for small uint8 values, verified
 // by the PolymarketAdapter + HyperliquidHybridAdapter Foundry test suites
 // which round-trip signatures. WHEN the frontend's wagmi `signTypedData`
 // integration lands (Month 1 W2 per docs/ROADMAP.md), the TypedData spec
@@ -35,7 +35,7 @@ pub const ACTION_SIGIL_TYPE_STRING: &[u8] =
 
 /// Compile-time keccak256 of the EIP-712 type strings. `keccak_const::Keccak256`
 /// is `const fn` so the typehash is computed at build time and embedded as a
-/// constant — no risk of off-by-one byte drift between the type string and
+/// constant, no risk of off-by-one byte drift between the type string and
 /// the typehash. Compiles to the same bytes a `cast keccak <TYPE_STRING>`
 /// call would produce.
 pub const DOMAIN_TYPEHASH: B256 = B256::new(
@@ -170,7 +170,7 @@ pub fn final_digest(domain_sep: B256, struct_hash: B256) -> B256 {
 // k256 is a dev-dep so this path is gated to test builds. cargo-stylus
 // invokes `cargo run --features=export-abi` against the host target, which
 // also satisfies `cfg(not(target_arch = "wasm32"))` but does NOT pull in
-// dev-deps — using `cfg(test)` keeps the dep where it belongs.
+// dev-deps, using `cfg(test)` keeps the dep where it belongs.
 #[cfg(all(test, not(target_arch = "wasm32")))]
 pub fn recover_signer(digest: &B256, sig: &Signature) -> Option<Address> {
     use k256::ecdsa::{RecoveryId, Signature as K256Sig, VerifyingKey};
@@ -278,7 +278,7 @@ pub enum DecodeError {
 ///
 /// Trailing 65 bytes: ECDSA signature (r ‖ s ‖ v).
 ///
-/// MAX_VENUES = MAX_INSTRUMENTS = 8 — anything larger is rejected to bound
+/// MAX_VENUES = MAX_INSTRUMENTS = 8, anything larger is rejected to bound
 /// gas + reject malformed envelopes early.
 pub fn decode_intent(bytes: &[u8]) -> Result<IntentEnvelope, DecodeError> {
     const FIXED_BODY_END: usize = 256;
@@ -416,7 +416,7 @@ pub enum CapViolation {
 
 /// Returns Ok(()) if every cap in the IntentSigil is respected by the
 /// ActionSigil; Err(CapViolation) names which cap was violated.
-/// Does NOT check signatures, revocation, or rate limits — those are runtime state.
+/// Does NOT check signatures, revocation, or rate limits, those are runtime state.
 pub fn caps_respected(intent: &IntentSigil, action: &ActionSigil) -> Result<(), CapViolation> {
     if !intent.venues_allowed.iter().any(|&v| v == action.venue_id) {
         return Err(CapViolation::Venue(action.venue_id));
@@ -509,7 +509,7 @@ mod tests {
             submitted_at: 0,
             action_nonce: U256::ZERO,
         };
-        // Iter 51: was `assert!(!caps_respected(...))` — checked rejection but
+        // Iter 51: was `assert!(!caps_respected(...))`, checked rejection but
         // not WHICH cap. Now: assert the Venue variant specifically so a
         // future refactor that broke the dispatch (e.g. matching instrument
         // before venue and reporting the wrong cap) would fail this test.
@@ -539,7 +539,7 @@ mod tests {
             action_nonce: U256::ZERO,
         };
         // Iter 51: assert the Notional variant specifically so the dispatch
-        // ordering is locked. Pre-fix this only asserted rejection — a
+        // ordering is locked. Pre-fix this only asserted rejection, a
         // refactor that moved the venue check after the notional check would
         // still pass but report the wrong cap.
         assert_eq!(

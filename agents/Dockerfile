@@ -22,7 +22,7 @@ COPY services/praetor-cli/Cargo.toml services/praetor-cli/
 RUN mkdir -p agents/augur/src agents/haruspex/src agents/auspex/src agents/template/src services/praetor-cli/src && \
     echo 'fn main(){}' | tee agents/augur/src/main.rs agents/haruspex/src/main.rs agents/auspex/src/main.rs agents/template/src/main.rs services/praetor-cli/src/main.rs
 
-# Pre-fetch deps. Failure here usually means a missing system lib —
+# Pre-fetch deps. Failure here usually means a missing system lib -
 # add it via apt-get above.
 RUN cargo fetch --locked
 
@@ -34,7 +34,7 @@ COPY services services
 RUN cargo build --release --bin augur --bin haruspex --bin auspex
 
 # -----------------------------------------------------------------------------
-# Runtime stage — tiny image with just the binaries and CA certificates.
+# Runtime stage, tiny image with just the binaries and CA certificates.
 # -----------------------------------------------------------------------------
 FROM debian:bookworm-slim AS runtime
 
@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Run as a dedicated non-root user (security hardening — the runtime only
+# Run as a dedicated non-root user (security hardening, the runtime only
 # needs to execute the binaries and write its state dir).
 RUN useradd --system --uid 10001 --user-group --no-create-home atrium
 

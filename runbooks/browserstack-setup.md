@@ -59,7 +59,7 @@ wss://cdp.lambdatest.com/playwright?capabilities=${encodeURIComponent(JSON.strin
 | Issue | Fix |
 |---|---|
 | `wsEndpoint` timeout | Check BrowserStack status page; ensure credentials are valid |
-| Tests pass locally but fail on BS | Add `{ timeout: 60_000 }` to assertions — network latency is higher |
+| Tests pass locally but fail on BS | Add `{ timeout: 60_000 }` to assertions, network latency is higher |
 | Missing browser | Update `browser_version` in config caps |
 
 ## Cost management

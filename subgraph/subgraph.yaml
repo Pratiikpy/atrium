@@ -1,5 +1,5 @@
 specVersion: 0.0.5
-description: Scribe — Atrium event indexer for The Graph
+description: Scribe, Atrium event indexer for The Graph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -150,7 +150,7 @@ dataSources:
           file: ./abis/Aqueduct.json
       eventHandlers:
         # Audit K-1 fix: signature now matches the actual emission (6 args,
-        # 2 indexed) — the prior 7-arg / 3-indexed signature produced a
+        # 2 indexed), the prior 7-arg / 3-indexed signature produced a
         # different topic hash so the handler never fired.
         - event: CrossChainCredit(indexed bytes32,indexed address,uint64,uint64,uint256,uint256)
           handler: handleCrossChainCredit
@@ -220,7 +220,7 @@ dataSources:
         - event: IntentValidated(indexed address,indexed address,bytes32)
           handler: handleIntentValidated
         # Tier-2 defensive observability. Plinth-driven credit-line decrement
-        # (audit HHH-4) — mandate-usage cap dashboard data source.
+        # (audit HHH-4), mandate-usage cap dashboard data source.
         - event: SigilOpenNotionalDecremented(indexed address,uint256,uint256,uint256)
           handler: handleSigilOpenNotionalDecremented
       file: ./src/sigil.ts
@@ -321,7 +321,7 @@ dataSources:
         - event: KillSwitchActivated(indexed address,uint256,uint256,uint256)
           handler: handleKillSwitchActivated
         # Tier-2 defensive observability. Partial-failure path of the kill
-        # switch — without indexing this, the UI would render "everything
+        # switch, without indexing this, the UI would render "everything
         # revoked" even when some agents were skipped.
         - event: SigilRevokeSkipped(indexed address,indexed address,bytes)
           handler: handleSigilRevokeSkipped

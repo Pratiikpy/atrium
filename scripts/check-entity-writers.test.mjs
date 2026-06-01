@@ -10,7 +10,7 @@ import { hasWriter, WRITER_IGNORE } from './check-entity-writers.mjs';
  * The gate runs `\bnew\s+<EntityName>\s*\(` against the concatenated
  * handler-file blob. A bug in that regex would either:
  *   - false-positive: match a comment or unrelated identifier, marking
- *     a ghost as written (silent ghost-entity bug — the verify-app
+ *     a ghost as written (silent ghost-entity bug, the verify-app
  *     leaderboards-empty regression that motivated this gate).
  *   - false-negative: fail to match a real writer, marking a real
  *     entity as a ghost (loud CI failure, easier to triage).
@@ -19,7 +19,7 @@ import { hasWriter, WRITER_IGNORE } from './check-entity-writers.mjs';
  * adversarial inputs.
  */
 
-describe('hasWriter — positive matches', () => {
+describe('hasWriter, positive matches', () => {
   it('matches "new Entity(" with one space', () => {
     const blob = `new Position(event.params.id);`;
     assert.equal(hasWriter('Position', blob), true);
@@ -48,9 +48,9 @@ describe('hasWriter — positive matches', () => {
   });
 });
 
-describe('hasWriter — negative matches (no false-positives)', () => {
+describe('hasWriter, negative matches (no false-positives)', () => {
   it('does NOT match an entity name without "new" prefix', () => {
-    // Position.load(id) — read-only, not a writer.
+    // Position.load(id), read-only, not a writer.
     const blob = `let p = Position.load(id);`;
     assert.equal(hasWriter('Position', blob), false);
   });
@@ -83,7 +83,7 @@ describe('hasWriter — negative matches (no false-positives)', () => {
   });
 });
 
-describe('hasWriter — edge cases', () => {
+describe('hasWriter, edge cases', () => {
   it('returns false on empty blob', () => {
     assert.equal(hasWriter('Position', ''), false);
   });

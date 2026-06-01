@@ -11,24 +11,23 @@
  * redeploy-stylus.mjs's in-process key decrypt + log redaction so the deployer
  * key never lands in stdout / scrollback.
  *
- * Usage: ATRIUM_KEYDIR=C:/Users/prate/.atrium node scripts/redeploy-solidity.mjs
+ * Usage: ATRIUM_KEYDIR=<your-key-dir> node scripts/redeploy-solidity.mjs
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const CHECKPOINT_PATH = resolve(REPO_ROOT, '.forge-cache/stylus-redeploy-checkpoint.json');
 const OUT_PATH = resolve(REPO_ROOT, '.forge-cache/solidity-redeploy.json');
-const FORGE_BIN = process.env.FORGE_BIN ?? (process.platform === 'win32'
-  ? 'C:/Users/prate/.foundry/bin/forge.exe'
-  : 'forge');
+const FORGE_BIN = process.env.FORGE_BIN ?? 'forge';
 
 // Known peers (Arbitrum Sepolia).
 const REGISTRY = '0x9a9af6e50491cd4694699d48564bbff18f9b40bc';   // PorticoRegistry (unchanged)

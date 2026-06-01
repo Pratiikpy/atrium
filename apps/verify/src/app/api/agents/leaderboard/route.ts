@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  *
  * The honest path forward is a paired commit (component + route +
  * tests) that maps real Rostrum metrics onto a new component prop
- * shape — tracked in human_left.md `rostrum-leaderboard-wiring`. Until
+ * shape, tracked in human_left.md `rostrum-leaderboard-wiring`. Until
  * that ships the route returns the existing pending shape so the
  * component renders the empty state honestly. A health-check gql probe
  * against `rostrumReputations` confirms the data source is reachable
@@ -45,7 +45,7 @@ export async function GET() {
     agents: [],
     source: 'pending' as const,
     detail: probeOk
-      ? `Rostrum subgraph reachable (${probeRows} reputation row(s) indexed). Leaderboard component still on prototype field shape — paired refactor pending per human_left.md \`rostrum-leaderboard-wiring\`.`
+      ? `Rostrum subgraph reachable (${probeRows} reputation row(s) indexed). Leaderboard component still on prototype field shape, paired refactor pending per human_left.md \`rostrum-leaderboard-wiring\`.`
       : 'Rostrum subgraph probe failed. Retrying on next refresh.',
   });
 }

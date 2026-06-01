@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Feature section shell — eyebrow + centered title + product illustration.
+ * Feature section shell, eyebrow + centered title + product illustration.
  * Layout-only; no fake data.
  */
 export function Feature({

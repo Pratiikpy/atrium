@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title DepositWithdrawRoundTrip — ERC-4626 round-trip integration test
+/// @title DepositWithdrawRoundTrip, ERC-4626 round-trip integration test
 /// @notice Deposits USDC to Coffer, mints shares, withdraws shares, asserts
 ///         assets within rounding tolerance. Proves round-down preservation:
 ///         convertToShares(convertToAssets(shares)) <= shares

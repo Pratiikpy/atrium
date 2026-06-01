@@ -107,7 +107,7 @@ export const DISCLOSURES: Disclosure[] = [
     id: 'numbers',
     surface: 'Headline numbers on landing + mobile landing',
     what:
-      'The fake-data components (Numbers.tsx, MobileLanding.tsx, Features.tsx PortfolioMock) with hardcoded $4.13M / $12.37M / setInterval increments were deleted in the 2026-05-28 honesty pass. The live-stats strip (NumbersSection) now renders "—" for any value not sourced from a live API. One surface is explicitly illustrative rather than "—": the "capital convergence" diagram (Impluvium) shows sample per-venue collateral figures, but it is labelled "illustrative schematic" so it is never read as live measurement.',
+      'The fake-data components (Numbers.tsx, MobileLanding.tsx, Features.tsx PortfolioMock) with hardcoded $4.13M / $12.37M / setInterval increments were deleted in the 2026-05-28 honesty pass. The live-stats strip (NumbersSection) now renders "n/a" for any value not sourced from a live API. One surface is explicitly illustrative rather than "n/a": the "capital convergence" diagram (Impluvium) shows sample per-venue collateral figures, but it is labelled "illustrative schematic" so it is never read as live measurement.',
     why:
       'Per `docs/conventions/ui.md`: never show a placeholder number that looks real. The Lovable-port components with hardcoded $4.13M / $12.37M / setInterval increments are gone.',
     whenReal: 'Live as soon as Scribe + Plinth + Coffer return non-zero data after the timelock fires.',
@@ -130,7 +130,7 @@ export const DISCLOSURES: Disclosure[] = [
     what:
       'Both adapters are listed on /app/markets for design completeness, but `open_position` reverts with `ScaffoldNotImplemented`. The /app/trade venue list never offered them; the markets tile renders a "scaffold · open blocked" pill explicitly.',
     why:
-      'Year-1 scope shipped the 7 production venues (Hyperliquid, Aave Horizon, Pendle, Curve, Trade.xyz, Polymarket, GMX). Synthetix V3 + Morpho Blue scaffolds existed as forward-compatible contracts; before the Phase theta-followup lockdown, an open call would have pulled USDC via Coffer.adapterPull but never deployed into the upstream protocol — funds-strand risk.',
+      'Year-1 scope shipped the 7 production venues (Hyperliquid, Aave Horizon, Pendle, Curve, Trade.xyz, Polymarket, GMX). Synthetix V3 + Morpho Blue scaffolds existed as forward-compatible contracts; before the Phase theta-followup lockdown, an open call would have pulled USDC via Coffer.adapterPull but never deployed into the upstream protocol, a funds-strand risk.',
     whenReal:
       'Year 2. Real Synthetix V3 `commitOrder` + sUSD-vs-USDC bridging, and real Morpho `supplyCollateral` + `borrow` + LLTV math. The contract scaffolds + tests are in place to make those follow-ups mechanical.',
     severity: 'interim',

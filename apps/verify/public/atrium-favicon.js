@@ -1,4 +1,4 @@
-// Atrium live favicon — black tile + italic "A" + breathing status bar
+// Atrium live favicon, black tile + italic "A" + breathing status bar
 //
 // Lifted verbatim from `design/Atrium.html` (asset uuid
 // fe2d3138-93f8-493d-83aa-9a56015475fb) via the Wave-N audit. The design
@@ -53,7 +53,7 @@
     ctx.textBaseline = "middle";
     ctx.fillText("A", SIZE / 2 - 1, SIZE / 2 - 4);
 
-    // Status bar — breathes via sin wave when enabled
+    // Status bar, breathes via sin wave when enabled
     const t = frame / 28; // 28 frames ≈ one half cycle
     const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI);
     const alpha = breathing ? 0.45 + 0.55 * pulse : 1;
@@ -82,7 +82,7 @@
   function loop() {
     frame++;
     draw();
-    // ~12fps is enough for breathing — keeps CPU minimal
+    // ~12fps is enough for breathing, keeps CPU minimal
     raf = setTimeout(() => requestAnimationFrame(loop), 85);
   }
 
@@ -92,7 +92,7 @@
     loop();
   }
 
-  // Pause while the tab is hidden — saves battery, avoids unnecessary work
+  // Pause while the tab is hidden, saves battery, avoids unnecessary work
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       if (raf) { clearTimeout(raf); raf = null; }

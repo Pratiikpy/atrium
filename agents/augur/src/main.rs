@@ -1,4 +1,4 @@
-//! Augur — Atrium mean-reversion reference agent.
+//! Augur, Atrium mean-reversion reference agent.
 //!
 //! Strategy: Bollinger band mean-reversion on a single HIP-3 stock perp.
 //! - 20-period rolling mean and standard deviation on hourly closes.
@@ -75,7 +75,7 @@ async fn main() -> Result<()> {
 }
 
 async fn tick(args: &Args, client: &reqwest::Client, state: &mut state::AgentState) -> Result<()> {
-    // 1. Fetch venue health — bail early if instrument is offline
+    // 1. Fetch venue health, bail early if instrument is offline
     let health: Vec<VenueHealth> = client
         .get(format!("{}/v1/venues/health", args.codex_url))
         .send()
@@ -103,7 +103,7 @@ async fn tick(args: &Args, client: &reqwest::Client, state: &mut state::AgentSta
     let signal = bands.signal_for(current);
     info!(price = current, ?bands, ?signal, "decision");
 
-    // 4. Act on signal — build + sign ActionSigil, submit to Plinth via Postern
+    // 4. Act on signal, build + sign ActionSigil, submit to Plinth via Postern
     match signal {
         Signal::Hold => {}
         Signal::EnterLong | Signal::EnterShort | Signal::Close => {
@@ -111,7 +111,7 @@ async fn tick(args: &Args, client: &reqwest::Client, state: &mut state::AgentSta
             // call EntryPoint via Pimlico bundler. Year-1 scaffold logs the intent.
             info!(
                 ?signal,
-                "would submit ActionSigil — wire to Pimlico in production"
+                "would submit ActionSigil, wire to Pimlico in production"
             );
         }
     }

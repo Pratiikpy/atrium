@@ -24,7 +24,7 @@ async function fetchSummary(): Promise<Summary> {
     return await r.json();
   } catch {
     // Honesty contract (iteration 34): unknown freshness → render as stale.
-    // The alternative — defaulting to isStale=false on fetch failure — would
+    // The alternative, defaulting to isStale=false on fetch failure, would
     // show green on the dashboard during an outage of the verify-app itself,
     // exactly when an operator most needs the truth.
     return {
@@ -45,23 +45,23 @@ export function ReservesStatRow() {
   const { data } = useQuery({ queryKey: ['reserves-summary'], queryFn: fetchSummary, refetchInterval: 60_000 });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Tile label="Redeemable now" value={data?.redeemableUsd ?? '—'} sub="Coffer.totalAssets() · live read" />
-      <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '—'} sub="last hourly attestation" />
+      <Tile label="Redeemable now" value={data?.redeemableUsd ?? '-'} sub="Coffer.totalAssets() · live read" />
+      <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '-'} sub="last hourly attestation" />
       <Tile
         label="Last attestation"
-        value={data?.lastAttestedAgo ?? '—'}
+        value={data?.lastAttestedAgo ?? '-'}
         sub={
           data?.isStale
             ? `STALE · ${data.staleReason ?? 'past freshness threshold'}`
             : 'every 60 min'
         }
         // Iteration 34: visual flag when stale. The "every 60 min" sub-label
-        // pre-fix was the only freshness signal — implicit, and only readable
+        // pre-fix was the only freshness signal, implicit, and only readable
         // to a user who notices the discrepancy between "25 hours ago" + "every
         // 60 min." Now the sub-label flips to STALE + reason when isStale.
         warn={data?.isStale === true}
       />
-      <Tile label="Leaves in tree" value={data?.leafCount?.toLocaleString('en-US') ?? '—'} sub="one per Coffer balance" />
+      <Tile label="Leaves in tree" value={data?.leafCount?.toLocaleString('en-US') ?? '-'} sub="one per Coffer balance" />
     </div>
   );
 }

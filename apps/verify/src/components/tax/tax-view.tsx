@@ -15,7 +15,7 @@ import type { TaxJurisdiction, TaxYear } from './tax-types';
  * Pre-audit-U-13: the jurisdiction bar held local state, no other
  * component read it. Stats / allowance / events / exports all hardcoded
  * `jurisdiction=uk&year=2026` in their URLs. Clicking UK/US/DE toggled
- * the visual selection but did nothing — classic dead-control bug.
+ * the visual selection but did nothing, classic dead-control bug.
  *
  * Owning both the header (with export CTAs) and the body lets a single
  * state source drive every downstream fetch + download URL.

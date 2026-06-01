@@ -110,16 +110,16 @@ contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, IERC165,
     ) CCIPReceiverBase(_router) {
         // Audit iteration 46 fix: pre-fix the constructor accepted any
         // address for all 5 params including zero. The unrecoverable case
-        // is _praetor_timelock == 0 — setAllowedSource and
+        // is _praetor_timelock == 0, setAllowedSource and
         // setSourceClaimbackRegistry are both onlyTimelock, and
         // msg.sender can never equal address(0) on EVM. A typo in deploy
         // would brick cross-chain configuration forever; the only
         // "recovery" is redeploy + CCIP message rerouting.
         // _coffer_or_zero intentionally allows zero (testnet bootstrap
-        // before Coffer ships) — that's the only sentinel-zero param here.
+        // before Coffer ships), that's the only sentinel-zero param here.
         // Same DDD-5 / NNNN-1 / BBBBB-1 / LLL-1 pattern as 18 other
         // contracts; partial-coverage closer for AqueductReceiver.
-        // _router zero-check lives in the parent constructor — CCIPReceiverBase
+        // _router zero-check lives in the parent constructor, CCIPReceiverBase
         // reverts with InvalidRouter(address(0)) before this body runs. Don't
         // duplicate; the parent has the right selector for ops triage.
         require(_usdc != address(0), "zero usdc");
@@ -134,7 +134,7 @@ contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, IERC165,
     /// 041-SC20 fix: restore IERC165 supportsInterface. Pre-fix this receiver
     /// dropped it, so the CCIP OffRamp's ERC165Checker probe for
     /// IAny2EVMMessageReceiver returned false and the offRamp skipped
-    /// ccipReceive entirely — USDC landed here but dest_user was never
+    /// ccipReceive entirely, USDC landed here but dest_user was never
     /// credited. Returning true for the receiver + ERC165 interface ids makes
     /// the offRamp deliver the message and call ccipReceive.
     function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
@@ -170,7 +170,7 @@ contract AqueductReceiver is CCIPReceiverBase, IAny2EVMMessageReceiver, IERC165,
         } else {
             // Audit GGG-2 fix: was `IERC20(usdc).transfer(...)` with discarded
             // return. The else-branch is the user-facing rescue path when
-            // Coffer is undeployed or the credit has expired — silent failure
+            // Coffer is undeployed or the credit has expired, silent failure
             // here would mark the CCIP message processed (line above) without
             // ever delivering the rescued USDC.
             bool ok = IERC20(usdc).transfer(dest_user, received);

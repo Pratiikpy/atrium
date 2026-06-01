@@ -1,4 +1,4 @@
-# Lantern Attestor — Share-Redemption-Aware Design
+# Lantern Attestor, Share-Redemption-Aware Design
 
 ## Overview
 
@@ -8,8 +8,8 @@ The Lantern attestor publishes hourly Merkle roots attesting to each user's rede
 
 | Source | Role | Trust Level |
 |--------|------|-------------|
-| Scribe (The Graph) | Provides user list (who has ever deposited) | Low — used only for enumeration |
-| RPC (Arbitrum Sepolia) | Provides authoritative balance via `convertToAssets(balanceOf(user))` | High — on-chain state |
+| Scribe (The Graph) | Provides user list (who has ever deposited) | Low, used only for enumeration |
+| RPC (Arbitrum Sepolia) | Provides authoritative balance via `convertToAssets(balanceOf(user))` | High, on-chain state |
 | Lantern signer | Signs the Merkle root before on-chain publish | Trusted operator key |
 
 ## Architecture (Phase 6)

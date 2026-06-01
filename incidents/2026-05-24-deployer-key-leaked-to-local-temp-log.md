@@ -1,4 +1,4 @@
-# 2026-05-24 — Deployer EOA private key leaked to local temp log
+# 2026-05-24: Deployer EOA private key leaked to local temp log
 
 ## Summary
 
@@ -6,7 +6,7 @@ The first two runs of `scripts/redeploy-stylus.mjs` echoed the decrypted
 deployer EOA private key (for `0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`)
 to stdout via a `console.log` of the spawned cargo-stylus command line.
 The console output was tee'd to a local temp log at
-`C:\Users\prate\AppData\Local\Temp\stylus-deploy-coffer.log`, so the
+`%LOCALAPPDATA%\Temp\stylus-deploy-coffer.log`, so the
 plaintext key sat on disk for roughly 90 seconds before the log was
 wiped.
 

@@ -1,5 +1,5 @@
 /**
- * Per-agent state — recorded across cron invocations.
+ * Per-agent state, recorded across cron invocations.
  *
  * Vercel serverless functions have no persistent local FS, but each
  * cron invocation is independent: state must live somewhere that
@@ -7,11 +7,11 @@
  *
  *   1. **In-memory** (this file). State is per-Edge-worker-instance.
  *      Cold starts reset it. For demo purposes (count of ticks, last
- *      seen mandate) this is fine — the user reads it via /api/status
+ *      seen mandate) this is fine, the user reads it via /api/status
  *      and what they see is "this instance has done N ticks since
  *      last cold start", which is honest.
- *   2. **Upstash Redis** — adds a signup. Skip for testnet.
- *   3. **On-chain Edict events** — emit a tick event from a fixed
+ *   2. **Upstash Redis**, adds a signup. Skip for testnet.
+ *   3. **On-chain Edict events**, emit a tick event from a fixed
  *      relayer wallet. Most expensive but most demoable. Future.
  *
  * If/when persistence matters (e.g. dedup across cold-starts to avoid

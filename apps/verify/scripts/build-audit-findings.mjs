@@ -7,7 +7,7 @@
  * time via `node:fs/promises`. On Vercel the file is not packaged
  * into the serverless bundle (process.cwd() = /var/task; docs/ lives
  * outside the Next.js project root), so every production request
- * returned an empty `findings: []` array with `source: 'pending'` —
+ * returned an empty `findings: []` array with `source: 'pending'` -
  * silently displaying "no audit findings" while the markdown
  * register lists 200+ rows.
  *

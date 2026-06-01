@@ -10,7 +10,7 @@ import { GET } from './route';
 /**
  * The address endpoint feeds every wagmi write path (vault deposit /
  * withdraw, agents issue-mandate, etc.). Locks:
- *   1. Closed slug enum — caller can't probe arbitrary registry keys
+ *   1. Closed slug enum, caller can't probe arbitrary registry keys
  *   2. null passthrough when contract isn't deployed
  *   3. Real address forwarded verbatim
  */
@@ -29,7 +29,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/deployments/address — input gating', () => {
+describe('GET /api/deployments/address, input gating', () => {
   it('rejects missing slug with 400', async () => {
     const res = await GET(makeReq(undefined));
     expect(res.status).toBe(400);
@@ -71,7 +71,7 @@ describe('GET /api/deployments/address — input gating', () => {
       'postern-kill-switch',
       'postern-key-registry',
       // Audit U-20 + U-28: per-adapter Portico slugs. Slugs are
-      // adapterSlug values (some venues share — HIP-3 + HIP-4 → hyperliquid).
+      // adapterSlug values (some venues share, HIP-3 + HIP-4 → hyperliquid).
       'adapter-hyperliquid',
       'adapter-aave-horizon',
       'adapter-pendle',
@@ -87,7 +87,7 @@ describe('GET /api/deployments/address — input gating', () => {
   it('every VENUES adapterSlug has a matching adapter-* slug', async () => {
     // Audit U-28: closes a regression class. Pre-fix this iterated
     // VENUES.id which broke for HIP-4 (id `hl-hip4`, no `adapter-hl-hip4`
-    // contract — HIP-4 routes through `adapter-hyperliquid`). Now we
+    // contract, HIP-4 routes through `adapter-hyperliquid`). Now we
     // iterate the de-duped adapterSlug values, matching the real contract
     // deploy pattern.
     const { VENUES } = await import('@/lib/venues');
@@ -114,7 +114,7 @@ describe('GET /api/deployments/address — input gating', () => {
   });
 });
 
-describe('GET /api/deployments/address — address passthrough', () => {
+describe('GET /api/deployments/address, address passthrough', () => {
   it('returns null when contract is not deployed', async () => {
     mockLoadContractAddress.mockResolvedValueOnce(null);
     const res = await GET(makeReq('coffer'));

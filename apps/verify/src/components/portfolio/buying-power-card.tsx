@@ -40,7 +40,7 @@ export function BuyingPowerCard() {
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
-            {isLoading ? <span className="skeleton inline-block h-8 w-40 rounded" /> : data?.currentUsd ?? '—'}
+            {isLoading ? <span className="skeleton inline-block h-8 w-40 rounded" /> : data?.currentUsd ?? '-'}
           </p>
         </div>
         <div className="flex gap-1 text-xs">
@@ -76,7 +76,7 @@ function PillTab({ label, active }: { label: string; active?: boolean }) {
 
 // Audit VVV-1 fix: `series[].valueUsd` comes from `/api/portfolio/
 // buying-power` which formats via the shared `formatUsd` helper (KK-3/4
-// precision-preserving) — producing strings like "$1,234.56" with the
+// precision-preserving), producing strings like "$1,234.56" with the
 // dollar sign AND thousands separators. Pre-fix `parseFloat("$1,234.56")`
 // returned NaN because parseFloat stops at the leading `$`. Every min/max/
 // y-coordinate became NaN → polyline points all rendered as "NaN,NaN" →
@@ -103,7 +103,7 @@ function Sparkline({ series, loading }: { series?: BuyingPower['series']; loadin
   if (values.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-[11px] text-muted">
-        Series data malformed — refresh after the next Scribe tick
+        Series data malformed, refresh after the next Scribe tick
       </div>
     );
   }

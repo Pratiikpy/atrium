@@ -55,7 +55,7 @@ export function RecentTransfers() {
             <p className="font-mono text-sm text-ink">{t.amount} {t.asset}</p>
             <p className="text-[10px] uppercase tracking-wider text-muted">{t.fromChain} → {t.toChain}</p>
           </div>
-          <span className="font-mono text-xs text-muted">{t.duration ?? '—'}</span>
+          <span className="font-mono text-xs text-muted">{t.duration ?? '-'}</span>
           <span className="font-mono text-xs text-muted">{t.timestamp}</span>
           <span className="rounded-full border border-divider px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
             {t.status}

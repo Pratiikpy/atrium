@@ -32,7 +32,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/agents/my-mandates — pending paths', () => {
+describe('GET /api/agents/my-mandates, pending paths', () => {
   it('returns source:pending + no_wallet_configured when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const res = await GET();
@@ -53,7 +53,7 @@ describe('GET /api/agents/my-mandates — pending paths', () => {
   });
 });
 
-describe('GET /api/agents/my-mandates — mandate computation', () => {
+describe('GET /api/agents/my-mandates, mandate computation', () => {
   it('returns active mandates from Scribe when no revocations', async () => {
     (gql as any).mockResolvedValueOnce({
       sigilValidations: [

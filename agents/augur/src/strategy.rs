@@ -1,4 +1,4 @@
-//! Augur strategy module — pure functions, no I/O.
+//! Augur strategy module, pure functions, no I/O.
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Signal {

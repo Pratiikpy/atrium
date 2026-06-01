@@ -12,7 +12,7 @@ const LEAVES: RawLeaf[] = [
 
 /**
  * 079-BE6 regression. Pre-fix verification was a wallet-address find() that
- * ignored the root entirely — a "Verified" badge backed by nothing. The fix
+ * ignored the root entirely, a "Verified" badge backed by nothing. The fix
  * recomputes the root and checks the wallet's inclusion proof against the
  * on-chain attested root.
  */

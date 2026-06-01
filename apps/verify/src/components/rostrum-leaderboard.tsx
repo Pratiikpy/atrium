@@ -89,17 +89,17 @@ export function RostrumLeaderboard() {
               </td>
               <td className="py-3 pr-6 text-ink">
                 {(() => {
-                  // Audit NN-8 fix: prior code did `Number(BigInt(.))/1e6` twice —
+                  // Audit NN-8 fix: prior code did `Number(BigInt(.))/1e6` twice -
                   // precision loss past safe-int + reads the BigInt twice. Format
                   // once via string-arithmetic so even very large PnL renders correctly.
                   const s = String(a.totalPnlSigned ?? '0');
-                  if (!/^-?\d+$/.test(s)) return '—';
+                  if (!/^-?\d+$/.test(s)) return '-';
                   const neg = s.startsWith('-');
                   const abs = neg ? s.slice(1) : s;
                   const whole = abs.length > 6 ? abs.slice(0, -6) : '0';
                   const frac = abs.padStart(7, '0').slice(-6, -4); // 2-decimal precision
                   const wholeNum = Number(whole);
-                  if (!Number.isFinite(wholeNum)) return '—';
+                  if (!Number.isFinite(wholeNum)) return '-';
                   const sign = neg ? '-' : '+';
                   return `${sign}$${wholeNum.toLocaleString('en-US')}.${frac}`;
                 })()}
@@ -111,9 +111,9 @@ export function RostrumLeaderboard() {
                   // Audit NN-5 fix: validate Scribe timestamp before formatting.
                   // `Number("NaN") * 1000` → NaN → "Invalid Date" in UI.
                   const s = a.lastActionTimestamp;
-                  if (s == null || !/^\d+$/.test(String(s))) return '—';
+                  if (s == null || !/^\d+$/.test(String(s))) return '-';
                   const n = parseInt(String(s), 10);
-                  if (!Number.isFinite(n) || n < 0 || n > 253_402_300_799) return '—';
+                  if (!Number.isFinite(n) || n < 0 || n > 253_402_300_799) return '-';
                   return new Date(n * 1000).toLocaleDateString();
                 })()}
               </td>

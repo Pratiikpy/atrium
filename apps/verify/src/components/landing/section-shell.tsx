@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /**
- * SectionShell — the eyebrow / headline / sub lockup that every marketing
+ * SectionShell, the eyebrow / headline / sub lockup that every marketing
  * section uses. Ports the `.section-head.centered` pattern from
  * design/Atriumnew.html. Headings are Geist 500 (bold sans), matching
  * the design's headline treatment; the italic Instrument Serif accent

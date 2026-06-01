@@ -135,7 +135,7 @@ contract PorticoRegistryTest is Test {
     /// adapter), flips already-false flags, and emits with
     /// adapter=address(0). The subgraph treats a zero-adapter
     /// deregister event as a no-op, but pinning the behavior here
-    /// forces a deliberate refactor — if a future contributor adds a
+    /// forces a deliberate refactor, if a future contributor adds a
     /// "must be registered first" guard, this test fails and they
     /// must update the subgraph mapping in lockstep.
     function test_deregisterAdapter_neverRegisteredVenue_isNoOp_iter88() public {
@@ -169,7 +169,7 @@ contract PorticoRegistryTest is Test {
     // ── Audit DDD-5 lock: constructor zero-checks ────────────────────
     //
     // Per DDD-5: both addresses non-zero or the registry can never be
-    // controlled — onlyTimelock setters revert forever, onlyPraetor
+    // controlled, onlyTimelock setters revert forever, onlyPraetor
     // emergency-deregister path bricked.
 
     function test_constructor_revertsOnZeroPraetor_DDD5() public {
@@ -195,7 +195,7 @@ contract PorticoRegistryTest is Test {
     //
     // Per FIRE77-PR5, the registry has a SEPARATE delist path that bypasses
     // the 48h timelock. The motivation: when a live exploit is found in an
-    // adapter, waiting 48h is too slow — Coffer's 1%-per-block notional cap
+    // adapter, waiting 48h is too slow, Coffer's 1%-per-block notional cap
     // is the only defense in the interim. Praetor multisig can deregister
     // in one tx via `emergencyDeregisterAdapter`. The function had zero
     // tests before iter 55 even though it can be invoked under the most
@@ -217,7 +217,7 @@ contract PorticoRegistryTest is Test {
         vm.prank(timelock);
         registry.registerAdapter(1, address(adapter), codehash, 1);
 
-        // Timelock is rejected — emergency path is praetor-only. This is
+        // Timelock is rejected, emergency path is praetor-only. This is
         // intentional asymmetry from `deregisterAdapter`: the timelock CAN
         // routine-deregister but CANNOT emergency-deregister, because the
         // emergency path's premise is that the timelock is too slow.
@@ -253,7 +253,7 @@ contract PorticoRegistryTest is Test {
         vm.prank(praetor);
         registry.emergencyDeregisterAdapter(1, "exploit-discovered");
 
-        // Both state flags flip — Coffer's `is_registered` check now refuses
+        // Both state flags flip, Coffer's `is_registered` check now refuses
         // routes through this adapter even before the next block.
         assertFalse(
             registry.isRegisteredAdapter(address(adapter)),
@@ -300,7 +300,7 @@ contract PorticoRegistryTest is Test {
 
         // Deploy v2 with different bytecode (MockAdapter has the same code
         // for a fresh deploy, but a new instance has a different address
-        // and may have a different codehash if CREATE2 salt differs — for
+        // and may have a different codehash if CREATE2 salt differs, for
         // this test, simulate an upgrade by deploying a fresh adapter.
         // Real upgrade: new contract with new bytecode, e.g. MockAdapter v2.
         MockAdapter adapterV2 = new MockAdapter();

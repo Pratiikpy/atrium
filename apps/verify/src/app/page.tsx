@@ -142,7 +142,7 @@ export default function LandingPage() {
                     {/* Audit honesty fix (#11/#13): tag was "Live" on every
                         venue, and the footer rendered a fabricated "Test
                         collateral" dollar figure from static.ts under it -
-                        contradicting the honesty page's promise to render "—"
+                        contradicting the honesty page's promise to render "-"
                         for anything not from a live read. The adapters ARE
                         registered in PorticoRegistry, so "Registered" is the
                         honest tag; and we show the real collateral-asset types

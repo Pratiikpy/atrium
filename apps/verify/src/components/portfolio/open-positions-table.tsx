@@ -24,9 +24,9 @@ interface Position {
   /** null when the subgraph hasn't observed the entry price yet (audit U-33). */
   entryPrice: string | null;
   // Audit U-21: pre-fix `markPrice` and `pnlUsd` were strings echoing fake
-  // measurements ("entry · entry · $0.00 PnL"). Both are nullable now —
+  // measurements ("entry · entry · $0.00 PnL"). Both are nullable now -
   // the route returns null until the mark-oracle path lands. Component
-  // renders "—" with a "pending" caption for null.
+  // renders "-" with a "pending" caption for null.
   markPrice: string | null;
   pnlUsd: string | null;
   pnlDirection: 'up' | 'down' | 'flat' | null;
@@ -83,7 +83,7 @@ export function OpenPositionsTable({ filterVenueId }: { filterVenueId?: number |
   if (!filtered.length) {
     // Iteration 39 audit fix: distinguish "real-measured-zero" (source=scribe,
     // empty array) from "couldn't-measure-yet" (source=pending). Pre-fix both
-    // rendered the same main text "No open positions on this wallet" — a
+    // rendered the same main text "No open positions on this wallet", a
     // user during a Scribe outage would read it as a confirmed measurement
     // when actually no measurement was available. Now the main text flips
     // based on source; the sub-label continues to name the unblock action.
@@ -158,9 +158,9 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                 <td className="px-4 py-3 font-mono text-ink-soft">{p.size}</td>
                 <td className="px-4 py-3 font-mono text-ink">{p.notionalUsd}</td>
                 <td className="px-4 py-3 font-mono text-ink-soft">
-                  {p.entryPrice ?? <span className="text-muted" title="entry price pending subgraph event-v2 extension">—</span>}
+                  {p.entryPrice ?? <span className="text-muted" title="entry price pending subgraph event-v2 extension">-</span>}
                   <span className="mx-1 text-muted">·</span>
-                  {p.markPrice ?? <span className="text-muted" title="mark price pending oracle">—</span>}
+                  {p.markPrice ?? <span className="text-muted" title="mark price pending oracle">-</span>}
                 </td>
                 <td
                   className={
@@ -176,7 +176,7 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                   title={p.pnlUsd == null ? 'PnL pending mark-oracle wiring' : undefined}
                 >
                   {p.pnlUsd == null
-                    ? '—'
+                    ? '-'
                     : (p.pnlDirection === 'up' ? '+' : '') + p.pnlUsd}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -209,7 +209,7 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                             // Phase theta audit follow-up (2026-05-25):
                             // pass both Plinth + venue ids. Fall back to
                             // venuePositionId for plinthPositionId only
-                            // when the API hasn't surfaced the join yet —
+                            // when the API hasn't surfaced the join yet -
                             // matches the API's own fallback shape.
                             plinthPositionId:
                               p.plinthPositionId ?? p.venuePositionId!,
@@ -222,7 +222,7 @@ function PositionsTableBody({ positions }: { positions: Position[] }) {
                       </button>
                     )
                   ) : (
-                    <span className="text-[10px] text-muted">—</span>
+                    <span className="text-[10px] text-muted">-</span>
                   )}
                 </td>
               </tr>

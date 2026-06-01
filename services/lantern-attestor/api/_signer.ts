@@ -11,7 +11,7 @@ import { privateKeyToAccount } from 'viem/accounts';
  *
  * Backup: split 3-of-5 via Shamir (offline).
  *
- * Per TDD §13.3 — cloud HSM was rejected (no free tier).
+ * Per TDD §13.3, cloud HSM was rejected (no free tier).
  * Audit C-20 / F-7 fix: the Argon2 verify call was theatre; the key was
  * pulled raw from env. The plaintext-env path is removed. The signer now
  * actually decrypts.
@@ -39,12 +39,12 @@ export async function loadSigningKey() {
   if (!passphrase) throw new Error('LANTERN_KEY_PASSPHRASE must be set');
 
   // Two key-source paths:
-  //   1. LANTERN_KEY_ENVELOPE_JSON — envelope inline as an env var. Used on
+  //   1. LANTERN_KEY_ENVELOPE_JSON, envelope inline as an env var. Used on
   //      Vercel / Cloudflare Workers where the filesystem is read-only and
   //      bundling secret files is awkward. The envelope is encrypted so
   //      having it in env-vars-at-rest is acceptable (the passphrase is
   //      what actually authorises decryption).
-  //   2. LANTERN_KEY_PATH — file path. Original path; preferred for VPS /
+  //   2. LANTERN_KEY_PATH, file path. Original path; preferred for VPS /
   //      bare-metal deploys where the envelope sits outside the repo tree
   //      and is mounted read-only.
   let envelopeJson: string;
@@ -61,7 +61,7 @@ export async function loadSigningKey() {
       .realpath(new URL('../../..', import.meta.url).pathname)
       .catch(() => undefined);
     if (repoRoot && realpath.startsWith(repoRoot)) {
-      throw new Error(`LANTERN_KEY_PATH (${realpath}) is inside the repo tree — refusing to load`);
+      throw new Error(`LANTERN_KEY_PATH (${realpath}) is inside the repo tree, refusing to load`);
     }
     envelopeJson = await readFile(envPath, 'utf8');
   } else {

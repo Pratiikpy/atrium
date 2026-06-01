@@ -23,7 +23,7 @@ const YEARS: TaxYear[] = ['2024', '2025', '2026'];
  * row, allowance bar, events table, or export buttons (which all
  * hardcoded `jurisdiction=uk&year=2026` in their fetch URLs).
  *
- * Now: state is owned by `<TaxView>` and passed down — every consumer
+ * Now: state is owned by `<TaxView>` and passed down, every consumer
  * re-fetches when these change.
  */
 export function TaxJurisdictionBar({
@@ -37,7 +37,7 @@ export function TaxJurisdictionBar({
   year: TaxYear;
   setYear: (y: TaxYear) => void;
 }) {
-  const formLabel = JURISDICTIONS.find((j) => j.id === jurisdiction)?.form ?? '—';
+  const formLabel = JURISDICTIONS.find((j) => j.id === jurisdiction)?.form ?? '-';
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-divider bg-parchment p-2">
       <div role="tablist" aria-label="Jurisdiction" className="flex gap-1">

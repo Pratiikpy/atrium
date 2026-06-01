@@ -12,7 +12,7 @@ import { CuratorGrant, CuratorFunding } from '../generated/schema';
  * Pre-fix the Curator contract emitted 4 events on-chain (GrantCreated,
  * GrantClaimed, GrantCancelled, FundsReceived) but Scribe never saw them.
  * The verify-app Cohort/Curator page had no way to surface grant history
- * — every dashboard read fell through to "0 grants" even when the chain
+ *, every dashboard read fell through to "0 grants" even when the chain
  * actually held an active grant.
  *
  * Grant state is encoded as a string enum: 'pending' → 'claimed' or
@@ -43,7 +43,7 @@ export function handleGrantClaimed(event: GrantClaimed): void {
   if (g == null) {
     // Defensive: a Claim without a prior Create indicates a chain reorg
     // or a startBlock misconfig. Skip rather than create an orphan record
-    // — Scribe's reorg-protection will replay the Create when re-indexed.
+    //, Scribe's reorg-protection will replay the Create when re-indexed.
     return;
   }
   g.state = 'claimed';

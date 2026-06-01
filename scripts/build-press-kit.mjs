@@ -27,7 +27,7 @@ function collectFiles(dir, base) {
   return results;
 }
 
-// Minimal ZIP creation (store method, no compression — keeps it simple and dependency-free)
+// Minimal ZIP creation (store method, no compression, keeps it simple and dependency-free)
 function createZip(files) {
   const parts = [];
   const centralDir = [];

@@ -6,7 +6,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { STEP_CONFIG } from './[step]/page';
 
 /**
- * Verifier overview — the entry point + map for the 7-step "verify every
+ * Verifier overview, the entry point + map for the 7-step "verify every
  * claim" flow. Each step page links back here ("Back to overview"), and the
  * landing CTA points here so a judge lands on the full sequence before
  * stepping in. Step titles/contracts come from the single STEP_CONFIG source
@@ -14,7 +14,7 @@ import { STEP_CONFIG } from './[step]/page';
  */
 
 export const metadata: Metadata = {
-  title: 'Verifier — every claim, on-chain',
+  title: 'Verifier, every claim, on-chain',
   description:
     'Seven steps, each backed by a real contract call on Arbitrum Sepolia: deposit, open, margin, chaos, liquidation, proof-of-reserves, kill switch.',
   alternates: { canonical: '/verify' },
@@ -30,7 +30,7 @@ export default function VerifierOverviewPage() {
         <h1 className="mt-2 font-display text-4xl text-ink sm:text-5xl">Verify every claim</h1>
         <p className="mt-6 max-w-prose text-balance text-lg text-ink-soft">
           Atrium makes seven claims. Each one is a real contract call on Arbitrum Sepolia you
-          can run yourself and check on Arbiscan — no trust required. Start at step one, or jump
+          can run yourself and check on Arbiscan, no trust required. Start at step one, or jump
           to any step.
         </p>
 

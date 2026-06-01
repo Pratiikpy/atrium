@@ -25,7 +25,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/transfer/recent — pending paths', () => {
+describe('GET /api/transfer/recent, pending paths', () => {
   it('returns pending when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');
@@ -43,7 +43,7 @@ describe('GET /api/transfer/recent — pending paths', () => {
   });
 });
 
-describe('GET /api/transfer/recent — happy path', () => {
+describe('GET /api/transfer/recent, happy path', () => {
   it('maps each Scribe credit to wire-safe transfer (NN-7 precision)', async () => {
     (gql as any).mockResolvedValue({
       crossChainCredits: [

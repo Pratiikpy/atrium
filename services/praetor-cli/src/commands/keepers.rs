@@ -1,4 +1,4 @@
-//! Praetor keeper ops — list, stake, slash.
+//! Praetor keeper ops, list, stake, slash.
 //!
 //! Audit YYY-4 fix: pre-fix all 3 actions were no-op stubs that logged and
 //! returned Ok(()). `praetor keepers slash <keeper> --reason "..."` is the
@@ -51,7 +51,7 @@ async fn stake(network: &str, keeper: &str, amount: &str) -> Result<()> {
     let vigil = load_address(network, "vigil")?;
     let rpc = network_rpc(network)?;
 
-    // Vigil.stake_keeper() is payable — value carries the stake amount.
+    // Vigil.stake_keeper() is payable, value carries the stake amount.
     let calldata_output = Command::new("cast")
         .args(["calldata", "stake_keeper()"])
         .output()
@@ -72,7 +72,7 @@ async fn stake(network: &str, keeper: &str, amount: &str) -> Result<()> {
     println!("  data:  {calldata}");
     println!("  rpc:   {rpc}");
     println!();
-    println!("`stake_keeper` is payable + open to any caller — no multisig needed.");
+    println!("`stake_keeper` is payable + open to any caller, no multisig needed.");
     println!("The keeper account itself signs; this CLI just prints the tx shape.");
     Ok(())
 }
@@ -82,7 +82,7 @@ async fn slash(network: &str, keeper: &str, reason: &str) -> Result<()> {
     let vigil = load_address(network, "vigil")?;
     let rpc = network_rpc(network)?;
 
-    // Vigil.slash_keeper(keeper, reason) — onlyPraetor (multisig) per vigil/lib.rs.
+    // Vigil.slash_keeper(keeper, reason), onlyPraetor (multisig) per vigil/lib.rs.
     // Per A-8 fix: also requires keeper's missed_windows >= max_misses (on-chain check).
     let calldata_output = Command::new("cast")
         .args(["calldata", "slash_keeper(address,string)", keeper, reason])
@@ -106,12 +106,12 @@ async fn slash(network: &str, keeper: &str, reason: &str) -> Result<()> {
     println!("  reason: {reason}");
     println!("  rpc:    {rpc}");
     println!();
-    println!("`slash_keeper` is multisig-gated (NOT timelocked — operational call).");
+    println!("`slash_keeper` is multisig-gated (NOT timelocked, operational call).");
     println!("Vigil also enforces on-chain that the keeper has missed enough windows;");
     println!("if not, the call reverts with NotEnoughMisses(misses). Run `praetor keepers list`");
     println!("first to confirm missedWindows24h >= max_misses_per_window (default 3).");
     println!(
-        "(Iter 48 rename: this error was previously named TooManyMisses — inverted semantic.)"
+        "(Iter 48 rename: this error was previously named TooManyMisses, inverted semantic.)"
     );
     Ok(())
 }

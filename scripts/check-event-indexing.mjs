@@ -40,7 +40,7 @@ const INDEXING_IGNORE = new Map([
   ['*.AuthorizedCallerUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['*.InstrumentAdded', 'Praetor timelock action; captured via PraetorTimelock.Executed'],
   // Stoa is pure-math; no state events to index.
-  // ['StoaBlackScholes.StoaPhase2NotLive', '...'] — removed iter 52 alongside
+  // ['StoaBlackScholes.StoaPhase2NotLive', '...'], removed iter 52 alongside
   // the dead event declaration in Stoa. No event to ignore anymore.
   // Aqueduct destination/claimback chain events live on the OTHER chain. Indexing
   // them would require a separate subgraph deployment; source-chain Aqueduct
@@ -122,7 +122,7 @@ async function collectEvents() {
 /**
  * Parse subgraph.yaml into per-data-source handler sets.
  *
- * Pre-fix the gate matched event names globally — if PraetorTimelock emits
+ * Pre-fix the gate matched event names globally, if PraetorTimelock emits
  * EmergencyPaused but only Aqueduct's handler is registered, the gate would
  * falsely report it as covered because the name 'EmergencyPaused' appears
  * somewhere in subgraph.yaml. Same-name-different-contract collisions are
@@ -156,7 +156,7 @@ async function collectHandlersPerSource() {
  * Resolve which subgraph data source corresponds to a given contract name.
  *
  * For most contracts the data-source name matches the contract name
- * (Plinth, Coffer, Aqueduct, etc.). A few have aliases — capture those
+ * (Plinth, Coffer, Aqueduct, etc.). A few have aliases, capture those
  * explicitly so the gate matches correctly. When a contract has NO data
  * source, treat its events as un-handled (the contract is invisible to
  * the indexer).
@@ -186,7 +186,7 @@ const CONTRACT_TO_SOURCE = {
 };
 
 function lookupSource(contractName) {
-  // Adapters and other non-mapped contracts default to null — their events
+  // Adapters and other non-mapped contracts default to null, their events
   // aren't separately indexed (they ride on Plinth/Router/Coffer events).
   if (Object.prototype.hasOwnProperty.call(CONTRACT_TO_SOURCE, contractName)) {
     return CONTRACT_TO_SOURCE[contractName];

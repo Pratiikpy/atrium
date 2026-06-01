@@ -74,7 +74,7 @@ contract RostrumTest is Test {
 
     /// Iter 86: pin zero-slippage rejection. Without this guard a follower
     /// could submit max_slippage_bps=0, which the mirror-trade math reads
-    /// as "any price drift triggers rejection" — silently disabling every
+    /// as "any price drift triggers rejection", silently disabling every
     /// mirror trade for that follower.
     function test_follow_rejectsZeroSlippage_iter86() public {
         vm.prank(follower);
@@ -85,7 +85,7 @@ contract RostrumTest is Test {
     /// Iter 86: pin operator_fee_bps > 10% rejection. This validation
     /// rule has been in the contract since v1 but was entirely untested
     /// pre-iter-86. A future contributor relaxing the cap would silently
-    /// allow operators to charge >10% fees — the worst UX surprise.
+    /// allow operators to charge >10% fees, the worst UX surprise.
     function test_follow_rejectsOperatorFeeAbove10Pct_iter86() public {
         // operator_fee_bps = 1001 (> 10% cap).
         vm.prank(follower);
@@ -103,7 +103,7 @@ contract RostrumTest is Test {
     }
 
     /// Iter 86: pin allocation_bps == 10000 (exactly 100%) accepted.
-    /// `allocation_bps > 10_000` strict revert means 10000 itself passes —
+    /// `allocation_bps > 10_000` strict revert means 10000 itself passes -
     /// the user is allowed to mirror 100% of the leader's notional.
     function test_follow_acceptsAllocationAt100Pct_iter86() public {
         vm.prank(follower);
@@ -269,7 +269,7 @@ contract RostrumTest is Test {
 
         // Manually seed exposure by running mirrorOpen-equivalent state.
         // Easiest path: open a follow + call mirrorOpen until exposure crosses.
-        // For unit-purity, use storage-write via vm.store would be brittle —
+        // For unit-purity, use storage-write via vm.store would be brittle -
         // so we approximate by re-checking remaining-cap branch via a fresh
         // call where the contract has zero exposure. The exposure branch is
         // exercised end-to-end in test_mirrorOpen_perActionCapTracked.
@@ -292,7 +292,7 @@ contract RostrumTest is Test {
     /// instead of an honest size.
     ///
     /// Numbers: abs_leader=1e30, follower_avail=1e30, leader_avail=1e30,
-    /// allocation_bps=10000. Chained product would be 1e64, fits — so
+    /// allocation_bps=10000. Chained product would be 1e64, fits, so
     /// I push further: abs_leader=1e38, follower_avail=1e38. Chained
     /// product = 1e76 * 10000 = 1e80, OVERFLOWS uint256 (max 1.16e77).
     /// Staged: weighted = 1e38 * 1e38 / 1e38 = 1e38 → * 10000 / 10000 =
@@ -322,7 +322,7 @@ contract RostrumTest is Test {
     /// 192 is defense-in-depth and structurally unreachable through
     /// computeMirrorNotional's current code path. To produce `proportional
     /// > int256.max ≈ 5.78e76`, the intermediate `weighted * bps` must
-    /// exceed 5.78e80 — which itself overflows uint256 (max 1.16e77) at
+    /// exceed 5.78e80, which itself overflows uint256 (max 1.16e77) at
     /// the multiply step before the division can scale it down. The
     /// staging from FIRE77-R1 effectively guarantees proportional ≤
     /// int256.max for any allocation_bps in [1, 10_000].
@@ -378,7 +378,7 @@ contract RostrumTest is Test {
             "FIRE77-R3: endFollow must zero follower_exposure"
         );
 
-        // Re-follow must now be unthrottled — a clean lifetime budget.
+        // Re-follow must now be unthrottled, a clean lifetime budget.
         vm.prank(follower);
         rostrum.follow(leader, 5_000, 100, 50, 1_000e6, 50e6, uint64(block.timestamp + 7 days));
         rostrum.mirrorOpen(follower, leader, 43, 1, bytes32("BTC-PERP"), int256(100e6), 1_000e6, hex"", hex"");
@@ -389,7 +389,7 @@ contract RostrumTest is Test {
         );
     }
 
-    // ── mirrorOpen() — uses MockPlinth ────────────────────────────────
+    // ── mirrorOpen(), uses MockPlinth ────────────────────────────────
 
     function test_mirrorOpen_followerAccountPaused_failsSoftly() public {
         uint64 exp = uint64(block.timestamp + 7 days);
@@ -456,7 +456,7 @@ contract RostrumTest is Test {
 
     /// Iter 54 audit fix: `resumeFollow` is the only path that clears
     /// `is_paused_by_follower` once set, and the dashboard "Resume copy-
-    /// trade" button reads as a single bit-flip — but the function had
+    /// trade" button reads as a single bit-flip, but the function had
     /// zero CI coverage. A refactor that wrote `true` to the bit by
     /// mistake (typo, missing `!`, wrong slot in a packed-storage opt)
     /// would silently leave mirroring paused forever after the user
@@ -469,7 +469,7 @@ contract RostrumTest is Test {
         rostrum.follow(leader, 5_000, 100, 50, 1_000e6, 50e6, exp);
 
         // Pause: bit goes high. mirrorOpen now reverts (covered by
-        // test_mirrorOpen_pausedFollow_reverts above — re-asserted here
+        // test_mirrorOpen_pausedFollow_reverts above, re-asserted here
         // so the round-trip ordering is unambiguous).
         vm.prank(follower);
         rostrum.pauseFollow(leader);
@@ -498,7 +498,7 @@ contract RostrumTest is Test {
     }
 
     function test_mirrorOpen_missingFollow_reverts() public {
-        // No `follow()` call was made — record is empty.
+        // No `follow()` call was made, record is empty.
         vm.expectRevert(Rostrum.InvalidParams.selector);
         rostrum.mirrorOpen(follower, leader, 42, 1, bytes32("BTC-PERP"), int256(100e6), 1_000e6, hex"", hex"");
     }
@@ -662,7 +662,7 @@ contract RostrumTest is Test {
         vm.expectEmit(true, true, false, false, address(rostrum));
         emit ActionRecorded(agent, actionKind);
 
-        // recordAction is called by Sigil — for the test, pretend
+        // recordAction is called by Sigil, for the test, pretend
         // we're Sigil (the caller authorization check, if any, is
         // already locked elsewhere).
         rostrum.recordAction(agent, actionKind);
@@ -689,7 +689,7 @@ contract RostrumTest is Test {
     // Pre-fix setReputation accepted any agent address including zero.
     // A Praetor multisig typo would waste a 48h timelock slot setting
     // reputation for the zero address, then the subgraph would index a
-    // permanent RostrumReputation entry keyed on 0x0 — pure storage
+    // permanent RostrumReputation entry keyed on 0x0, pure storage
     // pollution + dashboard noise. Same DDD-5 / NNNN-1 partial-coverage
     // shape as the iter 43-46 sweep.
 
@@ -710,7 +710,7 @@ contract RostrumTest is Test {
         vm.prank(timelock);
         rostrum.setReputation(leader, 800);
 
-        // Second set goes 800 → 950 — `previous` must capture the OLD value.
+        // Second set goes 800 → 950, `previous` must capture the OLD value.
         vm.expectEmit(true, false, false, true, address(rostrum));
         emit ReputationUpdated(leader, 800, 950);
         vm.prank(timelock);
@@ -758,7 +758,7 @@ contract RostrumTest is Test {
         rost.setApprovedKeeper(address(this), true);
 
         // Set up follower account state through the malicious plinth's
-        // getAccount return values — collateral > required so available > 0.
+        // getAccount return values, collateral > required so available > 0.
         malPlinth.setAccount(follower, 10_000e6, 1_000e6, false);
 
         // Set up a follow record so the inner mirrorOpen check passes.
@@ -780,7 +780,7 @@ contract RostrumTest is Test {
         // ever flips to true, the nonReentrant modifier was removed.
         assertFalse(malPlinth.reentryDidSucceed(), "DDD-4: reentry MUST be rejected by nonReentrant");
         // Load-bearing assertion #2: exposure incremented EXACTLY ONCE
-        // (the outer legitimate call's single +50e6 increment) — NOT twice.
+        // (the outer legitimate call's single +50e6 increment), NOT twice.
         // Pre-DDD-4, the inner reentry would have also succeeded and
         // doubled this to 100e6. The DDD-4 invariant: "reentry must not
         // increase exposure beyond what a single non-reentrant call would."
@@ -833,7 +833,7 @@ contract MaliciousReentrantPlinth {
         // DDD-4 this would have re-read the (unchanged) follow record and
         // recursed into another openPosition call → double exposure.
         //
-        // The reentry MUST be wrapped in try/catch — otherwise its revert
+        // The reentry MUST be wrapped in try/catch, otherwise its revert
         // would unwind this frame's `reentryAttempted = true` write, and
         // the outer mirrorOpen's try/catch would see the whole openPosition
         // failure cleanly. With try/catch here, the attempt is recorded
@@ -844,7 +844,7 @@ contract MaliciousReentrantPlinth {
             reentryDidSucceed = true; // would only flip if guard absent
         } catch {
             reentryAttempted = true;
-            // reentryDidSucceed stays false — the guard worked
+            // reentryDidSucceed stays false, the guard worked
         }
         return 1;
     }

@@ -20,7 +20,7 @@
  * re-run can resume from the failed step.
  *
  * Usage:
- *   ATRIUM_KEYDIR=/c/Users/prate/.atrium node scripts/redeploy-stylus.mjs [contracts...]
+ *   ATRIUM_KEYDIR=<your-key-dir> node scripts/redeploy-stylus.mjs [contracts...]
  *
  * Args (optional): subset of {coffer, sigil, vigil, plinth, init-coffer,
  *   init-sigil, init-vigil}. Default: all in order.
@@ -28,13 +28,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const REGISTRY_PATH = resolve(REPO_ROOT, 'deployments/arbitrum_sepolia.json');
 const MIRROR_PATH = resolve(REPO_ROOT, 'apps/verify/public/deployments/arbitrum_sepolia.json');
@@ -148,9 +149,7 @@ function cargoStylus(contractDir, args, env = {}) {
   ], { captureOutput: true });
 }
 
-const CAST_BIN = process.env.CAST_BIN ?? (process.platform === 'win32'
-  ? 'C:/Users/prate/.foundry/bin/cast.exe'
-  : 'cast');
+const CAST_BIN = process.env.CAST_BIN ?? 'cast';
 
 function castSend(to, sig, args, pk) {
   const cmd = ['send', '--rpc-url', RPC, '--private-key', pk, to, sig, ...args];
@@ -280,7 +279,7 @@ async function main() {
   const depositCap = (100_000n * 10n ** 6n).toString();
   const perUserCap = (5_000n * 10n ** 6n).toString();
 
-  // Step 1: Coffer — #[constructor](asset, plinth, praetor, timelock, deposit_cap, per_user_cap).
+  // Step 1: Coffer, #[constructor](asset, plinth, praetor, timelock, deposit_cap, per_user_cap).
   // Plinth is deployed AFTER Coffer (circular dep), so pass the zero placeholder
   // and wire the real Plinth via set_plinth() once it exists (see Step 5).
   if (stepsToRun.includes('coffer') && !checkpoint.coffer?.address) {
@@ -292,7 +291,7 @@ async function main() {
     console.log(`\ncoffer already deployed in checkpoint: ${checkpoint.coffer.address}`);
   }
 
-  // Step 2: Sigil — still initialize()-based (no #[constructor]); deploy no-arg.
+  // Step 2: Sigil, still initialize()-based (no #[constructor]); deploy no-arg.
   if (stepsToRun.includes('sigil') && !checkpoint.sigil?.address) {
     const { address, tx } = await deployStylusNoConstructor('sigil', 'contracts/sigil', pk);
     checkpoint.sigil = { address, tx, deployed_at: new Date().toISOString() };
@@ -301,7 +300,7 @@ async function main() {
     console.log(`\nsigil already deployed in checkpoint: ${checkpoint.sigil.address}`);
   }
 
-  // Step 3: Vigil — #[constructor](plinth, coffer, portico, praetor, timelock).
+  // Step 3: Vigil, #[constructor](plinth, coffer, portico, praetor, timelock).
   // Coffer is already deployed above; plinth is the zero placeholder (set_plinth in Step 7).
   if (stepsToRun.includes('vigil') && !checkpoint.vigil?.address) {
     const cofferAddr = checkpoint.coffer?.address ?? registry.contracts.coffer.address;

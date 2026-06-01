@@ -4,7 +4,7 @@ import { Card, Stat, RecessedCard, Tag } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
- * /cohort/[id] — detail page for an individual cohort partner.
+ * /cohort/[id], detail page for an individual cohort partner.
  *
  * Per the "no inflated numbers" rule: until partners actually sign and
  * Scribe indexes their data, the partner list is empty. This page is the
@@ -41,10 +41,10 @@ export default async function CohortPartnerPage({ params }: Params) {
       </section>
 
       <section className="mt-12 grid gap-4 md:grid-cols-4">
-        <Stat label="Testnet TVL" value="—" sub="from Scribe" />
-        <Stat label="Open positions" value="—" sub="from Plinth" />
-        <Stat label="Active mandates" value="—" sub="Sigil count" />
-        <Stat label="Joined" value="—" sub="on-chain timestamp" />
+        <Stat label="Testnet TVL" value="-" sub="from Scribe" />
+        <Stat label="Open positions" value="-" sub="from Plinth" />
+        <Stat label="Active mandates" value="-" sub="Sigil count" />
+        <Stat label="Joined" value="-" sub="on-chain timestamp" />
       </section>
 
       <section className="mt-16 grid gap-8 lg:grid-cols-3">

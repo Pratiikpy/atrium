@@ -1,4 +1,4 @@
-"""Unit tests for UK CGT calculator — matches HMRC HS284 worked examples."""
+"""Unit tests for UK CGT calculator, matches HMRC HS284 worked examples."""
 
 from __future__ import annotations
 

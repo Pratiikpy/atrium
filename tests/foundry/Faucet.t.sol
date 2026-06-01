@@ -8,7 +8,7 @@ import {Faucet} from "../../contracts/faucet/src/Faucet.sol";
 /// @notice Phase theta.5 fix (2026-05-25). Pre-fix the Faucet shipped to
 ///         Sepolia with zero unit tests despite holding USDC + ETH that
 ///         users claim on onboarding. The audit (Round 1) flagged this
-///         as a HIGH coverage hole — a faucet failure on judge day is
+///         as a HIGH coverage hole, a faucet failure on judge day is
 ///         the first interaction in the demo flow, so a regression that
 ///         silently lands in production blocks the entire user funnel.
 ///

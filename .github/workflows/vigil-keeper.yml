@@ -1,4 +1,4 @@
-name: Atrium vigil-keeper — 5-minute cron loop
+name: Atrium vigil-keeper, 5-minute cron loop
 
 on:
   schedule:

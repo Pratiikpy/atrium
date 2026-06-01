@@ -11,7 +11,7 @@ import { ARB_SEPOLIA_USDC, USDC_DECIMALS } from '@/lib/testnet-tokens';
 
 /**
  * Vault · Deposit. Audit U-15: previously the submit button had
- * `type="button"` but no `onClick` handler — fully dead. Now the click
+ * `type="button"` but no `onClick` handler, fully dead. Now the click
  * runs an honest approve→deposit flow via wagmi:
  *
  *   - If the user's USDC allowance is below the deposit amount, send

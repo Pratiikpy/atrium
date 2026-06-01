@@ -1,5 +1,5 @@
 /**
- * Codex — Atrium's x402-payable API gateway.
+ * Codex, Atrium's x402-payable API gateway.
  *
  * Pipeline (per TDD §8.2):
  *   x402 paymentMiddleware → Idempotency-Key check → rate limit → handler →
@@ -53,10 +53,10 @@ app.get('/', (c) =>
   })
 );
 
-// Public endpoints — no payment, no rate limit beyond standard CF protection
+// Public endpoints, no payment, no rate limit beyond standard CF protection
 app.get('/health', (c) => c.json({ ok: true }));
 
-// Paid endpoints — wrapped with the full pipeline
+// Paid endpoints, wrapped with the full pipeline
 app.use('/v1/*', x402PaymentMiddleware);
 app.use('/v1/*', idempotency);
 app.use('/v1/*', rateLimit);
@@ -78,7 +78,7 @@ app.notFound((c) =>
 app.onError((err, c) => {
   // Audit FIRE78-CODEX1 fix (sub-agent HIGH): `err.message` can include
   // stack traces, D1 query strings with bound params, RPC URLs, or Scribe
-  // URLs — all of which are env secrets. Log full error server-side only;
+  // URLs, all of which are env secrets. Log full error server-side only;
   // return a static client-facing string in production. Dev still surfaces
   // detail for local debugging.
   console.error('Codex error', err);

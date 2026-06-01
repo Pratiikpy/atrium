@@ -1,5 +1,5 @@
 /**
- * Haruspex tick — 7-day SMA crossover momentum agent (Phase 6).
+ * Haruspex tick, 7-day SMA crossover momentum agent (Phase 6).
  *
  * Long when price > SMA + 1σ. Close when price < SMA.
  */

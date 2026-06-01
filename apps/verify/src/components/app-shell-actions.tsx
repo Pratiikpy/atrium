@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 
 /**
- * Topbar action cluster — Notifications · Refresh · New trade.
+ * Topbar action cluster, Notifications · Refresh · New trade.
  *
  * Split out as a `'use client'` component so the AppShell itself can stay a
  * server component. Audit P-11 fix: Refresh now actually calls

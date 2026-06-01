@@ -6,7 +6,7 @@ import {PolymarketAdapter} from "../../contracts/adapters/polymarket/src/Polymar
 import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdapter.sol";
 
 /// @title PolymarketAdapter foundry test suite
-/// @notice First **hybrid** adapter test — cross-chain (via Aqueduct CCIP) +
+/// @notice First **hybrid** adapter test, cross-chain (via Aqueduct CCIP) +
 ///         off-chain attestation. Two security-critical paths the simpler
 ///         adapters didn't have:
 ///           1. Aqueduct queueing on open: USDC approved + send_collateral called
@@ -91,7 +91,7 @@ contract PolymarketAdapterTest is Test {
     }
 
     function test_metadata_isHybridTrue() public view {
-        // Polymarket is the first hybrid adapter — confirms attest_off_chain_state
+        // Polymarket is the first hybrid adapter, confirms attest_off_chain_state
         // is implemented non-trivially (unlike Curve/TradeXyz/AaveHorizon).
         assertTrue(adapter.isHybrid());
     }
@@ -128,7 +128,7 @@ contract PolymarketAdapterTest is Test {
 
     function test_setValidators_clearsOldSet_DDDDD1() public {
         // The setUp already wired {v1, v2, v3} as validators with quorum 2.
-        // Rotate to a DIFFERENT set {v3} only — v1 and v2 should be evicted.
+        // Rotate to a DIFFERENT set {v3} only, v1 and v2 should be evicted.
         address newSole = validator3;
 
         address[] memory rotated = new address[](1);
@@ -186,7 +186,7 @@ contract PolymarketAdapterTest is Test {
         // a Praetor multisig typo from ever introducing this hazard.
         address[] memory v = new address[](2);
         v[0] = validator1;
-        v[1] = address(0); // hostile entry — must reject
+        v[1] = address(0); // hostile entry, must reject
 
         vm.prank(praetor);
         vm.expectRevert("zero validator");
@@ -289,7 +289,7 @@ contract PolymarketAdapterTest is Test {
     }
 
     /// Iter 60 audit fix: pin setAuthorizedCaller auth + event. Mirror
-    /// of iter 60 cross-adapter sweep — same subgraph-observability
+    /// of iter 60 cross-adapter sweep, same subgraph-observability
     /// invariant.
     event AuthorizedCallerUpdated(address indexed caller, bool authorized);
     function test_setAuthorizedCaller_rejectsHostile_iter60() public {
@@ -418,7 +418,7 @@ contract PolymarketAdapterTest is Test {
 
         IPorticoAdapter.PositionView memory view_ = adapter.get_position(id);
         assertEq(view_.owner, user, "originator must be user, not coffer");
-        // Polymarket positions don't have an on-open price — entry is set by
+        // Polymarket positions don't have an on-open price, entry is set by
         // the first attestation. Verify entry stays zero pre-attestation.
         assertEq(view_.entry_price_q64, 0);
         assertEq(view_.unrealized_pnl_signed, 0);
@@ -457,13 +457,13 @@ contract PolymarketAdapterTest is Test {
         vm.prank(coffer);
         adapter.close_position(id, hex"");
 
-        // Second close must fail — is_open flipped to false.
+        // Second close must fail, is_open flipped to false.
         vm.prank(coffer);
         vm.expectRevert(PolymarketAdapter.PositionNotFound.selector);
         adapter.close_position(id, hex"");
     }
 
-    // ── attest_off_chain_state — the security-critical hybrid path ───
+    // ── attest_off_chain_state, the security-critical hybrid path ───
 
     function test_attest_revertsOnDuplicateAttestationHash() public {
         uint256 id = _openPosition(int256(100e6), user);
@@ -496,7 +496,7 @@ contract PolymarketAdapterTest is Test {
         bytes32 attHash = keccak256("att-dedupe");
         bytes32 digest = _digestForAttHash(attHash);
 
-        // Sign with validator1 twice — should count as ONE.
+        // Sign with validator1 twice, should count as ONE.
         bytes[] memory sigs = new bytes[](2);
         address[] memory signers = new address[](2);
         sigs[0] = _sign(validator1Pk, digest);
@@ -598,7 +598,7 @@ contract PolymarketAdapterTest is Test {
 
     // ── Constructor zero-checks (audit NNNN-1) ───────────────────────
     // Audit TTTT-1: NNNN-1 added four `require(_X != address(0))` guards
-    // to the constructor. SSSS-1 test-coverage-gap lens — pin the revert
+    // to the constructor. SSSS-1 test-coverage-gap lens, pin the revert
     // path on every checked address. The uint64 selector argument is
     // value-typed; zero is a valid (if mis-configured) selector and is
     // not constructor-checked (operationally the praetor would surface

@@ -9,16 +9,16 @@ Five end-to-end journeys per TDD §9. Each test runs in one of two modes:
 
 ## The five journeys
 
-1. **`01-connect-wallet.spec.ts`** — Postern passkey login.
-2. **`02-deposit-usdc.spec.ts`** — Coffer vault deposit.
-3. **`03-open-hedged-position.spec.ts`** — Plinth + adapters open path.
-4. **`04-view-lantern-attestation.spec.ts`** — Hourly proof of reserves.
-5. **`05-kill-switch.spec.ts`** — Revoke all session keys + mandates in one tx.
+1. **`01-connect-wallet.spec.ts`**, Postern passkey login.
+2. **`02-deposit-usdc.spec.ts`**, Coffer vault deposit.
+3. **`03-open-hedged-position.spec.ts`**, Plinth + adapters open path.
+4. **`04-view-lantern-attestation.spec.ts`**, Hourly proof of reserves.
+5. **`05-kill-switch.spec.ts`**, Revoke all session keys + mandates in one tx.
 
 ## Running
 
 ```bash
-# local mode (default — auto-starts `next dev`)
+# local mode (default, auto-starts `next dev`)
 pnpm test:e2e
 
 # specific journey

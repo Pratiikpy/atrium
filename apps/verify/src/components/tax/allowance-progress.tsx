@@ -19,7 +19,7 @@ interface Allowance {
 // the user may have already used part of their allowance. Protocol safety rule:
 // line: "never display a placeholder number that looks real". Now: API
 // failure returns user-specific values as null + source='pending'; the
-// component renders honest "—" sentinels + a pending notice.
+// component renders honest "-" sentinels + a pending notice.
 async function fetchAllowance(jurisdiction: TaxJurisdiction, year: TaxYear): Promise<Allowance> {
   try {
     const r = await fetch(`/api/tax/allowance?jurisdiction=${jurisdiction}&year=${year}`);
@@ -56,14 +56,14 @@ export function TaxAllowanceProgress({
       <header className="flex items-baseline justify-between">
         <p className="font-display text-base text-ink">{data?.jurisdictionLabel ?? 'CGT allowance'}</p>
         <p className="font-mono text-sm text-ink">
-          <span className="text-muted">{data?.usedUsd ?? '—'}</span>
+          <span className="text-muted">{data?.usedUsd ?? '-'}</span>
           <span className="mx-1 text-muted">/</span>
-          {data?.totalUsd ?? '—'}
+          {data?.totalUsd ?? '-'}
         </p>
       </header>
       {/* £3,000 is a public legal constant (UK Treasury 2026/27 CGT annual
           exempt amount). Showing the user's USED/REMAINING numbers when the
-          API is unreachable would be the misleading part — fixed above. */}
+          API is unreachable would be the misleading part, fixed above. */}
       <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">
         Annual allowance · £3,000 {data?.totalUsd ? `(${data.totalUsd} equiv)` : '(equiv pending FX)'}
       </p>
@@ -75,7 +75,7 @@ export function TaxAllowanceProgress({
       </div>
       <div className="mt-2 flex justify-between font-mono text-[10px] text-muted">
         <span>$0</span>
-        <span>{data?.remainingUsd ?? '—'} · annual allowance</span>
+        <span>{data?.remainingUsd ?? '-'} · annual allowance</span>
       </div>
       {isPending && (
         <p className="mt-3 text-[10px] uppercase tracking-wider text-muted">

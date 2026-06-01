@@ -1,4 +1,4 @@
-# Sentry Grouping Rules — Atrium
+# Sentry Grouping Rules, Atrium
 
 Phase 12 config-as-code reference for Sentry issue grouping.
 
@@ -39,9 +39,9 @@ family:javascript package:next/** -group
 ## Tags for Filtering
 
 Phase 12 adds these custom tags automatically:
-- `chain_id` — The chain ID (421614 for Arbitrum Sepolia)
-- `wallet_truncated_first_4` — First 6 chars of connected wallet (e.g., `0x1a2b`)
-- `route_kind` — `browser` or `server`
+- `chain_id`, The chain ID (421614 for Arbitrum Sepolia)
+- `wallet_truncated_first_4`, First 6 chars of connected wallet (e.g., `0x1a2b`)
+- `route_kind`, `browser` or `server`
 
 ## Maintenance
 

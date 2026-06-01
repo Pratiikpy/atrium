@@ -37,7 +37,7 @@ export function handlePositionClosedViaRouter(event: PositionClosedViaRouter): v
   const r = new RouterPositionEvent(id);
   r.user = event.params.user;
   r.venueId = event.params.venue_id;
-  // Close event does not carry instrument_id / notional — leave null. The
+  // Close event does not carry instrument_id / notional, leave null. The
   // dashboard joins to the corresponding `open` record via plinth_position_id
   // if it needs those fields.
   r.instrumentId = null;

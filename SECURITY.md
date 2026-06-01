@@ -4,7 +4,7 @@
 
 Email **security@atrium.fi** with a description and reproduction steps.
 
-- PGP encryption optional — see `runbooks/pgp-key-generation.md` for the public key (placeholder until Phase 7 publishes).
+- PGP encryption optional. See `runbooks/pgp-key-generation.md` for the public key (placeholder until Phase 7 publishes).
 - Best-effort 48-hour acknowledgment. Critical issues triaged same-day.
 - 90-day responsible disclosure window.
 
@@ -12,7 +12,7 @@ Email **security@atrium.fi** with a description and reproduction steps.
 
 Full scope, severity matrix, and reward tiers are documented at:
 
-**[/security/bounty](https://verify.atrium.fi/security/bounty)** — the single source of truth.
+**[/security/bounty](https://verify.atrium.fi/security/bounty)**: the single source of truth.
 
 Summary: Critical $5–25K, High $1–5K, Medium $250–1K, Low/Info swag + hall-of-fame.
 
@@ -24,7 +24,7 @@ Researchers who responsibly disclose are credited at:
 
 **[/security/hall-of-fame](https://verify.atrium.fi/security/hall-of-fame)**
 
-(None yet — repo is pre-launch.)
+(None yet, repo is pre-launch.)
 
 ## Scope
 
@@ -53,7 +53,7 @@ Atrium targets Arbitrum Sepolia testnet for Year 1. No user funds will be at rea
 
 Design intent (live by Month 3 per `docs/MASTER_PLAN.md`):
 
-- Kani + proptest formal-method invariants in CI. 3 of 5 invariants wired at scaffold time; the remaining 2 land Month 2–6.
+- Kani + proptest formal-method invariants in CI. 3 of 5 invariants wired at scaffold time; the remaining 2 land Month 2-6.
 - Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.
 - 3-keeper redundancy with economic slashing.
 - Praetor 3-of-5 multisig with a 48-hour PraetorTimelock on every parameter change.
@@ -66,14 +66,12 @@ Where live code differs from this posture, the gap is honestly logged in `audits
 
 Operational runbooks for each service live under `runbooks/`. Key procedures:
 
-- `runbooks/key-rotation.md` — deployer key rotation
-- `runbooks/incident-notifier.md` — notifier outage
-- `runbooks/incident-lantern.md` — Lantern attestor outage
-- `runbooks/incident-scribe.md` — subgraph indexer lag
-- `runbooks/incident-keeper.md` — vigil-keeper failover
-- `runbooks/pgp-key-generation.md` — PGP key for encrypted disclosures
-
-<!-- TODO: runbooks/incident-response.md — general incident response playbook not yet created -->
+- `runbooks/key-rotation.md`: deployer key rotation
+- `runbooks/incident-notifier.md`: notifier outage
+- `runbooks/incident-lantern.md`: Lantern attestor outage
+- `runbooks/incident-scribe.md`: subgraph indexer lag
+- `runbooks/incident-keeper.md`: vigil-keeper failover
+- `runbooks/pgp-key-generation.md`: PGP key for encrypted disclosures
 
 ## Threat model
 

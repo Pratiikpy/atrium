@@ -194,7 +194,7 @@ export function parseAumUsd(s: string): number {
 }
 
 function Sparkline({ series, direction }: { series: number[]; direction: 'up' | 'down' | 'flat' }) {
-  if (!series.length) return <span className="text-muted">—</span>;
+  if (!series.length) return <span className="text-muted">-</span>;
   const min = Math.min(...series);
   const max = Math.max(...series);
   const range = max - min || 1;

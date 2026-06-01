@@ -43,7 +43,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CSP headers with nonce-based script loading
 - Rate limiting on all public API routes
 
-## v0.2.1 — 2026-05-25
+## v0.2.1 (2026-05-25)
 
 ### Fixed
 - Closed every code-doable item from post-launch contract + integration audit
@@ -51,7 +51,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Selector-mismatch class regression-tested against deployed ABIs
 - Faucet drain functions guard against zero-address recipients
 
-## v0.2.0 — 2026-05-25
+## v0.2.0 (2026-05-25)
 
 ### Added
 - Subgraph completeness (Rostrum + eight event handlers)
@@ -61,7 +61,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Mobile-app reaches canon parity with desktop verifier
 - Code4rena audit pack assembled
 
-## v0.1.0 — 2026-05-23
+## v0.1.0 (2026-05-23)
 
 ### Added
 - LanternAttestor proof-of-reserves cron with on-chain publish
@@ -71,7 +71,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Praetor CLI gains lantern publish-now + seed pre-flight
 - Loadtest baselines via k6
 
-## pre-v0.1 — 2026-05-18
+## pre-v0.1 (2026-05-18)
 
 ### Added
 - Verifier-mode UI complete with deployment-readiness banners and live Kani CI badge

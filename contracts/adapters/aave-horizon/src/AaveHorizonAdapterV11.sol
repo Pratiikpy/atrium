@@ -96,7 +96,7 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
     function isHybrid() external pure returns (bool) { return false; }
     function supportedInstruments() external view returns (bytes32[] memory) { return supported_instruments_; }
 
-    /// v1.0 legacy entry point — refuses with a clear error so callers
+    /// v1.0 legacy entry point, refuses with a clear error so callers
     /// must migrate to v1.1. Removes the `tx.origin` audit-B-10 vulnerability.
     function open_position(bytes32, int256, bytes calldata) external pure returns (uint256) {
         revert V10NotSupported();
@@ -108,7 +108,7 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         revert V10NotSupported();
     }
 
-    /// v1.1 entry point — takes explicit `originator` from Coffer.
+    /// v1.1 entry point, takes explicit `originator` from Coffer.
     function open_position_v11(
         address originator,
         bytes32 instrument_id,
@@ -122,7 +122,7 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         // the Plinth margin DELTA (a fraction of notional for leveraged
         // instruments), not abs(notional). Supply min(notional, delivered):
         // when the delivered margin is below notional (leveraged), supply the
-        // margin — supplying abs(notional) reverted at pool.supply for
+        // margin, supplying abs(notional) reverted at pool.supply for
         // under-funding on every leveraged open. When the adapter is fully
         // funded, supply exactly the notional. notional_signed is retained for
         // Plinth's margin accounting + direction.
@@ -157,13 +157,13 @@ contract AaveHorizonAdapterV11 is IPorticoAdapterV11, ReentrancyGuard {
         if (pos.owner != originator) revert PositionNotOwned();
         // Audit JJJ-8 fix: pre-fix this passed `type(uint256).max` which per
         // Aave V3 IPool semantics withdraws the ENTIRE aToken balance of the
-        // adapter — across all open positions. A close from one user drained
+        // adapter, across all open positions. A close from one user drained
         // the principal of every other user supplied through this adapter,
         // and the realized_pnl calculation reported that delta as the closer's
         // profit. Cross-position fund-drain via Plinth margin accounting.
         //
         // Now: withdraw exactly the principal this position supplied. We lose
-        // pro-rata interest accrual — that's a known testnet trade. The
+        // pro-rata interest accrual, that's a known testnet trade. The
         // proper fix (pro-rata aToken-balance share) needs aToken-interface
         // tracking + totalSupplied state and is deferred Year-2.
         uint256 withdrawn = pool.withdraw(usdc, pos.supplied_amount, atrium_coffer);

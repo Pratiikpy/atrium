@@ -33,7 +33,7 @@ afterEach(() => {
   else process.env.TABLET_URL = ORIGINAL_TABLET_URL;
 });
 
-describe('GET /api/tax/summary — JJ-5 input validation', () => {
+describe('GET /api/tax/summary, JJ-5 input validation', () => {
   it('falls back to jurisdiction=uk on invalid input', async () => {
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest('jurisdiction=evilcorp'))).json();
@@ -42,7 +42,7 @@ describe('GET /api/tax/summary — JJ-5 input validation', () => {
     expect(json.taxRate).toBe('10%'); // UK rate
   });
 
-  it('accepts uk / us / de / other (U-30 — Tablet enum is `de`, not `eu`)', async () => {
+  it('accepts uk / us / de / other (U-30, Tablet enum is `de`, not `eu`)', async () => {
     const { GET } = await import('./route');
     const usJson = await (await GET(makeRequest('jurisdiction=us'))).json();
     expect(usJson.taxRate).toBe('15%');
@@ -99,7 +99,7 @@ describe('GET /api/tax/summary — JJ-5 input validation', () => {
   });
 });
 
-describe('GET /api/tax/summary — Tablet integration', () => {
+describe('GET /api/tax/summary, Tablet integration', () => {
   it('returns pending when TABLET_URL unset', async () => {
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest(''))).json();

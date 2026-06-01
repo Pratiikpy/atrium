@@ -5,7 +5,7 @@ import { AgentsStatRow } from '@/components/agents/stat-row';
 import { AgentsView } from '@/components/agents/agents-view';
 import { AgentsMobile } from '@/components/mobile/panels/agents-mobile';
 
-/* PERF-04: NewMandateButton is heavy (EIP-712 signing logic) — dynamic.
+/* PERF-04: NewMandateButton is heavy (EIP-712 signing logic), dynamic.
    Audit #50: CopyTradeMandate wraps it to read ?copy and prefill recommended
    caps from the marketplace/leaderboard deep-link. */
 const CopyTradeMandate = nextDynamic(

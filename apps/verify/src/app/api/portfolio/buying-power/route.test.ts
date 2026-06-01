@@ -39,7 +39,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_DEMO_WALLET;
 });
 
-describe('GET /api/portfolio/buying-power — KK-3 NaN-timestamp drop', () => {
+describe('GET /api/portfolio/buying-power, KK-3 NaN-timestamp drop', () => {
   it('drops series rows whose timestamp is empty', async () => {
     (gql as any).mockResolvedValue({
       marginUpdates: [
@@ -97,7 +97,7 @@ describe('GET /api/portfolio/buying-power — KK-3 NaN-timestamp drop', () => {
   });
 });
 
-describe('GET /api/portfolio/buying-power — KK-4 formatUsd precision', () => {
+describe('GET /api/portfolio/buying-power, KK-4 formatUsd precision', () => {
   it('computes free margin via BigInt subtract (collateral - required)', async () => {
     (gql as any).mockResolvedValue({
       marginUpdates: [
@@ -145,7 +145,7 @@ describe('GET /api/portfolio/buying-power — KK-4 formatUsd precision', () => {
   });
 });
 
-describe('GET /api/portfolio/buying-power — pending paths', () => {
+describe('GET /api/portfolio/buying-power, pending paths', () => {
   it('returns source:pending when wallet env is unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');

@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {IPorticoAdapter} from "../../../portico-registry/src/IPorticoAdapter.sol";
 import {ReentrancyGuard} from "../../../portico-registry/src/ReentrancyGuard.sol";
 
-/// Morpho Blue — partial interface used by Atrium adapter. Full at
+/// Morpho Blue, partial interface used by Atrium adapter. Full at
 /// resources/morpho-blue/src/Morpho.sol.
 /// Morpho Blue keys lending markets by `MarketParams` (collateral + loan
 /// token + LLTV + oracle + IRM). Atrium pre-registers approved markets and
@@ -34,7 +34,7 @@ interface IERC20 {
 /// @title MorphoBlueAdapter
 /// @notice Portico adapter for Morpho Blue isolated lending markets.
 ///
-///         **Status:** Phase-2 conditional per PRD §17 / TDD §13 — Month-9 ship
+///         **Status:** Phase-2 conditional per PRD §17 / TDD §13, Month-9 ship
 ///         contingent on the Stylus Sprint grant landing by Month 7. This scaffold
 ///         freezes the contract shape; the real implementation maps the
 ///         IPorticoAdapter `open_position(notional_signed > 0)` semantics to
@@ -90,7 +90,7 @@ contract MorphoBlueAdapter is IPorticoAdapter, ReentrancyGuard {
     /// Phase theta-followup (2026-05-25): the scaffold can no longer accept
     /// open_position calls. Pre-fix, calling open via the Router would pull
     /// USDC from Coffer (per adapterPull) but the scaffold never deployed
-    /// the collateral into Morpho — the funds would strand in the adapter.
+    /// the collateral into Morpho, the funds would strand in the adapter.
     error ScaffoldNotImplemented();
 
     modifier onlyAuthorizedCaller() {
@@ -157,7 +157,7 @@ contract MorphoBlueAdapter is IPorticoAdapter, ReentrancyGuard {
     {
         // Phase theta-followup (2026-05-25): scaffold blocks entry. Pre-fix
         // a call would pull USDC via Coffer.adapterPull, record position
-        // metadata, and never deploy into Morpho — the collateral would
+        // metadata, and never deploy into Morpho, the collateral would
         // strand in the adapter and Coffer's share accounting would
         // permanently disagree with on-chain reality. Real Morpho supply
         // + borrow + LLTV math lands Year-2.

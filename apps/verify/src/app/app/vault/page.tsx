@@ -15,7 +15,7 @@ export const metadata = {
 // useReadContract / useWriteContract. Those hooks require WagmiProvider
 // in context, which doesn't exist during static prerender. Forcing
 // dynamic rendering avoids the WagmiProviderNotFoundError and is the
-// right semantic anyway — vault state is wallet-specific.
+// right semantic anyway, vault state is wallet-specific.
 export const dynamic = 'force-dynamic';
 
 export default function VaultPage() {
@@ -28,8 +28,8 @@ export default function VaultPage() {
       ]}
       // Viewport slots: only the active layout mounts, so the deposit form +
       // stats hooks fire once. (The md:hidden wrapper below is now redundant
-      // belt-and-braces — the slot already prevents the desktop double-mount
-      // the comment warns about — but kept for defence in depth.)
+      // belt-and-braces, the slot already prevents the desktop double-mount
+      // the comment warns about, but kept for defence in depth.)
       mobile={
         <div className="md:hidden">
           <VaultMobile />

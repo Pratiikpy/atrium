@@ -14,7 +14,7 @@ const TERMS: Record<string, string> = {
   'p&l 24h':
     'Your profit or loss over the last 24 hours, shown as a dollar amount and as a percent of your collateral.',
   notional: 'The total face value of a position, including leverage.',
-  leverage: 'Multiplier on your collateral — higher leverage means larger positions but faster liquidation.',
+  leverage: 'Multiplier on your collateral, higher leverage means larger positions but faster liquidation.',
   'maintenance margin': 'Minimum collateral required to keep a position open before liquidation triggers.',
   'initial margin': 'Collateral required to open a new position.',
   'liquidation buffer':

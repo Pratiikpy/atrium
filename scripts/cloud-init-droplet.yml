@@ -1,5 +1,5 @@
 #cloud-config
-# Atrium daemons droplet — first-boot provisioning.
+# Atrium daemons droplet, first-boot provisioning.
 # Applied automatically when provision-do-droplet.sh creates the droplet.
 
 package_update: true

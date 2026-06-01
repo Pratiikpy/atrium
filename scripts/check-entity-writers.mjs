@@ -5,7 +5,7 @@
  *
  * Walks every `type X @entity` declaration in subgraph/schema.graphql, then
  * walks subgraph/src/**.ts for writers (`new X(` or `X.load(...)`). Reports
- * any entity with zero writers — those are "ghost entities" defined in the
+ * any entity with zero writers, those are "ghost entities" defined in the
  * schema but never produced by a handler. Queries against them silently
  * return empty arrays, which is exactly the verify-app leaderboards-always-
  * empty bug found in iteration 16.
@@ -49,7 +49,7 @@ async function* walk(dir, ext) {
   for (const entry of entries) {
     const p = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      // Skip generated AssemblyScript bindings — those are read-only mirrors
+      // Skip generated AssemblyScript bindings, those are read-only mirrors
       // of the schema; the writers live in hand-written handler files.
       if (entry.name === 'generated' || entry.name === 'node_modules') continue;
       yield* walk(p, ext);
@@ -83,7 +83,7 @@ async function collectWriters() {
 function hasWriter(entityName, blob) {
   // `new Entity(` instantiates a fresh row.
   // `Entity.load(` reads an existing row (must follow with .save() to be
-  // a meaningful writer — but load-only is also evidence the entity is
+  // a meaningful writer, but load-only is also evidence the entity is
   // consumed in handler code, which means the schema is alive in some
   // sense). For ghost-entity purposes the conservative check is "any
   // reference in handler code at all" but that's too loose. We require
@@ -112,7 +112,7 @@ async function main() {
   console.log(`  ignored:    ${ignored.length} (per WRITER_IGNORE allow-list)`);
   console.log(`  GHOSTS:     ${ghosts.length}`);
   if (ghosts.length > 0) {
-    console.log('\nghost entities — defined in schema.graphql but no `new Entity(` in subgraph/src/:');
+    console.log('\nghost entities, defined in schema.graphql but no `new Entity(` in subgraph/src/:');
     for (const name of ghosts) {
       console.log(`  ${name}`);
     }

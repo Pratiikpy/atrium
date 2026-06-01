@@ -4,7 +4,7 @@ import { keccak256, encodeAbiParameters, parseAbiParameters, type Hex } from 'vi
  * Lantern Merkle verification (079-BE6 fix).
  *
  * Pre-fix the "Verified" badge was produced by a wallet-address find() over an
- * unverified IPFS JSON — the attested root was never compared, the tree never
+ * unverified IPFS JSON, the attested root was never compared, the tree never
  * re-hashed, no proof checked. This module does the real thing, mirroring the
  * attestor's hashing byte-for-byte (services/lantern-attestor/src/merkle.ts):
  *   - leaf  = keccak256(keccak256(abi.encode(address,uint256,bytes32)))  [double-hash, OZ]

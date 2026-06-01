@@ -27,7 +27,7 @@ afterEach(() => {
   consoleSpy.mockRestore();
 });
 
-describe('Codex safeErrorDetail — production redaction', () => {
+describe('Codex safeErrorDetail, production redaction', () => {
   it('returns static fallback in production (NOT err.message)', () => {
     const err = new Error('D1 SELECT failed: tx_hash=0xLEAKY rpc=https://leak.example.com');
     expect(safeErrorDetail(err, { ENV: 'production' })).toBe('upstream unavailable');
@@ -42,7 +42,7 @@ describe('Codex safeErrorDetail — production redaction', () => {
   });
 });
 
-describe('Codex safeErrorDetail — dev pass-through', () => {
+describe('Codex safeErrorDetail, dev pass-through', () => {
   it('returns err.message when env.ENV is undefined (dev default)', () => {
     const err = new Error('Scribe 503');
     expect(safeErrorDetail(err, {})).toBe('Scribe 503');
@@ -59,7 +59,7 @@ describe('Codex safeErrorDetail — dev pass-through', () => {
   });
 });
 
-describe('Codex safeErrorDetail — env-shape mismatch tolerance', () => {
+describe('Codex safeErrorDetail, env-shape mismatch tolerance', () => {
   it('treats env=null as non-production (dev pass-through)', () => {
     // Defensive: a Worker that hasn't bound ENV must NOT fall to the
     // "production" branch by accident. Default-to-dev keeps debug

@@ -1,5 +1,5 @@
 /**
- * setup-stylus-adapters — Task #335: schedule setAuthorizedCaller(AtriumRouter, true)
+ * setup-stylus-adapters, Task #335: schedule setAuthorizedCaller(AtriumRouter, true)
  * on every v1.1 adapter via PraetorTimelock.
  *
  * Usage:
@@ -106,7 +106,7 @@ async function main() {
       }
       console.log(`\n  Scheduling setAuthorizedCaller on ${slug} (${addr})...`);
       // Phase 2b changed all 9 adapters to onlyTimelock for setAuthorizedCaller
-      // (MASTER_PLAN §6.2 — 48h veto window applies to authorization changes).
+      // (MASTER_PLAN §6.2, 48h veto window applies to authorization changes).
       // This timelock-schedule path is the correct production workflow.
       const entry: OpsEntry = {
         slug,

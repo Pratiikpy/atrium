@@ -19,7 +19,7 @@ import { join } from 'node:path';
  * extension (adding a 6th arg, renaming `ipfsCid`, etc.) needs to land
  * in BOTH .ts files OR this test fails loudly.
  *
- * Same shape as apps/verify/src/lib/verifier-hooks-contract.test.ts —
+ * Same shape as apps/verify/src/lib/verifier-hooks-contract.test.ts -
  * pin the function-name selectors against the contract so a regression
  * fails CI before it reaches a live tx that reverts on chain.
  */
@@ -85,8 +85,8 @@ describe('LanternAttestor.publish ABI parity', () => {
     const api = readFileSync(API, 'utf8');
     // The writeContract call must reference root, blockNumber, a leaf-
     // count expression, an ipfsCid expression, and the signature. We
-    // don't pin exact identifier names — both files use slightly
-    // different locals (leafCountArg vs leafCountForEvent) — but the
+    // don't pin exact identifier names, both files use slightly
+    // different locals (leafCountArg vs leafCountForEvent), but the
     // function name + 5-arg shape is mandatory.
     expect(src).toMatch(/functionName:\s*['"`]publish['"`]/);
     expect(api).toMatch(/functionName:\s*['"`]publish['"`]/);

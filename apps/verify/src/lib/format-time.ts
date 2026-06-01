@@ -6,7 +6,7 @@
  * `parseInt(timestamp)`. The audit S-6 fix (sort by unix, not by human
  * string) was applied to `notifications/route.ts` but the same bug existed
  * in `portfolio/activity/route.ts` (sort by `a.timestamp < b.timestamp`
- * where `timestamp` is the human "Xm ago" string — non-deterministic).
+ * where `timestamp` is the human "Xm ago" string, non-deterministic).
  *
  * Centralizing the helpers prevents the audit S-6 regression and makes
  * the NaN-rejection (Wave-II audit II-1) uniform everywhere a Scribe
@@ -33,7 +33,7 @@ export function parseTsOrNull(s: string | null | undefined): number | null {
  * Human-readable "5s ago" / "12m ago" / "3h ago" / "2d ago" string.
  * Clamps at 0 so clock skew doesn't render negative durations.
  *
- * NEVER use the returned string as a sort key — it's lexical and
+ * NEVER use the returned string as a sort key, it's lexical and
  * non-deterministic. Sort by the underlying unix seconds, then call
  * `ago()` for display only.
  */

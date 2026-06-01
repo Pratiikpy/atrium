@@ -1,4 +1,4 @@
-//! Haruspex — momentum reference agent.
+//! Haruspex, momentum reference agent.
 //!
 //! Strategy: 10-period RSI on HIP-3 stock perps. Enter long on overbought
 //! breakout. Exit when RSI back in neutral band. Audit C-17 fix: now wired
@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_env_filter("info").init();
     // Silent-failure guard: instrument_id is the fundamental identifier the
     // agent operates on. Pre-fix, an unset HARUSPEX_INSTRUMENT_ID would default
-    // to "" and the agent would run silently — fetching empty prices, never
+    // to "" and the agent would run silently, fetching empty prices, never
     // taking an action, hitting allocation caps after 24h of no-ops. The
     // operator would think everything was fine. Now we refuse to start.
     let instrument_id = std::env::var("HARUSPEX_INSTRUMENT_ID")

@@ -10,7 +10,7 @@ import { ImageResponse } from 'next/og';
  * The image renders dynamically (Next.js dynamic OG image): parchment
  * background, italic Instrument Serif wordmark, the testnet pill, and
  * the subtitle that names the product in one line. Same dimensions
- * (1200x630) work for both og:image and twitter:image — `./twitter-
+ * (1200x630) work for both og:image and twitter:image, `./twitter-
  * image.tsx` re-exports this so the Twitter card matches the OG.
  *
  * Routes can override per-page metadata via their own opengraph-image
@@ -38,7 +38,7 @@ export default async function OpengraphImage() {
       fonts = [{ name: 'Instrument Serif', data: fontData, style: 'italic' }];
     }
   } catch {
-    // Font not available — fall through to generic serif
+    // Font not available, fall through to generic serif
   }
 
   return new ImageResponse(

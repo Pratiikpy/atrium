@@ -11,7 +11,7 @@
  *            past `Number.MAX_SAFE_INTEGER` (~$9B at micro-USDC scale).
  *
  * Audit U-36: the prior fix used `parseFloat(formatUnits(big, decimals))`
- *            which STILL round-trips through Number — past ~$10^15 sub-
+ *            which STILL round-trips through Number, past ~$10^15 sub-
  *            cent precision drops, sub-cent values truncate to $0.00,
  *            negatives render as "$-100.00" not "-$100.00". The current
  *            implementation is BigInt-native:
@@ -21,7 +21,7 @@
  *              - negatives render as "-$100.00" (conventional form)
  *
  * All three helpers accept the raw on-chain BigInt + the asset's decimal
- * count. Callers MUST pass the correct decimals — USDC is 6, ETH-like is 18.
+ * count. Callers MUST pass the correct decimals, USDC is 6, ETH-like is 18.
  */
 
 /**
@@ -30,7 +30,7 @@
  * digits with banker-neutral half-up rounding, applies thousands
  * separators to the integer part.
  *
- * `displayDecimals` ≤ `decimals` — the function rounds down to fewer
+ * `displayDecimals` ≤ `decimals`, the function rounds down to fewer
  * display digits. `displayDecimals > decimals` is supported (pads with
  * trailing zeros).
  *
@@ -50,7 +50,7 @@ function formatBigDecimal(amountWei: bigint, decimals: number, displayDecimals: 
   let intPart: bigint;
   let displayFrac: bigint;
   if (displayDecimals >= decimals) {
-    // Pad with trailing zeros — no rounding needed.
+    // Pad with trailing zeros, no rounding needed.
     intPart = intPartRaw;
     displayFrac = fracPartRaw * 10n ** BigInt(displayDecimals - decimals);
   } else {
@@ -69,7 +69,7 @@ function formatBigDecimal(amountWei: bigint, decimals: number, displayDecimals: 
   }
 
   // Thousands separator on the integer part. JavaScript regex on the
-  // string representation is the standard trick — at this scale (<10^60)
+  // string representation is the standard trick, at this scale (<10^60)
   // performance is irrelevant.
   const intStr = intPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const fracStr = displayFrac.toString().padStart(displayDecimals, '0');
@@ -82,7 +82,7 @@ function formatBigDecimal(amountWei: bigint, decimals: number, displayDecimals: 
  *  matching the conventional US currency format). */
 export function formatUsd(amountWei: bigint, decimals: number): string {
   const body = formatBigDecimal(amountWei, decimals, 2);
-  // Move the sign outside the dollar sign — "-100.00" → "-$100.00".
+  // Move the sign outside the dollar sign, "-100.00" → "-$100.00".
   if (body.startsWith('-')) {
     return `-$${body.slice(1)}`;
   }

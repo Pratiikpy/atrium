@@ -16,7 +16,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_tx_hash ON payments (tx_hash);
 
 -- Audit HHHH-1: `rate_limit_counters` was declared but the live rate-limit
 -- middleware (src/middleware/rate-limit.ts) uses an in-memory Map per
--- isolate (documented as acceptable for Workers free tier — see
+-- isolate (documented as acceptable for Workers free tier, see
 -- human_left.md #18). Table retained for Year-2 migration to durable
 -- backing store (CF Durable Object or Upstash Redis); IF NOT EXISTS keeps
 -- it cheap to migrate and forward-compatible.

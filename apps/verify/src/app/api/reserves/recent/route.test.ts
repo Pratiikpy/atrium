@@ -44,7 +44,7 @@ function row(overrides: Partial<{
   };
 }
 
-describe('GET /api/reserves/recent — MM-2 corrupt-row drop', () => {
+describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
   it('drops rows with non-numeric blockNumber', async () => {
     (gql as any).mockResolvedValue({
       lanternAttestations: [
@@ -144,7 +144,7 @@ describe('GET /api/reserves/recent — MM-2 corrupt-row drop', () => {
 // Audit U-11: ?window param drives the gql limit so the "24h / 7d / 30d"
 // tabs in the UI fetch the right slice of attestations instead of being
 // dead spans.
-describe('GET /api/reserves/recent — window param', () => {
+describe('GET /api/reserves/recent, window param', () => {
   function makeReq(window: string | undefined) {
     const url = new URL('http://localhost/api/reserves/recent');
     if (window) url.searchParams.set('window', window);

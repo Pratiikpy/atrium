@@ -39,7 +39,7 @@ DEPLOY_FILE="deployments/arbitrum_sepolia.json"
 
 if [ ! -f "${DEPLOY_FILE}" ]; then
     echo "ERROR: ${DEPLOY_FILE} not found."
-    echo "Run the contract deploy first (Month-1 task — Praetor CLI deploy)."
+    echo "Run the contract deploy first (Month-1 task, Praetor CLI deploy)."
     echo "The PorticoRegistry + adapter + AtriumRouter chain must be live"
     echo "before the subgraph can index a meaningful event stream."
     exit 1

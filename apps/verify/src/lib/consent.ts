@@ -1,5 +1,5 @@
 /**
- * Consent gate — Phase 3 hardening + Phase 10 cookie banner integration.
+ * Consent gate, Phase 3 hardening + Phase 10 cookie banner integration.
  *
  * Reads/writes localStorage `atrium_consent_v1` (JSON of categories → boolean).
  * SSR-safe: returns false when window is undefined.

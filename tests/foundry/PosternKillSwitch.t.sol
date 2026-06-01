@@ -111,7 +111,7 @@ contract PosternKillSwitchTest is Test {
     //
     // Pre-MMM-6, a single reverting `sigil.revokeAllOnBehalfOf` would have
     // reverted the entire activate() call. The user's session keys would
-    // NOT have been cancelled — the most important step of the kill switch
+    // NOT have been cancelled, the most important step of the kill switch
     // skipped because of an unrelated stale-nonce error on one agent. The
     // fix wrapped each per-agent revoke in try/catch and emits
     // `SigilRevokeSkipped`. Same protection on the markAllRevoked side.
@@ -151,7 +151,7 @@ contract PosternKillSwitchTest is Test {
         agents[1] = agentB;
 
         // Emitted event must report 1 revoked, NOT 2 (the count excludes the
-        // failed agent — KillSwitchActivated.sigil_agents_revoked is the
+        // failed agent, KillSwitchActivated.sigil_agents_revoked is the
         // honest "actually revoked" count, not the input length).
         vm.expectEmit(true, false, false, true, address(killSwitch));
         emit PosternKillSwitch.KillSwitchActivated(user, 1, 2, block.timestamp);
@@ -260,5 +260,5 @@ contract MockKeyRegistry {
     }
 }
 
-/// Minimal EntryPoint stub — PosternKillSwitch only stores the address.
+/// Minimal EntryPoint stub, PosternKillSwitch only stores the address.
 contract MockEntryPoint {}

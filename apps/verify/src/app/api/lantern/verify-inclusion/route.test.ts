@@ -7,7 +7,7 @@ import { computeRoot, type RawLeaf } from '@/lib/lantern-merkle';
  *
  * The verify-inclusion route is a thin proxy that fetches an IPFS-pinned
  * Merkle tree and reports inclusion. The audit found that prior code
- * interpolated `ipfsCid` directly into the gateway URL — letting a hostile
+ * interpolated `ipfsCid` directly into the gateway URL, letting a hostile
  * caller pivot to any host (SSRF) or read sibling paths (`Qm…/../etc`).
  *
  * The fix pins a strict CIDv0/CIDv1 regex and validates the gateway
@@ -34,7 +34,7 @@ function makePostRequest(body: unknown): Request {
   });
 }
 
-describe('POST /api/lantern/verify-inclusion — input validation', () => {
+describe('POST /api/lantern/verify-inclusion, input validation', () => {
   it('rejects a non-JSON body with bad_request_body', async () => {
     const req = new Request('http://localhost/api/lantern/verify-inclusion', {
       method: 'POST',
@@ -107,7 +107,7 @@ describe('POST /api/lantern/verify-inclusion — input validation', () => {
         wallet: '0x' + 'a'.repeat(40),
       }),
     );
-    // Validation passes — should NOT be 400 invalid_cid.
+    // Validation passes, should NOT be 400 invalid_cid.
     const json = await res.json();
     expect(json.reason).not.toBe('invalid_cid');
   });
@@ -179,7 +179,7 @@ describe('POST /api/lantern/verify-inclusion — input validation', () => {
   });
 });
 
-describe('POST /api/lantern/verify-inclusion — real verification (079-BE6)', () => {
+describe('POST /api/lantern/verify-inclusion, real verification (079-BE6)', () => {
   const salt = (n: number) => (`0x${n.toString(16).padStart(64, '0')}`);
   const VALID_CID = 'Qm' + 'a'.repeat(44).replace(/0|O|I|l/g, 'A');
   const walletA = '0x' + 'a'.repeat(40);

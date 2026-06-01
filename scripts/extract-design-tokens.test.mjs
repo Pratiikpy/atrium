@@ -10,7 +10,7 @@ import { extractBundleSection, CONFIRMED_TOKENS } from './extract-design-tokens.
  * agency prototype's visual language).
  */
 
-describe('extractBundleSection — script-tag matching', () => {
+describe('extractBundleSection, script-tag matching', () => {
   it('finds manifest section with simple shape', async () => {
     const html = `<html><script type="__bundler/manifest">{"abc":1}</script></html>`;
     const result = await extractBundleSection(html, 'manifest');
@@ -68,7 +68,7 @@ describe('extractBundleSection — script-tag matching', () => {
   });
 });
 
-describe('CONFIRMED_TOKENS — shape contract for UI scaffolding', () => {
+describe('CONFIRMED_TOKENS, shape contract for UI scaffolding', () => {
   it('exposes the canonical parchment + ink colors', () => {
     assert.equal(CONFIRMED_TOKENS.colors.parchment, '#FBFAF7');
     assert.equal(CONFIRMED_TOKENS.colors.ink, '#1A1714');

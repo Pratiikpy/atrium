@@ -1,6 +1,6 @@
 # Incident Response Procedure
 
-Phase 12 — general incident response for Atrium production.
+Phase 12, general incident response for Atrium production.
 
 Referenced from `SECURITY.md`.
 
@@ -32,7 +32,7 @@ Referenced from `SECURITY.md`.
 
 ### 3. Mitigate
 
-**P0 — Fund safety:**
+**P0, Fund safety:**
 ```bash
 # Emergency pause via Praetor multisig
 cast send $PRAETOR_TIMELOCK "pause()" --private-key $MULTISIG_KEY_1
@@ -41,7 +41,7 @@ cast send $PRAETOR_TIMELOCK "pause()" --private-key $MULTISIG_KEY_1
 cast send $POSTERN_KILL_SWITCH "revokeAll(address)" $COMPROMISED_ACCOUNT
 ```
 
-**P1 — Service restoration:**
+**P1, Service restoration:**
 ```bash
 # Hotfix branch
 git checkout -b hotfix/incident-YYYY-MM-DD
@@ -50,7 +50,7 @@ git push -u origin hotfix/incident-YYYY-MM-DD
 # Vercel auto-deploys preview; promote to production via Vercel UI
 ```
 
-**P2/P3 — Ticket:**
+**P2/P3, Ticket:**
 - Create GitHub issue with `incident` label
 - Link to incident channel
 - Schedule for next sprint
@@ -71,11 +71,11 @@ Template: `incidents/YYYY-MM-DD-<slug>.md`
 
 ## Timeline
 
-- HH:MM — Alert fired
-- HH:MM — Incident commander assigned
-- HH:MM — Root cause identified
-- HH:MM — Mitigation applied
-- HH:MM — Service restored
+- HH:MM, Alert fired
+- HH:MM, Incident commander assigned
+- HH:MM, Root cause identified
+- HH:MM, Mitigation applied
+- HH:MM, Service restored
 
 ## Root Cause (5 Whys)
 
@@ -85,8 +85,8 @@ Template: `incidents/YYYY-MM-DD-<slug>.md`
 
 ## Action Items
 
-- [ ] <action> — owner — due date
-- [ ] <action> — owner — due date
+- [ ] <action>, owner, due date
+- [ ] <action>, owner, due date
 
 ## Lessons Learned
 

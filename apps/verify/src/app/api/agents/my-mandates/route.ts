@@ -84,7 +84,7 @@ export async function GET(req?: Request) {
 
     // Compute the live mandate set: drop any validation whose intentHash has
     // since been revoked. Keyed by intentHash because that's the Sigil's
-    // identity — a single agent can hold multiple mandates with different
+    // identity, a single agent can hold multiple mandates with different
     // intents (one for hedging, one for stat-arb).
     const revokedHashes = new Set<string>();
     for (const r of data.sigilRevocations ?? []) {

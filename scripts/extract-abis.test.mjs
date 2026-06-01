@@ -10,7 +10,7 @@ import { TARGETS } from './extract-abis.mjs';
  * extractor by misshapen entry.
  */
 
-describe('TARGETS — shape contract', () => {
+describe('TARGETS, shape contract', () => {
   it('is a non-empty array', () => {
     assert.ok(Array.isArray(TARGETS));
     assert.ok(TARGETS.length > 0);

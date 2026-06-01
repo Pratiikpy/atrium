@@ -16,7 +16,7 @@ import { safeErrorDetail } from '@/lib/safe-error';
  *
  * Audit NN-3 fix: Scribe returns numeric fields as strings (BigInt-as-string
  * convention). Prior code typed them as `number` and let downstream components
- * implicitly coerce — `new Date(timestamp * 1000)` on a malformed string
+ * implicitly coerce, `new Date(timestamp * 1000)` on a malformed string
  * rendered the literal "Invalid Date" in the dashboard. Now the route
  * parses + validates each field and returns 404 if any are corrupt, the
  * same shape as "no attestation exists" so the dashboard renders the empty
@@ -72,7 +72,7 @@ export async function GET() {
     const timestamp = parseTsOrNull(latest.timestamp);
     const leafCount = parseStrictPositiveInt(latest.leafCount);
     if (blockNumber == null || timestamp == null || leafCount == null) {
-      // Corrupt Scribe row — surface as "no attestation" rather than ship
+      // Corrupt Scribe row, surface as "no attestation" rather than ship
       // NaN downstream. The dashboard's empty state is the honest result.
       return NextResponse.json({ exists: false, reason: 'corrupt_indexed_row' }, { status: 404 });
     }

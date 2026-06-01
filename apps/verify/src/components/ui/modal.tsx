@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 
 /**
- * Shared modal — focus trap + Escape + aria-modal + scroll-lock + click-out.
+ * Shared modal, focus trap + Escape + aria-modal + scroll-lock + click-out.
  *
  * Audit R-6 (Wave-S) + Wave-T hardening + Wave-U hardening:
  *   - Focus trap (initial focus, Tab/Shift-Tab cycle)
@@ -30,7 +30,7 @@ const FOCUSABLE_SELECTOR =
 // Audit U-3 fix: state stored on `document.body.dataset` instead of module
 // globals. Dataset survives React StrictMode double-invoke (because cleanup
 // → re-mount within the same paint cycle never sees a stale module value
-// across the two passes — both passes see and update the dataset).
+// across the two passes, both passes see and update the dataset).
 const LOCK_FLAG = 'atriumModalLock';
 const LOCK_COUNT_ATTR = 'atriumModalLockCount';
 const LOCK_ORIGINAL_ATTR = 'atriumModalOriginalOverflow';
@@ -166,7 +166,7 @@ export function Modal({
   );
 }
 
-/** Modal close-X button — composes with `<Modal>` so the X reliably exists. */
+/** Modal close-X button, composes with `<Modal>` so the X reliably exists. */
 export function ModalCloseButton({ onClose }: { onClose: () => void }) {
   return (
     <button

@@ -3,7 +3,7 @@
  * step to the contract / off-chain route that will actually execute it
  * plus the honest "what runs on click" copy.
  *
- * Step 1 ships first (Coffer deposit — exercises the same path as the
+ * Step 1 ships first (Coffer deposit, exercises the same path as the
  * vault page). Steps 2–7 each carry a specific "pending Month X" message
  * so the runner can render an honest disabled state instead of a generic
  * "wiring lands later" stub.
@@ -20,14 +20,14 @@ export type VerifierAction =
   | { kind: 'plinth-open-position'; pending: true }
   | { kind: 'plinth-recompute-margin'; pending: true }
   // Audit U-27: step 4 wired with real POST to /api/chaos/inject. The
-  // route itself gates on PRAETOR_CHAOS_URL — when the agent isn't
+  // route itself gates on PRAETOR_CHAOS_URL, when the agent isn't
   // deployed, it returns honest 503 with a named reason. The hook
   // surfaces that as an error status; once the agent ships, the same
   // POST returns 200 with the fault-recovery timing.
   | { kind: 'chaos-inject' }
   | { kind: 'vigil-liquidate'; pending: true }
   // Audit U-26: step 6 wired with real /api/lantern/verify-inclusion. The
-  // action is read-only (no contract write) — fetch the latest
+  // action is read-only (no contract write), fetch the latest
   // attestation, post wallet+root+cid, surface the result. No `pending`
   // flag needed once the route works end-to-end.
   | { kind: 'lantern-verify' }
@@ -88,19 +88,19 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     title: 'Verify against Lantern proof-of-reserves',
     action: { kind: 'lantern-verify' },
     // Wired live by audit U-26. The action is a read-only inclusion-
-    // proof check — no contract deploy needed. It fails honestly with
+    // proof check, no contract deploy needed. It fails honestly with
     // `no_attestation_yet` until the Lantern attestor cron publishes
     // its first attestation (per docs/MASTER_PLAN.md Phase 6), at which
     // point the same code path succeeds with the real Merkle inclusion
     // result.
     pendingReason:
-      'No Lantern attestation indexed yet — the read path is wired but the cron defers to Month 6.',
+      'No Lantern attestation indexed yet, the read path is wired but the cron defers to Month 6.',
   },
   7: {
     step: 7,
     title: 'Kill Switch: revoke every mandate + session key',
     action: { kind: 'postern-kill-switch' },
-    // Wired live by audit U-18 — fires PosternKillSwitch.activate(...)
+    // Wired live by audit U-18, fires PosternKillSwitch.activate(...)
     // when the contract is in the deployments registry. Until then the
     // deployment-status gate (which reads `?step=7`) keeps the button
     // disabled and renders this banner instead.

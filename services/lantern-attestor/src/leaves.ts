@@ -1,5 +1,5 @@
 /**
- * Lantern leaf builder — share-redemption-aware (Phase 6, FULL_AUDIT #20).
+ * Lantern leaf builder, share-redemption-aware (Phase 6, FULL_AUDIT #20).
  *
  * Every leaf's balance is now sourced from on-chain via
  * Coffer.convertToAssets(balanceOf(user)). Scribe only provides the user
@@ -7,7 +7,7 @@
  *
  * Rate-limit budget: batches of 100 users, 5 concurrent batches via
  * async-sema. At ~50ms/multicall that's ~1s per 500 users. For 10k users
- * the full fanout takes ~20s — well within the 60s tick budget.
+ * the full fanout takes ~20s, well within the 60s tick budget.
  */
 
 import { createPublicClient, http } from 'viem';

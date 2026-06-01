@@ -5,13 +5,13 @@ import { fileURLToPath } from 'node:url';
 
 /**
  * Audit U-44: humanize-error functions across components share one
- * voice convention — lowercase opener (except for contract names like
+ * voice convention, lowercase opener (except for contract names like
  * "Sigil", "Coffer"), no trailing period. Matches the founder-voice
  * guideline in `docs/conventions/writing.md`: plain, conversational
  * fragments rather than full sentences.
  *
  * Pre-fix, `components/agents/new-mandate-button.tsx`'s
- * `humanizeIssueError` was the only outlier — sentence-case + trailing
+ * `humanizeIssueError` was the only outlier, sentence-case + trailing
  * periods. Normalized to match the other three (vault deposit/withdraw,
  * trade order-form). This test pins the convention going forward.
  *
@@ -69,7 +69,7 @@ describe('U-44: humanize-error functions share lowercase-no-period style', () =>
           // (the slice-truncation fallback).
           if (s === '' || s.endsWith('…')) continue;
           if (s.endsWith('.')) {
-            failures.push(`${file}: humanize-return ends with period — "${s}"`);
+            failures.push(`${file}: humanize-return ends with period, "${s}"`);
           }
         }
       }

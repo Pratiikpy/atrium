@@ -1,7 +1,7 @@
 [project]
 name = "atrium-tablet"
 version = "0.1.0"
-description = "Tablet — UK CGT / US 8949 / DE FIFO tax exports for Atrium"
+description = "Tablet, UK CGT / US 8949 / DE FIFO tax exports for Atrium"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Atrium Contributors" }]

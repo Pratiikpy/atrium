@@ -12,9 +12,9 @@ Status: **not yet configured**
 
 ## Provider options
 
-1. **Cloudflare Email Routing** (free tier) — forward-only, no sending. Good enough for receiving disclosures.
-2. **Google Workspace** — full send/receive. Required if we need to reply from `@atrium.fi`.
-3. **Fastmail** — privacy-focused alternative.
+1. **Cloudflare Email Routing** (free tier), forward-only, no sending. Good enough for receiving disclosures.
+2. **Google Workspace**, full send/receive. Required if we need to reply from `@atrium.fi`.
+3. **Fastmail**, privacy-focused alternative.
 
 ## Steps (Cloudflare Email Routing)
 

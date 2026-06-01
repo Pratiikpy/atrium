@@ -60,7 +60,7 @@ contract TransferAdmin is Script {
 
         // 101-OPS3.1: each contract logs `ok` or `FAIL` above. A FAIL means
         // that contract does not yet implement the admin-transfer setter
-        // (set_praetor on Stylus, updatePraetor on Solidity) — the role did
+        // (set_praetor on Stylus, updatePraetor on Solidity), the role did
         // NOT move there. The setter is implemented + tested on coffer,
         // atrium-router, and portico-registry; the same one-line pattern must
         // be rolled out to the remaining admin-holders at redeploy. Treat any

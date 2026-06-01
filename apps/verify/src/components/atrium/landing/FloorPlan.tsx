@@ -34,7 +34,7 @@ const ROOMS: Room[] = [
 ];
 
 const ROOM_DESC: Record<string, string> = {
-  portico:   "Open standard adapter framework — IPorticoAdapter v1.0.0 — and the 7 live integrations.",
+  portico:   "Open standard adapter framework, IPorticoAdapter v1.0.0, and the 7 live integrations.",
   sigil:     "EIP-712 mandates over ERC-8004. Issues short-lived session keys bound to one agent.",
   rostrum:   "Agent leaderboard + copy-trading. Public performance, on-chain history, slashing appeals.",
   codex:     "x402-payable agent APIs. 8 endpoints. Signed responses.",
@@ -47,12 +47,12 @@ const ROOM_DESC: Record<string, string> = {
   coffer:    "ERC-4626 collateral vaults in Rust on the OpenZeppelin Rust ERC-4626 base.",
   lantern:   "Merkle attestations published every ≤10 minutes on-chain. Independent 14kb verifier.",
   cohort:    "Five to eight named design partners, sharing venue-specific knowledge.",
-  curator:   "Open-source grant programme — $20–50K ARB — for community-built Portico adapters.",
+  curator:   "Open-source grant programme, $20–50K ARB, for community-built Portico adapters.",
   postern:   "ERC-4337 + EIP-7702 wallet abstraction. Passkey login, session keys, social recovery.",
   aqueduct:  "Chainlink CCIP messaging contracts. Move collateral between testnets.",
   plinth:    "SPAN-style portfolio margin engine in Rust, deployed as Stylus.",
   vigil:     "NMS-aware partial-liquidation engine in Rust. Watches every position every block.",
-  stoa:      "Black-Scholes options engine in Rust. Phase 2 — ships if Trailblazer lands.",
+  stoa:      "Black-Scholes options engine in Rust. Phase 2, ships if Trailblazer lands.",
 };
 
 function DimLine({ x1, y1, x2, label }: { x1: number; y1: number; x2: number; y2: number; label: string }) {
@@ -242,8 +242,8 @@ export function FloorPlanSection() {
             </defs>
 
             <line x1="20" y1="760" x2="1220" y2="760" stroke="var(--floor-ink)" strokeWidth={0.6} strokeDasharray="6 6" opacity={0.4} />
-            <text x="20" y="754" className="floor-mono" fontSize="10" fill="var(--floor-muted)">— — PLAN VIEW · upper levels — —</text>
-            <text x="1220" y="754" className="floor-mono" textAnchor="end" fontSize="10" fill="var(--floor-muted)">— — SECTION · foundation — —</text>
+            <text x="20" y="754" className="floor-mono" fontSize="10" fill="var(--floor-muted)">-, PLAN VIEW · upper levels, -</text>
+            <text x="1220" y="754" className="floor-mono" textAnchor="end" fontSize="10" fill="var(--floor-muted)">-, SECTION · foundation, -</text>
 
             <rect x="90" y="124" width="1060" height="600" fill="none" stroke="var(--floor-ink)" strokeWidth={1.6} />
             <rect x="100" y="560" width="1040" height="160" fill="none" stroke="var(--floor-ink)" strokeWidth={0.8} opacity={0.6} />

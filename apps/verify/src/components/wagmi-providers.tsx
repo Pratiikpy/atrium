@@ -7,7 +7,7 @@ import { watchAccount } from 'wagmi/actions';
 import { wagmiConfig } from '@/lib/wagmi';
 
 /**
- * Wagmi boundary — only mounted on routes that actually use wallet hooks.
+ * Wagmi boundary, only mounted on routes that actually use wallet hooks.
  * Loaded via `next/dynamic` so the landing page bundle never pays the
  * ~150KB cost of viem + the connector ecosystem.
  *

@@ -1,6 +1,6 @@
 # Stylus build sandbox for local development on Windows / non-Linux hosts.
 #
-# Closes `human_left.md` #11 — local Stylus builds were blocked on Windows
+# Closes `human_left.md` #11, local Stylus builds were blocked on Windows
 # MSVC. CI on ubuntu-latest works (see .github/workflows/ci.yml, the
 # `test-rust` and `kani` jobs). This Dockerfile gives developers the same
 # environment locally so they don't have to wait for a CI roundtrip on

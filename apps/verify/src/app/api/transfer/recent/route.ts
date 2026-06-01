@@ -37,7 +37,7 @@ export async function GET(req?: Request) {
     // Audit NN-7 fix: precision loss past safe-int via Number(BigInt(.))/1e6.
     // formatShares uses viem's formatUnits which preserves the full precision.
     // Audit U-24 fix: per-row `duration: '8.4s'` and `timestamp: 'recent'`
-    // were hardcoded — every transfer row shipped identical fake values
+    // were hardcoded, every transfer row shipped identical fake values
     // even when scribe returned 20 distinct credits with different block
     // numbers. CrossChainCredit doesn't expose per-row timestamps (only
     // createdAtBlock), so the honest answer is null duration + the real

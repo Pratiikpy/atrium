@@ -20,7 +20,7 @@ events still happen but users are not paged.
 
 ## Triage (10 min target)
 
-1. Open `.github/workflows/notifier-cron.yml` Actions tab — confirm the
+1. Open `.github/workflows/notifier-cron.yml` Actions tab, confirm the
    1-minute cron is firing. A halted cron means GHA throttled (rare;
    Atrium is well within free-tier minutes).
 2. Inspect the latest tick log for: scribe-fetch errors, KV cursor
@@ -38,7 +38,7 @@ events still happen but users are not paged.
 | KV cursor frozen | Manually reset: `SET notifier:lastBlock <recent-block>` via Upstash UI | yes |
 | Telegram bot blocked | Rotate `TELEGRAM_BOT_TOKEN`; users re-`/start` the bot | yes |
 | Resend rate limit | Drop email cadence to once-per-event-class; document in the internal ops log | yes |
-| Scribe down | Wait — notifier resumes on next tick once Scribe returns | yes |
+| Scribe down | Wait, notifier resumes on next tick once Scribe returns | yes |
 
 ## Resolution checklist
 

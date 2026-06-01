@@ -46,7 +46,7 @@ contract StoaBlackScholesTest is Test {
     }
 
     function test_priceCall_scaffoldReturnsZero() public view {
-        // Until Phase-2 lands the math, scaffold returns 0 — locked behavior
+        // Until Phase-2 lands the math, scaffold returns 0, locked behavior
         // so Codex can detect-and-degrade rather than reporting a non-existent
         // option price as live.
         uint256 p = stoa.price_call(2_000e18, 2_100e18, 8e17, 5e16, 30 days);
@@ -109,7 +109,7 @@ contract StoaBlackScholesTest is Test {
 
     // ── Fuzz: conservative-upper-bound property ──────────────────────
     // Scaffold MUST never return less than (spot_e18 * contracts_e18) / 1e18
-    // — that is the upper bound a real BSM SPAN value can never exceed.
+    //, that is the upper bound a real BSM SPAN value can never exceed.
     // This property is what Plinth relies on to treat the scaffold output as
     // a strict ceiling so a scaffold cannot under-margin a real position.
     //

@@ -9,7 +9,7 @@
 // `scripts/redeploy-stylus.mjs` (deploy with no constructor args, then call
 // `initialize(address,address,address,address,address)`). They deliberately do
 // NOT assume a `#[constructor]` entry, an `action_nonce` replay guard, or an
-// EIP-2 upper-s rejection — none of those exist on the canonical contract.
+// EIP-2 upper-s rejection, none of those exist on the canonical contract.
 //
 // Coverage:
 //  - initialize() sets the admin slots + re-init / zero-arg guards
@@ -44,7 +44,7 @@ const KILL_SWITCH: Address = address!("00000000000000000000000000000000000000A5"
 
 // secp256k1 private keys (arbitrary non-zero scalars, < n). Used to make REAL
 // signatures so the recovery path is exercised end-to-end (the precompile is
-// then mocked to return exactly what k256 recovers — a faithful 0x01 stub).
+// then mocked to return exactly what k256 recovers, a faithful 0x01 stub).
 const OWNER_PK: [u8; 32] = [
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
@@ -129,7 +129,7 @@ fn sign_digest(pk: &[u8; 32], digest: &B256) -> Signature {
 
 /// The exact 128-byte calldata the contract builds for the 0x01 precompile,
 /// given a digest + signature. We replicate it so we can register a mock that
-/// returns the address k256 recovers — a faithful stand-in for the real
+/// returns the address k256 recovers, a faithful stand-in for the real
 /// precompile (TestVM does not execute precompiles natively).
 fn ecrecover_calldata(digest: &B256, sig: &Signature) -> Vec<u8> {
     let mut calldata = [0u8; 128];
@@ -305,7 +305,7 @@ fn setup() -> (TestVM, Sigil) {
 /// host serves precompile return bytes from a single `state.return_data` slot
 /// that is overwritten at mock-REGISTRATION time and is NOT updated per-key by
 /// `perform_mocked_static_call`. validate_action makes TWO precompile calls
-/// (owner sig, then agent sig) and reads `return_data` after each — so both
+/// (owner sig, then agent sig) and reads `return_data` after each, so both
 /// reads see the SAME bytes. The only way both the owner-check and the
 /// agent-check can pass in one invocation is for both recovered addresses to be
 /// identical. We therefore use a single signer for the happy path: the owner
@@ -378,7 +378,7 @@ fn fixture_keys_recover_to_expected_addresses() {
 }
 
 // ---------------------------------------------------------------------------
-// initialize() — admin wiring + guards (the slots the deploy script sets)
+// initialize(), admin wiring + guards (the slots the deploy script sets)
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -394,7 +394,7 @@ fn initialize_is_one_shot() {
     // Audit F-G + re-init guard: once praetor_multisig is set, a second
     // initialize must revert. This is the guard that the manual-initialize
     // pattern needs (a `#[constructor]` would get this implicitly; this
-    // contract does not use one — see scripts/redeploy-stylus.mjs).
+    // contract does not use one, see scripts/redeploy-stylus.mjs).
     let (vm, mut sigil) = setup();
     vm.set_sender(PRAETOR);
     let res = sigil.initialize(PRAETOR, TIMELOCK, PLINTH, REGISTRY, KILL_SWITCH);
@@ -426,7 +426,7 @@ fn initialize_rejects_zero_admin_args() {
 }
 
 // ---------------------------------------------------------------------------
-// validate_action — happy path + signature recovery
+// validate_action, happy path + signature recovery
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -468,7 +468,7 @@ fn validate_action_rejects_replayed_action_031sc10() {
 
 #[test]
 fn validate_action_rejects_non_plinth_caller_031sc10() {
-    // 031-SC10: validate_action is the agent-authorization gate — Plinth-only.
+    // 031-SC10: validate_action is the agent-authorization gate, Plinth-only.
     let (vm, mut sigil) = setup();
     let intent = happy_intent();
     let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
@@ -567,7 +567,7 @@ fn validate_action_rejects_forged_agent_signature() {
 }
 
 // ---------------------------------------------------------------------------
-// Caps — venue / notional (host-level, full validate path)
+// Caps, venue / notional (host-level, full validate path)
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -656,7 +656,7 @@ fn validate_action_rejects_oversize_notional() {
 }
 
 // ---------------------------------------------------------------------------
-// Rate limit — per agent per UTC day
+// Rate limit, per agent per UTC day
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -687,7 +687,7 @@ fn validate_action_enforces_per_day_rate_limit() {
 }
 
 // ---------------------------------------------------------------------------
-// Credit line — CUMULATIVE-only accounting + record_close decrement
+// Credit line, CUMULATIVE-only accounting + record_close decrement
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -766,7 +766,7 @@ fn record_close_decrements_open_notional_plinth_only() {
 }
 
 // ---------------------------------------------------------------------------
-// Revocation — single-intent, per-agent nonce, kill-switch
+// Revocation, single-intent, per-agent nonce, kill-switch
 // ---------------------------------------------------------------------------
 
 #[test]
@@ -945,7 +945,7 @@ fn domain_separator_is_stable_for_fixed_inputs() {
 // must print the SAME domain separator, struct hashes, digests, and flat wire
 // envelopes. The script's `--selfcheck` mode reproduces these exact values;
 // `make`/CI can diff them. If they ever drift, a real on-chain signature would
-// fail recovery silently (the WW-1 class of bug) — this is the tripwire.
+// fail recovery silently (the WW-1 class of bug), this is the tripwire.
 #[test]
 fn prints_eip712_reference_for_aave_fill_crosscheck() {
     let verifying = address!("c9933ebe7dc8c4849a1720b2e5b33e381442c873"); // deployed Sigil

@@ -42,7 +42,7 @@ venv/
 .pytest_cache/
 .mypy_cache/
 
-# Env + secrets — never commit
+# Env + secrets, never commit
 .env
 .env.*
 !.env.example
@@ -51,7 +51,7 @@ venv/
 secrets/
 keys/
 
-# Local notes — never commit
+# Local notes, never commit
 outreach/targets-private.md
 notes/
 *.local.md
@@ -96,7 +96,7 @@ resources/
 # Local IDE and editor workspace configurations
 .claude/
 
-# Internal ops scratch — kept local for the founder team, not on
+# Internal ops scratch, kept local for the founder team, not on
 # public github. Re-add to tracking only after stripping internal
 # paths / outreach names per docs/conventions/git.md "Public repo
 # readiness" + writing.md "Claims discipline".
@@ -110,13 +110,13 @@ CLAUDE.md
 # permanent product collateral.
 JUDGE_ONE_PAGER.md
 LAUNCH_READY.md
-# Self-judging audit files — internal, signed off, no longer useful
+# Self-judging audit files, internal, signed off, no longer useful
 # as public-facing. The current audit lives under audits/ which is
 # tracked and dated. Old root-level AUDIT_*.md are scratch.
 AUDIT_*.md
 
 # Long-form internal product + engineering docs. Serious product repos
-# don't publish their PRD, full architecture spec, or roadmap — these
+# don't publish their PRD, full architecture spec, or roadmap, these
 # are kept off-github (Notion / Drive). Local copies remain at the
 # names below for the team to reference; the public docs/ folder
 # keeps only what a real product publishes.
@@ -132,7 +132,7 @@ docs/MONTH_01_AUDIT.md
 docs/ROADMAP.md
 docs/kani-baseline.txt
 
-# Internal audit scratch — Auditor A through H letter-coded reviews,
+# Internal audit scratch, Auditor A through H letter-coded reviews,
 # month-N half-baked sweeps. Kept off-github; current public audit is
 # audits/2026-05-25-contract-quality-audit.md.
 audits/MONTH12_AUDIT_PLAN.md
@@ -143,12 +143,12 @@ audits/month-*.md
 # reference but not public.
 tripwires/
 
-# Demo rehearsal package — judge runbook, fault checklist, Loom
+# Demo rehearsal package, judge runbook, fault checklist, Loom
 # outline. Operationally useful for the team but reads as buildathon
 # scaffolding to an outsider.
 rehearsals/
 
-# Internal ops scripts — outreach templates, social announcement
+# Internal ops scripts, outreach templates, social announcement
 # drafts, code4rena submission pack, legal-consult questions, launch
 # runbook. All team-internal.
 ops/LAUNCH_RUNBOOK.md
@@ -168,13 +168,13 @@ think_data.md
 !apps/verify/public/**/*.png
 !apps/verify/public/**/*.jpg
 
-# Design source folder — Figma-Make HTML exports + extracted fonts and
+# Design source folder, Figma-Make HTML exports + extracted fonts and
 # JS assets. Design source lives in Figma; only final brand assets ship
 # under apps/verify/public/brand/. The local design/ folder is the team's
 # reference, not part of the public product surface.
 design/
 
-# Self-hosted fonts — downloaded at build time by scripts/download-fonts.mjs.
+# Self-hosted fonts, downloaded at build time by scripts/download-fonts.mjs.
 # Not committed to avoid large binaries in git.
 apps/verify/public/fonts/*.woff2
 
@@ -189,6 +189,7 @@ atrium-site-tokens.json
 
 # Internal planning / audit / readiness docs (kept local, out of the public repo)
 GOAL.md
+QA_TEST_PLAN.md
 BUILD_PLAN.md
 DO_NOW_PLAN.md
 FEATURE_COMPLETION.md
@@ -203,6 +204,13 @@ docs/FOUNDER-RUNBOOK.md
 # Local cutover rollback backups (timestamped deployment snapshots)
 deployments/*.bak
 apps/verify/public/deployments/*.bak
+
+# Editor backups, anywhere
+*.bak
+
+# Local QA scratch harnesses (real-tx E2E / screenshot sweeps), not shipped
+apps/verify/run-*.mjs
+apps/verify/visual-sweep.mjs
 
 # Kiro IDE workspace
 .kiro/

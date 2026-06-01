@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title PosternKillSwitch — one-tap revoke for all Sigil mandates + Postern session keys
+/// @title PosternKillSwitch, one-tap revoke for all Sigil mandates + Postern session keys
 /// @notice Postern (PRD §4.18 + TDD §7.4). Enables a user to revoke every active
 ///         delegation in a single batched UserOp. Required for trust UX: agents
 ///         and session keys are powerful, the kill switch makes them safe.
@@ -68,7 +68,7 @@ contract PosternKillSwitch {
         // Kill Switch contract's own address.
         //
         // Audit MMM-6 fix: wrap each per-agent revoke in try/catch. The kill
-        // switch is the emergency button — a single agent that reverts (Sigil
+        // switch is the emergency button, a single agent that reverts (Sigil
         // paused / agent already revoked in a stale nonce / future Sigil
         // upgrade quirk) must NOT prevent the user from revoking their
         // session keys via the registry step below. Counting + emitting
@@ -85,12 +85,12 @@ contract PosternKillSwitch {
         // Cancel every active Postern session key for this user.
         // Audit MMM-6: also guard the registry call. If markAllRevoked
         // reverts (e.g. unbounded loop OOG on a hostile-spam'd registry),
-        // the user is still better off than reverting the whole activate —
+        // the user is still better off than reverting the whole activate -
         // at least their Sigil mandates landed.
         address[] memory keys = keyRegistry.getActiveKeys(user);
         uint256 keys_cancelled = keys.length;
         try keyRegistry.markAllRevoked(user) {
-            // success — keys_cancelled is accurate
+            // success, keys_cancelled is accurate
         } catch {
             keys_cancelled = 0;
         }

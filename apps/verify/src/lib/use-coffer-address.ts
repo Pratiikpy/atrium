@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 /**
  * Reads the Coffer (ERC-4626 USDC vault) address from the deployments
- * registry. Returns `null` until the contract is deployed — components
+ * registry. Returns `null` until the contract is deployed, components
  * gating writes on this hook must check `address !== null` before
  * calling `useWriteContract`.
  *

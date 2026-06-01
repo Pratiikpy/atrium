@@ -9,7 +9,7 @@ import { VENUES, VENUE_COUNT, venueLabel } from './venues';
  * RH-Chain explicitly omitted until the SDK ships (`human_left.md` #3).
  */
 describe('VENUES list', () => {
-  it('contains exactly seven entries — locked at the v1 testnet count', () => {
+  it('contains exactly seven entries, locked at the v1 testnet count', () => {
     expect(VENUES).toHaveLength(7);
     expect(VENUE_COUNT).toBe(7);
   });
@@ -49,7 +49,7 @@ describe('VENUES list', () => {
 
   it('binary-outcome venues carry the highest haircut (largest tail-loss model)', () => {
     // Polymarket is the only binary venue. Its haircut should be the max
-    // across the seven — any future binary venue should follow suit.
+    // across the seven, any future binary venue should follow suit.
     const polymarket = VENUES.find((v) => v.id === 'polymarket');
     expect(polymarket).toBeDefined();
     const maxHaircut = Math.max(...VENUES.map((v) => v.haircutBps));
@@ -59,7 +59,7 @@ describe('VENUES list', () => {
 
 describe('venueLabel()', () => {
   it('returns the label for a known venueId', () => {
-    // Hyperliquid HIP-3 is Plinth venue_id 1 — locks the canonical mapping.
+    // Hyperliquid HIP-3 is Plinth venue_id 1, locks the canonical mapping.
     expect(venueLabel(1)).toBe('Hyperliquid HIP-3');
     expect(venueLabel(2)).toBe('Aave Horizon');
   });

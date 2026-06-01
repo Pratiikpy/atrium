@@ -4,7 +4,7 @@
 
 version: 2
 updates:
-  # npm — covers apps/verify + every service/* with a package.json. The
+  # npm, covers apps/verify + every service/* with a package.json. The
   # monorepo lives under pnpm-workspace.yaml; dependabot supports it
   # natively via the `npm` ecosystem.
   - package-ecosystem: "npm"
@@ -27,7 +27,7 @@ updates:
       next-react:
         patterns: ["next", "react", "react-dom", "@types/react*"]
 
-  # cargo — Stylus + Solidity-helper crates.
+  # cargo, Stylus + Solidity-helper crates.
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
@@ -44,7 +44,7 @@ updates:
       alloy:
         patterns: ["alloy*"]
 
-  # GitHub Actions — keep our own CI fresh.
+  # GitHub Actions, keep our own CI fresh.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -59,7 +59,7 @@ updates:
       actions:
         patterns: ["*"]
 
-  # Docker — keep Dockerfile base images fresh (FULL_AUDIT L-35).
+  # Docker, keep Dockerfile base images fresh (FULL_AUDIT L-35).
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

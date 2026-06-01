@@ -3,7 +3,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Atrium · Rostrum',
-  description: 'Action attestation log — trades ship Phase 6 of launch plan.',
+  description: 'Action attestation log, trades ship Phase 6 of launch plan.',
 };
 
 export default function RostrumPage() {

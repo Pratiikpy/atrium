@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import "forge-std/Test.sol";
 import {MockChainlinkUsdFeed} from "../../contracts/mocks/MockChainlinkUsdFeed.sol";
 
-/// @title MockChainlinkUsdFeed — testnet-stub behavior tests
+/// @title MockChainlinkUsdFeed, testnet-stub behavior tests
 /// @notice Pins the two invariants PlinthOracle.safe_price relies on: the feed
 ///         is ALWAYS fresh (updatedAt == block.timestamp, answeredInRound ==
 ///         roundId so the stale-round + freshness gates always pass) and the

@@ -53,7 +53,7 @@ export async function GET(req?: Request) {
     // Audit KK-8 fix: prior code sorted by the human "Xm ago" string,
     // which is lexical and non-deterministic ("10m ago" < "2m ago"
     // alphabetically). Same as the audit S-6 fix that landed in
-    // notifications/route.ts — the bug crept back here because the
+    // notifications/route.ts, the bug crept back here because the
     // activity feed was written without referencing that fix.
     //
     // Audit KK-9 + KK-10: drop events with corrupt timestamps or null
@@ -65,7 +65,7 @@ export async function GET(req?: Request) {
       title: string;
       meta: string;
       timestamp: string;
-      tsUnix: number; // sort key — stripped before wire
+      tsUnix: number; // sort key, stripped before wire
       txHash?: string;
     }
     const activities: Activity[] = [];

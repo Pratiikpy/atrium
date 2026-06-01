@@ -101,7 +101,7 @@ export async function GET(req?: Request) {
       });
     }
     notifications.sort((a, b) => b.tsUnix - a.tsUnix);
-    // Audit T-6 + U-7: tsUnix is a server-side sort key only — strip from
+    // Audit T-6 + U-7: tsUnix is a server-side sort key only, strip from
     // wire. The destructure-discard pattern is intentional; eslint-disable
     // below silences the unused-vars lint on the intentionally-discarded var.
     const wireSafe = notifications.slice(0, 50).map((n) => {

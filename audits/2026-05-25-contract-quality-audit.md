@@ -1,4 +1,4 @@
-# Atrium contracts — final quality audit, 2026-05-25
+# Atrium contracts, final quality audit, 2026-05-25
 
 Scope: every Solidity + Stylus contract in `contracts/`. Focus on best
 practices, structure, efficiency, and security vulnerabilities.
@@ -15,7 +15,7 @@ test suites pass.
 | Open | 0 | 0 | 2 | 4 | 6 |
 
 No critical or high findings. The 2 medium items are both KYC/tier
-related (Edict downgrade path + Sumsub RED-review handling) — both
+related (Edict downgrade path + Sumsub RED-review handling), both
 already disclosed publicly on `/docs/honesty`. The 4 low items are
 defense-in-depth hardening. The 6 informational items are notes for
 future review cycles.
@@ -33,10 +33,10 @@ sweeps run:
 
 | Pattern | What it catches | Result |
 |---|---|---|
-| `unchecked { ... }` in Solidity | Overflow surfaces | 0 hits — code relies on 0.8+ checked math throughout |
+| `unchecked { ... }` in Solidity | Overflow surfaces | 0 hits, code relies on 0.8+ checked math throughout |
 | `.transfer(...)`, `.send(...)`, `.call{value:}` without return check | Lost-funds + silent failures | All 11 hits checked; 0 unchecked returns |
 | `unwrap_or(...)` in Stylus | Silent fail-open on RPC errors | 26 hits reviewed; the 3 risky ones (Coffer USDC paused, Plinth margin, Coffer USDC balance) were closed in an earlier hardening cycle |
-| `tx.origin` | 4337-bundler / router misuse | 0 hits in current code; legacy v1.0 adapter (Aave 0xE991) has `tx.origin` per audit-B-10 — V11 redeploy migrated to explicit `originator` |
+| `tx.origin` | 4337-bundler / router misuse | 0 hits in current code; legacy v1.0 adapter (Aave 0xE991) has `tx.origin` per audit-B-10, V11 redeploy migrated to explicit `originator` |
 | `ecrecover` raw | Signature malleability, address(0) bypass | 3 hits; all 3 (Hyperliquid, Polymarket, Sigil) defend against address(0) recovery + dedup by recovered identity, defanging malleability |
 | `block.timestamp` for security-critical compare | Miner manipulation | 11 hits; all are timelock / cooldown / oracle-staleness with proper buffers (LINK burn 30d, MIN_EXPIRES_AT_DELTA 1h, Faucet cooldown) |
 | Initializer guards | Re-init takeover | All upgradeable contracts use `initialized` flag + check |
@@ -55,7 +55,7 @@ silently returns `ok: true, ignored: 'review_not_green'` on RED without
 doing anything on chain.
 
 Already disclosed publicly on `/docs/honesty` under
-[`reference-agents`](../apps/verify/src/app/docs/honesty/page.tsx) — the
+[`reference-agents`](../apps/verify/src/app/docs/honesty/page.tsx), the
 adjacent disclosure pattern applies here too. For Year-1 testnet this
 is acceptable because no real KYC has been completed yet; for mainnet
 it needs:
@@ -80,7 +80,7 @@ ceremony). `scripts/safe-ceremony.md` is the runbook.
 
 ### LOW-1: Faucet drain functions don't check zero-address recipient
 
-`contracts/faucet/src/Faucet.sol:83-93` — `drainUsdc(to, amount)` and
+`contracts/faucet/src/Faucet.sol:83-93`, `drainUsdc(to, amount)` and
 `drainEth(to, amount)` are praetor-only. They don't check `to !=
 address(0)`. If the praetor key accidentally drains to zero, funds are
 permanently lost. Two-line fix:
@@ -93,7 +93,7 @@ function drainUsdc(address to, uint256 amount) external {
 }
 ```
 
-Defense-in-depth, no exploit path — only matters if the praetor key
+Defense-in-depth, no exploit path, only matters if the praetor key
 fat-fingers an address.
 
 **Status:** Open. Trivial fix; deferred to next Faucet redeploy.
@@ -104,7 +104,7 @@ fat-fingers an address.
 signers via raw `ecrecover` without checking that `s ≤ secp256k1n/2`
 (EIP-2 lower-s constraint). For both contracts the dedup loop runs by
 recovered claimed-address, so the canonical-vs-malleable pair recovers
-to the same address and only counts once — malleability is defanged
+to the same address and only counts once, malleability is defanged
 operationally.
 
 But the convention is to reject upper-s outright so signature payloads
@@ -130,7 +130,7 @@ Sepolia faucet caps at ~0.1 ETH so no testnet keeper can self-stake.
 The `set_keeper_min_stake_emergency` setter (an earlier hardening cycle) was added to
 let the founder lower this for the demo. Until the founder runs that
 setter + redeploys, the Vigil keeper service runs in monitoring-only
-mode — it observes paused accounts but can't actually call
+mode, it observes paused accounts but can't actually call
 `executeLiquidation`.
 
 Already disclosed on `/docs/honesty#vigil-keeper`.
@@ -167,7 +167,7 @@ pub fn foo(&mut self, ...) -> Result<..., Error> {
 
 Plinth, Coffer, Sigil, Vigil all carry this. The Solidity adapters
 don't reenter into Coffer / Plinth post-write so OZ `ReentrancyGuard`
-isn't pulled in — `portico-registry/src/ReentrancyGuard.sol` is the
+isn't pulled in, `portico-registry/src/ReentrancyGuard.sol` is the
 home-grown variant for the Solidity layer.
 
 ### INFO-3: ERC-7201 namespaced storage on upgradeable contracts
@@ -180,18 +180,18 @@ Prevents slot collisions across upgrades.
 
 Every parameter setter is `onlyTimelock` (e.g. `Coffer.set_adapter`,
 `Plinth.set_oracle`, `Edict.setSumsubVerifier`). Multisig-only emergency
-paths exist for instant action (`pause`) but cannot change state — only
+paths exist for instant action (`pause`) but cannot change state, only
 pause it. Asymmetry: pause is instant, resume needs 48h. Per design.
 
 ### INFO-5: All adapter `close_position` paths sweep USDC to Coffer
 
 Audit task θ.1 added `IERC20(usdc).transfer(atrium_coffer, settled)`
 after every adapter's `close_position` settlement. Pre-θ.1, settled
-funds stayed in the adapter's balance — a UX bug (user can't withdraw)
+funds stayed in the adapter's balance, a UX bug (user can't withdraw)
 but not a loss-of-funds bug. Now all 7 production adapters
 (Hyperliquid, Aave V11, Pendle, Curve, Trade.xyz, Polymarket, GMX) sweep.
 Synthetix + Morpho are scaffold-locked (`revert ScaffoldNotImplemented`
-on open) so the close path is unreachable — defense-in-depth against
+on open) so the close path is unreachable, defense-in-depth against
 funds-strand on a stuck scaffold.
 
 ### INFO-6: Selector-mismatch class regression-tested
@@ -202,8 +202,8 @@ Three audit-tape selector mismatches caught this session:
 - Lantern `publish` 3-arg vs 5-arg (deployed contract)
 
 Two regression tests pin the selectors to the deployed contracts:
-- `apps/verify/src/lib/verifier-hooks-contract.test.ts` — UI hooks
-- `services/lantern-attestor/src/publish-abi.test.ts` — off-chain service
+- `apps/verify/src/lib/verifier-hooks-contract.test.ts`, UI hooks
+- `services/lantern-attestor/src/publish-abi.test.ts`, off-chain service
 
 A future selector drift fails CI before reaching a live tx that reverts
 with empty-data. The pattern should be extended to the chaos route
@@ -214,10 +214,10 @@ silently drift again.
 
 This audit reviewed contract code only. NOT reviewed in this pass:
 
-- Off-chain services (Codex, Notifier, Lantern-attestor) — covered
+- Off-chain services (Codex, Notifier, Lantern-attestor), covered
   in `audits/2026-05-25-services-audit.md` (TBD)
-- Subgraph schema integrity — `subgraph/` deserves a separate pass
-- Front-end input validation — covered by an earlier hardening cycle dead-UI sweep
+- Subgraph schema integrity, `subgraph/` deserves a separate pass
+- Front-end input validation, covered by an earlier hardening cycle dead-UI sweep
 
 ## Tests run as part of this audit
 

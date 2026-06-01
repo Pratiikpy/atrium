@@ -1,17 +1,17 @@
 import Link from 'next/link';
 
 /**
- * Hero — "One wallet. Every venue. One buying-power number."
+ * Hero, "One wallet. Every venue. One buying-power number."
  *
  * Port of design/Atriumnew.html section#hero.hero-monument. Dark
  * "monument" hero with centered eyebrow + headline + engineering chrome
  * + venue cards row + unified-margin pool card + leverage ladder.
  *
  * Design tokens (from design/Atriumnew.html computed styles):
- *   bg     oklch(0.11 0.008 60)   — near-black warm
- *   ink    oklch(0.96 0.003 60)   — near-white warm
- *   accent #C46A5E                — terracotta italic emphasis (lifted for dark bg)
- *   font   Geist 500 (display)    — clamp(36px,7vw,77px) / lh 1.04 / tracking -0.03em
+ *   bg     oklch(0.11 0.008 60)  , near-black warm
+ *   ink    oklch(0.96 0.003 60)  , near-white warm
+ *   accent #C46A5E               , terracotta italic emphasis (lifted for dark bg)
+ *   font   Geist 500 (display)   , clamp(36px,7vw,77px) / lh 1.04 / tracking -0.03em
  *
  * Numbers on the venue cards + pool card are the design's reference
  * layout values. Live deployment fills these from Scribe + RPC reads via
@@ -70,7 +70,7 @@ export function HeroSection() {
           number.
         </h1>
 
-        {/* Benefit band — the margin-multiplier wedge, plain + concrete (Phase 1
+        {/* Benefit band, the margin-multiplier wedge, plain + concrete (Phase 1
             legibility). Numbers are clearly labelled illustrative, not live TVL;
             real buying power is computed by Plinth and shown in /app. */}
         <div className="mx-auto mt-8 max-w-2xl">
@@ -118,15 +118,15 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Venue cards — row 1 */}
+        {/* Venue cards, row 1 */}
         <div className="mx-auto mt-10 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <VenueCard name="Hyperliquid HIP-3" tag="HL-HIP3" kind="Tokenized-stock perps" tvl="—" assets="USDC · WETH" share="—" />
-          <VenueCard name="Hyperliquid HIP-4" tag="HL-HIP4" kind="Permissioned perps" tvl="—" assets="USDC" share="—" />
-          <VenueCard name="Aave Horizon" tag="AAVE-V3" kind="RWA collateral" tvl="—" assets="aUSDC · USTB" share="—" />
-          <VenueCard name="Pendle V2" tag="PENDLE" kind="Fixed-yield · PT" tvl="—" assets="PT-stETH" share="—" />
+          <VenueCard name="Hyperliquid HIP-3" tag="HL-HIP3" kind="Tokenized-stock perps" tvl="-" assets="USDC · WETH" share="-" />
+          <VenueCard name="Hyperliquid HIP-4" tag="HL-HIP4" kind="Permissioned perps" tvl="-" assets="USDC" share="-" />
+          <VenueCard name="Aave Horizon" tag="AAVE-V3" kind="RWA collateral" tvl="-" assets="aUSDC · USTB" share="-" />
+          <VenueCard name="Pendle V2" tag="PENDLE" kind="Fixed-yield · PT" tvl="-" assets="PT-stETH" share="-" />
         </div>
 
-        {/* Pool card — unified margin pool */}
+        {/* Pool card, unified margin pool */}
         <div className="mx-auto mt-3 max-w-[1100px]">
           <div className="rounded-md border border-[oklch(0.22_0.006_60)] bg-[oklch(0.13_0.008_60)] p-7 md:p-9">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -142,11 +142,11 @@ export function HeroSection() {
               className="mt-4 font-mono leading-none tracking-[-0.02em] text-[oklch(0.96_0.003_60)]"
               style={{ fontVariantNumeric: 'tabular-nums lining-nums', fontSize: 'clamp(44px, 6vw, 64px)' }}
             >
-              —
+              -
             </p>
             <div className="mt-6 grid grid-cols-1 gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[oklch(0.72_0.004_60)] md:grid-cols-3">
               <div>Buying power · 3.0× portfolio margin</div>
-              <div className="md:text-center">Collateral —</div>
+              <div className="md:text-center">Collateral -</div>
               <div className="md:text-right">
                 <span className="inline-flex items-center gap-1.5 text-[oklch(0.72_0.13_145)]">
                   <span aria-hidden className="size-1.5 rounded-full bg-[oklch(0.72_0.13_145)]" />
@@ -157,12 +157,12 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Venue cards — row 2 */}
+        {/* Venue cards, row 2 */}
         <div className="mx-auto mt-3 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <VenueCard name="Curve" tag="CURVE" kind="Stableswap LP" tvl="—" assets="3pool LP" share="—" />
-          <VenueCard name="Trade.xyz" tag="TRADE" kind="RFQ · dark pool" tvl="—" assets="WETH · WBTC" share="—" />
-          <VenueCard name="Polymarket" tag="PMK" kind="Prediction · CTF" tvl="—" assets="USDC" share="—" />
-          <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="—" assets="—" share="—" muted />
+          <VenueCard name="Curve" tag="CURVE" kind="Stableswap LP" tvl="-" assets="3pool LP" share="-" />
+          <VenueCard name="Trade.xyz" tag="TRADE" kind="RFQ · dark pool" tvl="-" assets="WETH · WBTC" share="-" />
+          <VenueCard name="Polymarket" tag="PMK" kind="Prediction · CTF" tvl="-" assets="USDC" share="-" />
+          <VenueCard name="RH-Chain" tag="RH-NTV" kind="Native spot · pending" tvl="-" assets="-" share="-" muted />
         </div>
 
         {/* Leverage ladder + portfolio-margin indicator (design parity #4) */}
@@ -184,7 +184,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* CTAs — design parity #2: dual CTA (Open testnet white pill + See the product dark pill) */}
+        {/* CTAs, design parity #2: dual CTA (Open testnet white pill + See the product dark pill) */}
         <div className="mt-14 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/app"
@@ -203,7 +203,7 @@ export function HeroSection() {
           </a>
         </div>
 
-        {/* Trust strip — design parity #3: green-dot stack of integrations */}
+        {/* Trust strip, design parity #3: green-dot stack of integrations */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[oklch(0.72_0.004_60)]">
           {[
             'Arbitrum Sepolia',

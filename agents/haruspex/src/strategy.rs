@@ -1,4 +1,4 @@
-//! Haruspex strategy — RSI momentum on a single HIP-3 stock perp.
+//! Haruspex strategy, RSI momentum on a single HIP-3 stock perp.
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Signal {

@@ -1,6 +1,6 @@
 [package]
 name = "atrium-augur"
-description = "Augur — mean-reversion reference agent for Atrium"
+description = "Augur, mean-reversion reference agent for Atrium"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

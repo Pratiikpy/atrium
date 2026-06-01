@@ -126,7 +126,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<StepStatus>> {
       const routerAddr = registry?.contracts?.['atrium-router']?.address as `0x${string}`;
 
       // Check Plinth.is_paused via Router's is_paused (Router wraps Plinth)
-      // Actually check Router.is_paused() — if Router is paused, step 2/3 can't run
+      // Actually check Router.is_paused(), if Router is paused, step 2/3 can't run
       const isPaused = await client.readContract({
         address: routerAddr,
         abi: [{ type: 'function', name: 'is_paused', stateMutability: 'view', inputs: [], outputs: [{ type: 'bool' }] }],
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<StepStatus>> {
         }) as boolean;
         if (!isAuthorized) {
           blocker = 'router-not-authorized-on-adapters';
-          // Don't add to missing — step can still proceed if user only uses
+          // Don't add to missing, step can still proceed if user only uses
           // adapters that ARE authorized. But flag the blocker.
         }
       }
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<StepStatus>> {
         }
       }
     } catch {
-      // RPC failure — fail open for step 2/3 since init probes passed
+      // RPC failure, fail open for step 2/3 since init probes passed
     }
   }
 
@@ -197,7 +197,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<StepStatus>> {
           blocker = blocker ?? 'keeper-not-staked';
         }
       } catch {
-        // RPC failure — fail open (do not block readiness on a transient read error).
+        // RPC failure, fail open (do not block readiness on a transient read error).
       }
     }
   }

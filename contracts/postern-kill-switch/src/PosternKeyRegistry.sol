@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title PosternKeyRegistry — tracks every ERC-7715 session key issued to a Postern wallet
+/// @title PosternKeyRegistry, tracks every ERC-7715 session key issued to a Postern wallet
 /// @notice ERC-7715 has no native enumeration primitive. Without this registry the
 ///         Kill Switch cannot list "all active keys" to revoke them. Each Postern
 ///         wallet records issuances here at the time of grant.
@@ -26,7 +26,7 @@ contract PosternKeyRegistry {
 
     constructor(address _posternKillSwitch) {
         // Audit MMM-10 fix (DDD-5 pattern): zero kill switch bricks
-        // markAllRevoked forever — the registry can never bulk-revoke
+        // markAllRevoked forever, the registry can never bulk-revoke
         // session keys, defeating the Postern emergency design.
         require(_posternKillSwitch != address(0), "zero kill switch");
         posternKillSwitch = _posternKillSwitch;

@@ -8,7 +8,7 @@ import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
- * Top-up banner — appears on the Portfolio when the liquidation buffer
+ * Top-up banner, appears on the Portfolio when the liquidation buffer
  * drops below the warning threshold (default 20%). Clicking "Top up"
  * opens a deposit modal pre-filled with a suggested amount that aims to
  * restore a healthy buffer. From ATRIUM_FULL_FLOW_DESIGN.md
@@ -16,7 +16,7 @@ import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
  *
  * Honest behavior:
  *  - Hides entirely when margin-health source is "pending" (Plinth not
- *    deployed yet) — would be a misleading banner otherwise.
+ *    deployed yet), would be a misleading banner otherwise.
  *  - Hides when bufferBps is null or above the threshold.
  *  - The suggested amount is a coarse heuristic until Plinth exposes a
  *    "what would restore buffer to X%" view. User can override.
@@ -47,7 +47,7 @@ export function TopUpBanner() {
   const [open, setOpen] = useState(false);
 
   // Hide when no live data or buffer is healthy. We do NOT fire on a null
-  // bufferBps even though that "could" mean liquidation — the source is
+  // bufferBps even though that "could" mean liquidation, the source is
   // explicitly pending, so we don't have any signal to warn on.
   if (!health || health.source !== 'plinth') return null;
   if (health.liquidationBufferBps === null) return null;
@@ -146,7 +146,7 @@ function TopUpModal({
 
       {cofferAddress === null && (
         <p className="mt-3 text-xs text-muted">
-          Coffer is not deployed on this network — top-up lights up once the vault contract is in
+          Coffer is not deployed on this network, top-up lights up once the vault contract is in
           the registry.
         </p>
       )}

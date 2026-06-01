@@ -1,5 +1,5 @@
 /**
- * setup-coffer-adapters — Task #337: schedule Coffer.setAdapter(router, true, cap)
+ * setup-coffer-adapters, Task #337: schedule Coffer.setAdapter(router, true, cap)
  * via PraetorTimelock for the AtriumRouter.
  *
  * Coffer.set_adapter is timelock-gated (assert_timelock). The Stylus ABI exports
@@ -78,7 +78,7 @@ async function main() {
   console.log(`[setup-coffer-adapters] router (to approve)=${routerAddr}`);
   console.log(`[setup-coffer-adapters] per_block_cap=${perBlockCap} (${Number(perBlockCap) / 1e6} USDC)`);
 
-  // Coffer.setAdapter(router, true, cap) — approve the Router as orchestrator
+  // Coffer.setAdapter(router, true, cap), approve the Router as orchestrator
   const calldata = encodeSetAdapter(routerAddr, true, perBlockCap);
   console.log(`[setup-coffer-adapters] inner calldata: ${calldata}`);
 

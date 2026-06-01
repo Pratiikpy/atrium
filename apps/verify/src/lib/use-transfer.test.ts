@@ -5,14 +5,14 @@ import { AQUEDUCT_SEND_ABI } from './use-transfer';
 /**
  * 053-SEC10 regression. The Transfer button calls the deployed Aqueduct,
  * which only exposes `send_collateral(uint64,address,uint256,uint256)`.
- * Pre-fix the hook used `send(uint256,uint64,address)` — a different 4-byte
- * selector, wrong arg order, and no `expires_at` — so every transfer
+ * Pre-fix the hook used `send(uint256,uint64,address)`, a different 4-byte
+ * selector, wrong arg order, and no `expires_at`, so every transfer
  * reverted on-chain while the UI presented the button as functional.
  *
  * This locks the hook's ABI to the real contract signature so the wrong
  * selector can never silently return.
  */
-describe('useTransfer — Aqueduct send_collateral selector', () => {
+describe('useTransfer, Aqueduct send_collateral selector', () => {
   const item = AQUEDUCT_SEND_ABI[0];
 
   it('targets send_collateral with the deployed arg order and types', () => {

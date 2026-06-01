@@ -64,4 +64,4 @@ doppler secrets set KEEPER_PRIVATE_KEY=$KEEPER_PRIVATE_KEY \
 
 - The keeper EOA holds only the minimum stake + gas. Worst case: leak compromises only stake funds.
 - Rotate by generating a new EOA, staking, updating Doppler, then unstaking the old one.
-- Never reuse the deployer EOA as the keeper — deployer controls upgrades and multisig proposals.
+- Never reuse the deployer EOA as the keeper, deployer controls upgrades and multisig proposals.

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
   if (!tokenAddress || !rpcUrl) {
     return NextResponse.json({ tokenSymbol: token, balanceFormatted: null, source: 'pending' });
   }
-  // Audit R-8 fix: distinguish "address is invalid" (operator misconfig — 500
+  // Audit R-8 fix: distinguish "address is invalid" (operator misconfig, 500
   // with logging so the bug surfaces) from "RPC is down or contract is not
   // deployed" (genuinely pending, fall through to the pending response).
   //

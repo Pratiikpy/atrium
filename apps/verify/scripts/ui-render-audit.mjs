@@ -2,7 +2,7 @@
 // production server, captures console errors, page (error-boundary) errors,
 // HTTP status, a full-page screenshot, and scans rendered text for prototype
 // mock-numbers that CLAUDE.md forbids shipping as real. Output: a JSON report
-// + console summary. Not a unit test — this is the "click every screen like a
+// + console summary. Not a unit test, this is the "click every screen like a
 // real user" launch-bar pass (render half; wallet flows are a separate pass).
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';

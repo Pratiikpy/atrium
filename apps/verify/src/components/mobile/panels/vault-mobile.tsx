@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * VaultMobile — Mobile-optimized deposit/withdraw panel.
+ * VaultMobile, Mobile-optimized deposit/withdraw panel.
  * Mobile flow: Deposit USDC (one of the 5 required mobile flows).
  * Re-uses useVaultDeposit, useVaultWithdraw, useBalanceAware from Phase 5a.
  * 44px touch targets, 16px body text, safe-area padding.
@@ -63,7 +63,7 @@ export function VaultMobile() {
     activeStatus.kind === 'depositing' || activeStatus.kind === 'submitting' ||
     ('kind' in activeStatus && activeStatus.kind === 'pending');
 
-  const gasLabel = gasEstUsd ? ` — ~${gasEstUsd} gas` : '';
+  const gasLabel = gasEstUsd ? `, ~${gasEstUsd} gas` : '';
   const submitLabel = mode === 'deposit' ? `Deposit${gasLabel}` : `Withdraw${gasLabel}`;
 
   return (
@@ -74,14 +74,14 @@ export function VaultMobile() {
           onClick={chainGuard.switchChain}
           className="min-h-[44px] w-full rounded-xl bg-testnet/10 border border-testnet/40 px-4 py-3 text-[16px] text-testnet"
         >
-          Wrong network — tap to switch to {chainGuard.target.name}
+          Wrong network, tap to switch to {chainGuard.target.name}
         </button>
       )}
 
       {/* Contract paused banner */}
       {paused && (
         <div className="min-h-[44px] rounded-xl bg-neg/10 border border-neg/40 px-4 py-3 text-[16px] text-neg">
-          Coffer is paused — deposits and withdrawals disabled
+          Coffer is paused, deposits and withdrawals disabled
         </div>
       )}
 
@@ -89,7 +89,7 @@ export function VaultMobile() {
       <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-4">
         <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-mob-muted">USDC Balance</p>
         <p className="mt-1 text-[24px] font-medium text-mob-ink">
-          ${balanceFormatted ?? '—'}
+          ${balanceFormatted ?? '-'}
         </p>
       </section>
 

@@ -1,5 +1,5 @@
 /**
- * praetor timelock-execute — executes a scheduled tx via PraetorTimelock.execute(target, data, scheduled_timestamp).
+ * praetor timelock-execute, executes a scheduled tx via PraetorTimelock.execute(target, data, scheduled_timestamp).
  *
  * Usage:
  *   npx tsx services/praetor-cli/src/commands/timelock-execute.ts \
@@ -103,14 +103,14 @@ async function main() {
       console.error(`ERROR: Timelock not expired. ${hours}h ${mins}m remaining (ready at ${readyAt}).`);
       process.exit(1);
     }
-    console.log(`[timelock-execute] op-id ${opId} — timelock expired, ready to execute.`);
+    console.log(`[timelock-execute] op-id ${opId}, timelock expired, ready to execute.`);
   }
 
   console.log(`[timelock-execute] target=${target}`);
   console.log(`[timelock-execute] scheduled_timestamp=${scheduledTimestamp}`);
 
   if (dryRun) {
-    console.log('[timelock-execute] DRY RUN — simulating execute call...');
+    console.log('[timelock-execute] DRY RUN, simulating execute call...');
     try {
       await publicClient.simulateContract({
         address: timelockAddr,

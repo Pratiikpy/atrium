@@ -1,5 +1,5 @@
 /**
- * Scribe client for Lantern — user list only (Phase 6).
+ * Scribe client for Lantern, user list only (Phase 6).
  *
  * Balance authority is now on-chain (leaves.ts does RPC fanout).
  * Scribe's role is 'list users to consider' only.

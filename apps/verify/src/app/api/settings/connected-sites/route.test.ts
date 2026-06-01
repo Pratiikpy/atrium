@@ -33,7 +33,7 @@ function makeRequest(method: string, query: string, body?: unknown): NextRequest
   });
 }
 
-describe('GET /api/settings/connected-sites — empty state', () => {
+describe('GET /api/settings/connected-sites, empty state', () => {
   it('returns source:pending when no sessions registered', async () => {
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest('GET', ''))).json();
@@ -42,7 +42,7 @@ describe('GET /api/settings/connected-sites — empty state', () => {
   });
 });
 
-describe('POST /api/settings/connected-sites — host validation (LL-6)', () => {
+describe('POST /api/settings/connected-sites, host validation (LL-6)', () => {
   it('accepts a canonical hostname', async () => {
     const { POST } = await import('./route');
     const res = await POST(makeRequest('POST', '', { host: 'app.uniswap.org' }));

@@ -9,7 +9,7 @@ import { safeErrorDetail } from './safe-error';
  *
  * Contract:
  *   - In production (NODE_ENV === 'production'): return the static
- *     fallback, never the raw err.message — prevents leaking gateway
+ *     fallback, never the raw err.message, prevents leaking gateway
  *     URLs, RPC endpoints, library stack traces, env-var presence.
  *   - In dev / test: pass through err.message for fast debugging.
  *   - Always logs the full error server-side via console.error.
@@ -36,7 +36,7 @@ afterEach(() => {
   consoleSpy.mockRestore();
 });
 
-describe('safeErrorDetail — production redaction', () => {
+describe('safeErrorDetail, production redaction', () => {
   it('returns the static fallback (NOT err.message) in production', () => {
     setEnv('production');
     const err = new Error('RPC at https://leaky.rpc.example.com failed');
@@ -54,13 +54,13 @@ describe('safeErrorDetail — production redaction', () => {
     const err = new Error('RPC at https://leaky.rpc.example.com failed');
     safeErrorDetail(err);
     expect(consoleSpy).toHaveBeenCalled();
-    // Server-side log captures the full stack — ops still has visibility.
+    // Server-side log captures the full stack, ops still has visibility.
     const callArgs = consoleSpy.mock.calls[0];
     expect(String(callArgs[1])).toContain('leaky.rpc.example.com');
   });
 });
 
-describe('safeErrorDetail — dev / test pass-through', () => {
+describe('safeErrorDetail, dev / test pass-through', () => {
   it('returns err.message in non-production', () => {
     setEnv('development');
     const err = new Error('Scribe 503 retry-after 5s');
@@ -85,7 +85,7 @@ describe('safeErrorDetail — dev / test pass-through', () => {
   });
 });
 
-describe('safeErrorDetail — non-Error inputs', () => {
+describe('safeErrorDetail, non-Error inputs', () => {
   it('does not throw on string input', () => {
     setEnv('development');
     expect(() => safeErrorDetail('a bare string')).not.toThrow();

@@ -17,7 +17,7 @@ export const attestationRouter = new Hono<{
  * Codex's agent + third-party consumers are expected to do the same.
  *
  * The `caveat.is_publishable_check` field names the gate explicitly. A
- * consumer that ignores it is making an active choice — same shape as
+ * consumer that ignores it is making an active choice, same shape as
  * the `--json-path` opt-out warning in praetor-cli backtest publish.
  */
 attestationRouter.get('/latest', async (c) => {

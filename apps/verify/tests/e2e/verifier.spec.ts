@@ -16,14 +16,14 @@ test.describe('Verifier 7-step flow', () => {
   });
 
   test('Step 2: gated deployment check', async ({ page }) => {
-    test.skip(isGated(2), 'Step 2 gated — contracts not deployed in local mode');
+    test.skip(isGated(2), 'Step 2 gated, contracts not deployed in local mode');
     await page.goto('/verify/2');
     await page.getByRole('button', { name: /run step/i }).click();
     await expect(page.locator('[data-testid="tx-hash"]')).toBeVisible({ timeout: 60_000 });
   });
 
   test('Step 3: gated deployment check', async ({ page }) => {
-    test.skip(isGated(3), 'Step 3 gated — contracts not deployed in local mode');
+    test.skip(isGated(3), 'Step 3 gated, contracts not deployed in local mode');
     await page.goto('/verify/3');
     await page.getByRole('button', { name: /run step/i }).click();
     await expect(page.locator('[data-testid="tx-hash"]')).toBeVisible({ timeout: 60_000 });
@@ -40,7 +40,7 @@ test.describe('Verifier 7-step flow', () => {
   });
 
   test('Step 5: vigil-liquidate (gated)', async ({ page }) => {
-    test.skip(isGated(5), 'Step 5 gated — vigil not deployed in local mode');
+    test.skip(isGated(5), 'Step 5 gated, vigil not deployed in local mode');
     await page.goto('/verify/5');
     await page.getByRole('button', { name: /run step/i }).click();
     await expect(page.locator('[data-testid="tx-hash"]')).toBeVisible({ timeout: 60_000 });

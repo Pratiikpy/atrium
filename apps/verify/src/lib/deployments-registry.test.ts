@@ -10,7 +10,7 @@ import { readFile } from 'node:fs/promises';
 import { loadDeploymentRegistry, loadContractAddress, listLiveContracts } from './deployments-registry';
 
 /**
- * Pins the centralized deployments-registry helpers — replaces 5+ copy-pasted
+ * Pins the centralized deployments-registry helpers, replaces 5+ copy-pasted
  * path-walk blocks across routes. If a future refactor breaks the candidate-
  * path order, the zero-address sentinel handling, or the hex validation,
  * CI catches it before review.

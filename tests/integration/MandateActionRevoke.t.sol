@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title MandateActionRevoke — integration test
+/// @title MandateActionRevoke, integration test
 /// @notice Owner signs Sigil mandate, agent calls Router.openPositionViaAdapter
 ///         under that mandate, position opens, owner calls Sigil.revoke,
 ///         agent's next action reverts with SigilRevoked. Tests Phase 2a's

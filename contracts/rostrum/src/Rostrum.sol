@@ -308,7 +308,7 @@ contract Rostrum is ReentrancyGuard {
     /// including address(0). A Praetor multisig typo could waste a 48h
     /// timelock slot setting reputation for the zero address (no agent
     /// can act as zero address on EVM), and the subgraph would index a
-    /// permanent RostrumReputation entry keyed on 0x0 — pure storage
+    /// permanent RostrumReputation entry keyed on 0x0, pure storage
     /// pollution plus dashboard noise. Reject at the boundary.
     ///
     /// Note: the score itself has no upper bound on chain. Off-chain

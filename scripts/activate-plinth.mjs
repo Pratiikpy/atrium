@@ -17,13 +17,14 @@
  */
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const PLINTH = process.argv[2] ?? '0xef31b4b75badc0faf323e3448248585b57a78ecd';
 const DOCKER_IMAGE = 'atrium-stylus';

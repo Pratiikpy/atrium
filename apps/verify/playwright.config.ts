@@ -4,10 +4,10 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright config for the Atrium Verifier Mode app.
  *
  * Two modes:
- *   pnpm test:e2e            — runs against the local dev server (next dev). Asserts
+ *   pnpm test:e2e           , runs against the local dev server (next dev). Asserts
  *                              the HONEST PENDING UI state: buttons disabled, helper
  *                              copy naming the missing contract, "pending" badges.
- *   E2E_MODE=sepolia pnpm test:e2e — runs against a deployed Sepolia env. Asserts
+ *   E2E_MODE=sepolia pnpm test:e2e, runs against a deployed Sepolia env. Asserts
  *                              on real tx-hash format + Arbiscan links + post-success
  *                              UI transitions. Only flips green once Stylus contracts
  *                              are deployed (gated on human_left.md #11).
@@ -42,7 +42,7 @@ export default defineConfig({
       name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
       // @mobile-tagged journeys assert the mobile-only panels (VaultMobile,
-      // KillSwitchFAB, ReservesMobile) which are `md:hidden` on desktop — they
+      // KillSwitchFAB, ReservesMobile) which are `md:hidden` on desktop, they
       // belong to the mobile-safari project below. Excluding them here keeps
       // the desktop project asserting the desktop layout only.
       grepInvert: /@mobile/,

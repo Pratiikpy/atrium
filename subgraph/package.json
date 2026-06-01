@@ -1,7 +1,7 @@
 {
   "name": "@atrium/subgraph",
   "version": "0.1.0",
-  "description": "Scribe — Atrium event indexer",
+  "description": "Scribe, Atrium event indexer",
   "license": "MIT",
   "private": true,
   "scripts": {

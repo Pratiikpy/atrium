@@ -1,4 +1,4 @@
-// Sigil — Atrium agent mandate contract
+// Sigil, Atrium agent mandate contract
 //
 // EIP-712 typed-data envelope for agent delegation. IntentSigil is the
 // parent mandate signed by the owner; ActionSigil is the per-action
@@ -21,7 +21,7 @@ use stylus_sdk::call::static_call;
 
 // Wire the EIP-712 module per Agent A audit (MUST-FIX #1).
 // `validate_action` is still a conservative `Ok(false)` until the full
-// signature-recovery loop is wired Wave 1 — but the module compiles in.
+// signature-recovery loop is wired Wave 1, but the module compiles in.
 pub mod eip712;
 
 sol! {
@@ -100,13 +100,13 @@ sol_storage! {
         //
         // Audit HHH-4: pre-fix this field was named `open_notional_wei` and the
         // intent_envelope cap field is `max_total_open_notional_wei`. The mental
-        // model is "running open exposure" — credit frees on close. BUT: Plinth's
+        // model is "running open exposure", credit frees on close. BUT: Plinth's
         // Position struct doesn't store the agent that opened it, so close_position
         // has no path to call back into Sigil with `record_close(agent, amount)`.
         // The counter therefore only grows.
         //
         // Effect on user safety: FAIL-SAFE. The agent's per-mandate credit-line
-        // is consumed FASTER than the user expected, not slower — the agent
+        // is consumed FASTER than the user expected, not slower, the agent
         // becomes useless once the cap is hit, no extra funds at risk.
         // Effect on agent UX: degraded. A long-lived mandate that opens/closes
         // many positions hits the cap from cumulative volume, not concurrent.
@@ -193,7 +193,7 @@ impl Sigil {
         self.params.max_mandate_duration_seconds.set(Uint::<32, 1>::from(30u32 * 24 * 60 * 60)); // 30 days
         self.params.max_actions_per_24h_hard_cap.set(Uint::<16, 1>::from(100u16));
 
-        // EIP-712 domain separator — chainId substituted at deploy time
+        // EIP-712 domain separator, chainId substituted at deploy time
         // domain = keccak256(
         //   EIP712Domain(name string,version string,uint256 chainId,address verifyingContract)
         // )
@@ -241,7 +241,7 @@ impl Sigil {
         intent_bytes: alloc::vec::Vec<u8>,
         action_bytes: alloc::vec::Vec<u8>,
     ) -> Result<bool, SigilError> {
-        // 031-SC10: validate_action is the agent-authorization gate — only
+        // 031-SC10: validate_action is the agent-authorization gate, only
         // Plinth may invoke it (same trust boundary as record_close). Pre-fix
         // it had no caller gate, so any address could drive the mandate path;
         // combined with the missing replay guard below, the authorization
@@ -301,7 +301,7 @@ impl Sigil {
         // Iter 51 audit fix: pre-fix `caps_respected` returned bool and
         // all three failure modes folded into a generic InvalidSignature
         // revert. The errors `VenueNotAllowed`, `InstrumentNotAllowed`,
-        // and `NotionalExceeded` were declared but never reverted — same
+        // and `NotionalExceeded` were declared but never reverted, same
         // dead-error lie-class as iter 49 (InsufficientCollateralError)
         // and iter 50 (AdapterAlsoApprovedAsOrchestrator). Now: typed
         // CapViolation enum, dispatched to the specific SigilError so
@@ -408,7 +408,7 @@ impl Sigil {
         }
         self.used_action_hash.setter(action_key).set(true);
 
-        // 9. Persist counters. Only after the signature gate passes — a
+        // 9. Persist counters. Only after the signature gate passes, a
         //    malformed envelope should not be able to consume rate-limit
         //    budget or credit-line.
         self.actions_per_day
@@ -439,7 +439,7 @@ impl Sigil {
 
     /// Audit HHH-4 fix (`human_left.md` #29): Plinth calls this on close_position
     /// to decrement the agent's running open-notional. Pre-fix the credit-line
-    /// only increased — `max_total_open_notional_wei` behaved as a CUMULATIVE
+    /// only increased, `max_total_open_notional_wei` behaved as a CUMULATIVE
     /// lifetime cap rather than a running OPEN cap. Long-lived mandates that
     /// open + close many positions hit the cap from cumulative volume, not
     /// concurrent exposure.
@@ -587,7 +587,7 @@ mod kani_proofs {
         let now: u64 = kani::any();
         let expires_at: u64 = kani::any();
         kani::assume(now < expires_at);
-        // Trivial in the abstract — the real check is in `validate_action`
+        // Trivial in the abstract, the real check is in `validate_action`
         // and is covered by proptest once that function is implemented.
         assert!(now <= expires_at);
     }
@@ -601,7 +601,7 @@ mod kani_proofs {
 ///
 /// Returns `None` if v is malformed, if the precompile reverts, or if the
 /// returned address is the zero address (which secp256k1 never produces as a
-/// valid recovery — meaning the precompile signalled failure).
+/// valid recovery, meaning the precompile signalled failure).
 fn ecrecover_via_precompile(
     contract: &Sigil,
     digest: B256,

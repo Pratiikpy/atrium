@@ -6,7 +6,7 @@ import { formatEther } from 'viem';
 
 /**
  * Gas estimation with USD preview. Uses useDeferredValue for debouncing
- * (no setTimeout — banned by project convention). Cached 60s.
+ * (no setTimeout, banned by project convention). Cached 60s.
  * Reads ETH/USD from /api/protocol/eth-price (backed by PlinthOracle).
  */
 export function useGasPreview(params: {

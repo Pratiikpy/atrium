@@ -13,7 +13,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 /**
  * Audit FIRE78-CODEX3 fix (sub-agent HIGH): cap the idempotency key length.
  * Pre-fix, a caller could submit a multi-MB key and INSERT OR REPLACE
- * resets its TTL on every call — repeated over many keys, D1 storage
+ * resets its TTL on every call, repeated over many keys, D1 storage
  * grows unboundedly. 128 chars is well above the standard 36-char UUID
  * idempotency keys but small enough to make the storage attack
  * uneconomic.

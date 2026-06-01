@@ -1,4 +1,4 @@
-# Runbook — deployer EOA key rotation
+# Runbook, deployer EOA key rotation
 
 Rotates the deployer EOA that holds admin privileges on all Atrium contracts.
 Triggered by: compromise, scheduled quarterly rotation, or incident follow-up.
@@ -107,7 +107,7 @@ If the new EOA is compromised before execution, or if the rotation must be abort
 praetor timelock cancel --operation-id <ID>
 ```
 
-Each scheduled operation can be cancelled by any multisig signer before the 48h window expires. After execution, rollback requires scheduling a new `transferAdmin` back to the old (or a third) EOA — another 48h wait.
+Each scheduled operation can be cancelled by any multisig signer before the 48h window expires. After execution, rollback requires scheduling a new `transferAdmin` back to the old (or a third) EOA, another 48h wait.
 
 ---
 

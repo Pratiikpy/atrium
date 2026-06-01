@@ -2,14 +2,14 @@ import { Hono } from 'hono';
 
 export const backtestRouter = new Hono<{ Bindings: { DB: D1Database } }>();
 
-// Bounded input domains. strategy_id is a slug — alnum + dash + underscore,
+// Bounded input domains. strategy_id is a slug, alnum + dash + underscore,
 // 1-64 chars. Larger or special-char ids land in logs, D1 table, response
 // poll URLs; bounding them caps blast radius.
 const STRATEGY_ID_REGEX = /^[A-Za-z0-9_-]{1,64}$/;
 // Backtest params are kwargs (strategy parameters, date range). 32 KB is
 // 10x the largest known live strategy JSON; anything bigger is a misuse.
 const JSON_BODY_MAX_BYTES = 32 * 1024;
-// job_id is always a v4 UUID emitted by this route — pin the shape so a
+// job_id is always a v4 UUID emitted by this route, pin the shape so a
 // caller fishing for arbitrary rows hits a 400 instead of a DB query.
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

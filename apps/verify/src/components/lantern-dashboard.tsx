@@ -37,7 +37,7 @@ export function LanternDashboard() {
       // Merkle root from the published tree, compares it to the on-chain
       // attested root, and checks the wallet's inclusion proof. The previous
       // tree.leaves.some(user == address) was a bare membership scan with no
-      // root comparison and no proof — a "Verified" backed by nothing.
+      // root comparison and no proof, a "Verified" backed by nothing.
       const r = await fetch('/api/lantern/verify-inclusion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,7 +65,7 @@ export function LanternDashboard() {
     );
   }
 
-  // Error state — fetch threw or the API responded non-2xx
+  // Error state, fetch threw or the API responded non-2xx
   if (error) {
     return (
       <div className="mt-12 rounded-md border border-neg/40 bg-neg/5 p-6">
@@ -85,7 +85,7 @@ export function LanternDashboard() {
     );
   }
 
-  // Permission state — wallet on the wrong chain
+  // Permission state, wallet on the wrong chain
   if (isConnected && chainId && chainId !== 421614) {
     return (
       <div className="mt-12 rounded-md border border-testnet/30 bg-testnet/5 p-6">
@@ -98,7 +98,7 @@ export function LanternDashboard() {
     );
   }
 
-  // Empty state — request succeeded but Lantern has not yet published
+  // Empty state, request succeeded but Lantern has not yet published
   if (!data) {
     return (
       <div className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
@@ -156,7 +156,7 @@ export function LanternDashboard() {
           </button>
           {proofResult === 'verified' && (
             <p className="mt-3 text-sm text-live">
-              Verified — the published tree hashes to the on-chain attested root and your wallet&apos;s
+              Verified, the published tree hashes to the on-chain attested root and your wallet&apos;s
               inclusion proof reproduces it.
             </p>
           )}
@@ -164,7 +164,7 @@ export function LanternDashboard() {
             <p className="mt-3 text-sm text-testnet">No balance found for your wallet in this attestation.</p>
           )}
           {proofResult === 'error' && (
-            <p className="mt-3 text-sm text-neg">Could not verify — the attestation tree is unavailable or did not match the attested root.</p>
+            <p className="mt-3 text-sm text-neg">Could not verify, the attestation tree is unavailable or did not match the attested root.</p>
           )}
         </div>
       ) : (

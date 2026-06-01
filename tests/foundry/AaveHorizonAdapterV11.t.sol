@@ -13,7 +13,7 @@ import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdap
 ///         forced to migrate cleanly.
 ///
 ///         Also: `addInstrument` moved from `onlyPraetor` to `onlyTimelock`
-///         (F-32 fix — risk-param changes go through 48h objection window).
+///         (F-32 fix, risk-param changes go through 48h objection window).
 contract AaveHorizonAdapterV11Test is Test {
     AaveHorizonAdapterV11 internal adapter;
     MockAavePoolV11 internal pool;
@@ -58,7 +58,7 @@ contract AaveHorizonAdapterV11Test is Test {
     // ── Metadata ─────────────────────────────────────────────────────
 
     function test_metadata_versionIs_1_1_0() public view {
-        // v1.1 — the explicit-originator variant.
+        // v1.1, the explicit-originator variant.
         (uint256 major, uint256 minor, uint256 patch) = adapter.version();
         assertEq(major, 1);
         assertEq(minor, 1);
@@ -95,7 +95,7 @@ contract AaveHorizonAdapterV11Test is Test {
     // ── addInstrument (timelock-only, F-32) ──────────────────────────
 
     function test_addInstrument_rejectsMultisig() public {
-        // Praetor multisig must NOT be able to add — it's a parameter change,
+        // Praetor multisig must NOT be able to add, it's a parameter change,
         // belongs behind the 48h timelock per F-32.
         vm.prank(praetor);
         vm.expectRevert(AaveHorizonAdapterV11.Unauthorized.selector);
@@ -142,7 +142,7 @@ contract AaveHorizonAdapterV11Test is Test {
         assertEq(adapter.get_haircut_bps(TBILL_3M), 200, "params updated");
     }
 
-    // ── open_position_v11 — explicit originator ──────────────────────
+    // ── open_position_v11, explicit originator ──────────────────────
 
     function test_openV11_onlyCoffer() public {
         vm.prank(hostile);
@@ -184,14 +184,14 @@ contract AaveHorizonAdapterV11Test is Test {
     }
 
     function test_openV11_emptyPayloadIsAccepted() public {
-        // v1.1 doesn't parse payload — Aave Horizon takes no off-chain args.
+        // v1.1 doesn't parse payload, Aave Horizon takes no off-chain args.
         // An empty payload must NOT trigger a BadVenuePayload-style revert.
         vm.prank(coffer);
         uint256 id = adapter.open_position_v11(user, TBILL_3M, int256(500e6), hex"");
         assertGt(id, 0);
     }
 
-    // ── close_position_v11 — originator-bound ────────────────────────
+    // ── close_position_v11, originator-bound ────────────────────────
 
     function test_closeV11_onlyCoffer() public {
         vm.prank(coffer);

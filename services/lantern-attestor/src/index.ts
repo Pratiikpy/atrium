@@ -1,5 +1,5 @@
 /**
- * Lantern — Atrium proof-of-reserves attestor.
+ * Lantern, Atrium proof-of-reserves attestor.
  *
  * Cron-driven (hourly). Reads all Coffer balances from Scribe, builds a sparse
  * Merkle tree, signs the root with the Argon2id-encrypted software key, and

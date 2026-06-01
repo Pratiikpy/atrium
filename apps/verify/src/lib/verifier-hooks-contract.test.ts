@@ -29,8 +29,8 @@ interface HookContract {
 }
 
 const HOOK_CONTRACTS: HookContract[] = [
-  // Step 1 (coffer-deposit). The deposit hook itself doesn't fetch — it
-  // uses wagmi useWriteContract — but the deployment-status gate goes
+  // Step 1 (coffer-deposit). The deposit hook itself doesn't fetch, it
+  // uses wagmi useWriteContract, but the deployment-status gate goes
   // through /api/deployments/status. The address hook used inside
   // the deposit-card component goes through /api/deployments/address.
   // Both are covered by use-coffer-address + use-deployment-status tests
@@ -69,7 +69,7 @@ const HOOK_CONTRACTS: HookContract[] = [
   },
   // Open-position (Trade form). Phase theta audit follow-up
   // (2026-05-25): routed through AtriumRouter.open_position_via_adapter
-  // — pre-fix the hook called adapter.open_position directly from the
+  //, pre-fix the hook called adapter.open_position directly from the
   // user's wallet, which fails Unauthorized (only the Router is on the
   // adapter's authorized-caller list) AND bypasses Coffer.adapterPull.
   {
@@ -152,7 +152,7 @@ describe('Verifier hooks ↔ API route URL contract', () => {
 
   it('use-issue-mandate.ts signs EIP-712 via wagmi useSignTypedData', () => {
     // Issue-mandate is the only hook that uses signTypedData (not
-    // writeContract) — the signed envelope is posted to a server route
+    // writeContract), the signed envelope is posted to a server route
     // rather than written on-chain. Locks the wagmi function name.
     const text = readFileSync(join(LIB_DIR, 'use-issue-mandate.ts'), 'utf8');
     expect(text).toContain('useSignTypedData');

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ActivityMobile — Mobile activity timeline.
+ * ActivityMobile, Mobile activity timeline.
  * Re-uses /api/portfolio/activity. Filter chips + vertical timeline.
  * 44px touch targets, 64px rows, pull-to-refresh via button.
  */
@@ -46,11 +46,11 @@ export function ActivityMobile() {
 
   const filtered = (data?.activities ?? []).filter(a => filter === 'all' || a.kind === filter);
 
-  // Error state (distinct from empty — E2E-48)
+  // Error state (distinct from empty, E2E-48)
   if (error) {
     return (
       <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load — retry</p>
+        <p className="text-[16px] text-neg">Could not load, retry</p>
         <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
           Retry
         </button>

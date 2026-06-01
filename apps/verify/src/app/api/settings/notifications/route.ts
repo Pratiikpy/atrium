@@ -20,7 +20,7 @@ import { createHmac, timingSafeEqual as cryptoTimingSafeEqual } from 'node:crypt
  * - Now: both methods require `Authorization: Bearer <NOTIFIER_INTERNAL_KEY>`.
  *   The notifier service already holds this secret; the verify UI calls
  *   this route via a server action that injects the header. Direct
- *   browser-side fetches are out of scope until SIWE session lands —
+ *   browser-side fetches are out of scope until SIWE session lands -
  *   see human_left.md `notifier-prefs-siwe` for the deferred follow-up
  *   that swaps Bearer for wallet-signature auth on the user-facing path.
  */
@@ -64,7 +64,7 @@ function kvKey(user: string): string {
  * cannot leak the secret length. Returns null on success, a 401
  * NextResponse on failure (caller must early-return).
  *
- * Refuses to authenticate at all when NOTIFIER_INTERNAL_KEY is unset —
+ * Refuses to authenticate at all when NOTIFIER_INTERNAL_KEY is unset -
  * a missing secret is treated as fail-closed, never fail-open. The
  * notifier service has the same fail-closed contract on its side.
  */

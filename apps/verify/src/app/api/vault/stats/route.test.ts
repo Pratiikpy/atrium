@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // vi.hoisted ensures these mock references are hoisted before vi.mock
-// factories run — necessary because the factory closes over them.
+// factories run, necessary because the factory closes over them.
 const mocks = vi.hoisted(() => ({
   totalAssets: vi.fn(),
   balanceOf: vi.fn(),
@@ -35,12 +35,12 @@ vi.mock('viem/chains', () => ({
   arbitrumSepolia: { id: 421614 },
 }));
 
-// The route also does `await import('@/lib/format-usd')` — this should
+// The route also does `await import('@/lib/format-usd')`, this should
 // resolve to the real module fine since format-usd has no external
 // deps, but if Next.js path-alias resolution breaks under vi mock
 // the route silently falls into its catch handler. Force the real
 // module via the actual relative path used by tsconfig.
-// (Re-asserting the real exports is enough — vi.mock(NAME) without
+// (Re-asserting the real exports is enough, vi.mock(NAME) without
 // a factory keeps the real module but lets us track calls.)
 import { GET } from './route';
 
@@ -66,7 +66,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/vault/stats — pending paths', () => {
+describe('GET /api/vault/stats, pending paths', () => {
   it('returns source:pending when Coffer not in registry', async () => {
     mocks.loadContractAddress.mockResolvedValue(null);
     const json = await (await GET()).json();
@@ -90,7 +90,7 @@ describe('GET /api/vault/stats — pending paths', () => {
   });
 });
 
-describe('GET /api/vault/stats — Coffer deployed, S-1 6-decimal invariant', () => {
+describe('GET /api/vault/stats, Coffer deployed, S-1 6-decimal invariant', () => {
   beforeEach(() => {
     mocks.loadContractAddress.mockResolvedValue('0x' + '1'.repeat(40));
   });

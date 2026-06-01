@@ -31,7 +31,7 @@ const SIGIL_MAX_VENUES = 8;
 const ZERO_ADDR = '0x' + '0'.repeat(40);
 const VALID_VENUE_IDS = new Set(VENUES.map((v) => v.id));
 // Atrium runs on Arbitrum Sepolia. The server recomputes the EIP-712 hash
-// against this chainId only — a signature produced for any other chain
+// against this chainId only, a signature produced for any other chain
 // fails recovery and is rejected (we never accept cross-chain mandates).
 const ARB_SEPOLIA_CHAIN_ID = 421614;
 const USDC_DECIMALS = 6;
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'agent must be 0x-prefixed 40-hex' }, { status: 400 });
   }
   if (body.agent.toLowerCase() === ZERO_ADDR) {
-    return NextResponse.json({ ok: false, error: 'agent cannot be the zero address — this would brick mandate revocation' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'agent cannot be the zero address, this would brick mandate revocation' }, { status: 400 });
   }
   if (!body.perActionCapUsdc || body.perActionCapUsdc <= 0) {
     return NextResponse.json({ ok: false, error: 'per-action cap must be > 0' }, { status: 400 });
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
     // 2026-05-29 security review (signature-binding): DO NOT trust the
     // client-supplied intentHash. The pre-fix code recovered the signer from
     // `body.intentHash` directly, so a caller could submit arbitrary mandate
-    // fields alongside a signature over an UNRELATED hash and still pass — the
+    // fields alongside a signature over an UNRELATED hash and still pass, the
     // signature was never bound to the mandate being created.
     //
     // Now: recompute the EIP-712 struct hash server-side from the validated
@@ -255,7 +255,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Legacy path (no signature posted) — kept for the smoke tests and any
+  // Legacy path (no signature posted), kept for the smoke tests and any
   // pre-wagmi client.
   // Audit S-4 fix: previously echoed the full validated payload including
   // the agent address. Probes would have their inputs preserved in server
@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
   // not the user-supplied values.
   //
   // Phase theta audit follow-up (2026-05-25): pre-fix the message said
-  // "Sigil contract not deployed yet" — but Sigil IS deployed. The
+  // "Sigil contract not deployed yet", but Sigil IS deployed. The
   // correct framing: the envelope is valid; the client needs to sign it
   // via wagmi to complete issuance. Updated copy below.
   return NextResponse.json({

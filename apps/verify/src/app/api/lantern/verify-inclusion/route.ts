@@ -5,7 +5,7 @@ import { verifyInclusion, type RawLeaf } from '@/lib/lantern-merkle';
 export const dynamic = 'force-dynamic';
 
 /**
- * Inclusion verifier — server-side proxy that fetches the tree from IPFS
+ * Inclusion verifier, server-side proxy that fetches the tree from IPFS
  * and reports whether `wallet` is in `tree.leaves`.
  *
  * Audit P-11 + R-1 (this fire): originally a GET; rewritten as POST with

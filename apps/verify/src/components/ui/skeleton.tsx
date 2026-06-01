@@ -1,5 +1,5 @@
 /**
- * Skeleton loading placeholder — pulsing rectangle matching content shape.
+ * Skeleton loading placeholder, pulsing rectangle matching content shape.
  * Replaces Loader2 animate-spin spinners throughout the app.
  */
 export function Skeleton({

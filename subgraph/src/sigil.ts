@@ -60,7 +60,7 @@ export function handleIntentValidated(event: IntentValidated): void {
   // never written.
   recordAction(event.params.agent, event.block.timestamp);
 
-  // Phase 4: Counter — increment activeAgentsCount (approximation: each
+  // Phase 4: Counter, increment activeAgentsCount (approximation: each
   // new agent validation bumps the count; the Agent entity creation in
   // recordAction is the authoritative signal for distinct agents).
   incrementCounter('activeAgentsCount', BigInt.fromI32(1), event.block.timestamp);

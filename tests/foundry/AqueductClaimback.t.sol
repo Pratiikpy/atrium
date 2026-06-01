@@ -8,7 +8,7 @@ import {AqueductClaimback} from "../../contracts/aqueduct/src/AqueductClaimback.
 /// @notice Hardens the cross-chain double-spend defense per Agent B audit #12.
 ///         The destination AqueductReceiver writes an ack into this contract
 ///         via the CCIP router on the source chain. Source-chain `claim_back`
-///         must read `hasDeliveryAck` before refunding — if an ack exists, the
+///         must read `hasDeliveryAck` before refunding, if an ack exists, the
 ///         claim-back path is closed.
 ///
 ///         This suite pins: only the router can write acks; reads return false
@@ -57,7 +57,7 @@ contract AqueductClaimbackTest is Test {
     }
 
     function test_hasDeliveryAck_defaultsFalse() public view {
-        // An unknown message id must report false — the source Aqueduct
+        // An unknown message id must report false, the source Aqueduct
         // must treat "no ack received" as "claim-back still permitted".
         assertFalse(claimback.hasDeliveryAck(keccak256("never-acked")));
         assertFalse(claimback.hasDeliveryAck(bytes32(0)));

@@ -1,5 +1,5 @@
 /**
- * InMemoryD1 — same-shape replacement for Cloudflare's D1Database, used
+ * InMemoryD1, same-shape replacement for Cloudflare's D1Database, used
  * by the Vercel deploy. SQL is interpreted via a tiny pattern-match
  * dispatcher (we don't run real SQL); instead each known query string
  * maps to a typed in-memory operation.
@@ -17,7 +17,7 @@
  *     start. For testnet this is acceptable: the only durable
  *     correctness invariant is "no double-payment for the same
  *     tx_hash", and a fresh instance starts with an empty payments set
- *     — which fails open to the on-chain replay protection inside
+ *    , which fails open to the on-chain replay protection inside
  *     x402PaymentMiddleware (Coffer-side nonce + Transfer-log uniqueness).
  *
  * Year-1 W2 deliverable: swap this for Turso (libsql) once we have a
@@ -114,7 +114,7 @@ function makeStatement(sql: string): D1Statement {
         paymentsById.set(id, row);
         if (txHash) {
           const lower = txHash.toLowerCase();
-          // UNIQUE constraint per schema.sql — refuse duplicate replay.
+          // UNIQUE constraint per schema.sql, refuse duplicate replay.
           if (paymentsByTxHash.has(lower)) {
             return { success: false, meta: { rows_written: 0 } };
           }
@@ -128,7 +128,7 @@ function makeStatement(sql: string): D1Statement {
         backtests.set(id, { id, raw_args: bound });
         return { success: true, meta: { rows_written: 1 } };
       }
-      // Unknown statement — log to console so the gap is visible.
+      // Unknown statement, log to console so the gap is visible.
       console.warn('[InMemoryD1] unhandled SQL:', trimmed);
       return { success: false, meta: { rows_written: 0 } };
     },

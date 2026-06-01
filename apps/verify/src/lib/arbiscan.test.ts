@@ -15,7 +15,7 @@ import { arbiscanTxUrl, isValidTxHash } from './arbiscan';
 
 const VALID = '0x' + 'a'.repeat(64);
 
-describe('isValidTxHash — regex gate', () => {
+describe('isValidTxHash, regex gate', () => {
   it('accepts a canonical 0x-prefixed 64-hex string', () => {
     expect(isValidTxHash(VALID)).toBe(true);
     expect(isValidTxHash('0x' + 'F'.repeat(64))).toBe(true);
@@ -56,7 +56,7 @@ describe('isValidTxHash — regex gate', () => {
   });
 });
 
-describe('arbiscanTxUrl — URL composition', () => {
+describe('arbiscanTxUrl, URL composition', () => {
   it('returns sepolia URL by default', () => {
     expect(arbiscanTxUrl(VALID)).toBe(`https://sepolia.arbiscan.io/tx/${VALID}`);
   });

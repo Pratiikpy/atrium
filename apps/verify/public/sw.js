@@ -1,5 +1,5 @@
 /**
- * Atrium Service Worker — vanilla (no next-pwa dependency).
+ * Atrium Service Worker, vanilla (no next-pwa dependency).
  *
  * Strategy: Cache-first for static assets (fonts, icons, CSS/JS bundles).
  * Network-first for API routes and HTML navigation.
@@ -23,7 +23,7 @@ const STATIC_ASSETS = [
 
 self.addEventListener('install', (event) => {
   // Resilient precache: cache each asset individually so a single 404 cannot
-  // reject the whole install (cache.addAll is atomic — one missing asset there
+  // reject the whole install (cache.addAll is atomic, one missing asset there
   // silently bricks the service worker, which is exactly what happened when
   // the icon PNGs were absent at the public root). allSettled tolerates a
   // missing optional asset and still installs.

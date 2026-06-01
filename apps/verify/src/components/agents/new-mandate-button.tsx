@@ -36,7 +36,7 @@ export function NewMandateButton({
 }: {
   /** Audit #50: when set, the modal pre-fills these caps (copy-trade funnel). */
   prefill?: MandatePrefill;
-  /** e.g. "Copying Augur — recommended caps prefilled". */
+  /** e.g. "Copying Augur, recommended caps prefilled". */
   prefillLabel?: string;
   /** Auto-open the modal on mount once deployment is ready (deep-link landing). */
   autoOpen?: boolean;
@@ -76,7 +76,7 @@ export function NewMandateButton({
       {helper && (
         <p className="text-right text-[10px] uppercase tracking-wider text-muted">{helper}</p>
       )}
-      {/* Audit T-5 fix: single gate on `open` — MandateModal mounts once
+      {/* Audit T-5 fix: single gate on `open`, MandateModal mounts once
           and Modal handles visibility. Avoids the divergent-gate footgun. */}
       <MandateModal open={open} onClose={() => setOpen(false)} prefill={prefill} prefillLabel={prefillLabel} />
     </div>
@@ -201,7 +201,7 @@ function MandateModal({
             <p className="font-medium text-ink">{prefillLabel}</p>
             <p className="mt-1">
               Caps below are the agent&apos;s recommended limits. Enter the agent&apos;s on-chain
-              address to sign — reference agents do not have a registered address yet.
+              address to sign, reference agents do not have a registered address yet.
             </p>
           </div>
         )}
@@ -303,11 +303,11 @@ function humanizeIssueError(reason: string): string {
   // Audit U-44: normalized to lowercase no-period to match the
   // convention used by humanizeReason in vault/deposit-card,
   // vault/withdraw-card, and humanizeOpenReason in trade/order-form.
-  // Pre-fix this one used sentence-case + trailing periods — the only
+  // Pre-fix this one used sentence-case + trailing periods, the only
   // outlier. Founder-voice (writing.md): plain, conversational copy.
   if (reason === 'wallet_not_connected') return 'connect wallet first';
   if (reason === 'sigil_not_deployed')
-    return 'Sigil is not deployed on this network — mandate signing lights up Month 1 W2';
+    return 'Sigil is not deployed on this network, mandate signing lights up Month 1 W2';
   if (reason === 'signature_rejected') return 'wallet rejected the signature';
   if (reason.startsWith('Unknown venue slug:')) return reason;
   return reason.slice(0, 200);

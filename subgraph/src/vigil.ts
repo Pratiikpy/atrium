@@ -30,7 +30,7 @@ export function handleLiquidationExecuted(event: LiquidationExecuted): void {
   const vigilContract = Vigil.bind(event.address);
   const jobResult = vigilContract.try_jobs(event.params.job_id);
   if (!jobResult.reverted) {
-    // jobs() returns (position_id, user, ...) — value1 = user address
+    // jobs() returns (position_id, user, ...), value1 = user address
     liq.user = jobResult.value.value1;
     liq.account = jobResult.value.value1.toHexString();
   } else {
@@ -114,7 +114,7 @@ export function handleKeeperMissedWindow(event: KeeperMissedWindow): void {
   const keeperId = event.params.keeper.toHexString();
   let k = Keeper.load(keeperId);
   if (!k) {
-    // Mark called before stake — defensive create so the count survives
+    // Mark called before stake, defensive create so the count survives
     // even if event ordering is unusual.
     k = new Keeper(keeperId);
     k.stakeWei = BigInt.zero();
@@ -143,7 +143,7 @@ export function handleKeeperRewarded(event: KeeperRewarded): void {
     k.save();
   }
   // Always log the per-reward record even if Keeper entity doesn't exist
-  // yet — the reward IS the source of truth, the aggregate is derived.
+  // yet, the reward IS the source of truth, the aggregate is derived.
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString();
   const d = new SubsystemDiagnosticEvent(id);
   d.kind = 'keeper_rewarded';
@@ -157,7 +157,7 @@ export function handleKeeperRewarded(event: KeeperRewarded): void {
 
 // Tier-2 defensive observability. Stale-version push attempt: a keeper
 // tried to execute a liquidation against an outdated margin_version.
-// Indicates the keeper is running stale state — surfaces a keeper-health
+// Indicates the keeper is running stale state, surfaces a keeper-health
 // signal before it cascades into missed-window slashing.
 export function handleStaleJobRejected(event: StaleJobRejected): void {
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString();

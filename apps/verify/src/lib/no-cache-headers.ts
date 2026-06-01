@@ -1,5 +1,5 @@
 /**
- * Cache-Control headers for user-specific routes — Phase 3 hardening.
+ * Cache-Control headers for user-specific routes, Phase 3 hardening.
  *
  * Applied to every route that uses requireWalletMatch to prevent CDN
  * caching of per-user data.

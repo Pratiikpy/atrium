@@ -3,12 +3,12 @@
 import type { TaxJurisdiction, TaxYear } from './tax-types';
 
 /**
- * Three export-format CTAs (CSV / PDF / Signed) — matches the prototype's
+ * Three export-format CTAs (CSV / PDF / Signed), matches the prototype's
  * view-actions slot. Props are jurisdiction + year so the download URL
  * reflects the user's selection from the jurisdiction bar.
  *
  * `signed` and `pdf` are accepted formats per /api/tax/export's enum gate
- * (csv / json / pdf — `signed` was the prototype's name for a JSON+Merkle
+ * (csv / json / pdf, `signed` was the prototype's name for a JSON+Merkle
  * proof; the route exposes it under the `json` format with a signature
  * header). Keeping the prototype's three button labels for UI parity but
  * routing `signed` to `format=json` since that's the real enum value.

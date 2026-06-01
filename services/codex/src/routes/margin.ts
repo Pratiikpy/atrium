@@ -5,7 +5,7 @@ import { safeErrorDetail } from '../lib/error-safe';
 export const marginRouter = new Hono<{ Bindings: { SCRIBE_URL: string; ENV?: string } }>();
 
 // Audit FFF-6 fix: same EEE-1 address-validation gap. Non-hex path params were
-// passed straight to The Graph (which returns empty + 200, not 400) — caller
+// passed straight to The Graph (which returns empty + 200, not 400), caller
 // got ambiguous "exists: false" instead of "you sent garbage".
 const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
 

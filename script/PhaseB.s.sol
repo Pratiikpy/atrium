@@ -9,13 +9,13 @@ import {PosternKillSwitch} from "../contracts/postern-kill-switch/src/PosternKil
 import {PosternKeyRegistry} from "../contracts/postern-kill-switch/src/PosternKeyRegistry.sol";
 import {Faucet} from "../contracts/faucet/src/Faucet.sol";
 
-/// @title Atrium Phase-B deploy — Solidity contracts that depend on the
+/// @title Atrium Phase-B deploy, Solidity contracts that depend on the
 ///        already-deployed Stylus contracts (Coffer, Sigil, Vigil, PlinthMath).
 /// @notice Atrium Phase-A deployed 4 Stylus contracts + 7 standalone Solidity
 ///         contracts. This script picks up the Solidity contracts that needed
 ///         to wait for the Stylus addresses to exist.
 ///
-///         Skips: AtriumRouter, Rostrum, venue adapters — all blocked on
+///         Skips: AtriumRouter, Rostrum, venue adapters, all blocked on
 ///         Plinth deploying (size surgery pending, see LAUNCH_READY.md §A.7).
 contract PhaseB is Script {
     // === Live testnet addresses (per Chainlink + Circle docs) ===
@@ -27,7 +27,7 @@ contract PhaseB is Script {
     address constant ENTRYPOINT_V07          = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
 
     // === Phase-A deploy outputs (see deployments/arbitrum_sepolia.json) ===
-    // Checksums calculated by EIP-55 — Solidity refuses any other casing.
+    // Checksums calculated by EIP-55, Solidity refuses any other casing.
     address constant PRAETOR_TIMELOCK        = 0x0dAd24d7feb2bB797e0f69e02c2F32104FCF22d4;
     address constant COFFER_STYLUS           = 0x7420084855421EF0794a971BD5190F5c0C292071;
     address constant SIGIL_STYLUS            = 0xEfD38821466Ca31E0B1734F89F1D6EC9A4bc70D0;
@@ -42,7 +42,7 @@ contract PhaseB is Script {
         vm.startBroadcast(pk);
 
         // -----------------------------------------------------------------
-        // 1. Aqueduct (CCIP bridge) — depends on Coffer
+        // 1. Aqueduct (CCIP bridge), depends on Coffer
         // -----------------------------------------------------------------
         Aqueduct aqueduct = new Aqueduct(
             ARB_SEPOLIA_CCIP_ROUTER,
@@ -54,7 +54,7 @@ contract PhaseB is Script {
         );
         console.log("Aqueduct:         ", address(aqueduct));
 
-        // 2. AqueductReceiver — also needs USDC + Coffer + Praetor wiring
+        // 2. AqueductReceiver, also needs USDC + Coffer + Praetor wiring
         // so it can credit cross-chain arrivals into the Coffer vault.
         AqueductReceiver receiver = new AqueductReceiver(
             ARB_SEPOLIA_CCIP_ROUTER,
@@ -65,7 +65,7 @@ contract PhaseB is Script {
         );
         console.log("AqueductReceiver: ", address(receiver));
 
-        // 3. AqueductClaimback — depends on Aqueduct
+        // 3. AqueductClaimback, depends on Aqueduct
         AqueductClaimback claimback = new AqueductClaimback(
             address(aqueduct),
             ARB_SEPOLIA_CCIP_ROUTER
@@ -108,7 +108,7 @@ contract PhaseB is Script {
 ///         Onboarding drop sized to the testnet USDC the Circle faucet
 ///         actually grants per claim (~10 USDC per 24 h). Original spec
 ///         called for 100 USDC drops but that requires a whale-deposit
-///         we don't have — 5 USDC × 8 claims is the realistic ratio.
+///         we don't have, 5 USDC × 8 claims is the realistic ratio.
 contract DeployFaucet is Script {
     address constant ARB_SEPOLIA_USDC = 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d;
 

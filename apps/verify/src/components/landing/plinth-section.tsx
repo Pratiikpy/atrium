@@ -10,10 +10,10 @@ export function PlinthSection() {
           <br className="hidden md:inline" /> mathematically.
         </>
       }
-      sub="Plinth computes a SPAN-style cross-product margin number in Rust, deployed as Stylus. The same math costs 10–100× more gas in equivalent Solidity — which is why it has not shipped onchain elsewhere."
+      sub="Plinth computes a SPAN-style cross-product margin number in Rust, deployed as Stylus. The same math costs 10–100× more gas in equivalent Solidity, which is why it has not shipped onchain elsewhere."
     >
       <div className="mx-auto grid max-w-4xl gap-3 text-center md:grid-cols-3">
-        {/* Audit SSS-2 fix: copy claimed "14 SPAN scenarios" — but
+        {/* Audit SSS-2 fix: copy claimed "14 SPAN scenarios", but
             `contracts/plinth/src/span.rs:24-32` defines exactly 7 entries in
             `SCENARIOS_BPS` (`±10%, ±5%, ±2%, 0`). The landing-page number
             doubled the actual implementation. Now sourced to match the

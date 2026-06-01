@@ -18,11 +18,11 @@ interface AgentsSummary {
 // activeMandates / activeSessionKeys / agentsCopied / feeAgentsCount and
 // hardcoded "across HL · Pendle · Aave" as a fake venue list. UI rendered
 // "0 active mandates / 0 session keys / across HL · Pendle · Aave" on any
-// API failure — even if the user had real mandates. A user with 3 active
+// API failure, even if the user had real mandates. A user with 3 active
 // mandates seeing "0 active mandates" might panic-press Kill Switch
 // thinking their delegation got revoked. Same RRR-5/6 misleading-data
 // pattern as the tax surface. Now: nulls + source='pending' → tiles render
-// "—" sentinels and the Tile sub copy honestly says "pending".
+// "-" sentinels and the Tile sub copy honestly says "pending".
 async function fetchSummary(): Promise<AgentsSummary> {
   try {
     const r = await fetch('/api/agents/summary');
@@ -49,22 +49,22 @@ export function AgentsStatRow() {
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <Tile
         label="Active mandates"
-        value={data?.activeMandates?.toString() ?? '—'}
+        value={data?.activeMandates?.toString() ?? '-'}
         sub={data?.activeSessionKeys != null ? `${data.activeSessionKeys} session keys` : 'session keys pending'}
       />
       <Tile
         label="Total capacity"
-        value={data?.totalCapacityUsd ?? '—'}
+        value={data?.totalCapacityUsd ?? '-'}
         sub={data?.capacityUsedPct != null ? `${data.capacityUsedPct}% used` : 'pending'}
       />
       <Tile
         label="Agents copied"
-        value={data?.agentsCopied?.toString() ?? '—'}
+        value={data?.agentsCopied?.toString() ?? '-'}
         sub={data?.agentsByVenues ?? 'venue breakdown pending'}
       />
       <Tile
         label="Fees paid · 30d"
-        value={data?.feesPaidUsd ?? '—'}
+        value={data?.feesPaidUsd ?? '-'}
         sub={data?.feeAgentsCount != null ? `to ${data.feeAgentsCount} agent operators` : 'fees pending'}
       />
     </div>

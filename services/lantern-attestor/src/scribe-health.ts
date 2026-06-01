@@ -2,7 +2,7 @@
  * Scribe health check for lantern-attestor.
  *
  * If lagBlocks > 50 (~12s on Arbitrum L2), the Scribe data is too stale
- * to build a trustworthy Merkle tree — abort the publish and alert.
+ * to build a trustworthy Merkle tree, abort the publish and alert.
  * Threshold: 50 blocks ≈ 12.5s. Lantern publishes hourly, so even a
  * 12s lag means the tree could miss a deposit that landed 12s ago.
  * For POR integrity, we abort rather than publish a stale tree.

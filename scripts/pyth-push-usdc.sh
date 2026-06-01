@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pyth-push-usdc.sh — push a fresh USDC/USD price into the on-chain Pyth oracle
+# pyth-push-usdc.sh, push a fresh USDC/USD price into the on-chain Pyth oracle
 # on Arbitrum Sepolia, then confirm it is readable inside Plinth's 60s freshness
 # window.
 #
@@ -45,4 +45,4 @@ cast send "$PYTH" "updatePriceFeeds(bytes[])" "[$BLOB]" --value "$FEE" \
 
 echo "[pyth-push] verifying getPriceNoOlderThan(60s)..."
 cast call "$PYTH" "getPriceNoOlderThan(bytes32,uint256)(int64,uint64,int32,uint256)" "$FEED" 60 --rpc-url "$RPC"
-echo "[pyth-push] OK — USDC/USD is fresh within the 60s window"
+echo "[pyth-push] OK, USDC/USD is fresh within the 60s window"

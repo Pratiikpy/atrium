@@ -35,18 +35,18 @@ ERC-7201 namespaced. See `src/lib.rs` `sol_storage!` block.
 
 Critical fields per account:
 
-- `collateral_value_wei` — read from Coffer
-- `required_margin_wei` — computed by SPAN
-- `margin_version` — monotonic nonce, prevents Vigil race
-- `is_paused` — set on under-collateralization
+- `collateral_value_wei`, read from Coffer
+- `required_margin_wei`, computed by SPAN
+- `margin_version`, monotonic nonce, prevents Vigil race
+- `is_paused`, set on under-collateralization
 
 ## Invariants (Kani + proptest)
 
-1. **Solvency** — `required_margin` is non-negative (constructed from U256)
-2. **Oracle freshness** — `block_timestamp - last_publish_time <= freshness_seconds`
-3. **Mandate expiry** — `block_timestamp <= intent.expires_at` (proven in Sigil)
-4. **Monotonic notional** — doubling a position's size cannot decrease required margin
-5. **No reentrancy** — `is_updating` guard around every state mutation
+1. **Solvency**, `required_margin` is non-negative (constructed from U256)
+2. **Oracle freshness**, `block_timestamp - last_publish_time <= freshness_seconds`
+3. **Mandate expiry**, `block_timestamp <= intent.expires_at` (proven in Sigil)
+4. **Monotonic notional**, doubling a position's size cannot decrease required margin
+5. **No reentrancy**, `is_updating` guard around every state mutation
 
 Run proofs:
 
@@ -85,9 +85,9 @@ cargo stylus deploy --network arbitrum-sepolia --private-key $DEPLOYER_PRIVATE_K
 
 ## Open questions (carried from TDD §24.3)
 
-- Stylus `TestVM` API exact shape — verified Wave -1, may require harness adjustments
-- SPAN scenario count — currently 7. May expand to 11 after Archive backtest tuning
-- Diversification credit between correlation classes — none in v1, planned for v2
+- Stylus `TestVM` API exact shape, verified Wave -1, may require harness adjustments
+- SPAN scenario count, currently 7. May expand to 11 after Archive backtest tuning
+- Diversification credit between correlation classes, none in v1, planned for v2
 
 ## Files
 

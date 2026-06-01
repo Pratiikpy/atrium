@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * sitemap.xml — every public-facing URL. Excludes /app/* (wallet-gated),
+ * sitemap.xml, every public-facing URL. Excludes /app/* (wallet-gated),
  * /api/* (server endpoints), /monitoring (Sentry tunnel).
  *
  * SEO-04: Added /docs/honesty, /docs/api, /team, /security, /changelog,
@@ -37,7 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/legal/terms',
   ];
 
-  // The 7-step Verifier walk — explicit so each step is indexable.
+  // The 7-step Verifier walk, explicit so each step is indexable.
   const verifierSteps = [1, 2, 3, 4, 5, 6, 7].map((n) => `/verify/${n}`);
 
   return [...publicRoutes, ...verifierSteps].map((path) => ({

@@ -41,7 +41,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('gql() — happy path', () => {
+describe('gql(), happy path', () => {
   it('returns the unwrapped data on a 200 with valid GraphQL response', async () => {
     (global.fetch as any).mockResolvedValue(
       new Response(JSON.stringify({ data: { partners: [{ id: '0x1' }] } }), { status: 200 }),
@@ -86,7 +86,7 @@ describe('gql() — happy path', () => {
   });
 });
 
-describe('gql() — error paths', () => {
+describe('gql(), error paths', () => {
   it('throws "Scribe NNN" when response is non-2xx (404)', async () => {
     (global.fetch as any).mockResolvedValue(new Response('', { status: 404 }));
     await expect(gql('query { x }')).rejects.toThrow(/Scribe 404/);
@@ -151,7 +151,7 @@ describe('gql() — error paths', () => {
   });
 });
 
-describe('gql() — invariants under chaos', () => {
+describe('gql(), invariants under chaos', () => {
   it('does not swallow errors when both data AND errors are present', async () => {
     // Edge case: some GraphQL servers return both partial data and a
     // non-empty errors array. The helper prioritizes the error.
@@ -167,7 +167,7 @@ describe('gql() — invariants under chaos', () => {
     await expect(gql('query { x y }')).rejects.toThrow(/Partial result/);
   });
 
-  it('does not retry — caller controls retry policy (TanStack Query)', async () => {
+  it('does not retry, caller controls retry policy (TanStack Query)', async () => {
     // Single fetch call per gql invocation. Retries belong in the
     // TanStack Query layer above this helper.
     (global.fetch as any).mockResolvedValue(new Response('', { status: 500 }));
@@ -176,7 +176,7 @@ describe('gql() — invariants under chaos', () => {
   });
 });
 
-describe('gql() — iteration 41: PLACEHOLDER env detection', () => {
+describe('gql(), iteration 41: PLACEHOLDER env detection', () => {
   it('throws ScribeNotConfigured when NEXT_PUBLIC_SCRIBE_URL is unset', async () => {
     // Override the test-setup default. Pre-fix this case was silent: the
     // route would 404 against the PLACEHOLDER URL, catch into "pending,"
@@ -191,7 +191,7 @@ describe('gql() — iteration 41: PLACEHOLDER env detection', () => {
 
   it('throws when NEXT_PUBLIC_SCRIBE_URL still contains the literal PLACEHOLDER string', async () => {
     // Operator did set the env but to the unedited template value. Same
-    // shape as unset — refuse before fetch.
+    // shape as unset, refuse before fetch.
     process.env.NEXT_PUBLIC_SCRIBE_URL =
       'https://api.studio.thegraph.com/query/PLACEHOLDER/atrium/version/latest';
     await expect(gql('query { x }')).rejects.toBeInstanceOf(ScribeNotConfigured);

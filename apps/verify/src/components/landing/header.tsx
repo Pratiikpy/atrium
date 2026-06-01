@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /**
- * Marketing header — over-dark variant matching design/Atriumnew.html
+ * Marketing header, over-dark variant matching design/Atriumnew.html
  * `header.nav.over-dark`. Sticky, semi-transparent dark backdrop with
  * blurred backdrop so the hero monument shows through.
  *

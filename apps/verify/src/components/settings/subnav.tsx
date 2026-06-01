@@ -4,7 +4,7 @@ import { useState, createContext, useContext, type ReactNode } from 'react';
 
 /**
  * Settings subnav + tab context. Audit P-6 fix: prior version had 6 tabs
- * but only the "Wallet" cards rendered — clicking the other 5 silently
+ * but only the "Wallet" cards rendered, clicking the other 5 silently
  * toggled `active` state with no visible effect.
  *
  * Now `SettingsTabs` provides a context so each section card can opt-in
@@ -67,7 +67,7 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
         <div className="space-y-4">
           {tabMeta?.readyMonth && active !== 'wallet' && (
             <div className="rounded-md border border-testnet/30 bg-testnet/5 p-5 text-sm">
-              <p className="font-medium text-testnet">{tabMeta.label} — coming {tabMeta.readyMonth}</p>
+              <p className="font-medium text-testnet">{tabMeta.label}, coming {tabMeta.readyMonth}</p>
               <p className="mt-1 text-ink-soft">
                 The {tabMeta.label.toLowerCase()} tab is scaffolded but not yet wired.
                 See <code className="font-mono">docs/MASTER_PLAN.md</code> for the exact ship date.
@@ -84,11 +84,11 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
 /**
  * Section helper: only renders its children when its tab is active.
  *
- * IMPORTANT — Audit R-4 fix: `SettingsTabPanel` MUST stay in this
+ * IMPORTANT, Audit R-4 fix: `SettingsTabPanel` MUST stay in this
  * `'use client'` file. The function reads `TAB_CONTEXT` via `useContext`,
  * which is a React-runtime call that only works in client components.
  * If you refactor this helper into a separate file or into a server
- * component (it *looks* pure — just a context read + return children),
+ * component (it *looks* pure, just a context read + return children),
  * runtime will fail with `useContext is not a function` the moment a
  * server component tries to render it. Do not split.
  */

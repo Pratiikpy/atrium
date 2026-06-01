@@ -1,7 +1,7 @@
 /**
  * Vercel Edge Function entry for Codex.
  *
- * The same Hono app from src/index.ts runs under Vercel's Edge runtime —
+ * The same Hono app from src/index.ts runs under Vercel's Edge runtime -
  * Hono ships a `handle()` adapter that wires the standard Request/Response
  * pair the Edge runtime delivers.
  *
@@ -10,7 +10,7 @@
  *   - Vercel Edge here uses Upstash Redis REST (services/codex/src/lib/
  *     upstash-db.ts) when UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
  *     are configured. Pre-fix the Vercel deploy fell back to inMemoryDB on
- *     every request — per-instance state lost on cold start, which silently
+ *     every request, per-instance state lost on cold start, which silently
  *     disabled x402 replay-dedup and Idempotency-Key dedup. Upstash gives
  *     both deploys identical replay/idempotency semantics.
  *   - When Upstash is not configured, the entry still falls back to
@@ -29,7 +29,7 @@ export const config = {
 const upstashDB = maybeUpstashDB(process.env);
 if (!upstashDB) {
   console.warn(
-    '[codex/vercel] UPSTASH_REDIS_REST_URL or _TOKEN unset — falling back ' +
+    '[codex/vercel] UPSTASH_REDIS_REST_URL or _TOKEN unset, falling back ' +
       'to per-instance inMemoryDB. x402 replay-dedup + idempotency are NOT ' +
       'durable. Configure both env vars in the Vercel project to enable ' +
       'Upstash-backed dedup. See human_left.md `codex-vercel-upstash`.',
@@ -38,7 +38,7 @@ if (!upstashDB) {
 
 // Phase theta audit follow-up (2026-05-25): pre-fix this file defaulted
 // CODEX_PAY_TO_ADDRESS to the deployer EOA `0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42`
-// — a key that leaked on 2026-05-24 (see incidents/). Anyone paying
+//, a key that leaked on 2026-05-24 (see incidents/). Anyone paying
 // x402 fees against this Vercel deploy would have sent USDC to the
 // leaked address. Now the fallback is removed: an unconfigured deploy
 // returns a startup warning + responds with HTTP 503 'pay_to_not_configured'
@@ -47,7 +47,7 @@ if (!process.env.CODEX_PAY_TO_ADDRESS) {
   console.warn(
     '[codex/vercel] CODEX_PAY_TO_ADDRESS unset. x402 payments will return ' +
       '503 until configured. Pre-2026-05-25 the fallback was the leaked ' +
-      'deployer EOA — removed to prevent silent payment routing.',
+      'deployer EOA, removed to prevent silent payment routing.',
   );
 }
 
@@ -64,7 +64,7 @@ export default async function handler(req: Request): Promise<Response> {
     COINBASE_X402_API_KEY: process.env.COINBASE_X402_API_KEY ?? '',
     CODEX_USDC_ADDRESS: process.env.CODEX_USDC_ADDRESS
       ?? '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
-    // No fallback — see incident note above.
+    // No fallback, see incident note above.
     CODEX_PAY_TO_ADDRESS: process.env.CODEX_PAY_TO_ADDRESS ?? '',
     CODEX_MIN_PAYMENT_USDC_WEI: process.env.CODEX_MIN_PAYMENT_USDC_WEI ?? '1000000',
     STOA_ADDRESS: process.env.STOA_ADDRESS,

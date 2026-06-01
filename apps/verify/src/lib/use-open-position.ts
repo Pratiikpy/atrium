@@ -18,7 +18,7 @@ import { instrumentIdForVenue } from '@/lib/instruments';
  *   3. The Router's IPorticoAdapterV11 dispatch logic (v1.1 adapters like
  *      AaveHorizonAdapterV11 revert V10NotSupported on direct v1.0 calls)
  *   4. The adapter's `is_authorized_caller` check (the user's EOA is NOT on
- *      the adapter's authorized-caller mapping — only the Router is)
+ *      the adapter's authorized-caller mapping, only the Router is)
  *
  * Every direct adapter.open_position call from a user wallet would have
  * reverted Unauthorized. The Trade page's "Open position" button was dead.
@@ -40,7 +40,7 @@ import { instrumentIdForVenue } from '@/lib/instruments';
 // contracts/atrium-router/src/AtriumRouter.sol:149. The action_sigil +
 // intent_sigil bytes are empty until the Sigil mandate path lights up
 // the user-direct-open case (today Plinth accepts empty bytes from the
-// user's own EOA — owner == caller short-circuits the mandate check).
+// user's own EOA, owner == caller short-circuits the mandate check).
 const ROUTER_ABI = [
   {
     type: 'function',

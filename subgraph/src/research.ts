@@ -6,7 +6,7 @@ export function handleBacktestPublished(event: BacktestPublished): void {
   const ba = new BacktestAttestation(id);
   ba.ipfsHash = event.params.ipfs_hash;
   ba.tradesCount = event.params.trades_count;
-  // Convert int256 to i32 via toI32() — values fit comfortably in 32 bits for bps
+  // Convert int256 to i32 via toI32(), values fit comfortably in 32 bits for bps
   ba.collateralDeltaBps = event.params.collateral_delta_bps.toI32();
   ba.timestampSeconds = event.params.timestamp_seconds;
   ba.notebookUrl = event.params.notebook_url;

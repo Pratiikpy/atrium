@@ -17,7 +17,7 @@ export function humanizeWalletError(error: unknown): { message: string; raw?: st
 
   // Nonce issues
   if (/nonce too low/i.test(raw)) {
-    return { message: 'Stale tx — refresh and try again', raw };
+    return { message: 'Stale tx, refresh and try again', raw };
   }
 
   // Contract revert with reason
@@ -28,13 +28,13 @@ export function humanizeWalletError(error: unknown): { message: string; raw?: st
 
   // WebAuthn errors
   if (/timed out|the operation either timed out/i.test(raw)) {
-    return { message: 'Authenticator timed out — try again', raw };
+    return { message: 'Authenticator timed out, try again', raw };
   }
   if (/cancelled by the user|the operation was cancelled/i.test(raw)) {
     return { message: 'Authenticator cancelled', raw };
   }
   if (/not allowed|notallowederror/i.test(raw)) {
-    return { message: 'Authenticator not allowed — check permissions', raw };
+    return { message: 'Authenticator not allowed, check permissions', raw };
   }
 
   // App-specific codes

@@ -16,7 +16,7 @@ const VALID_CATEGORIES = ['bug', 'ux', 'feature', 'other'] as const;
  */
 export async function POST(req: NextRequest) {
   // Broken-auth fix: the prior check looked for a cookie named
-  // `atrium_session` (underscore) and only tested EXISTENCE — but the real
+  // `atrium_session` (underscore) and only tested EXISTENCE, but the real
   // session cookie is `atrium-session` (hyphen) and must be HMAC-verified.
   // So the old check both looked at the wrong cookie AND accepted any
   // non-empty value. getSession() reads + verifies the signed cookie.
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 400 });
   }
 
-  // Forward feedback — in production this would POST to Notion API or send email.
+  // Forward feedback, in production this would POST to Notion API or send email.
   // For now, log and acknowledge.
   const feedbackUrl = process.env.FEEDBACK_WEBHOOK_URL;
   if (feedbackUrl) {

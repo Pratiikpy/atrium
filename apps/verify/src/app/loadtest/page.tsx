@@ -22,12 +22,12 @@ export default function LoadtestPage() {
       <section className="mt-16 rounded-md border border-divider bg-parchment-soft/40 p-6">
         <h2 className="font-display text-2xl text-ink">SLOs (Year-1 testnet)</h2>
         <ul className="mt-3 space-y-2 text-ink-soft">
-          <li>• <code className="font-mono">Plinth.update_margin</code> — ≤ 80K gas P95</li>
-          <li>• <code className="font-mono">Plinth.open_position</code> (5 existing positions) — ≤ 120K gas P95</li>
-          <li>• Codex API — ≤ 200ms P95</li>
-          <li>• Scribe indexer lag — ≤ 30s normal</li>
-          <li>• Verifier Mode time-to-interactive — ≤ 1.5s on broadband</li>
-          <li>• Lantern attestation cadence — 1 publish/hour ± 15min jitter</li>
+          <li>• <code className="font-mono">Plinth.update_margin</code>, ≤ 80K gas P95</li>
+          <li>• <code className="font-mono">Plinth.open_position</code> (5 existing positions), ≤ 120K gas P95</li>
+          <li>• Codex API, ≤ 200ms P95</li>
+          <li>• Scribe indexer lag, ≤ 30s normal</li>
+          <li>• Verifier Mode time-to-interactive, ≤ 1.5s on broadband</li>
+          <li>• Lantern attestation cadence, 1 publish/hour ± 15min jitter</li>
         </ul>
       </section>
       </div>

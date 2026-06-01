@@ -1,4 +1,4 @@
-"""Atrium Archive — weekly research loop.
+"""Atrium Archive, weekly research loop.
 
 Phase eta.3 (2026-05-25). Runs per-strategy backtests, computes the
 collateral-saved-vs-baseline delta, writes a Jupyter notebook, pins it

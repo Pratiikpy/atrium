@@ -6,7 +6,7 @@ import path from 'node:path';
  *
  * Before Wave-HH, 5+ routes each had their own copy of the path-walk
  * pattern (vault/stats, protocol/subsystems, protocol/metrics,
- * portfolio-source, deployments/status). Each copy had subtle drift —
+ * portfolio-source, deployments/status). Each copy had subtle drift -
  * different fallback paths, different error swallowing, different
  * "contracts" vs "addresses" key handling.
  *
@@ -27,7 +27,7 @@ import path from 'node:path';
  * write addresses to BOTH paths OR unify them. The verify-app's
  * convention is the older one; the script's is the newer Solidity-style
  * one. Unification is out of scope for the verify-app to decide unilaterally
- * — the operator chooses which side wins at deploy time.
+ *, the operator chooses which side wins at deploy time.
  */
 
 export interface DeploymentRecord {

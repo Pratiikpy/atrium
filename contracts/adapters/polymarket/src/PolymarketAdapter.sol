@@ -60,7 +60,7 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     // Audit DDDDD-1 fix: track the current validator set in an array so
     // `setValidators` can clear the OLD set before flipping the new one.
     // Pre-fix the function only ORed in the new addresses, leaving
-    // rotated-out validators with `is_validator = true` indefinitely —
+    // rotated-out validators with `is_validator = true` indefinitely -
     // a compromised key remained valid after Praetor "rotated" it.
     // Mirror of HyperliquidHybridAdapter's pattern (which already
     // clears properly).
@@ -75,8 +75,8 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
     // a caller-supplied opaque `bytes32 attestation_hash`, so a validator
     // signature for position 7's attestation hash could be replayed against
     // position 99 (different fields, same `attestation_hash` value). Now
-    // the typehash binds every load-bearing field — venue_position_id,
-    // instrument_id, price_q64, pnl, block_no — so the digest changes if
+    // the typehash binds every load-bearing field, venue_position_id,
+    // instrument_id, price_q64, pnl, block_no, so the digest changes if
     // any of them change. Off-chain validators must update their signing
     // payload to match this struct definition.
     bytes32 private constant ATTESTATION_TYPEHASH = keccak256(
@@ -285,7 +285,7 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
         // Pre-fix, a signed attestation for position A with hash H could be
         // replayed against position B by the caller because the on-chain
         // digest only depended on H. Now the digest reflects the full
-        // attestation contents — replay against any other position changes
+        // attestation contents, replay against any other position changes
         // every field and produces a different digest the validators
         // didn't sign.
         bytes32 structHash = keccak256(abi.encode(
@@ -300,7 +300,7 @@ contract PolymarketAdapter is IPorticoAdapter, ReentrancyGuard {
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
 
         // Audit G-4 fix: previously only checked is_validator on the address
-        // array — a caller could pass any list of validators and clear quorum
+        // array, a caller could pass any list of validators and clear quorum
         // without holding their keys. Now we recover each signature and
         // dedupe so a single validator can't double-vote, mirroring the
         // Hyperliquid pattern.

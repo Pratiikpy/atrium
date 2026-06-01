@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {IPorticoAdapter} from "../../../portico-registry/src/IPorticoAdapter.sol";
 import {ReentrancyGuard} from "../../../portico-registry/src/ReentrancyGuard.sol";
 
-/// Aave V3 Pool interface — the subset Atrium needs.
+/// Aave V3 Pool interface, the subset Atrium needs.
 /// Full interface at resources/aave-v3-core/contracts/interfaces/IPool.sol
 interface IAavePool {
     function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external;
@@ -173,7 +173,7 @@ contract AaveHorizonAdapter is IPorticoAdapter, ReentrancyGuard {
 
         // Audit JJJ-8 fix: pre-fix this passed `type(uint256).max` which per
         // Aave V3 IPool semantics withdraws the ENTIRE aToken balance of the
-        // adapter — across all open positions. One close drained every other
+        // adapter, across all open positions. One close drained every other
         // user's principal and reported it as the closer's profit. Note: v1.0
         // is also revert-gated by V10NotSupported in the v1.1 contract (the
         // only deploy target), so this v1.0 fix is defense-in-depth in case
@@ -191,7 +191,7 @@ contract AaveHorizonAdapter is IPorticoAdapter, ReentrancyGuard {
         onlyCoffer
         returns (int256 realized_pnl_signed)
     {
-        // v1: not implemented — close + reopen for modifications
+        // v1: not implemented, close + reopen for modifications
         venue_position_id;
         notional_delta_signed;
         venue_payload;
@@ -236,7 +236,7 @@ contract AaveHorizonAdapter is IPorticoAdapter, ReentrancyGuard {
     }
 
     function attest_off_chain_state(bytes calldata signed_attestation) external returns (bool) {
-        // Not hybrid — always returns false to signal "no off-chain attestation needed"
+        // Not hybrid, always returns false to signal "no off-chain attestation needed"
         signed_attestation;
         return false;
     }

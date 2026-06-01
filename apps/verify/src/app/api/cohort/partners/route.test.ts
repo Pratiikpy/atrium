@@ -18,7 +18,7 @@ import { gql } from '@/lib/scribe-helpers';
  *   - `{ partners: [], source: 'pending' }` on ANY failure (network, timeout, etc.)
  *
  * The UI uses `source` to render either a real list or the honest empty
- * state — so this route's contract is the foundation of the
+ * state, so this route's contract is the foundation of the
  * never-fake-numbers invariant for cohort data.
  */
 
@@ -30,12 +30,12 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/cohort/partners — happy path', () => {
+describe('GET /api/cohort/partners: happy path', () => {
   it('maps gql cohortPartners → {partners, source:scribe}', async () => {
     (gql as any).mockResolvedValue({
       cohortPartners: [
-        { id: '0xaaaa', displayName: 'Wintermute' },
-        { id: '0xbbbb', displayName: 'Selini' },
+        { id: '0xaaaa', displayName: 'Acme Markets' },
+        { id: '0xbbbb', displayName: 'Cohort Partner B' },
       ],
     });
 
@@ -44,8 +44,8 @@ describe('GET /api/cohort/partners — happy path', () => {
     const json = await res.json();
     expect(json.source).toBe('scribe');
     expect(json.partners).toHaveLength(2);
-    expect(json.partners[0]).toEqual({ id: '0xaaaa', name: 'Wintermute' });
-    expect(json.partners[1]).toEqual({ id: '0xbbbb', name: 'Selini' });
+    expect(json.partners[0]).toEqual({ id: '0xaaaa', name: 'Acme Markets' });
+    expect(json.partners[1]).toEqual({ id: '0xbbbb', name: 'Cohort Partner B' });
   });
 
   it('falls back to id.slice(0, 10) when displayName is null', async () => {
@@ -82,7 +82,7 @@ describe('GET /api/cohort/partners — happy path', () => {
   });
 });
 
-describe('GET /api/cohort/partners — honest pending on failure', () => {
+describe('GET /api/cohort/partners: honest pending on failure', () => {
   it('returns source:pending when gql throws Scribe 5xx', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe 502'));
     const json = await (await GET()).json();
@@ -114,7 +114,7 @@ describe('GET /api/cohort/partners — honest pending on failure', () => {
     expect(json.source).toBe('pending');
   });
 
-  it('returns 200 (not 500) even on gql failure — never breaks the UI', async () => {
+  it('returns 200 (not 500) even on gql failure: never breaks the UI', async () => {
     // The UI polls this every 30s; if it ever 5xx'd, the cohort section
     // would error-boundary while real Scribe outages are momentary.
     (gql as any).mockRejectedValue(new Error('Network connection failed'));
@@ -123,7 +123,7 @@ describe('GET /api/cohort/partners — honest pending on failure', () => {
   });
 });
 
-describe('GET /api/cohort/partners — response shape invariants', () => {
+describe('GET /api/cohort/partners: response shape invariants', () => {
   it('always returns {partners: [...], source: ...} regardless of state', async () => {
     // Test every branch produces the canonical shape.
     const scenarios = [

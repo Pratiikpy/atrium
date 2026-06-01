@@ -114,7 +114,7 @@ export function AgentProfileLive({ id, venues }: { id: string; venues: string[] 
                     Scribe-backed source returns. */}
                 {profile?.source === 'scribe'
                   ? profile.deboostEvents.length
-                  : '—'}
+                  : '-'}
               </p>
             </div>
           </div>

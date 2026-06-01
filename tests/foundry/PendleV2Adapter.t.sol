@@ -32,7 +32,7 @@ interface IPendleRouterShape {
 /// @title PendleV2Adapter foundry test suite
 /// @notice Pendle's principal-token (PT) yield-stripping path. Adapter holds
 ///         PT tokens on behalf of the user; PnL realized at close as
-///         (token_out − supplied). Market expiry is a hard gate — once a
+///         (token_out − supplied). Market expiry is a hard gate, once a
 ///         Pendle market matures the adapter must refuse new opens.
 contract PendleV2AdapterTest is Test {
     PendleV2Adapter internal adapter;
@@ -110,7 +110,7 @@ contract PendleV2AdapterTest is Test {
     }
 
     /// Iter 60 audit fix: setAuthorizedCaller had zero tests on Pendle
-    /// — neither auth gating, state effect, nor event emission was
+    ///, neither auth gating, state effect, nor event emission was
     /// pinned. The function gates which Router contracts can pull
     /// USDC from the adapter (open_position / close_position), so a
     /// refactor breaking it would silently allow any caller to drain.
@@ -131,7 +131,7 @@ contract PendleV2AdapterTest is Test {
 
     function test_addInstrument_rejectsMultisig_EEEEE1() public {
         // Audit EEEEE-1 load-bearing: the multisig CANNOT add instruments
-        // directly. Pre-fix this was the only auth path — Praetor could
+        // directly. Pre-fix this was the only auth path, Praetor could
         // list a hostile instrument with no 48h community-veto window.
         vm.prank(praetor);
         vm.expectRevert(PendleV2Adapter.Unauthorized.selector);
@@ -158,7 +158,7 @@ contract PendleV2AdapterTest is Test {
     /// Iter 57 audit fix: pin the addInstrument → get_*_bps storage
     /// routing on Pendle. Last of the 9 adapters with the (haircut,
     /// initial, maintenance) param triplet to get its dedicated routing
-    /// test — see iter 56 task #230/#231 for the cross-adapter sweep.
+    /// test, see iter 56 task #230/#231 for the cross-adapter sweep.
     /// Three distinct prime values so any pairwise swap of the
     /// argument-to-mapping writes fails exactly one assertEq.
     function test_addInstrument_routesBpsArgsCorrectly_iter57() public {
@@ -220,7 +220,7 @@ contract PendleV2AdapterTest is Test {
     }
 
     function test_open_rejectsMaturedMarket() public {
-        // Warp past the market's expiry — open must revert.
+        // Warp past the market's expiry, open must revert.
         //
         // Audit Y-1 (caught running this suite): an inline `market.expiry()`
         // inside the expectRevert encoding is a STATICCALL that consumes the
@@ -266,7 +266,7 @@ contract PendleV2AdapterTest is Test {
 
     function test_open_negativeNotional_treatsAsAbsoluteSupply() public {
         // Pendle is supply-only; negative notional uses abs() for the supply
-        // amount. Verify the contract behavior — locks the v1 pattern.
+        // amount. Verify the contract behavior, locks the v1 pattern.
         router.setPtOut(500e18);
         bytes memory payload = _buildOpenPayload(user, 490e18);
 

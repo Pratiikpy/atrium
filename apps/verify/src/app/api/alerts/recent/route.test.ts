@@ -15,7 +15,7 @@ import { gql } from '@/lib/scribe-helpers';
  *   Math.min caps at MAX_LIMIT=100. Default 25 on missing/invalid.
  * - Closed-enum kind: rejected with 400 + structured error string
  *   if outside the 6 canonical AlertEvent kinds.
- * - 503 on Scribe failure (NOT silent fallback to []) — alerts are
+ * - 503 on Scribe failure (NOT silent fallback to []), alerts are
  *   the ops timeline; a missing alert during an oracle disagreement
  *   is the load-bearing security signal. Honest "scribe_unavailable"
  *   503 beats silent "all green" 200.
@@ -33,7 +33,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/alerts/recent — input validation', () => {
+describe('GET /api/alerts/recent, input validation', () => {
   it('rejects non-canonical kind with 400 + invalid_kind', async () => {
     const { GET } = await import('./route');
     const res = await GET(makeRequest('kind=invented_alert_kind'));
@@ -68,7 +68,7 @@ describe('GET /api/alerts/recent — input validation', () => {
   });
 });
 
-describe('GET /api/alerts/recent — limit clamp', () => {
+describe('GET /api/alerts/recent, limit clamp', () => {
   it('uses default 25 on missing limit', async () => {
     let captured: any;
     (gql as any).mockImplementation(async (_q: string, vars: any) => {
@@ -114,7 +114,7 @@ describe('GET /api/alerts/recent — limit clamp', () => {
   });
 });
 
-describe('GET /api/alerts/recent — since parameter', () => {
+describe('GET /api/alerts/recent, since parameter', () => {
   it('defaults to since=0 when missing', async () => {
     let captured: any;
     (gql as any).mockImplementation(async (_q: string, vars: any) => {
@@ -149,7 +149,7 @@ describe('GET /api/alerts/recent — since parameter', () => {
   });
 });
 
-describe('GET /api/alerts/recent — success path', () => {
+describe('GET /api/alerts/recent, success path', () => {
   it('passes through alertEvents under {alerts, count, source}', async () => {
     const events = [
       { id: '0xa', kind: 'oracle_disagreement', contract: 'plinth', blockNumber: '100', timestamp: '1700000000' },
@@ -166,7 +166,7 @@ describe('GET /api/alerts/recent — success path', () => {
   });
 });
 
-describe('GET /api/alerts/recent — Scribe outage returns 503 (not silent fallback)', () => {
+describe('GET /api/alerts/recent, Scribe outage returns 503 (not silent fallback)', () => {
   it('returns 503 + scribe_unavailable on gql failure (NOT empty 200)', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe timeout'));
     const { GET } = await import('./route');

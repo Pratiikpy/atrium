@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tplus48-aave-fill.sh — drive the first REAL on-chain trade-fill through
+# tplus48-aave-fill.sh, drive the first REAL on-chain trade-fill through
 # AtriumRouter on Arbitrum Sepolia, once the three 48h timelock ops scheduled
 # 2026-05-29/30 have elapsed.
 #
@@ -28,7 +28,7 @@
 # KNOWN RISK (#430): the Router pulls Plinth's margin DELTA to the adapter, but
 #   the adapter supplies abs(notional). For USDC-LEND (cash-equivalent) the fill
 #   succeeds only if Plinth's required margin >= notional. If the margin is a
-#   fraction of notional, step 6 reverts at pool.supply (adapter under-funded) —
+#   fraction of notional, step 6 reverts at pool.supply (adapter under-funded) -
 #   that is the #430 seam surfacing on a real fill, a genuine result to report,
 #   not a script bug. Reported honestly either way.
 set -uo pipefail
@@ -66,12 +66,12 @@ execute_op() {
   local executed ready_at n
   executed=$(cast call "$TL" "executed(bytes32)(bool)" "$id" --rpc-url "$RPC")
   ready_at=$((ts + 172800)); n=$(now)
-  if [ "$executed" = "true" ]; then echo "[$label] already executed — skip"; return 0; fi
+  if [ "$executed" = "true" ]; then echo "[$label] already executed, skip"; return 0; fi
   if [ "$n" -lt "$ready_at" ]; then echo "[$label] NOT READY (ready_at $ready_at, now $n, in $(( (ready_at-n)/60 ))min)"; return 1; fi
   # recompute the id to be sure nothing drifted before broadcasting
   local recomputed; recomputed=$(cast keccak "$(cast abi-encode 'f(address,bytes,uint256)' "$target" "$data" "$ts")")
-  if [ "$recomputed" != "$id" ]; then echo "[$label] ID MISMATCH ($recomputed != $id) — ABORT, not broadcasting"; return 2; fi
-  if [ "$MODE" != "run" ]; then echo "[$label] READY — would execute (check mode, no tx)"; return 0; fi
+  if [ "$recomputed" != "$id" ]; then echo "[$label] ID MISMATCH ($recomputed != $id), ABORT, not broadcasting"; return 2; fi
+  if [ "$MODE" != "run" ]; then echo "[$label] READY, would execute (check mode, no tx)"; return 0; fi
   echo "[$label] executing..."
   cast send "$TL" "execute(address,bytes,uint64)" "$target" "$data" "$ts" --private-key "$KEY" --rpc-url "$RPC" --json \
     | python3 -c "import sys,json; d=json.load(sys.stdin); print('[$label] status', d['status'], 'tx', d['transactionHash'])"
@@ -89,7 +89,7 @@ echo "Adapter.is_supported_instrument(USDC-LEND): $(cast call "$AAVE" "is_suppor
 echo "Adapter.is_authorized_caller(Router): $(cast call "$AAVE" "is_authorized_caller(address)(bool)" "$ROUTER" --rpc-url "$RPC")"
 
 if [ "$R1" -ne 0 ] || [ "$R2" -ne 0 ] || [ "$R3" -ne 0 ]; then
-  echo; echo "Not all timelock ops are executed yet — stopping before the fill. Re-run after the windows open."
+  echo; echo "Not all timelock ops are executed yet, stopping before the fill. Re-run after the windows open."
   exit 0
 fi
 if [ "$MODE" != "run" ]; then echo; echo "check mode: wiring shown above; re-run with 'run' once windows are open to drive the fill."; exit 0; fi

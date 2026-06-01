@@ -1,4 +1,4 @@
-// Next.js 15 instrumentation hook — fires once per server runtime start.
+// Next.js 15 instrumentation hook, fires once per server runtime start.
 // We use it to register Sentry for the right runtime (Node or Edge) and
 // to capture nested-request errors via onRequestError.
 //

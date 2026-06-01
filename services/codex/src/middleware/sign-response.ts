@@ -4,11 +4,11 @@ import type { MiddlewareHandler } from 'hono';
  * HMAC-SHA256 signs every response body. Clients verify with the public key
  * exposed at /v1/keys/{X-Codex-Key-Id}.
  *
- * Per TDD §8.2 + PRD §21.5 STRIDE table — tamper-evidence on every API call.
+ * Per TDD §8.2 + PRD §21.5 STRIDE table, tamper-evidence on every API call.
  *
  * Audit FFF-3 fix: the HMAC now covers `${timestamp}.${body}`, not body alone.
  * Pre-fix, an intermediary could rewrite `X-Codex-Timestamp` to "now" without
- * invalidating the signature — verifiers checking staleness would always see
+ * invalidating the signature, verifiers checking staleness would always see
  * a fresh response. Binding the timestamp into the HMAC input means any
  * tampering of either field flips the signature.
  *

@@ -13,7 +13,7 @@ interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
 
-/// Chainlink CCIP — full interface at
+/// Chainlink CCIP, full interface at
 /// resources/chainlink-brownie-contracts/contracts/src/v0.8/ccip/interfaces/IRouterClient.sol
 interface IRouterClient {
     struct EVMTokenAmount {
@@ -48,7 +48,7 @@ interface IAqueductSourceMinimal {
     function hasDeliveryAck(bytes32 message_id) external view returns (bool);
 }
 
-/// Chainlink CCIP Client library — extraArgs encoding helper.
+/// Chainlink CCIP Client library, extraArgs encoding helper.
 library Client {
     struct EVMExtraArgsV1 {
         uint256 gasLimit;
@@ -79,7 +79,7 @@ contract Aqueduct {
     // Aqueduct deployment on the destination chain (set per-pair by Praetor)
     mapping(uint64 => address) public aqueductOnDest;
 
-    // Outbound credits — keyed by CCIP message id
+    // Outbound credits, keyed by CCIP message id
     mapping(bytes32 => CrossChainCreditRecord) public credits;
 
     // Reorg-safety: prevent same-block-replay if a tx is reincluded after reorg
@@ -217,7 +217,7 @@ contract Aqueduct {
         uint256 minExpiresAt = block.timestamp + MIN_EXPIRES_AT_DELTA;
         if (expires_at < minExpiresAt) revert ExpiresAtTooSoon(expires_at, minExpiresAt);
 
-        // Reorg safety — include destSelector so multi-chain sends in same block don't false-positive
+        // Reorg safety, include destSelector so multi-chain sends in same block don't false-positive
         bytes32 nonce = keccak256(abi.encode(msg.sender, amount_wei, block.number, dest_user, destSelector));
         if (seen_send_nonces[nonce]) revert ReplayDetected(nonce);
         seen_send_nonces[nonce] = true;
@@ -330,7 +330,7 @@ contract Aqueduct {
         if (msg.sender != claimback_registry) revert Unauthorized();
         CrossChainCreditRecord storage record = credits[messageId];
         if (record.user == address(0)) revert CreditNotFound(messageId);
-        if (record.is_settled) return; // idempotent — claim_back may have run first
+        if (record.is_settled) return; // idempotent, claim_back may have run first
         record.is_settled = true;
         emit CrossChainCreditSettled(messageId);
     }
@@ -350,7 +350,7 @@ contract Aqueduct {
         // Audit CCCCC-2 fix: emit a deposit event so the subgraph + ops
         // dashboard can chart LINK top-ups against the LinkBalanceLow
         // alert series. Pre-fix the event channel showed only the
-        // depletion events, not the refills — operators couldn't tell
+        // depletion events, not the refills, operators couldn't tell
         // whether a low-balance alert was acted on.
         emit LinkDeposited(msg.sender, amount, link.balanceOf(address(this)));
     }

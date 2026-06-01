@@ -23,7 +23,7 @@ async function fetchWallet(wallet: string | null): Promise<Wallet> {
     return await r.json();
   } catch {
     return {
-      address: '—',
+      address: '-',
       ens: null,
       authenticator: null,
       bundler: null,
@@ -67,16 +67,16 @@ export function WalletDetailCard() {
       </div>
 
       <dl className="mt-5 divide-y divide-divider-soft">
-        <RowLine label="Address" value={data?.address ?? '—'} mono />
-        <RowLine label="ENS" value={data?.ens ?? '—'} mono />
-        <RowLine label="Authenticator" value={data?.authenticator ?? '—'} />
+        <RowLine label="Address" value={data?.address ?? '-'} mono />
+        <RowLine label="ENS" value={data?.ens ?? '-'} mono />
+        <RowLine label="Authenticator" value={data?.authenticator ?? '-'} />
         <RowLine label="Session keys" value={sessionKeysLive ? 'Postern registry · live' : 'pending'} />
         <RowLine label="Bundler" value={data?.bundler ?? 'none'} />
         <RowLine label="Paymaster" value={data?.paymaster ?? 'none'} />
       </dl>
 
       <p className="mt-3 text-[11px] text-muted">
-        Gas is self-funded on testnet — there is no bundler or paymaster yet.
+        Gas is self-funded on testnet, there is no bundler or paymaster yet.
         ERC-4337 / ERC-7702 account abstraction is a Year-2 item; Postern
         currently provides the on-chain session-key registry.
       </p>

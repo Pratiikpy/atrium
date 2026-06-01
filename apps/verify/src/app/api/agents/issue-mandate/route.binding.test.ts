@@ -8,7 +8,7 @@ import { instrumentIdsForVenues } from '@/lib/instruments';
  * Locks the 2026-05-29 signature-binding fix on /api/agents/issue-mandate.
  *
  * Pre-fix the route recovered the signer from the CLIENT-supplied intentHash,
- * so the signature never bound to the mandate fields — a caller could post
+ * so the signature never bound to the mandate fields, a caller could post
  * arbitrary fields with a signature over an unrelated hash and pass. The fix
  * recomputes the EIP-712 struct hash server-side from the validated fields +
  * the canonical domain (chainId 421614 + deployed Sigil address), recovers
@@ -17,7 +17,7 @@ import { instrumentIdsForVenues } from '@/lib/instruments';
  * signing is rejected.
  */
 
-// Well-known test private key (Anvil account #1) — NOT a real-funds key.
+// Well-known test private key (Anvil account #1), NOT a real-funds key.
 const TEST_PK = '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d';
 const account = privateKeyToAccount(TEST_PK);
 const SIGIL = ('0x' + 'c9'.repeat(20)) as `0x${string}`;
@@ -94,10 +94,10 @@ describe('issue-mandate signature binding', () => {
   it('rejects when a form field is tampered after signing (signature no longer binds)', async () => {
     const { signature, intentHash, expiresAt, nonce } = await buildSigned();
     // Signed for actionsPerDay=24; submit 48. Still passes the 1..1000 bound
-    // check, so it reaches the signature stage — where the server recomputes a
+    // check, so it reaches the signature stage, where the server recomputes a
     // different hash from the tampered field (max_actions_per_24h is in the
     // signed struct) and rejects. (A field that fails an earlier bound check,
-    // e.g. an over-cap value, would 400 before this stage — also rejected,
+    // e.g. an over-cap value, would 400 before this stage, also rejected,
     // just not on this path.)
     const res = await POST(
       req({ ...FORM, actionsPerDay: 48, signature, intentHash, expiresAt: expiresAt.toString(), nonce: nonce.toString() }) as never,

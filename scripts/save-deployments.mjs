@@ -3,7 +3,7 @@
  * Read forge broadcast log and write deployments/<network>.json in the
  * shape `apps/verify/src/lib/deployments-registry.ts` expects.
  *
- * Idempotent — merges with any existing registry; never overwrites a slug
+ * Idempotent, merges with any existing registry; never overwrites a slug
  * that's already present unless the new entry has a non-zero address.
  *
  * Usage: node scripts/save-deployments.mjs <chainId>
@@ -39,7 +39,7 @@ const NAME_TO_SLUG = {
   PosternKeyRegistry: 'postern-key-registry',
   Rostrum: 'rostrum',
   Faucet: 'faucet',
-  // Stylus contracts deployed via `cargo stylus deploy`, not forge — so the
+  // Stylus contracts deployed via `cargo stylus deploy`, not forge, so the
   // mapping below isn't actually consumed by this script for them. Kept here
   // for documentation: every slug in deployments/*.json should appear here
   // so the verify-app's lookup never silently 404s.
@@ -47,7 +47,7 @@ const NAME_TO_SLUG = {
   // cargo-stylus deploy output, recorded manually after each Stylus deploy.
 };
 
-// Optional secondary mirror — the verify-app's static asset path. Keeping
+// Optional secondary mirror, the verify-app's static asset path. Keeping
 // this in sync prevents the "frontend shows zeros while chain has the
 // contract" footgun. See deployments-registry.ts audit U-40 comment.
 const FRONTEND_MIRROR = ['apps', 'verify', 'public', 'deployments'];
@@ -100,7 +100,7 @@ if (existsSync(REGISTRY_FILE)) {
     existing = JSON.parse(await readFile(REGISTRY_FILE, 'utf8'));
     existing.contracts ??= {};
   } catch {
-    // bad JSON — overwrite
+    // bad JSON, overwrite
   }
 }
 

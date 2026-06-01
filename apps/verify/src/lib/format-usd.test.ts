@@ -9,7 +9,7 @@ import { formatUsd, formatShares, formatSharePrice } from './format-usd';
  * before review.
  */
 
-describe('formatUsd() — audit S-1 (USDC 6 decimals)', () => {
+describe('formatUsd(), audit S-1 (USDC 6 decimals)', () => {
   it('formats 1 USDC (1_000_000 wei at 6 decimals) as "$1.00"', () => {
     expect(formatUsd(1_000_000n, 6)).toBe('$1.00');
   });
@@ -32,7 +32,7 @@ describe('formatUsd() — audit S-1 (USDC 6 decimals)', () => {
     // Lock whichever the JS runtime uses so a Node version bump doesn't
     // silently change shipped UI numbers.
     const result = formatUsd(1_235_000n, 6);
-    // Accept both — what matters is that some 2-decimal value is produced.
+    // Accept both, what matters is that some 2-decimal value is produced.
     expect(result).toMatch(/^\$1\.2[34]$/);
   });
 
@@ -74,7 +74,7 @@ describe('formatUsd() — audit S-1 (USDC 6 decimals)', () => {
   it('U-36: BigInt precision at any scale (no parseFloat truncation)', () => {
     const oneTrillion = 1_000_000_000_000_000_000n; // $1T in micro-USDC
     expect(formatUsd(oneTrillion, 6)).toBe('$1,000,000,000,000.00');
-    // Plus 99 micro-cents — the .99 must survive intact.
+    // Plus 99 micro-cents, the .99 must survive intact.
     expect(formatUsd(oneTrillion + 990_000n, 6)).toBe('$1,000,000,000,000.99');
     // Past the parseFloat boundary: 10^25 micro-USDC. Pre-fix would
     // truncate the cents to .00; BigInt-native preserves them.
@@ -88,14 +88,14 @@ describe('formatUsd() — audit S-1 (USDC 6 decimals)', () => {
     expect(formatUsd(-1n, 6)).toBe('-$0.00');
   });
 
-  it('U-36: sub-cent values still render as $0.00 (display contract — 2 decimal cap)', () => {
-    // formatUsd is fixed at 2 display decimals — values under half a cent
+  it('U-36: sub-cent values still render as $0.00 (display contract, 2 decimal cap)', () => {
+    // formatUsd is fixed at 2 display decimals, values under half a cent
     // round to $0.00 by design (UI doesn't show sub-cent precision in
     // currency display). To render dust accurately, callers should use
     // formatSharePrice (4 decimals) or a future helper with more digits.
     expect(formatUsd(999n, 6)).toBe('$0.00');
     expect(formatUsd(4999n, 6)).toBe('$0.00');
-    // Half-cent rounds up — banker-neutral half-up at the boundary.
+    // Half-cent rounds up, banker-neutral half-up at the boundary.
     expect(formatUsd(5000n, 6)).toBe('$0.01');
     expect(formatUsd(5001n, 6)).toBe('$0.01');
   });
@@ -117,7 +117,7 @@ describe('formatShares()', () => {
   });
 });
 
-describe('formatSharePrice() — audit S-1 (4 decimal precision)', () => {
+describe('formatSharePrice(), audit S-1 (4 decimal precision)', () => {
   it('formats 1.0 share price as "$1.0000"', () => {
     expect(formatSharePrice(1_000_000n, 6)).toBe('$1.0000');
   });

@@ -20,7 +20,7 @@ export async function GET(req?: Request) {
   // Phase theta audit follow-up (2026-05-25): accept ?wallet= query
   // param so users who connect their own wallet see THEIR portfolio,
   // not the demo wallet's. Pre-fix every request read DEMO_WALLET_ADDRESS
-  // unconditionally — Year-1 single-tenant artifact that hid the real
+  // unconditionally, Year-1 single-tenant artifact that hid the real
   // user's data behind the demo wallet's. `req?` keeps the existing
   // vitest GET() calls compatible (they get the env-fallback path).
   const walletParam = req ? new URL(req.url).searchParams.get('wallet') : null;

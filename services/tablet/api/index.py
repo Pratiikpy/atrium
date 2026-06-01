@@ -1,4 +1,4 @@
-# Vercel serverless entrypoint — re-exports the FastAPI app from src/.
+# Vercel serverless entrypoint, re-exports the FastAPI app from src/.
 #
 # Tablet's src/ is a Python package (has __init__.py) and uses relative
 # imports like `from .jurisdictions.uk import ...`. So we must import via

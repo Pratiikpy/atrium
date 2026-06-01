@@ -7,13 +7,13 @@ import { useAccount } from 'wagmi';
  * "which wallet should this page's data be scoped to". Pre-fix every
  * portfolio component fetched /api/portfolio/* with no wallet param;
  * the backend defaulted to DEMO_WALLET_ADDRESS, so a connected user
- * always saw the demo wallet's data — single-tenant behavior buried
+ * always saw the demo wallet's data, single-tenant behavior buried
  * behind a multi-tenant UI.
  *
  * Now: the API routes accept ?wallet=0x<40-hex> as the canonical
  * override. This hook returns the connected wallet (from wagmi) so
  * every fetch can pass it through. When no wallet is connected the
- * hook returns null and the API falls back to DEMO_WALLET_ADDRESS —
+ * hook returns null and the API falls back to DEMO_WALLET_ADDRESS -
  * matches the pre-fix behavior so smoke tests + cohort demo flow
  * stay working.
  *

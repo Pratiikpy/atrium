@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
  *
  * Note: a production implementation routes the DELETE through
  * PosternKeyRegistry.revokeSession() and waits for the Lantern
- * attestation event. The interim memory map below is intentional — it
+ * attestation event. The interim memory map below is intentional, it
  * lets the UI surface (disconnect button → optimistic update) be
  * end-to-end testable before the contract ships.
  *

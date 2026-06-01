@@ -18,7 +18,7 @@ export function Footer() {
             <p className="text-[12px] text-[var(--muted)]">
               <a href="mailto:support@atrium.fi" className="hover:text-[var(--ink)]">support@atrium.fi</a>
               {' · '}
-              Discord launching with testnet — see{' '}
+              Discord launching with testnet, see{' '}
               <Link href="/security" className="hover:text-[var(--ink)]">/security</Link> for security@ contact
             </p>
           </div>

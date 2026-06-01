@@ -10,7 +10,7 @@ import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { SlippageSelect } from '@/components/trade/slippage-select';
 import { HelpTip } from '@/components/ui/help-tip';
 
-/* PERF-04: Dynamic import — RiskPreviewModal only renders on first trade */
+/* PERF-04: Dynamic import, RiskPreviewModal only renders on first trade */
 const RiskPreviewModal = dynamic(
   () => import('@/components/trade/risk-preview-modal').then((m) => m.RiskPreviewModal),
   { ssr: false },
@@ -36,7 +36,7 @@ interface ImpactPreview {
 
 async function fetchImpact(sizeUsd: string, venue: string): Promise<ImpactPreview> {
   if (!sizeUsd || parseFloat(sizeUsd) <= 0) {
-    return { initialMarginUsd: '—', maintenanceMarginUsd: '—', source: 'pending' };
+    return { initialMarginUsd: '-', maintenanceMarginUsd: '-', source: 'pending' };
   }
   try {
     const r = await fetch(`/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}`);
@@ -87,7 +87,7 @@ export function OrderForm({
 
   // First-trade risk preview gate. The flow doc treats this as required
   // before the very first open-position click. Persistence is per-device
-  // (localStorage) — re-openable from Settings once that tab ships.
+  // (localStorage), re-openable from Settings once that tab ships.
   const [hasAcknowledgedRisk, setHasAcknowledgedRisk] = useState(false);
   const [showRiskPreview, setShowRiskPreview] = useState(false);
   useEffect(() => {
@@ -95,7 +95,7 @@ export function OrderForm({
     try {
       setHasAcknowledgedRisk(window.localStorage.getItem(RISK_ACK_KEY) === '1');
     } catch {
-      // ignore storage failures (private mode, etc.) — the worst case is
+      // ignore storage failures (private mode, etc.), the worst case is
       // the modal re-fires on next visit, which is the safe direction.
     }
   }, []);
@@ -113,7 +113,7 @@ export function OrderForm({
     try {
       window.localStorage.setItem(RISK_ACK_KEY, '1');
     } catch {
-      // continue regardless — see above
+      // continue regardless, see above
     }
     setHasAcknowledgedRisk(true);
     setShowRiskPreview(false);
@@ -189,8 +189,8 @@ export function OrderForm({
       </div>
 
       <dl className="mt-5 space-y-1.5 border-t border-divider-soft pt-4 font-mono text-xs">
-        <Row label="Maintenance margin" value={impact?.maintenanceMarginUsd ?? '—'} />
-        <Row label="Initial margin" value={impact?.initialMarginUsd ?? '—'} />
+        <Row label="Maintenance margin" value={impact?.maintenanceMarginUsd ?? '-'} />
+        <Row label="Initial margin" value={impact?.initialMarginUsd ?? '-'} />
         <div className="flex items-center justify-between">
           <dt className="text-muted flex items-center gap-1">Slippage tolerance <HelpTip term="slippage" /></dt>
           <dd><SlippageSelect value={slippage} onChange={setSlippage} walletAddress={address} /></dd>

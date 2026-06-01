@@ -23,7 +23,7 @@ function bufferAtShock(sizeUsd: number, leverage: number, shockBps: number): num
 describe('Risk Preview buffer math', () => {
   it('shows healthy buffer at modest shocks', () => {
     // $1000, 3x, -5% shock: healthy = 100, pnl = -150 → buffer = 0? Let's check.
-    // Reality of the formula is conservative — make sure it stays non-negative.
+    // Reality of the formula is conservative, make sure it stays non-negative.
     const b = bufferAtShock(1000, 3, -500);
     expect(b).toBeGreaterThanOrEqual(0);
   });

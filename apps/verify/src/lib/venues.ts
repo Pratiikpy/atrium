@@ -1,5 +1,5 @@
 /**
- * Canonical venue list — single source of truth for the seven Portico-
+ * Canonical venue list, single source of truth for the seven Portico-
  * whitelisted venues. Audit P-4 fix: prior to this file, "seven"/"six"/
  * "eight" all appeared in different surfaces (hero copy / impluvium SVG
  * with 6 circles / trade page "eight venues" / venue-chip-bar with 7

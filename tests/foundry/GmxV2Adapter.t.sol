@@ -121,7 +121,7 @@ contract GmxV2AdapterTest is Test {
     }
 
     /// Iter 60 audit fix: pin AuthorizedCallerUpdated event. Mirror of
-    /// iter 60 Synthetix add — same subgraph-observability invariant.
+    /// iter 60 Synthetix add, same subgraph-observability invariant.
     event AuthorizedCallerUpdated(address indexed caller, bool authorized);
     function test_setAuthorizedCaller_emitsAuthorizedCallerUpdated_iter60() public {
         address router_ = makeAddr("router-iter60");

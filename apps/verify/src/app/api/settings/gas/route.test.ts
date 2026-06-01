@@ -7,7 +7,7 @@ import { GET } from './route';
  *
  * - Iter-37: pre-fix the server returned `sponsored: 0` in both
  *   the wallet-set and wallet-unset paths. The client gas-
- *   sponsorship.tsx then did `data?.sponsored ?? '—'`; JS nullish
+ *   sponsorship.tsx then did `data?.sponsored ?? '-'`; JS nullish
  *   coalescing on 0 returns 0 (non-nullish) → UI rendered "0 / 10
  *   sponsored" as if measured. The fix: `sponsored: null` in both
  *   paths until Pimlico paymaster wiring lands.
@@ -26,7 +26,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/settings/gas — iter-37 sponsored:null honesty', () => {
+describe('GET /api/settings/gas, iter-37 sponsored:null honesty', () => {
   it('returns sponsored:null when wallet env unset', async () => {
     const json = await (await GET()).json();
     expect(json.sponsored).toBeNull();
@@ -49,7 +49,7 @@ describe('GET /api/settings/gas — iter-37 sponsored:null honesty', () => {
   it('renders source:pending while paymaster is unwired (both paths)', async () => {
     // The wallet-set / unset paths return identical pending shapes
     // until the Pimlico paymaster wiring lands. This test locks that
-    // — a refactor "lighting up" one path without wiring the actual
+    //, a refactor "lighting up" one path without wiring the actual
     // Pimlico read would silently advertise sponsorship that isn't
     // happening.
     let json = await (await GET()).json();

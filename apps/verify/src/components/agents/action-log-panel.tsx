@@ -1,5 +1,5 @@
 /**
- * Action log tab — per-agent action history for the connected wallet.
+ * Action log tab, per-agent action history for the connected wallet.
  *
  * Scribe currently has `Agent.totalActionsCount` (aggregate) but no
  * per-action entity. The honest answer is to surface the aggregate
@@ -17,7 +17,7 @@ export function ActionLogPanel() {
       <p className="font-display text-xl text-ink">Per-action indexing pending</p>
       <p className="mx-auto mt-2 max-w-lg text-sm text-muted">
         Scribe tracks aggregate <code className="font-mono text-ink">totalActionsCount</code>{' '}
-        per agent, but per-action rows aren&rsquo;t in the schema yet — see{' '}
+        per agent, but per-action rows aren&rsquo;t in the schema yet, see{' '}
         <code className="font-mono text-ink">subgraph/indexing-todo.md</code>{' '}
         for the planned <code className="font-mono text-ink">AgentAction</code>{' '}
         entity. Once it lands, this tab will show every action your delegated

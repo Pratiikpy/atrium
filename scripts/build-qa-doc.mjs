@@ -25,7 +25,7 @@ function unesc(s) {
   return String(s ?? '')
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
     .replace(/&#39;/g, "'").replace(/&quot;/g, '"')
-    .replace(/[—–]/g, '-'); // em/en dash -> hyphen (writing.md rule)
+    .replace(/[-–]/g, '-'); // em/en dash -> hyphen (writing.md rule)
 }
 const prose = (s) => unesc(s).replace(/\s+/g, ' ').trim();
 const cell = (s) => prose(s).replace(/\|/g, '\\|'); // escape pipes inside table cells
@@ -313,7 +313,7 @@ Launch-ready is a decision, not a vibe. Fill this in only when the gate above is
 
 let doc = D.join('\n');
 // final safety: strip any stray em/en dashes the data carried in
-doc = doc.replace(/[—–]/g, '-');
+doc = doc.replace(/[-–]/g, '-');
 fs.writeFileSync(DOC_PATH, doc);
 const lines = doc.split('\n').length;
 console.log(`Wrote ${DOC_PATH}: ${lines} lines, ${(doc.length / 1024).toFixed(0)} KB`);

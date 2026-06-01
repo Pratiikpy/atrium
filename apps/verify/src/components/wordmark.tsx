@@ -10,7 +10,7 @@ const SIZE_CLASSES: Record<Size, string> = {
 };
 
 /**
- * The Atrium wordmark — serif italic with a horizontal underline.
+ * The Atrium wordmark, serif italic with a horizontal underline.
  * Matches the logo treatment in design/Atrium.html.
  * L-30: `font-display italic` for self-documentation; `.wordmark` CSS
  * class carries the underline treatment from globals.css.

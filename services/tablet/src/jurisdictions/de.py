@@ -1,4 +1,4 @@
-"""German tax — FIFO per asset per venue.
+"""German tax, FIFO per asset per venue.
 
 Rules (per § 23 EStG, German Einkommensteuergesetz):
   - FIFO (first-in-first-out) at the asset level

@@ -13,7 +13,7 @@ import { fetchCofferUsers } from './_scribe.js';
 import { buildLeaves } from './_leaves.js';
 import { pinTreeToIpfs } from './_ipfs.js';
 
-// Fail loudly at startup if any required env is missing — otherwise the
+// Fail loudly at startup if any required env is missing, otherwise the
 // service silently produces empty attestations: fetchCofferBalances would
 // resolve to [], buildTree → empty root, and the operator gets a happy
 // "tick complete" log while no attestation actually reaches the chain.

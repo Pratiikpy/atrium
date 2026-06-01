@@ -5,7 +5,7 @@ const HASH = ('0x' + 'cd'.repeat(32)) as `0x${string}`;
 
 /**
  * 114-PM3.3 regression. The onboarding "Claim faucet" button used `onNext`,
- * which never sent a tx — the funding drop was never dispatched while the UI
+ * which never sent a tx, the funding drop was never dispatched while the UI
  * implied a claim. The new hook dispatches Faucet.claim() and must only report
  * success once the on-chain receipt confirms (no fake success on submit).
  */

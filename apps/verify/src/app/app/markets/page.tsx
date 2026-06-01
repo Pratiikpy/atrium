@@ -155,7 +155,7 @@ export default function MarketsPage() {
               <p className="mt-1 text-xs text-muted">Instruments: {v.instruments}</p>
               {isScaffold && (
                 <p className="mt-3 text-xs text-testnet">
-                  Open is disabled — adapter is a Year-1 scaffold without venue-side
+                  Open is disabled, adapter is a Year-1 scaffold without venue-side
                   deployment (open_position reverts ScaffoldNotImplemented so the
                   Router cannot strand pulled USDC). Real implementation lands Year-2.
                 </p>

@@ -58,7 +58,7 @@ contract AqueductClaimback is IAqueductSource {
         //  1. `aqueduct.code.length > 0` skips the call if aqueduct is an
         //     EOA (e.g. test fixtures with `makeAddr`). Solidity 0.8.10+'s
         //     extcodesize-check at the interface call site is NOT
-        //     try/catch-wrappable — it reverts before the call expression
+        //     try/catch-wrappable, it reverts before the call expression
         //     evaluates inside try. Explicit guard handles this cleanly.
         //  2. `try { ... } catch` swallows any revert FROM the contract
         //     itself (CreditNotFound, paused, etc.) so the ack registry
@@ -68,7 +68,7 @@ contract AqueductClaimback is IAqueductSource {
             try IAqueductSettle(aqueduct).markSettled(message_id) {
                 // settled OK
             } catch {
-                // soft failure — ack registry already wrote
+                // soft failure, ack registry already wrote
             }
         }
     }

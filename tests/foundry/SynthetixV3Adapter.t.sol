@@ -118,7 +118,7 @@ contract SynthetixV3AdapterTest is Test {
 
     /// Iter 60 audit fix: pin the AuthorizedCallerUpdated event emission.
     /// Across 9 adapters this event existed in code but no test asserted
-    /// on it — a dropped emit would silently desync the Scribe subgraph
+    /// on it, a dropped emit would silently desync the Scribe subgraph
     /// (which reads this channel to track adapter-orchestrator rotations
     /// for ops dashboards). Same cross-contract gap shape as iter 56
     /// get_*_bps routing: declaration without assertion is invisible to

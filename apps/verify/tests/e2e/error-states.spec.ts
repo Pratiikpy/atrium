@@ -16,7 +16,7 @@ test.describe('Error states', () => {
     });
     // The wrong-chain banner should appear if wallet is connected to mainnet
     const banner = page.locator('[data-testid="wrong-chain-banner"], [role="alert"]');
-    // Soft assertion — banner only shows if wallet is actually connected
+    // Soft assertion, banner only shows if wallet is actually connected
     if (await banner.isVisible({ timeout: 5000 }).catch(() => false)) {
       await expect(banner).toContainText(/wrong|switch|network/i);
     }
@@ -24,7 +24,7 @@ test.describe('Error states', () => {
 
   test('paused-contract banner appears when contract paused', async ({ page }) => {
     // The paused state is fetched (no wallet needed) by useContractPaused()
-    // from /api/protocol/pause-state — NOT /api/deployment-status (stale path).
+    // from /api/protocol/pause-state, NOT /api/deployment-status (stale path).
     await page.route('**/api/protocol/pause-state**', async (route) => {
       await route.fulfill({
         status: 200,
@@ -32,7 +32,7 @@ test.describe('Error states', () => {
         body: JSON.stringify({ paused: true, reason: 'maintenance' }),
       });
     });
-    // The paused banner ('Coffer is paused — deposits and withdrawals disabled')
+    // The paused banner ('Coffer is paused, deposits and withdrawals disabled')
     // lives in the VaultMobile panel (src/components/mobile/panels/vault-mobile.tsx),
     // which is the visible vault surface below the md breakpoint. Use a mobile
     // viewport so it renders, and visit the vault route that mounts it.

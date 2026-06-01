@@ -14,13 +14,13 @@ import { VENUES, VENUE_COUNT } from '@/lib/venues';
  *
  * Honesty notes (deviate from prototype's setTimeout mocks):
  *  - Passkey step calls real `navigator.credentials.create()` when WebAuthn is
- *    available — no fake 2.4s `setTimeout`. If WebAuthn is missing or the
+ *    available, no fake 2.4s `setTimeout`. If WebAuthn is missing or the
  *    user dismisses, we surface the actual browser error.
- *  - Faucet step reads `/api/faucet/status` — if the faucet contract isn't
+ *  - Faucet step reads `/api/faucet/status`, if the faucet contract isn't
  *    deployed (current state) the "Claim faucet" button is disabled and we
  *    render the prototype's row table with each drop marked `pending` plus
  *    the named blocking reason from the API.
- *  - Margin step reads `/api/portfolio/buying-power` — if Plinth isn't
+ *  - Margin step reads `/api/portfolio/buying-power`, if Plinth isn't
  *    deployed yet (current state) we render the prototype card shape but
  *    fill each number with `pending` instead of fabricating $46,500.
  *  - Done step routes the three "next" cards to the real /app/* pages.
@@ -212,7 +212,7 @@ function Authenticator({ onNext, onBack }: { onNext: () => void; onBack: () => v
   }, []);
 
   // Real WebAuthn. No fake setTimeout. If the browser supports it and the
-  // user approves, we advance. Otherwise we surface the actual reason —
+  // user approves, we advance. Otherwise we surface the actual reason -
   // browser unsupported, user dismissed, etc. The credential itself isn't
   // persisted yet (Postern's credential storage ships with the contracts in
   // Month 1 W2); for now the ceremony itself is the truthful signal.
@@ -556,7 +556,7 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
   const [bp, setBp] = useState<BuyingPower | null>(null);
   useEffect(() => {
     // Phase theta audit follow-up: read buying power for the CONNECTED
-    // user — Step 4 of onboarding shows "you just deposited X, your
+    // user, Step 4 of onboarding shows "you just deposited X, your
     // buying power is now Y". Pre-fix it would have shown the demo
     // wallet's buying power as the success-confirmation number, which
     // is meaningless to the user who just funded their own wallet.
@@ -600,19 +600,19 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted">Collateral</p>
             <p className="mt-2 font-mono text-base font-medium text-ink">
-              {isLive ? '—' : 'pending'}
+              {isLive ? '-' : 'pending'}
             </p>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted">Utilisation</p>
             <p className="mt-2 font-mono text-base font-medium text-ink">
-              {isLive ? '—' : 'pending'}
+              {isLive ? '-' : 'pending'}
             </p>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted">Headroom</p>
             <p className="mt-2 font-mono text-base font-medium text-ink">
-              {isLive ? '—' : 'pending'}
+              {isLive ? '-' : 'pending'}
             </p>
           </div>
         </div>

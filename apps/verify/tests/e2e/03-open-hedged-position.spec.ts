@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 3 — Open hedged position.
+ * Journey 3, Open hedged position.
  *
- * Per TDD §9.3 + Verifier Mode step 2: user opens two parallel positions —
- * long HIP-3 perp via Hyperliquid hybrid + matching Aave Horizon T-bill —
+ * Per TDD §9.3 + Verifier Mode step 2: user opens two parallel positions -
+ * long HIP-3 perp via Hyperliquid hybrid + matching Aave Horizon T-bill -
  * and Plinth nets the margin under SPAN.
  *
  * Real DOM (verified against `apps/verify/src/app/verify/[step]/page.tsx`
@@ -16,8 +16,8 @@ import { test, expect } from '@playwright/test';
  *   - Top nav says "Back to overview" → href=/verify (NOT /verify/1)
  *   - Bottom nav says "Next step" → href=/verify/3 (Next.js typed-route)
  */
-test.describe('Journey 3 — Open hedged position', () => {
-  test('Verifier step 2 — title renders @critical @mobile', async ({ page }) => {
+test.describe('Journey 3, Open hedged position', () => {
+  test('Verifier step 2, title renders @critical @mobile', async ({ page }) => {
     await page.goto('/verify/2');
     // Honesty pass (page.tsx STEP_CONFIG['2'].title, 2026-05-25 audit follow-up):
     // the Verifier only exposes a single-leg open today, so the title was
@@ -60,13 +60,13 @@ test.describe('Journey 3 — Open hedged position', () => {
   test('Back to overview link points at /verify (not /verify/1) @critical', async ({ page }) => {
     await page.goto('/verify/2');
     // The header link uses the literal text "Back to overview" and points
-    // at /verify (the overview page) — NOT at /verify/1. Locks the IA so a
+    // at /verify (the overview page), NOT at /verify/1. Locks the IA so a
     // refactor doesn't break the overview ↔ step relationship.
     const backLink = page.locator('a', { hasText: /back to overview/i }).first();
     await expect(backLink).toBeVisible();
     const href = await backLink.getAttribute('href');
     expect(href).toMatch(/^\/verify(\?|$)/);
-    // Must NOT be /verify/1 — that would be circular if step 2 linked back to step 1.
+    // Must NOT be /verify/1, that would be circular if step 2 linked back to step 1.
     expect(href).not.toMatch(/^\/verify\/1/);
   });
 
@@ -81,7 +81,7 @@ test.describe('Journey 3 — Open hedged position', () => {
     expect(href).toMatch(/(verify\/3|step=3)/);
   });
 
-  test('Step 7 is the final step — no Next step link @critical', async ({ page }) => {
+  test('Step 7 is the final step, no Next step link @critical', async ({ page }) => {
     await page.goto('/verify/7');
     // STEP_CONFIG['7'].nextStep = null → no "Next step" link rendered.
     // Locks the demo flow end-state.

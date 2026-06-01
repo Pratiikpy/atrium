@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * KillSwitchMobile — Full-screen kill switch interface.
+ * KillSwitchMobile, Full-screen kill switch interface.
  * Mobile flow: Kill Switch (one of the 5 required mobile flows).
  * Re-uses useKillSwitch from Phase 5a.
  * 44px touch targets, 16px body text, safe-area padding.
@@ -84,17 +84,17 @@ export function KillSwitchMobile({ onClose }: { onClose?: () => void }) {
           <li>• Revokes all Sigil agent mandates</li>
           <li>• Cancels all Postern session keys</li>
           <li>• Stops all automated trading immediately</li>
-          <li>• Cannot be undone — re-issue mandates manually</li>
+          <li>• Cannot be undone, re-issue mandates manually</li>
         </ul>
 
         {/* Counts */}
         <div className="flex gap-6 text-center">
           <div>
-            <p className="text-[24px] font-medium text-mob-ink">{mandates.data?.count ?? '—'}</p>
+            <p className="text-[24px] font-medium text-mob-ink">{mandates.data?.count ?? '-'}</p>
             <p className="text-[14px] text-mob-muted">Active mandates</p>
           </div>
           <div>
-            <p className="text-[24px] font-medium text-mob-ink">{sessions.data?.count ?? '—'}</p>
+            <p className="text-[24px] font-medium text-mob-ink">{sessions.data?.count ?? '-'}</p>
             <p className="text-[14px] text-mob-muted">Session keys</p>
           </div>
         </div>
@@ -120,14 +120,14 @@ export function KillSwitchMobile({ onClose }: { onClose?: () => void }) {
         disabled={status.kind === 'submitting' || status.kind === 'success'}
         className="h-[64px] w-full rounded-xl bg-neg text-[18px] font-medium text-white disabled:opacity-40"
       >
-        {!confirmed ? 'Activate Kill Switch' : status.kind === 'submitting' ? 'Revoking…' : status.kind === 'success' ? 'Revoked ✓' : 'Confirm — this is irreversible'}
+        {!confirmed ? 'Activate Kill Switch' : status.kind === 'submitting' ? 'Revoking…' : status.kind === 'success' ? 'Revoked ✓' : 'Confirm, this is irreversible'}
       </button>
     </div>
   );
 }
 
 /**
- * Persistent FAB — renders a red shield button fixed bottom-right on every
+ * Persistent FAB, renders a red shield button fixed bottom-right on every
  * authenticated mobile page. Tapping opens KillSwitchMobile as an overlay.
  */
 export function KillSwitchFAB() {

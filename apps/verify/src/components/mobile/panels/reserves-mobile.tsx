@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ReservesMobile — Mobile Lantern attestation viewer.
+ * ReservesMobile, Mobile Lantern attestation viewer.
  * Mobile flow: View Lantern attestation (one of the 5 required mobile flows).
  * Re-uses /api/lantern/latest + verify-inclusion flow.
  * 44px touch targets, 16px body text, safe-area padding.
@@ -81,11 +81,11 @@ export function ReservesMobile() {
     }
   }
 
-  // Error state (distinct from empty — E2E-46)
+  // Error state (distinct from empty, E2E-46)
   if (error) {
     return (
       <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load — retry</p>
+        <p className="text-[16px] text-neg">Could not load, retry</p>
         <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
           Retry
         </button>
@@ -148,7 +148,7 @@ export function ReservesMobile() {
               {proofResult === 'verifying' && <p className="text-mob-muted">Checking inclusion…</p>}
               {proofResult === 'verified' && <p className="text-live">✓ Your wallet is included in the latest Merkle tree</p>}
               {proofResult === 'absent' && <p className="text-testnet">Your wallet is not in this attestation tree</p>}
-              {proofResult === 'error' && <p className="text-neg">Verification failed — IPFS gateway may be unreachable</p>}
+              {proofResult === 'error' && <p className="text-neg">Verification failed, IPFS gateway may be unreachable</p>}
             </div>
             <button onClick={() => setVerifyOpen(false)} className="mt-6 min-h-[44px] w-full rounded-xl border border-mob-line text-[16px] text-mob-ink">
               Close
@@ -174,7 +174,7 @@ export function ReservesMobile() {
         </div>
         {recent.error ? (
           <div className="mt-2 rounded-xl border border-neg/40 bg-neg/5 px-4 py-3">
-            <p className="text-[16px] text-neg">Could not load — retry</p>
+            <p className="text-[16px] text-neg">Could not load, retry</p>
             <button onClick={() => recent.refetch()} className="mt-2 min-h-[44px] text-[14px] text-mob-accent">Retry</button>
           </div>
         ) : (

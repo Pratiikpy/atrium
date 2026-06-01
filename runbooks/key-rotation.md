@@ -1,8 +1,8 @@
-# Runbook — key rotation
+# Runbook, key rotation
 
 Applies to: Lantern signing key, Codex backend HMAC key, Keeper bot keys.
 
-Praetor multisig and EOA founder hardware wallets are out of scope here — those rotate per their own physical-security procedure.
+Praetor multisig and EOA founder hardware wallets are out of scope here, those rotate per their own physical-security procedure.
 
 ## Lantern signing key (annual)
 
@@ -60,7 +60,7 @@ move users into higher-leverage tiers without real KYC.
 4. Trigger a test webhook from the Sumsub dashboard. Confirm the
    `/api/edict/sumsub-webhook` route returns 200 with a valid
    signature check.
-5. The old secret stops working immediately — confirm any in-flight
+5. The old secret stops working immediately, confirm any in-flight
    webhook retry from Sumsub is also re-signed.
 
 ## Research signer key (on compromise or annual)
@@ -93,4 +93,4 @@ notification prefs.
    - Vercel verify-app project env `ATRIUM_INTERNAL_KEY`
 3. Trigger a notifier tick via `workflow_dispatch`. Confirm the tick
    log shows successful `fetchPrefs` (not 401).
-4. Old secret stops working at the next tick — no draining required.
+4. Old secret stops working at the next tick, no draining required.

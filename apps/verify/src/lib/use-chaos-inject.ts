@@ -3,14 +3,14 @@
 import { useState } from 'react';
 
 /**
- * Chaos-inject runner — POSTs a whitelisted fault to /api/chaos/inject
+ * Chaos-inject runner, POSTs a whitelisted fault to /api/chaos/inject
  * which forwards to the Praetor chaos agent.
  *
  * The route already gates on `PRAETOR_CHAOS_URL`: when the agent isn't
  * deployed, it returns 503 with `chaos_agent_not_deployed`. We surface
  * that reason honestly instead of pretending the inject succeeded.
  *
- * For the Verifier-Mode demo we use `oracle_drift` — the most
+ * For the Verifier-Mode demo we use `oracle_drift`, the most
  * judge-visible fault since it ripples through Plinth's dual-oracle
  * tolerance check and Vigil's liquidation queue.
  *

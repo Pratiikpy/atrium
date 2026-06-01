@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import {PosternKillSwitch} from "../../contracts/postern-kill-switch/src/PosternKillSwitch.sol";
 import {PosternKeyRegistry} from "../../contracts/postern-kill-switch/src/PosternKeyRegistry.sol";
 
-/// @title KillSwitchRevokesEverything — integration test
+/// @title KillSwitchRevokesEverything, integration test
 /// @notice Issue 3 mandates via Sigil, issue 2 session keys via PosternKeyRegistry.
 ///         Call PosternKillSwitch.activate. Assert all 5 (3+2) revoked.
 ///         Tests PosternKeyRegistry chunked-revoke (Phase 2b) by varying key
@@ -26,7 +26,7 @@ contract MockSigilForKillSwitch {
 }
 
 contract MockEntryPointMinimal {
-    // Minimal stub — KillSwitch doesn't call EntryPoint in activate()
+    // Minimal stub, KillSwitch doesn't call EntryPoint in activate()
 }
 
 contract KillSwitchRevokesEverythingTest is Test {
@@ -64,7 +64,7 @@ contract KillSwitchRevokesEverythingTest is Test {
         // The real pattern: deploy kill switch first, then registry pointing to it
         // But PosternKeyRegistry constructor needs killSwitch address...
         // And PosternKillSwitch constructor needs keyRegistry address...
-        // This is a circular dependency — resolve with CREATE2 or two-step
+        // This is a circular dependency, resolve with CREATE2 or two-step
 
         // For testing: compute the kill switch address ahead of time
         address predictedKillSwitch = computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);

@@ -1,9 +1,9 @@
-//! Atrium agent template — the shared harness every reference agent uses.
+//! Atrium agent template, the shared harness every reference agent uses.
 //!
 //! A Curator-grant community agent fills in three things:
-//!   1. `Strategy::decide` — pure function returning a `Signal`
-//!   2. `AgentConfig` — instrument + allocation + cadence
-//!   3. `main.rs` — wires the strategy into the harness `run_loop`
+//!   1. `Strategy::decide`, pure function returning a `Signal`
+//!   2. `AgentConfig`, instrument + allocation + cadence
+//!   3. `main.rs`, wires the strategy into the harness `run_loop`
 //!
 //! Everything else (Codex reads, Sigil ActionSigil signing, Postern UserOp
 //! submission, Rostrum recordAction, state persistence) is in the template.
@@ -34,7 +34,7 @@ pub trait Strategy: Send + Sync {
     /// Pure function: given recent prices + current open position, return a Signal.
     fn decide(&self, prices: &[f64], current_position_notional: f64) -> Signal;
 
-    /// Strategy name — appears on Rostrum leaderboard.
+    /// Strategy name, appears on Rostrum leaderboard.
     fn name(&self) -> &'static str;
 }
 
@@ -68,7 +68,7 @@ async fn tick<S: Strategy>(
     client: &reqwest::Client,
     state: &mut state::AgentState,
 ) -> Result<()> {
-    // 1. Fetch venue health — bail early
+    // 1. Fetch venue health, bail early
     let health = codex::fetch_venue_health(client, &config.codex_url, config.venue_id).await?;
     if !health.is_operational {
         info!(venue = config.venue_id, "venue offline; skip");
@@ -83,7 +83,7 @@ async fn tick<S: Strategy>(
     // Silent-failure guard: fetch_prices is currently a stub returning [].
     // Strategies invariably return Hold on empty prices (RSI=NaN, Bollinger
     // bands undefined, etc.), so without this check every agent run would
-    // log "decision: Hold" forever — operator never knows the prices
+    // log "decision: Hold" forever, operator never knows the prices
     // endpoint isn't wired. Fail loud (skip this tick with a warn log) so
     // the gap is visible in the agent's stdout. When the /v1/prices
     // endpoint lands (codex roadmap), this check naturally goes quiet.
@@ -91,7 +91,7 @@ async fn tick<S: Strategy>(
         warn!(
             agent = strategy.name(),
             instrument = config.instrument_id,
-            "prices empty — Codex /v1/prices endpoint not wired yet; skipping tick"
+            "prices empty, Codex /v1/prices endpoint not wired yet; skipping tick"
         );
         return Ok(());
     }

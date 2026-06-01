@@ -23,7 +23,7 @@ export interface ValidatedTarget {
   url: URL;
   /** The single public IP the connection must be pinned to. */
   address: string;
-  /** 4 or 6 — the address family of `address`. */
+  /** 4 or 6, the address family of `address`. */
   family: 4 | 6;
 }
 

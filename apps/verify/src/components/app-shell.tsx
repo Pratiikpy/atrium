@@ -47,7 +47,7 @@ function useIsMobile(): boolean {
  *
  * Mobile: at < 768px the `.atrium-mobile-only` branch renders a
  * minimal chrome wrapping the same {children} content. No separate
- * MobileApp component — the Lovable-port was deleted in Phase 1.
+ * MobileApp component, the Lovable-port was deleted in Phase 1.
  *
  * Prop interface: { children, active, breadcrumb? }.
  */
@@ -104,7 +104,7 @@ export function AppShell({
   /**
    * Optional viewport-specific content slots. When a page passes `mobile` and
    * `desktop` separately, AppShell mounts ONLY the slot for the active
-   * viewport — so the two layouts never both mount and the page's data hooks
+   * viewport, so the two layouts never both mount and the page's data hooks
    * fire once, not twice. (Pre-slot pages crammed both layouts into `children`;
    * the #44 fix mounts `children` in one branch, but `children` still held both
    * layouts, so each /api read fired twice. The slots close that gap without a

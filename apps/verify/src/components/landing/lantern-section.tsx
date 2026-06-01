@@ -20,7 +20,7 @@ export function LanternSection() {
           </span>
         </>
       }
-      sub="Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally — without trusting Atrium."
+      sub="Lantern publishes a signed Merkle attestation every sixty minutes. Anyone can verify a balance against it locally, without trusting Atrium."
     >
       <MerkleTreeViz />
     </SectionShell>
@@ -36,7 +36,7 @@ function MerkleTreeViz() {
         viewBox="0 0 600 240"
         className="w-full"
         role="img"
-        aria-label="Merkle tree diagram with a root, two internal H(a,b) and H(c,d) nodes, and four leaf hashes — the structure Lantern signs and publishes each hour"
+        aria-label="Merkle tree diagram with a root, two internal H(a,b) and H(c,d) nodes, and four leaf hashes, the structure Lantern signs and publishes each hour"
       >
         {/* root */}
         <rect x="270" y="20" width="60" height="28" rx="6" fill="var(--color-ink)" />

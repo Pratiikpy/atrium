@@ -2,7 +2,7 @@
   "name": "@atrium/lantern-attestor",
   "version": "0.1.0",
   "private": true,
-  "description": "Lantern — hourly proof-of-reserves attestor for Atrium",
+  "description": "Lantern, hourly proof-of-reserves attestor for Atrium",
   "license": "MIT",
   "type": "module",
   "scripts": {

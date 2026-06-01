@@ -6,7 +6,7 @@ Pre-flight:
 - [ ] LINK balance on Aqueduct prefund wallet ≥ 100 testnet LINK
 - [ ] CI green on the commit being deployed
 
-## Wave 1 — foundation
+## Wave 1, foundation
 
 1. `praetor deploy --network arbitrum_sepolia --contract praetor-timelock`
 2. Record address in `deployments/arbitrum-sepolia.json`
@@ -16,14 +16,14 @@ Pre-flight:
 6. `praetor deploy --contract edict`
 7. Wire addresses into `apps/verify/.env.local` and `services/codex/wrangler.toml`
 
-## Wave 2 — core protocol
+## Wave 2, core protocol
 
-8. `praetor deploy --contract plinth` — pass coffer/sigil/portico/edict addresses to initialize
-9. `praetor deploy --contract vigil` — pass plinth/coffer addresses to initialize
+8. `praetor deploy --contract plinth`, pass coffer/sigil/portico/edict addresses to initialize
+9. `praetor deploy --contract vigil`, pass plinth/coffer addresses to initialize
 10. `praetor deploy --contract postern-kill-switch`
 11. `praetor deploy --contract research-attestation`
 
-## Wave 3 — adapters
+## Wave 3, adapters
 
 12. For each adapter: deploy, verify on Arbiscan, register in PorticoRegistry with bytecode hash
 13. `praetor multisig schedule --target portico-registry --call <abi-encoded registerAdapter call>`

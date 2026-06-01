@@ -1,5 +1,5 @@
 /**
- * Augur — volatility arbitrage agent.
+ * Augur, volatility arbitrage agent.
  * Bollinger-band momentum strategy. TS port of the Rust crate at
  * agents/augur/. Runs on Vercel cron every 5 min.
  *

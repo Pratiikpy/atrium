@@ -10,19 +10,20 @@
  * After this succeeds, run: node scripts/flip-cutover.mjs  (copies staged
  * registry over root+mirror), then redeploy verify-app + subgraph, then e2e.
  *
- * Usage: ATRIUM_KEYDIR=C:/Users/prate/.atrium node scripts/redeploy-timelock-execute.mjs
+ * Usage: ATRIUM_KEYDIR=<your-key-dir> node scripts/redeploy-timelock-execute.mjs
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const OPS_PATH = resolve(REPO, '.forge-cache/timelock-ops.json');
-const CAST = process.env.CAST_BIN ?? (process.platform === 'win32' ? 'C:/Users/prate/.foundry/bin/cast.exe' : 'cast');
+const CAST = process.env.CAST_BIN ?? 'cast';
 const DELAY = 172800; // 48h
 
 async function loadDeployerKey() {

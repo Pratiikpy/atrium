@@ -81,11 +81,11 @@ export async function POST(req: NextRequest) {
   // Call Edict.assignTier(wallet, 2, proof). Tier 2 = KYC-verified retail.
   //
   // Phase theta audit follow-up (2026-05-25): the contract signature is
-  // `assignTier(address user, UserTier tier, bytes32 proof)` — 3 args.
+  // `assignTier(address user, UserTier tier, bytes32 proof)`, 3 args.
   // Pre-fix this route declared the function with only 2 args, which
   // computed a different keccak256 selector than the deployed contract.
   // Every Sumsub callback reverted at the EVM dispatch table with
-  // "no matching function" — Year-1 KYC tier upgrades were entirely
+  // "no matching function", Year-1 KYC tier upgrades were entirely
   // broken in silence. Sumsub retries up to 3x then gives up; the
   // failure mode is "user completes KYC but stays at Tier 0 forever".
   //

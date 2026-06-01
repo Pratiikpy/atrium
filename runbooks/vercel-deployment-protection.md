@@ -43,5 +43,5 @@ If any issue is discovered post-toggle:
 
 ## Related
 
-- `runbooks/vercel-env-scoping.md` — environment variable configuration
-- `runbooks/dns-provisioning.md` — custom domain setup
+- `runbooks/vercel-env-scoping.md`, environment variable configuration
+- `runbooks/dns-provisioning.md`, custom domain setup

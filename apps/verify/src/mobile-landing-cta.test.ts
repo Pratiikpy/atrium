@@ -5,7 +5,7 @@ import path from 'node:path';
 /**
  * 125-UX8.1 regression. middleware.ts rewrites / to mobile-landing.html for
  * every mobile UA, so its "Open testnet" CTA is the primary entry into the
- * whole product. Pre-fix all three were bare <button>s with no handler/href —
+ * whole product. Pre-fix all three were bare <button>s with no handler/href -
  * dead for 100% of mobile visitors. Lock them as real /app links.
  */
 describe('mobile-landing "Open testnet" CTAs', () => {

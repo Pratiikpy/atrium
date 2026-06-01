@@ -59,7 +59,7 @@ pub async fn fetch_open_position(
 ) -> Result<OpenPosition> {
     // Silent-failure guard, mirroring fetch_prices: pre-fix this returned
     // OpenPosition::default() (notional 0, entry_price 0) which strategies
-    // would read as "no open position" — leading to over-opening positions
+    // would read as "no open position", leading to over-opening positions
     // if/when submission ever works. The default values are stub semantics,
     // NOT real "no open position" semantics (a real "no position" response
     // would also be Ok(default()), making the two states indistinguishable).
@@ -67,7 +67,7 @@ pub async fn fetch_open_position(
     // Fail loud so the gap surfaces: bail with a clear message naming the
     // missing endpoint. Harness catches via tick's `?` and warn-logs per
     // tick. When the Codex /v1/positions/aggregated/{agent} endpoint
-    // is wired (same waypoint as fetch_prices — Month 4 W2), replace bail
+    // is wired (same waypoint as fetch_prices, Month 4 W2), replace bail
     // with the real call.
     let _ = (client, codex_url);
     anyhow::bail!(
@@ -84,7 +84,7 @@ mod tests {
     //! its documented "harness loud-failure" convention; fetch_open_position
     //! BAILS instead of returning Ok(default()) to prevent the "agent
     //! over-opens because it thinks position is 0" failure mode. Both
-    //! anti-patterns mirror sigil.rs K-10 (iter 78) — when the upstream
+    //! anti-patterns mirror sigil.rs K-10 (iter 78), when the upstream
     //! endpoints land, these tests transition to assert real-data paths.
     use super::*;
 
@@ -143,7 +143,7 @@ mod tests {
     fn venue_health_default_is_not_operational_zero_spread() {
         // VenueHealth::default() is what fetch_venue_health returns when
         // a venue is not in the response. Strategy code consumes
-        // is_operational to skip pre-trade checks — the default MUST be
+        // is_operational to skip pre-trade checks, the default MUST be
         // is_operational=false so missing-data is treated as "venue down"
         // (loud), not "venue up with 0bps spread" (silent + dangerous).
         let h = VenueHealth::default();

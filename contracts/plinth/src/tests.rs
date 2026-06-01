@@ -178,7 +178,7 @@ fn empty_bytes() -> stylus_sdk::abi::Bytes {
 /// returns the whole buffer (src/vm.rs:367, src/call/raw.rs:215). The matched
 /// mock only sets `outs_len`, not the bytes the SDK reads back. So inside a
 /// single contract call, the oracle price, PlinthMath.requiredMargin, and
-/// Coffer.balanceOf all decode the SAME bytes — they must share one numeric
+/// Coffer.balanceOf all decode the SAME bytes, they must share one numeric
 /// value. The control-flow consequence is exploited deliberately below:
 ///   - maintenance recompute: collateral == required  -> healthy (not paused)
 ///   - open recompute:        required * 1.5 > collateral -> auto-paused
@@ -446,7 +446,7 @@ fn update_margin_underwater_pauses_and_queues_vigil() {
     // The open-time recompute is the underwater path under the single-buffer
     // constraint: required = math(V)*1.5 > collateral = V. We assert it paused
     // the account, persisted the inflated required, AND that Vigil.queue
-    // succeeded (no VigilQueueFailed event was emitted — the contract only
+    // succeeded (no VigilQueueFailed event was emitted, the contract only
     // emits that on an Err from queue_liquidation).
     let (vm, mut c) = deploy();
     register_instrument(&vm, &mut c);

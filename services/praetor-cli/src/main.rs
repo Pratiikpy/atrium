@@ -1,4 +1,4 @@
-//! Praetor — single-binary ops CLI for Atrium.
+//! Praetor, single-binary ops CLI for Atrium.
 //!
 //! Commands:
 //!   praetor deploy --network <sepolia|local> [--all | --contract <name>]

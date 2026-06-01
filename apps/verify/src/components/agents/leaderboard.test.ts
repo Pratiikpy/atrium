@@ -5,7 +5,7 @@ import { parseAumUsd } from './leaderboard';
  * Locks the compact-USD parser used by the leaderboard's sort-by-AUM
  * comparator. Once Rostrum data lands and the leaderboard renders real
  * rows, the sort tabs (P&L / Sharpe / AUM) must order AUM strings
- * correctly — `"$1.2M"` should sort above `"$840K"`, not below it as
+ * correctly, `"$1.2M"` should sort above `"$840K"`, not below it as
  * a lexicographic string sort would do.
  */
 describe('parseAumUsd', () => {

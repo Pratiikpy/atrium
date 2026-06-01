@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
 /**
- * Closing — port of design/Atriumnew.html section#open.closing.
+ * Closing, port of design/Atriumnew.html section#open.closing.
  * Dark slab anchoring the bottom of the landing. Matches the hero's
  * dark monument so the page bookends.
  *
- * Typography: Geist 500 (NOT Instrument Serif italic — design uses
+ * Typography: Geist 500 (NOT Instrument Serif italic, design uses
  * bold sans for the closing headline to mirror the hero, with the
  * italic-serif accent reserved for the hero's 'buying-power' emphasis).
  */

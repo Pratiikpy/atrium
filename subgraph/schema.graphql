@@ -1,8 +1,8 @@
 """
-Scribe — Atrium subgraph schema.
+Scribe, Atrium subgraph schema.
 
 Every entity is indexed from on-chain events. The frontends, Codex API, and
-Lantern dashboard read from here. No off-chain data smuggled in — the schema
+Lantern dashboard read from here. No off-chain data smuggled in, the schema
 is intentionally a faithful image of contract events.
 """
 
@@ -219,7 +219,7 @@ type Counter @entity {
 """
 Per-user Coffer balance derived from deposit + withdraw events. Read by Lantern.
 balanceWei is net deposited assets (not redeemable; Lantern reads
-Coffer.convertToAssets(balanceOf(user)) directly via RPC for POR — see Phase 6).
+Coffer.convertToAssets(balanceOf(user)) directly via RPC for POR, see Phase 6).
 """
 type CofferUserBalance @entity {
   "user address"
@@ -227,7 +227,7 @@ type CofferUserBalance @entity {
   user: Bytes!
   "Net deposited assets (deposits minus withdrawals, clamped to zero). Preferred alias: netDepositedAssetsWei."
   balanceWei: BigInt!
-  "Synonym for balanceWei — preferred for new consumers (FULL_AUDIT #20)."
+  "Synonym for balanceWei, preferred for new consumers (FULL_AUDIT #20)."
   netDepositedAssetsWei: BigInt!
   salt: Bytes!
   lastUpdatedBlock: BigInt!
@@ -266,7 +266,7 @@ type AdapterEvent @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-"PraetorTimelock scheduled ops — public visibility for the 48h window."
+"PraetorTimelock scheduled ops, public visibility for the 48h window."
 type TimelockSchedule @entity {
   "id from PraetorTimelock"
   id: ID!
@@ -277,7 +277,7 @@ type TimelockSchedule @entity {
   cancelledAt: BigInt
 }
 
-"Kill Switch activations — chaos events feed."
+"Kill Switch activations, chaos events feed."
 type KillSwitchEvent @entity(immutable: true) {
   id: ID!
   user: Bytes!
@@ -298,7 +298,7 @@ type LanternAttestation @entity {
 }
 
 """
-IntentToAgent — maps Sigil intent_hash to the agent that validated it.
+IntentToAgent, maps Sigil intent_hash to the agent that validated it.
 Written by handleIntentValidated; read by handlePositionClosed to attribute
 PnL to agents. Immutable because a given intent_hash is validated exactly once.
 """
@@ -310,7 +310,7 @@ type IntentToAgent @entity(immutable: true) {
 }
 
 """
-PosternKeyEvent — closes `human_left.md` #21.
+PosternKeyEvent, closes `human_left.md` #21.
 
 Pre-fix, the subgraph indexed Sigil mandates but had no Postern session-key
 aggregation. Codex `/agents/summary` had to return null for activeSessionKeys
@@ -331,7 +331,7 @@ type PosternKeyEvent @entity(immutable: true) {
 }
 
 """
-PosternSessionKey — derived state aggregating PosternKeyEvent.
+PosternSessionKey, derived state aggregating PosternKeyEvent.
 Active set = rows with state='active' AND expiresAt > current_block_timestamp.
 """
 type PosternSessionKey @entity {
@@ -351,7 +351,7 @@ Curator grant lifecycle. A grant is created by the Praetor timelock,
 claimed by the grantee once the cliff passes, or cancelled by Praetor
 multisig with a reason. The state field collapses the lifecycle into
 an enum so a single Scribe query gives the dashboard the current
-status without a join. Audit followup #26 — Curator events were
+status without a join. Audit followup #26, Curator events were
 emitted on-chain but never indexed pre-fix; without this entity the
 verify-app Cohort page can't show grant history at all.
 """
@@ -393,7 +393,7 @@ end-to-end record so the verify-app can show "tx 0xabc opened a
 hedged position on venue 1 via Router" without joining 3+ events.
 
 The Plinth-side PositionOpened event is still indexed at the Plinth
-data source — this entity is the Router-specific orchestration
+data source, this entity is the Router-specific orchestration
 metadata (plinth_position_id ↔ venue_position_id binding).
 """
 type RouterPositionEvent @entity(immutable: true) {
@@ -412,13 +412,13 @@ type RouterPositionEvent @entity(immutable: true) {
 }
 
 """
-Rostrum copy-trade follow relationship. Mutable — flips between
+Rostrum copy-trade follow relationship. Mutable, flips between
 'active' and 'ended' via FollowStarted / FollowEnded. The verify-app
 copy-trade leaderboard reads `rostrumFollows(where: { state: "active" })`
 for the live follower-count surface.
 
 Note on @derivedFrom: per-leader follower count is derived client-side
-from `rostrumFollows(where: { leader: $leader, state: "active" })` —
+from `rostrumFollows(where: { leader: $leader, state: "active" })` -
 simpler than maintaining a Leader entity with cached counts that drift.
 """
 type RostrumFollow @entity {
@@ -472,7 +472,7 @@ type RostrumLeaderDeboost @entity(immutable: true) {
 
 """
 Rostrum per-action-kind log. Drives the agent-action attribution
-surface — Augur/Haruspex/Auspex each record their decisions on-chain
+surface, Augur/Haruspex/Auspex each record their decisions on-chain
 so the public leaderboard can rank by action volume, not just PnL.
 """
 type RostrumAgentAction @entity(immutable: true) {
@@ -505,7 +505,7 @@ Unified defensive-observability log. Captures the six Tier-2 events
 from subgraph/indexing-todo.md as one entity so the verify-app's
 adapter/keeper/mandate dashboards each query the slice they need
 without scanning per-contract entities. Mirrors the AlertEvent
-pattern but at lower signal — these are diagnostic surfaces, not
+pattern but at lower signal, these are diagnostic surfaces, not
 PagerDuty-driving alerts.
 
 Per kind, the populated fields are:
@@ -579,7 +579,7 @@ type AlertEvent @entity(immutable: true) {
   # LINK balance low (Aqueduct)
   linkBalanceWei: BigInt
   link30dUsageWei: BigInt
-  # USDC paused (Coffer) — no params, just timestamp.
+  # USDC paused (Coffer), no params, just timestamp.
   # Adapter emergency deregister (PorticoRegistry)
   venueId: Int
   adapter: Bytes

@@ -5,8 +5,8 @@
  * Run: node scripts/download-fonts.mjs
  *
  * Fonts fetched:
- *   - Geist (400, 600) — Vercel's system font
- *   - Instrument Serif Italic (400) — display headings in OG images
+ *   - Geist (400, 600), Vercel's system font
+ *   - Instrument Serif Italic (400), display headings in OG images
  *
  * License: Both fonts are SIL Open Font License 1.1 (redistribution allowed).
  * Source: Google Fonts CDN (fonts.google.com).

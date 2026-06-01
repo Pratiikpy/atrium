@@ -7,11 +7,11 @@ import { useRevokeMandate } from '@/lib/use-revoke-mandate';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
- * My mandates tab — lists active Sigils issued by the connected wallet.
+ * My mandates tab, lists active Sigils issued by the connected wallet.
  *
  * Reads `/api/agents/my-mandates` which queries Scribe for SigilValidation
  * minus SigilRevocation. Empty list with `source: 'pending'` renders the
- * named "no wallet"/"scribe unavailable" reason — never silently empty.
+ * named "no wallet"/"scribe unavailable" reason, never silently empty.
  *
  * Each row shows agent address, issuance time, intent-hash short form,
  * an Arbiscan link to the validation tx, AND a Revoke button that fires
@@ -235,7 +235,7 @@ function shortenHash(h: string) {
   return h.length > 12 ? `${h.slice(0, 6)}…${h.slice(-4)}` : h;
 }
 function formatTs(seconds: number) {
-  if (!seconds) return '—';
+  if (!seconds) return '-';
   const d = new Date(seconds * 1000);
   return d.toISOString().slice(0, 10);
 }

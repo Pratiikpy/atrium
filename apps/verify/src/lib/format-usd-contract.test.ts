@@ -47,7 +47,7 @@ describe('formatUsd callsite contract', () => {
       }
     }
     expect(callsiteFiles.length).toBeGreaterThan(0);
-    // The current callsite set — locked here so a new caller has to
+    // The current callsite set, locked here so a new caller has to
     // explicitly add itself to the list. Forces the author to think about
     // whether their value is non-negative before adding.
     const allowedRelativePaths = [
@@ -73,7 +73,7 @@ describe('formatUsd callsite contract', () => {
     );
     // The route MUST compute abs before formatUsd to avoid feeding a
     // signed notional through. Pre-fix would render "-$1.00" for shorts
-    // — visually similar to the U-36 conventional-negative form but
+    //, visually similar to the U-36 conventional-negative form but
     // semantically wrong (a short position of $1 notional has positive
     // dollar size, the sign encodes direction).
     expect(txt).toContain('const abs = notional < 0n ? -notional : notional');
@@ -85,7 +85,7 @@ describe('formatUsd callsite contract', () => {
       join(SRC_ROOT, 'app/api/portfolio/buying-power/route.ts'),
       'utf8',
     );
-    // `free = collateral > required ? collateral - required : 0n` — never
+    // `free = collateral > required ? collateral - required : 0n`, never
     // negative, so formatUsd receives a clean non-negative value.
     expect(txt).toContain('free = collateral > required');
     expect(txt).toContain('formatUsd(free');

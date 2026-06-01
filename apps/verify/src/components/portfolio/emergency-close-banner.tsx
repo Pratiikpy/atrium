@@ -5,7 +5,7 @@ import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useEmergencyClose, type EmergencyClosePosition } from '@/lib/use-emergency-close';
 
 /**
- * Emergency close banner — appears under a position row when a normal
+ * Emergency close banner, appears under a position row when a normal
  * close has reverted with a liquidity-related reason. Offers a force-close
  * at market through the real Router close path (the same contract path as
  * the Close button), with a clear "you may eat slippage" warning.
@@ -14,7 +14,7 @@ import { useEmergencyClose, type EmergencyClosePosition } from '@/lib/use-emerge
  * AtriumRouter.close_position_via_adapter (receipt-gated), NOT the
  * Plinth-only Vigil.queueLiquidation that always reverted Unauthorized.
  *
- * Caller is the positions table — it passes the row's instrument label,
+ * Caller is the positions table, it passes the row's instrument label,
  * the close-error reason, and the position ids needed to drive the close.
  */
 export function EmergencyCloseBanner({
@@ -73,8 +73,8 @@ export function EmergencyCloseBanner({
         </header>
 
         <p className="mt-3 text-sm text-ink-soft">
-          This closes the full position at market through the Atrium Router — the same close path
-          as the Close button — accepting whatever price the venue offers right now.{' '}
+          This closes the full position at market through the Atrium Router, the same close path
+          as the Close button, accepting whatever price the venue offers right now.{' '}
           <strong className="text-ink">You may lose more than mid-market price</strong> if the
           venue is thin.
         </p>
@@ -82,7 +82,7 @@ export function EmergencyCloseBanner({
         <ul className="mt-3 space-y-1 text-xs text-ink-soft">
           <li>• Routes through AtriumRouter.close_position_via_adapter (Plinth + adapter settle in one tx)</li>
           <li>• You sign once; the button reports success only after the close confirms on-chain</li>
-          <li>• If the venue still cannot fill, the close reverts and the real reason is shown — no silent success</li>
+          <li>• If the venue still cannot fill, the close reverts and the real reason is shown, no silent success</li>
           <li>• The realised P&amp;L is recorded on-chain and indexed to your activity feed</li>
         </ul>
 
@@ -159,7 +159,7 @@ function humanizeEmergencyReason(reason: string): string {
   if (reason === 'router_not_deployed')
     return 'Atrium Router is not deployed on this network yet';
   if (reason === 'close_reverted')
-    return 'the venue could not fill the close — it reverted on-chain';
+    return 'the venue could not fill the close, it reverted on-chain';
   if (reason === 'invalid_position_id') return 'this position id is malformed';
   return reason.slice(0, 200);
 }
@@ -168,7 +168,7 @@ function humanizeEmergencyReason(reason: string): string {
  * Heuristic: classify a close-position revert reason as a liquidity issue.
  * Pre-fix, every close error went straight to a "retry" button with no
  * alternative path. The emergency close UX makes sense specifically when
- * the venue can't fill — not when (e.g.) the wallet rejected.
+ * the venue can't fill, not when (e.g.) the wallet rejected.
  *
  * The string match is intentionally permissive: different venues word
  * "no liquidity" differently, but they all tend to mention liquidity,

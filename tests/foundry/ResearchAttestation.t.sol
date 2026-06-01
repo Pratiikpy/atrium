@@ -79,7 +79,7 @@ contract ResearchAttestationTest is Test {
     // ── Audit DDD-5 lock: constructor zero-check ─────────────────────
     //
     // Without this guard, deploying with `_praetor_timelock == address(0)`
-    // would brick the contract — only the timelock can publish, and
+    // would brick the contract, only the timelock can publish, and
     // msg.sender == address(0) is structurally impossible.
 
     function test_constructor_revertsOnZeroTimelock_DDD5() public {

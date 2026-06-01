@@ -82,7 +82,7 @@ const REAL_ROW = {
   blockNumber: '123456',
 };
 
-describe('GET /api/research-attestation/latest — no attestation', () => {
+describe('GET /api/research-attestation/latest, no attestation', () => {
   it('returns 404 with reason when Scribe is empty', async () => {
     mockTransport({
       scribeResponse: { body: { data: { backtestAttestations: [] } } },
@@ -95,7 +95,7 @@ describe('GET /api/research-attestation/latest — no attestation', () => {
   });
 });
 
-describe('GET /api/research-attestation/latest — honesty gate branches', () => {
+describe('GET /api/research-attestation/latest, honesty gate branches', () => {
   it('schema v1 (no honesty field) → isPublishable false + warning', async () => {
     mockTransport({
       scribeResponse: { body: { data: { backtestAttestations: [REAL_ROW] } } },
@@ -103,7 +103,7 @@ describe('GET /api/research-attestation/latest — honesty gate branches', () =>
         body: {
           schema_version: 1,
           data_mode: 'unknown',
-          // no is_publishable field — pre-honesty-pass schema
+          // no is_publishable field, pre-honesty-pass schema
           trades_count: 1000,
         },
       },

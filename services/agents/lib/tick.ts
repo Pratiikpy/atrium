@@ -1,5 +1,5 @@
 /**
- * Shared tick() — every agent has the same outer pipeline. Differences
+ * Shared tick(), every agent has the same outer pipeline. Differences
  * live in the strategy function each agent passes in.
  *
  * Steps per cron firing:
@@ -42,7 +42,7 @@ export async function runTick(
   const health = await codexHealth(env.codexUrl);
   notes.push(`codex.health=${health.ok ? 'ok' : 'down'} (${health.latencyMs}ms)`);
   if (!health.ok) {
-    notes.push('codex down — skipping decision per security rule');
+    notes.push('codex down, skipping decision per security rule');
     const tick: AgentTick = {
       agent: agentName,
       startedAt,

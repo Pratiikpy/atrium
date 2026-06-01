@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
  *
  * step 1 → coffer (deposit / vault)
  * step 2 → plinth (open_position / trade)
- * step 3 → plinth (margin recompute — same as step 2)
+ * step 3 → plinth (margin recompute, same as step 2)
  * step 4 → chaos agent (off-chain)
  * step 5 → vigil (liquidator)
  * step 6 → lantern attestor (proof of reserves)
@@ -44,7 +44,7 @@ export function useDeploymentStatus(step: number) {
 
 /**
  * Helper copy for a disabled action button. Returns null if everything is
- * deployed (button should be enabled) — or while the query is still
+ * deployed (button should be enabled), or while the query is still
  * loading, so the UI doesn't flash three states (loading → not-ready →
  * ready) per page mount. Audit R-9 fix.
  */

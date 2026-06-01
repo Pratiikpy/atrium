@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import path from 'node:path';
 
 /**
- * Vitest config — host-side unit tests for the verify app.
+ * Vitest config, host-side unit tests for the verify app.
  *
  * Runs pure-function tests over `src/lib/*` and any component logic that
  * doesn't need a browser. Browser-required tests live in `tests/e2e/` and

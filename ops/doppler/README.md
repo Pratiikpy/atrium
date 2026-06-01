@@ -1,4 +1,4 @@
-# Doppler — Atrium secrets management
+# Doppler, Atrium secrets management
 
 Doppler replaces all `.env` files. Every secret is injected at runtime via `doppler run --`.
 
@@ -28,10 +28,10 @@ Each project has 8 configs:
 ## Usage
 
 ```bash
-# Local dev — run any service with secrets injected
+# Local dev, run any service with secrets injected
 doppler run --project atrium-dev --config verify-app -- pnpm dev
 
-# CI — single DOPPLER_TOKEN repo secret, config selected per job
+# CI, single DOPPLER_TOKEN repo secret, config selected per job
 doppler run -- make test
 ```
 

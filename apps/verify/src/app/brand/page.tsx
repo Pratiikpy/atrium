@@ -153,7 +153,7 @@ export default function BrandPage() {
           <TypeRow specimen="$1,247,820.00 . 0x4f29...81e0 . arb-sepolia . 16:14 UTC"
             meta="Geist Mono 400 . 14 / 22 . Figures + addresses"
             className="font-mono text-[14px] leading-[1.55]" />
-          <TypeRow specimen="ALL-CAPS MONO LABEL . POSITIONS . 8 VENUES"
+          <TypeRow specimen="ALL-CAPS MONO LABEL . POSITIONS . 7 VENUES"
             meta="Geist Mono 500 . 10.5 / 0.14em . Labels"
             className="font-mono text-[11.5px] uppercase tracking-[0.14em]" />
           <TypeRow specimen={<span className="font-display italic">Atrium</span>}
@@ -276,7 +276,7 @@ export default function BrandPage() {
               <span aria-hidden>✓</span> Do
             </div>
             <p className="mt-3 font-display text-[22px] italic leading-[1.35] tracking-[-0.012em] text-ink">
-              &ldquo;Atrium computes a SPAN-style cross-product margin number across eight onchain venues.&rdquo;
+              &ldquo;Atrium computes a SPAN-style cross-product margin number across seven onchain venues.&rdquo;
             </p>
             <p className="mt-3 text-[13px] leading-[1.5] text-muted">
               Specific. Names the mechanism. Counts the venues. Tells you what it is.

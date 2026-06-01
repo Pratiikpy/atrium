@@ -48,28 +48,28 @@ export function TaxStatRow({
   });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Tile label="Total proceeds" value={data?.totalProceedsUsd ?? '—'} sub={`YTD ${year}`} />
-      <Tile label="Cost basis" value={data?.costBasisUsd ?? '—'} sub={costBasisSub(jurisdiction)} />
+      <Tile label="Total proceeds" value={data?.totalProceedsUsd ?? '-'} sub={`YTD ${year}`} />
+      <Tile label="Cost basis" value={data?.costBasisUsd ?? '-'} sub={costBasisSub(jurisdiction)} />
       {/* Audit RRR-6 fix: prior code hardcoded `sub="below allowance"`
           regardless of the actual gain value. A user above the £3,000 UK CGT
-          annual exempt amount still saw "below allowance" — misleading
+          annual exempt amount still saw "below allowance", misleading
           regulatory copy. Now: neutral "vs £3,000 allowance" reference; the
           actual position vs allowance comes from the AllowanceProgress
           component below, which has the live `pctUsed` from the API. */}
       <Tile
         label="Realised gain"
-        value={data?.realisedGainUsd ?? '—'}
+        value={data?.realisedGainUsd ?? '-'}
         sub={allowanceSub(jurisdiction)}
         accent={data?.realisedGainDirection === 'up' ? 'success' : data?.realisedGainDirection === 'down' ? 'danger' : 'ink'}
       />
-      <Tile label="Tax owed · est" value={data?.taxOwedEstUsd ?? '—'} sub={`at ${data?.taxRate ?? '—'} basic rate`} />
+      <Tile label="Tax owed · est" value={data?.taxOwedEstUsd ?? '-'} sub={`at ${data?.taxRate ?? '-'} basic rate`} />
     </div>
   );
 }
 
 // Jurisdiction-aware copy. The previous hardcoded "HMRC matching rule" /
 // "vs £3,000 allowance" sub-text was UK-specific and rendered next to
-// US/EU tiles too — misleading the user about which calculation method
+// US/EU tiles too, misleading the user about which calculation method
 // produced the number.
 function costBasisSub(j: TaxJurisdiction): string {
   if (j === 'uk') return 'HMRC matching rule';
@@ -81,7 +81,7 @@ function allowanceSub(j: TaxJurisdiction): string {
   if (j === 'uk') return 'vs £3,000 allowance';
   if (j === 'us') return 'capital gains · LT / ST split applies';
   if (j === 'de') return '€1,000 Sparer-Freibetrag';
-  return '—';
+  return '-';
 }
 
 function Tile({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: 'success' | 'danger' | 'ink' }) {
@@ -90,7 +90,7 @@ function Tile({ label, value, sub, accent }: { label: string; value: string; sub
     <div className="rounded-md border border-divider bg-parchment p-4">
       <p className="text-[10px] uppercase tracking-wider text-label">{label}</p>
       <p className={'mt-2 font-mono text-2xl ' + color}>
-        {accent === 'success' && value !== '—' ? '+ ' : ''}
+        {accent === 'success' && value !== '-' ? '+ ' : ''}
         {value}
       </p>
       <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">{sub}</p>

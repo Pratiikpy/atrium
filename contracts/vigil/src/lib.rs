@@ -1,4 +1,4 @@
-// Vigil — Atrium liquidation engine
+// Vigil, Atrium liquidation engine
 //
 // Holds the keeper registry, queues liquidation jobs from Plinth, and rewards
 // the first responding keeper. Partial liquidations only (≤10% per block).
@@ -6,7 +6,7 @@
 //
 // Race fix per TDD §7.2 M6: every queued job records margin_version at queue
 // time. Vigil.execute_liquidation refuses to run if Plinth's current
-// margin_version has advanced — forces the keeper to re-queue against the
+// margin_version has advanced, forces the keeper to re-queue against the
 // fresh state.
 
 #![cfg_attr(not(any(feature = "export-abi", test)), no_main)]
@@ -62,13 +62,13 @@ sol! {
     error JobAlreadyComplete(uint256 job_id);
     error JobExpired(uint64 deadline_block, uint64 now_block);
     error StaleMarginVersion(uint256 expected, uint256 actual);
-    // Audit iteration 48 rename: was `TooManyMisses` — name-vs-code lie.
+    // Audit iteration 48 rename: was `TooManyMisses`, name-vs-code lie.
     // The error is returned by slash_keeper when `misses < max_misses`,
     // i.e. the keeper has NOT YET missed enough windows to be slashable.
     // The old name read as "exceeded the limit" but the actual semantic
     // was "didn't reach the threshold." Selector hash changes with the
     // rename; no tests caught by selector (verified iter 48), only the
-    // CLI help text referenced by name — both updated in the same fire.
+    // CLI help text referenced by name, both updated in the same fire.
     error NotEnoughMisses(uint16 misses);
     // Audit AAA-3 fix: surface a failed Plinth.close_position call rather
     // than `unwrap_or_default()` (which silently returns realized=0,
@@ -138,7 +138,7 @@ sol_interface! {
         function getAccount(address user) external view returns (uint256, uint256, uint256, bool);
         function closePosition(uint256 position_id) external returns (int256);
         function getUserPositions(address user) external view returns (uint256[] memory);
-        // Phase 2a: partial liquidation — reduce position by bps fraction
+        // Phase 2a: partial liquidation, reduce position by bps fraction
         function reducePosition(uint256 position_id, uint16 reduction_bps) external returns (int256);
     }
     interface ICoffer {
@@ -240,7 +240,7 @@ impl Vigil {
         // to 0.01 ETH so keepers can stake on Arbitrum Sepolia. It MUST NOT run on
         // mainnet. Stylus contracts run only on Arbitrum, so enforce at deploy
         // time that a testnet-stake build aborts construction on Arbitrum One
-        // (42161) — the low-stake config can never silently go live with real funds.
+        // (42161), the low-stake config can never silently go live with real funds.
         #[cfg(feature = "testnet-stake")]
         {
             assert!(
@@ -285,12 +285,12 @@ impl Vigil {
         let job_id = self.next_job_id.get() + U256::from(1);
         self.next_job_id.set(job_id);
 
-        // Audit A-7 fix: NMS ordering — pick the position on the most-liquid
+        // Audit A-7 fix: NMS ordering, pick the position on the most-liquid
         // venue first. We score venues by PorticoRegistry.get_venue_health
         // (operational + tightest quoted_spread_bps). Falls back to first
         // position when registry call fails or returns no signal.
         let plinth = IPlinth::new(self.plinth_address.get());
-        // Audit BBB-1 fix: see history above — propagate Err on Plinth failure
+        // Audit BBB-1 fix: see history above, propagate Err on Plinth failure
         // instead of unwrap_or_default(), which would produce position_id=0
         // and queue a liquidation against a phantom position.
         let positions = plinth.get_user_positions(self.vm(), Call::new(), user)
@@ -380,7 +380,7 @@ impl Vigil {
         if now_block > job_deadline_block {
             // Audit G-1 fix (was A-8): the prior code referenced a phantom
             // `triggered_by_keeper` field that LiquidationJob never carried,
-            // because there is no keeper-claim flow before execution — keepers
+            // because there is no keeper-claim flow before execution, keepers
             // race for the job. With no on-chain "keeper-of-record" recorded
             // at queue time, miss-counting belongs to Lantern's off-chain
             // monitor (queue_liquidation → JobExpired event, no execute_*
@@ -446,7 +446,7 @@ impl Vigil {
         job_mut.is_complete.set(true);
         job_mut.executed_by.set(caller);
 
-        // Update keeper record — read existing counters first, then write.
+        // Update keeper record, read existing counters first, then write.
         let (prev_liqs, prev_rewards) = {
             let k = self.keepers.getter(caller);
             (k.total_liquidations.get(), k.total_rewards_wei.get())
@@ -469,7 +469,7 @@ impl Vigil {
         Ok(recovered)
     }
 
-    /// Stake to become a keeper. Pays in native ETH (testnet only — mainnet
+    /// Stake to become a keeper. Pays in native ETH (testnet only, mainnet
     /// will use ARB once we deploy on Arbitrum One).
     #[payable]
     pub fn stake_keeper(&mut self) -> Result<(), VigilError> {
@@ -699,10 +699,10 @@ impl Vigil {
     /// Audit GGGG-1 fix: pre-fix `missed_windows_24h` was checked in
     /// `slash_keeper` (line 376: `if misses < max_misses`) but NEVER
     /// incremented anywhere in the contract. The check always reverted with
-    /// NotEnoughMisses (renamed from TooManyMisses iter 48 — the original
+    /// NotEnoughMisses (renamed from TooManyMisses iter 48, the original
     /// name was inverted, see error-decl comment) because misses stayed at
     /// 0 forever, so no keeper could ever be slashed. Wave-A-8 added the
-    /// check; it never added the writer. Sixth audit-trail-drift catch —
+    /// check; it never added the writer. Sixth audit-trail-drift catch -
     /// headline ("requires keeper to have actually missed enough windows
     /// on chain") didn't match behavior (no on-chain writer exists).
     ///
@@ -826,7 +826,7 @@ fn pick_nms_position(positions: &[U256]) -> U256 {
     // the venue's stored health on a separate cached view (populated by the
     // off-chain Vigil watcher). Until that cache is online, the first
     // position is the safe NMS fallback because Plinth orders user_position_ids
-    // by recency — older positions on more-liquid venues bubble to the front.
+    // by recency, older positions on more-liquid venues bubble to the front.
     positions.first().copied().unwrap_or(U256::ZERO)
 }
 

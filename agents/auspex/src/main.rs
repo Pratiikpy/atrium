@@ -1,4 +1,4 @@
-//! Auspex — basis-trade reference agent.
+//! Auspex, basis-trade reference agent.
 //!
 //! Strategy: long Pendle YT vs short equivalent Aave Horizon T-bill yield.
 //! Audit C-17 fix: now wired through the shared harness.
@@ -28,7 +28,7 @@ impl Strategy for AuspexStrategy {
 async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_env_filter("info").init();
     // Silent-failure guard, mirrors Haruspex. See haruspex/main.rs comment
-    // — an empty instrument_id would silently produce a no-op agent that
+    //, an empty instrument_id would silently produce a no-op agent that
     // never errors but never trades. Refuse to start instead.
     let instrument_id = std::env::var("AUSPEX_INSTRUMENT_ID")
         .context("AUSPEX_INSTRUMENT_ID must be set to a non-empty Plinth instrument id")?;

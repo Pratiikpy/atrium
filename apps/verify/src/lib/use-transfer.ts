@@ -11,7 +11,7 @@ import { USDC_DECIMALS } from './testnet-tokens';
 
 // 053-SEC10 fix (2026-05-30): the deployed Aqueduct exposes
 // `send_collateral(uint64 destSelector, address dest_user, uint256 amount_wei,
-// uint256 expires_at)` (nonpayable) — see contracts/aqueduct/src/Aqueduct.sol
+// uint256 expires_at)` (nonpayable), see contracts/aqueduct/src/Aqueduct.sol
 // and subgraph/abis/Aqueduct.json. Pre-fix this hook declared
 // `send(uint256,uint64,address)` (payable), which is a DIFFERENT 4-byte
 // selector with the wrong arg order and no `expires_at`, so every transfer

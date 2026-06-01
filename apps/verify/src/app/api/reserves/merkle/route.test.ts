@@ -25,7 +25,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/reserves/merkle — MM-3 strict leafCount validation', () => {
+describe('GET /api/reserves/merkle, MM-3 strict leafCount validation', () => {
   it('returns pending when no attestations indexed', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');

@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
 
-/// @title  Phase ϑ.followup — wire AtriumRouter onto every adapter's
+/// @title  Phase ϑ.followup, wire AtriumRouter onto every adapter's
 ///         authorised-caller allowlist.
 /// @notice Closes audit task #335. Each v1.1 adapter has an
 ///         `is_authorized_caller[router]` flag default-false. With it
@@ -11,7 +11,7 @@ import {Script, console} from "forge-std/Script.sol";
 ///         `close_position` from the Router with `Unauthorized()`. The
 ///         Router needs to be flipped on once per adapter.
 ///
-///         `setAuthorizedCaller(address, bool)` is `onlyTimelock` — must be
+///         `setAuthorizedCaller(address, bool)` is `onlyTimelock`, must be
 ///         called via PraetorTimelock (48h veto window). Phase 2b changed
 ///         all 9 adapters from onlyPraetor to onlyTimelock per MASTER_PLAN §6.2.
 ///
@@ -27,12 +27,12 @@ import {Script, console} from "forge-std/Script.sol";
 ///         Verification: `cast call <adapter> "is_authorized_caller(address)(bool)" <router>`
 ///         returns `true` for all 8.
 contract SetAuthorizedCallerOnAdapters is Script {
-    // Address of the AtriumRouter — destination caller we are whitelisting.
+    // Address of the AtriumRouter, destination caller we are whitelisting.
     // From deployments/arbitrum_sepolia.json.
     address constant ATRIUM_ROUTER = 0xF134127Cc2762d3Ebc5645abA6c99cD5a8b82717;
 
     // Eight v1.1 adapters from deployments/arbitrum_sepolia.json. The
-    // Aave adapter listed here is the V11 redeploy from Phase ζ.3 — the
+    // Aave adapter listed here is the V11 redeploy from Phase ζ.3, the
     // legacy 0xE991 entry is v1.0 and intentionally NOT in this list
     // (task #336, also closed).
     //
@@ -46,13 +46,13 @@ contract SetAuthorizedCallerOnAdapters is Script {
     address constant ADAPTER_POLYMARKET   = 0x98A688723c47ab6909bE04fD0AA3eCA5EE8B08Db;
     address constant ADAPTER_GMX          = 0x2531af9f7596D74F412bFab7D3b84EE7a32cD2d4;
     // Synthetix + Morpho are scaffold-locked (revert ScaffoldNotImplemented
-    // on open_position) — adding them as authorized callers is harmless
+    // on open_position), adding them as authorized callers is harmless
     // but pointless until Year-2. Included for symmetry so a future
     // unlock just requires flipping the scaffold lock, not a new script.
     address constant ADAPTER_SYNTHETIX    = 0x62B3b34ffA76FB62245702C0b7EfD37832eB39b8;
     address constant ADAPTER_MORPHO       = 0xfaBE2B0D1C66bC2976Ed3B0c58F3CDcB7878344e;
 
-    /// Mode 1 — broadcast directly with the praetor key. Year-1 1-of-1.
+    /// Mode 1, broadcast directly with the praetor key. Year-1 1-of-1.
     function run() external {
         uint256 pk = vm.envUint("DEPLOYER_PRIVATE_KEY");
         vm.startBroadcast(pk);
@@ -68,7 +68,7 @@ contract SetAuthorizedCallerOnAdapters is Script {
         vm.stopBroadcast();
     }
 
-    /// Mode 2 — print (target, calldata) for paste into Gnosis Safe UI.
+    /// Mode 2, print (target, calldata) for paste into Gnosis Safe UI.
     /// Run with: `forge script ... --sig "encode()"`
     function encode() external view {
         bytes memory data = abi.encodeWithSignature(

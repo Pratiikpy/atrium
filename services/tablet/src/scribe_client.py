@@ -12,7 +12,7 @@ from .models import Trade
 
 # Audit fix (iteration 27): set Decimal precision high enough to handle
 # wei-scale * Q64 multiplication without truncation. wei is 1e18, Q64 is
-# 2^64 ~ 1.8e19, so the intermediate product can be up to ~3.6e37 — well
+# 2^64 ~ 1.8e19, so the intermediate product can be up to ~3.6e37, well
 # within Decimal's default 28-digit context but worth pinning explicitly
 # so a future config change doesn't silently degrade tax accuracy.
 getcontext().prec = 50
@@ -26,7 +26,7 @@ class ScribeError(Exception):
     doesn't match what we asked for. Distinct from httpx network errors so
     the FastAPI handler can map it to a 502 with a clear message instead
     of silently returning an empty trades list (which would mean the user
-    gets a tax export claiming zero activity — wrong in either direction)."""
+    gets a tax export claiming zero activity, wrong in either direction)."""
 
 
 async def fetch_trades_for_year(
@@ -92,7 +92,7 @@ async def fetch_trades_for_year(
             positions = data.get("positions")
             if positions is None:
                 raise ScribeError(
-                    f"Scribe response missing 'positions' field — "
+                    f"Scribe response missing 'positions' field, "
                     f"schema drift or wrong subgraph deployed: {data}"
                 )
             if not isinstance(positions, list):
@@ -113,7 +113,7 @@ async def fetch_trades_for_year(
         # notionals are routinely 1e18+ for ETH-denominated positions and
         # Q64 prices for assets like ETH-USD reach ~7e22. Both bypass float
         # precision by 5+ orders of magnitude, producing qty values that
-        # are silently wrong by similar margins — UNDER-reported tax for
+        # are silently wrong by similar margins, UNDER-reported tax for
         # gains, OVER-reported for losses.
         #
         # Bounded fix: do the heavy arithmetic in Decimal (prec=50), cast
@@ -130,7 +130,7 @@ async def fetch_trades_for_year(
             # of 1e12 * notional, garbage that flowed into the tax
             # output. Skip with a warning so the operator sees the gap.
             _log.warning(
-                "skipping position id=%s — entryPriceQ64=%s yields non-positive price",
+                "skipping position id=%s, entryPriceQ64=%s yields non-positive price",
                 p.get("id"),
                 p.get("entryPriceQ64"),
             )

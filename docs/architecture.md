@@ -1,6 +1,6 @@
 # Architecture
 
-How Atrium fits together. High-level only — for implementation detail, read the code.
+How Atrium fits together. High-level only, for implementation detail, read the code.
 
 ## What problem this solves
 
@@ -37,9 +37,9 @@ Atrium gives each user one margin account that prices net exposure across all wh
 
 Off-chain, three services pace the system:
 
-- **Codex** — x402-payable read API. HMAC-signed responses, replay-deduped via D1/Upstash.
-- **Scribe** — subgraph indexer (The Graph hosted).
-- **Vigil keeper** — cron service that queues + executes liquidations against `Vigil`.
+- **Codex**, x402-payable read API. HMAC-signed responses, replay-deduped via D1/Upstash.
+- **Scribe**, subgraph indexer (The Graph hosted).
+- **Vigil keeper**, cron service that queues + executes liquidations against `Vigil`.
 
 ## Contract layer
 
@@ -60,7 +60,7 @@ Off-chain, three services pace the system:
 
 ## Security model
 
-- **Timelock for parameters, multisig for pause.** Every parameter setter is timelock-gated (`onlyTimelock`). Emergency pause is multisig-only, no timelock — can pause but cannot upgrade.
+- **Timelock for parameters, multisig for pause.** Every parameter setter is timelock-gated (`onlyTimelock`). Emergency pause is multisig-only, no timelock, can pause but cannot upgrade.
 - **Dual-oracle.** Every Plinth price read takes the median of Chainlink + Pyth with a 50bps tolerance + 60s freshness window. Either oracle stale or out of tolerance → revert.
 - **Reentrancy guards.** Every state-changing Stylus function carries an `is_updating` flag entered before any external call.
 - **Per-adapter per-block notional cap.** Coffer enforces a notional cap per adapter per block so a compromised adapter can drain at most 1% of TVL per block.
@@ -70,11 +70,11 @@ Full audit history under [`audits/`](../audits/). Incident post-mortems under [`
 
 ## Off-chain services
 
-- **`services/codex/`** — Hono-based API on Cloudflare Workers (primary) + Vercel (mirror). x402 USDC payment per call. HMAC-signed responses keyed by `X-Codex-Key-Id`. Idempotency-Key honored for 24h.
-- **`services/lantern-attestor/`** — Vercel cron. Pulls Coffer balances from Scribe each hour, builds a Merkle tree, pins to IPFS, signs the root, publishes to `LanternAttestor.publish`.
-- **`services/vigil-keeper/`** — GitHub Actions cron. Watches the subgraph for accounts crossing the liquidation threshold; calls `queueLiquidation` + `executeLiquidation` against `Vigil`.
-- **`services/notifier/`** — Subgraph-driven alert delivery (Telegram / Discord / email / webhook). Per-user preferences via Bearer-gated REST API.
-- **`services/praetor-cli/`** — Rust CLI for deploys, multisig schedule/execute, lantern publish-now, seed pre-flight, parameter changes.
+- **`services/codex/`**, Hono-based API on Cloudflare Workers (primary) + Vercel (mirror). x402 USDC payment per call. HMAC-signed responses keyed by `X-Codex-Key-Id`. Idempotency-Key honored for 24h.
+- **`services/lantern-attestor/`**, Vercel cron. Pulls Coffer balances from Scribe each hour, builds a Merkle tree, pins to IPFS, signs the root, publishes to `LanternAttestor.publish`.
+- **`services/vigil-keeper/`**, GitHub Actions cron. Watches the subgraph for accounts crossing the liquidation threshold; calls `queueLiquidation` + `executeLiquidation` against `Vigil`.
+- **`services/notifier/`**, Subgraph-driven alert delivery (Telegram / Discord / email / webhook). Per-user preferences via Bearer-gated REST API.
+- **`services/praetor-cli/`**, Rust CLI for deploys, multisig schedule/execute, lantern publish-now, seed pre-flight, parameter changes.
 
 ## Data flow
 

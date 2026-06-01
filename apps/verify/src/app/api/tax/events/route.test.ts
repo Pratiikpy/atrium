@@ -26,7 +26,7 @@ afterEach(() => {
   else process.env.TABLET_URL = ORIGINAL_TABLET_URL;
 });
 
-describe('GET /api/tax/events — pending state', () => {
+describe('GET /api/tax/events, pending state', () => {
   it('returns events:[] + source:pending when TABLET_URL unset', async () => {
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest(''))).json();
@@ -45,7 +45,7 @@ describe('GET /api/tax/events — pending state', () => {
   });
 });
 
-describe('GET /api/tax/events — NN-1 query-injection prevention', () => {
+describe('GET /api/tax/events, NN-1 query-injection prevention', () => {
   it('clamps invalid jurisdiction to uk in upstream URL', async () => {
     let captured: string | undefined;
     process.env.TABLET_URL = 'http://tablet-mock';

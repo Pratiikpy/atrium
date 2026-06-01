@@ -3,17 +3,17 @@
 @import "../styles/atrium-landing.css";
 
 /* =====================================================================
- * Atrium — design tokens (Lovable port, 2026-05-28)
+ * Atrium: design tokens (Lovable port, 2026-05-28)
  *
- * Source of truth: the Lovable prototype at C:\Users\prate\Downloads\atrium
+ * Source of truth: the Lovable prototype (design/ HTML files)
  * which was generated from design/Atriumnew.html + Mobile Landing.html +
  * Brand Kit.html + Atrium App.standalone.html + Mobile App.html.
  *
  * Two layers:
- *   1. `--bg`, `--ink`, `--accent` etc. — Lovable's canonical short names,
+ *   1. `--bg`, `--ink`, `--accent` etc. are Lovable's canonical short names,
  *      used by `.atrium-desktop-only` / `.atrium-m-root` / `.atrium-app`
  *      scoped CSS and by all new components.
- *   2. `--color-*` legacy aliases — kept stable so the existing 35 routes
+ *   2. `--color-*` legacy aliases, kept stable so the existing 35 routes
  *      using `bg-accent`, `text-ink-soft`, etc. don't break during the
  *      progressive port. Each legacy name resolves to its Lovable equiv.
  *
@@ -39,7 +39,7 @@
   --live:        oklch(58% 0.13 145);
   --neg:         oklch(56% 0.16 28);
 
-  /* === Lovable canonical tokens (Dark surfaces — hero, sigil, kill switch) === */
+  /* === Lovable canonical tokens (Dark surfaces: hero, sigil, kill switch) === */
   --dark-bg:     oklch(11% 0.008 60);
   --dark-ink:    oklch(96% 0.003 60);
   --dark-soft:   oklch(72% 0.004 60);
@@ -63,7 +63,7 @@
   --radius: 10px;
 
   /* =================================================================
-   * LEGACY ALIASES — kept stable so existing 35 routes don't break.
+   * LEGACY ALIASES: kept stable so existing 35 routes don't break.
    * New code should NOT use these; use the Lovable canonical names.
    * ================================================================= */
 
@@ -188,7 +188,7 @@
 }
 
 /* =====================================================================
- * Tailwind v4 theme inline — maps canonical tokens to Tailwind utilities
+ * Tailwind v4 theme inline: maps canonical tokens to Tailwind utilities
  * so `bg-accent`, `text-ink-soft`, etc. resolve to the Lovable tokens.
  * Also keeps every legacy `--color-*` available as a Tailwind utility.
  * ===================================================================== */
@@ -318,7 +318,7 @@ body {
   outline-offset: 2px;
 }
 
-/* A11Y-11: Reduced motion — defense-in-depth (globals layer) */
+/* A11Y-11: Reduced motion, defense-in-depth (globals layer) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -327,7 +327,7 @@ body {
 }
 
 /* =====================================================================
- * Atrium wordmark — Instrument Serif italic, the ONE reserved use
+ * Atrium wordmark: Instrument Serif italic, the ONE reserved use
  * ===================================================================== */
 .atrium-mark,
 .wordmark {
@@ -384,7 +384,7 @@ body {
 }
 
 /* =====================================================================
- * Atrium button — Apple-like pill
+ * Atrium button: Apple-like pill
  * ===================================================================== */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -505,7 +505,7 @@ body {
 .atrium-card.dense { padding: 16px 18px; }
 
 /* =====================================================================
- * Skeleton shimmer (NEVER spinners — per ui.md)
+ * Skeleton shimmer (NEVER spinners, per ui.md)
  * ===================================================================== */
 .skeleton {
   background: linear-gradient(
@@ -679,7 +679,7 @@ body {
 .rise.d3 { animation-delay: 220ms; }
 @keyframes rise { to { opacity: 1; transform: translateY(0); } }
 
-/* Impluvium dark variant — flips semantic tokens inside */
+/* Impluvium dark variant: flips semantic tokens inside */
 .impluvium-dark {
   --bg:        oklch(12% 0.008 60);
   --bg-sunk:   oklch(9%  0.008 60);
@@ -781,7 +781,7 @@ body {
 }
 
 /* =====================================================================
- * Mobile app shell — OLED dark, glass tabbar
+ * Mobile app shell: OLED dark, glass tabbar
  * ===================================================================== */
 .mobile-shell {
   min-height: 100vh;
@@ -838,7 +838,7 @@ body {
 .atrium-table tbody tr:hover { background: var(--bg-sunk); }
 
 /* =====================================================================
- * Focus rings — premium, on-brand, never the browser default
+ * Focus rings: premium, on-brand, never the browser default
  * ===================================================================== */
 :focus-visible {
   outline: 2px solid color-mix(in oklch, var(--ink) 90%, var(--accent));
@@ -905,7 +905,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 
 /* =====================================================================
- * Dual-render visibility — drives the device split
+ * Dual-render visibility: drives the device split
  * ===================================================================== */
 .atrium-desktop-only { }
 .atrium-mobile-only { display: none; }
@@ -915,7 +915,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 
 /* =====================================================================
- * Desktop App Shell — `.atrium-app` scope
+ * Desktop App Shell: `.atrium-app` scope
  * Ported from Lovable's atrium-app.css
  * ===================================================================== */
 :root {

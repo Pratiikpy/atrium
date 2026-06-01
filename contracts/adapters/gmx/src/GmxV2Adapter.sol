@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {IPorticoAdapter} from "../../../portico-registry/src/IPorticoAdapter.sol";
 import {ReentrancyGuard} from "../../../portico-registry/src/ReentrancyGuard.sol";
 
-/// GMX V2 perpetual market — partial interface used by Atrium adapter.
+/// GMX V2 perpetual market, partial interface used by Atrium adapter.
 /// Full at resources/gmx-synthetics/contracts/.
 interface IGmxRouter {
     function createPosition(
@@ -27,7 +27,7 @@ interface IERC20 {
 /// @title GmxV2Adapter
 /// @notice Portico adapter for GMX V2 perpetuals on Arbitrum Sepolia.
 ///
-///         **Status:** Phase-2 conditional per PRD §17 — ships only if the
+///         **Status:** Phase-2 conditional per PRD §17, ships only if the
 ///         Trailblazer AI / Stylus Sprint grants land by Month 7. This
 ///         scaffold establishes the contract shape so the deploy chain
 ///         (PorticoRegistry → adapter list → Verifier UI) doesn't need

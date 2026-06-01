@@ -1,5 +1,5 @@
 /**
- * Shared UI primitives — Atrium design system.
+ * Shared UI primitives, Atrium design system.
  *
  * Every Atrium page composes from these. Tokens come from
  * `apps/verify/src/app/globals.css` which mirrors `design/Atrium*.html`.

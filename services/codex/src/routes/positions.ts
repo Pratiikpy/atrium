@@ -43,7 +43,7 @@ positionsRouter.get('/:address', async (c) => {
 });
 
 /**
- * Audit Month-1 #160 — Codex endpoint expansion.
+ * Audit Month-1 #160, Codex endpoint expansion.
  *
  * GET /v1/positions/aggregated/:address
  *

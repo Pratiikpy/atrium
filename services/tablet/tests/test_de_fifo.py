@@ -1,4 +1,4 @@
-"""Unit tests for German FIFO tax calculator — § 23 EStG.
+"""Unit tests for German FIFO tax calculator, § 23 EStG.
 
 Iter 76 audit fix: pins the § 23 EStG holding-period exemption flag
 on src/jurisdictions/de.py. Pre-iter-76 zero tests pinned this
@@ -7,7 +7,7 @@ decide whether to claim Spekulationsfrist exemption.
 
 Note: the calculator FLAGS long-held positions but does NOT assert
 exemption. The flag triggers `flag_exemption_review: True` so the
-exporter renders "verify with tax adviser" — honest given recent
+exporter renders "verify with tax adviser", honest given recent
 contested rulings on crypto holdings.
 """
 

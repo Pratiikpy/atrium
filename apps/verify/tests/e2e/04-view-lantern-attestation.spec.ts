@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 4 — View Lantern attestation (proof of reserves).
+ * Journey 4, View Lantern attestation (proof of reserves).
  *
  * Per TDD §9.4: hourly Merkle-root attestation surfaces on /lantern. User
  * can verify their own balance via inclusion proof.
@@ -10,11 +10,11 @@ import { test, expect } from '@playwright/test';
  *   - Component fetches from /api/lantern/latest
  *   - Six explicit UI states: loading, error, empty, no-wallet, verified, absent
  *   - Verify button label: "Verify my inclusion"
- *   - The verify button is NOT disabled pre-deployment — clicking with no
+ *   - The verify button is NOT disabled pre-deployment, clicking with no
  *     wallet just no-ops (returns early). So my earlier toBeDisabled
  *     assertion was wrong.
  */
-test.describe('Journey 4 — Lantern attestation', () => {
+test.describe('Journey 4, Lantern attestation', () => {
   test('Lantern page loads @critical', async ({ page }) => {
     await page.goto('/lantern');
     const heading = page.getByRole('heading').first();
@@ -48,7 +48,7 @@ test.describe('Journey 4 — Lantern attestation', () => {
     // Lantern dashboard is a client component that fetches /api/lantern/latest
     // then renders one of: the verify button (data + wallet + IPFS-pinned tree),
     // "Inclusion verification pending IPFS pin" (real root indexed but the tree
-    // is not pinned — the honest state today, no WEB3_STORAGE_TOKEN), "No
+    // is not pinned, the honest state today, no WEB3_STORAGE_TOKEN), "No
     // attestation published yet" (no data), "Connect a wallet to verify…" (data,
     // no wallet), or "Lantern source unavailable" (error). Wait for it to settle
     // before reading the body, or we race the fetch and see neither state.
@@ -86,7 +86,7 @@ test.describe('Journey 4 — Lantern attestation', () => {
   test('Retry button mounts on error state @critical', async ({ page }) => {
     // The error-state branch in lantern-dashboard.tsx renders a Retry button.
     // We don't force the error state here, but we lock that *if* the page
-    // is in error, it offers a recovery path — never silent failure.
+    // is in error, it offers a recovery path, never silent failure.
     await page.goto('/lantern');
     const body = (await page.textContent('body')) ?? '';
     if (/lantern source unavailable/i.test(body)) {

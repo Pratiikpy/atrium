@@ -4,7 +4,7 @@ import { GET } from './route';
 /**
  * Locks the audit J-C1 fix: the Kani badge must reflect real CI state, not
  * a hardcoded "3 of 5" green dot. The badge is the trust surface of the
- * formal-verification claim on the landing page — if it ever drifts to a
+ * formal-verification claim on the landing page, if it ever drifts to a
  * static value, the audit J-C1 regression has shipped.
  *
  * Tests pin:
@@ -32,7 +32,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/kani/status — no upstream configured', () => {
+describe('GET /api/kani/status, no upstream configured', () => {
   it('returns "in-development" state from committed kani-status.json fallback', async () => {
     // Audit 2026-05-24 alpha.4 plus alpha.6: prior route had no public/
     // kani-status.json so unconfigured runs returned 'unknown'. The file
@@ -58,7 +58,7 @@ describe('GET /api/kani/status — no upstream configured', () => {
   });
 });
 
-describe('GET /api/kani/status — upstream success', () => {
+describe('GET /api/kani/status, upstream success', () => {
   beforeEach(() => {
     process.env.KANI_STATUS_URL = 'https://shields.io/badges/kani/atrium.json';
   });
@@ -120,7 +120,7 @@ describe('GET /api/kani/status — upstream success', () => {
   });
 
   it('reflects a real-world "fail" state', async () => {
-    // A failing Kani proof is the most important case — the badge must
+    // A failing Kani proof is the most important case, the badge must
     // surface the failure honestly.
     (global.fetch as any).mockResolvedValue(
       new Response(
@@ -135,7 +135,7 @@ describe('GET /api/kani/status — upstream success', () => {
   });
 });
 
-describe('GET /api/kani/status — upstream failure falls back honestly', () => {
+describe('GET /api/kani/status, upstream failure falls back honestly', () => {
   beforeEach(() => {
     process.env.KANI_STATUS_URL = 'https://broken.example.com/status.json';
   });
@@ -175,7 +175,7 @@ describe('GET /api/kani/status — upstream failure falls back honestly', () => 
   });
 });
 
-describe('GET /api/kani/status — response shape invariants', () => {
+describe('GET /api/kani/status, response shape invariants', () => {
   it('every response has all 6 fields populated (never undefined)', async () => {
     // Test all branches: no env var, success, partial, error, network fail.
     const scenarios: Array<() => Promise<void>> = [

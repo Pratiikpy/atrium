@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const yearLabel = String(year);
 
   // Audit LL-5: honest pending state. usedUsd was hardcoded to "$0" but
-  // marked source:pending — the literal "$0" would render if a downstream
+  // marked source:pending, the literal "$0" would render if a downstream
   // reader ignored source. Switch to null per real-data discipline.
   if (jurisdiction !== 'uk') {
     return NextResponse.json({

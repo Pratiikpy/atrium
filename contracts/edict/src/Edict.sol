@@ -7,10 +7,10 @@ pragma solidity ^0.8.28;
 ///         webhook (testnet) or the Praetor multisig (manual override).
 ///
 /// Tier ladder:
-///   Tier1 — default for any wallet, no KYC. Read-only + Verifier Mode.
-///   Tier2 — email verified. Deposit + simple positions.
-///   Tier3 — identity verified. All derivatives, all adapters.
-///   Tier4 — institutional KYC. Reserved for venue partner integrations.
+///   Tier1, default for any wallet, no KYC. Read-only + Verifier Mode.
+///   Tier2, email verified. Deposit + simple positions.
+///   Tier3, identity verified. All derivatives, all adapters.
+///   Tier4, institutional KYC. Reserved for venue partner integrations.
 contract Edict {
     enum UserTier { Tier1, Tier2, Tier3, Tier4 }
 
@@ -87,7 +87,7 @@ contract Edict {
     /// Audit iteration 44 fix: mirrors LanternAttestor.rotateSigningKey
     /// iter-43. Constructor's LLL-1 check (line 49-51) explicitly guards
     /// `_sumsubVerifier != address(0)` because zero would disable the
-    /// sumsub callback path in `assignTier` — `msg.sender == sumsubVerifier`
+    /// sumsub callback path in `assignTier`, `msg.sender == sumsubVerifier`
     /// becomes structurally impossible since msg.sender can never be
     /// address(0) on EVM. Pre-fix the setter accepted any address
     /// including zero, so a Praetor multisig accidentally scheduling a

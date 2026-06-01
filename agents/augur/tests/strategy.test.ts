@@ -44,7 +44,7 @@ describe('Augur z-score strategy', () => {
 
   it('handles data gaps (NaN/undefined filtered)', () => {
     const prices = Array.from({ length: 100 }, (_, i) => 100 + Math.sin(i * 0.1));
-    // Simulate gaps — computeZScore should handle gracefully
+    // Simulate gaps, computeZScore should handle gracefully
     const z = computeZScore(prices, 100);
     expect(Number.isFinite(z)).toBe(true);
   });

@@ -23,7 +23,7 @@ import { gql } from '@/lib/scribe-helpers';
  *
  * The contract: source = 'scribe' on success, 'pending' on Scribe
  * failure. Scribe failure ALSO sets isStale=true with reason
- * "Scribe unavailable; freshness unknown" — locks the honesty path.
+ * "Scribe unavailable; freshness unknown", locks the honesty path.
  */
 
 beforeEach(() => {
@@ -34,10 +34,10 @@ afterEach(() => {
 });
 
 const NOW_SEC = Math.floor(Date.now() / 1000);
-const FRESH_TS = String(NOW_SEC - 10 * 60); // 10 min ago — under the 25-min threshold
-const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago — well past the 25-min threshold
+const FRESH_TS = String(NOW_SEC - 10 * 60); // 10 min ago, under the 25-min threshold
+const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago, well past the 25-min threshold
 
-describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
+describe('GET /api/reserves/summary, KK-13 formatUsd precision', () => {
   it('renders TVL via formatUsd with $ prefix and locale separators', async () => {
     (gql as any).mockResolvedValue({
       counter: { totalTvlWei: '4000000' }, // $4.00, aggregated by the subgraph Counter
@@ -57,7 +57,7 @@ describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
     });
     const { GET } = await import('./route');
     const json = await (await GET()).json();
-    // tvl=0n branch returns null, not "$0.00" — same honesty pattern
+    // tvl=0n branch returns null, not "$0.00", same honesty pattern
     // as iter-36 in protocol/metrics.
     expect(json.tvlUsd).toBeNull();
   });
@@ -75,7 +75,7 @@ describe('GET /api/reserves/summary — KK-13 formatUsd precision', () => {
   });
 });
 
-describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
+describe('GET /api/reserves/summary, iter-34 staleness flag', () => {
   it('marks isStale=false when last attestation is fresh', async () => {
     (gql as any).mockResolvedValue({
       counter: null,
@@ -123,7 +123,7 @@ describe('GET /api/reserves/summary — iter-34 staleness flag', () => {
   });
 });
 
-describe('GET /api/reserves/summary — KK-14 parseTsOrNull guard', () => {
+describe('GET /api/reserves/summary, KK-14 parseTsOrNull guard', () => {
   it('falls back to lastAttestedAgo:pending on malformed timestamp', async () => {
     (gql as any).mockResolvedValue({
       counter: null,
@@ -158,7 +158,7 @@ describe('GET /api/reserves/summary — KK-14 parseTsOrNull guard', () => {
   });
 });
 
-describe('GET /api/reserves/summary — Scribe outage', () => {
+describe('GET /api/reserves/summary, Scribe outage', () => {
   it('returns source:pending with isStale:true on gql failure', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe 503'));
     const { GET } = await import('./route');
@@ -170,7 +170,7 @@ describe('GET /api/reserves/summary — Scribe outage', () => {
     expect(json.leafCount).toBeNull();
     expect(json.isStale).toBe(true);
     expect(json.staleReason).toBe('Scribe unavailable; freshness unknown');
-    // staleThresholdMin still surfaces — consumers may render a tile
+    // staleThresholdMin still surfaces, consumers may render a tile
     // labelled "threshold 25 min · unknown current age" honestly.
     expect(json.staleThresholdMin).toBe(25);
   });

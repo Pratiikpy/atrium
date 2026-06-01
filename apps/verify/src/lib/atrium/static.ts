@@ -1,4 +1,4 @@
-// Atrium — static catalog data for the landing page.
+// Atrium, static catalog data for the landing page.
 //
 // VENUES and SUBSYSTEMS describe the system architecture. The factual fields
 // on a Venue are id/name/short/type/asset/chain/pending; the `illustrativeCollateral`
@@ -28,7 +28,7 @@ export const VENUES: Venue[] = [
   { id: "cur", name: "Curve",             short: "CURVE",   type: "Stableswap LP",        illustrativeCollateral: 186_720,   asset: "3pool LP",     chain: "Ethereum Sepolia" },
   { id: "trd", name: "Trade.xyz",         short: "TRADE",   type: "RFQ · dark pool",      illustrativeCollateral: 401_890,   asset: "WETH · WBTC",  chain: "Arbitrum Sepolia" },
   { id: "pmk", name: "Polymarket",        short: "PMK",     type: "Prediction · CTF",     illustrativeCollateral:  58_200,   asset: "USDC",         chain: "via Aqueduct" },
-  { id: "rhc", name: "RH-Chain",          short: "RH-NTV",  type: "Native spot · pending", illustrativeCollateral: 0,        asset: "—",            chain: "Robinhood testnet", pending: true },
+  { id: "rhc", name: "RH-Chain",          short: "RH-NTV",  type: "Native spot · pending", illustrativeCollateral: 0,        asset: "-",            chain: "Robinhood testnet", pending: true },
 ];
 
 export const SUBSYSTEMS: Subsystem[] = [
@@ -52,7 +52,7 @@ export const SUBSYSTEMS: Subsystem[] = [
   { num: "18", name: "Postern",  sub: "Wallet abstraction",   stack: "ERC-4337 · 7702",     phase: "P1" },
 ];
 
-/** Technology stack Atrium builds on — verifiable from resources/ and contracts/. */
+/** Technology stack Atrium builds on, verifiable from resources/ and contracts/. */
 export const TECHNOLOGY_STACK = [
   "Arbitrum",
   "Stylus",

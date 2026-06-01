@@ -3,7 +3,7 @@ import { Card, RecessedCard, Tag } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 /**
- * /changelog — public-facing release timeline.
+ * /changelog, public-facing release timeline.
  *
  * Each entry is a published milestone, not an internal development phase.
  * Tag references the git tag where the milestone was cut.

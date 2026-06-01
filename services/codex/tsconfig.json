@@ -1,5 +1,5 @@
 {
-  "//": "Audit U-31: pre-fix this file didn't exist. `tsc --noEmit` with no tsconfig + no source-file args prints the help text and exits successfully — the build script silently passed every CI run. That's how the missing safeErrorDetail import in agents.ts (audit U-30) reached production. The minimal config below makes tsc actually compile the src/ tree and surface missing identifiers like 'safeErrorDetail' without enabling the wider strict-mode rules that flag unrelated Cloudflare-D1 generic-call ambiguities. The narrower scope is intentional — we want the missing-import gate, not a full TS-strict migration.",
+  "//": "Audit U-31: pre-fix this file didn't exist. `tsc --noEmit` with no tsconfig + no source-file args prints the help text and exits successfully, the build script silently passed every CI run. That's how the missing safeErrorDetail import in agents.ts (audit U-30) reached production. The minimal config below makes tsc actually compile the src/ tree and surface missing identifiers like 'safeErrorDetail' without enabling the wider strict-mode rules that flag unrelated Cloudflare-D1 generic-call ambiguities. The narrower scope is intentional, we want the missing-import gate, not a full TS-strict migration.",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",

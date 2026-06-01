@@ -4,10 +4,10 @@ import { useMemo } from 'react';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
 
 /**
- * Risk Preview modal — required before a wallet's first ever Open Position
+ * Risk Preview modal, required before a wallet's first ever Open Position
  * click on this device. Six risk bullets + a live buffer preview at the
  * user's planned size and leverage. Spec: ATRIUM_FULL_FLOW_DESIGN.md
- * "Before your first trade — Risk Preview".
+ * "Before your first trade, Risk Preview".
  *
  * The modal is education, not a contract or chain interaction. Consent is
  * the "I understand" button click; no checkbox theatre. Re-openable later
@@ -72,7 +72,7 @@ export function RiskPreviewModal({
         </li>
         <li>
           <strong>AI agents can only act inside the limits you set, but bad limits still lose
-            money.</strong> A 100-trade daily cap is enforced — but if each trade is a bad call,
+            money.</strong> A 100-trade daily cap is enforced, but if each trade is a bad call,
           the cap doesn't save you. Read the agent's profile before approving.
         </li>
         <li>
@@ -102,7 +102,7 @@ export function RiskPreviewModal({
           </ul>
         )}
         <p className="mt-2 text-[9px] text-muted">
-          Client-side preview using the same Plinth haircut formula. Numbers are simulated — actual
+          Client-side preview using the same Plinth haircut formula. Numbers are simulated, actual
           fills depend on venue execution.
         </p>
       </div>
@@ -113,7 +113,7 @@ export function RiskPreviewModal({
           onClick={onCancel}
           className="rounded-md border border-divider px-4 py-3 text-sm font-medium text-ink hover:border-ink/30"
         >
-          Cancel — go back
+          Cancel, go back
         </button>
         <button
           type="button"

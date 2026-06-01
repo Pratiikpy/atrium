@@ -23,7 +23,7 @@ const nextConfig = {
       // (every page ships a `md:hidden <X>Mobile` panel + MobileBottomNav +
       // KillSwitchFAB on real data), so /mobile/app serves the REAL app rather
       // than the old static mock, which shipped fabricated numbers
-      // ($12,374,820 buying power etc.) — a no-fake-data / no-misleading-info fix.
+      // ($12,374,820 buying power etc.), a no-fake-data / no-misleading-info fix.
       { source: '/mobile/app', destination: '/app' },
     ],
     afterFiles: [],

@@ -7,7 +7,7 @@ import {TradeXyzAdapter} from "../../contracts/adapters/trade-xyz/src/TradeXyzAd
 /// @title Adapter close_position → atrium_coffer transfer regression
 /// @notice Phase theta.1 fix verification. Four adapters (GMX, Hyperliquid,
 ///         Polymarket, TradeXyz) silently stranded user collateral in the
-///         adapter after close_position — the venue settled USDC back to
+///         adapter after close_position, the venue settled USDC back to
 ///         msg.sender (the adapter), but the adapter never forwarded it to
 ///         Coffer. Coffer's share accounting then disagreed with on-chain
 ///         reality and depositors who tried to redeem after a peer's close

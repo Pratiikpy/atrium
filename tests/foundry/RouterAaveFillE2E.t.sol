@@ -7,7 +7,7 @@ import {AaveHorizonAdapterV11} from "../../contracts/adapters/aave-horizon/src/A
 import {MockAavePool} from "../../contracts/mocks/MockAavePool.sol";
 import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdapter.sol";
 
-/// @title RouterAaveFillE2E — the REAL Aave fill path through the REAL Router
+/// @title RouterAaveFillE2E, the REAL Aave fill path through the REAL Router
 /// @notice Closes the one trade-fill verification gap that was buildable
 ///         locally with zero timelock wait. On-chain, venue 2 (Aave Horizon)
 ///         is the ONLY registry-active venue (its v1.1.1 adapter 0x826dc4FE is
@@ -16,7 +16,7 @@ import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdap
 ///         timelock (#337) lands, routes through THIS adapter. Yet before this
 ///         file the Aave adapter was only ever tested in ISOLATION
 ///         (AaveHorizonAdapterV11.t.sol calls open_position_v11 directly as the
-///         Coffer) — never chained through AtriumRouter. The existing
+///         Coffer), never chained through AtriumRouter. The existing
 ///         AtriumRouter.t.sol proves the end-to-end chain only for CurveAdapter.
 ///
 ///         This suite proves the four-step Router orchestration end to end for
@@ -34,12 +34,12 @@ import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdap
 ///         registry, dispatches to the v1.1 entry point (version()==(1,1,0)),
 ///         Coffer delivers the margin USDC to the adapter, the adapter supplies
 ///         it into the Aave pool, the venue position is owned by the USER (not
-///         the Router — the B-10/G-5 originator fix), and the close path
+///         the Router, the B-10/G-5 originator fix), and the close path
 ///         withdraws the principal back to Coffer.
 ///         What this does NOT prove (still gated, documented in
 ///         project_audit_build_gaps_status memory + task #429): the real Stylus
 ///         Plinth SPAN margin math, the real Sigil EIP-712 owner resolution,
-///         and the dual-oracle price read — those require the live Stylus
+///         and the dual-oracle price read, those require the live Stylus
 ///         deployment + the 48h timelock ops + a per-trade Pyth push.
 contract RouterAaveFillE2E is Test {
     AtriumRouter internal router;
@@ -116,7 +116,7 @@ contract RouterAaveFillE2E is Test {
         aave.setAuthorizedCaller(address(router), true);
 
         // The adapter only opens positions on supported instruments
-        // (addInstrument is onlyTimelock — the on-chain equivalent gates a
+        // (addInstrument is onlyTimelock, the on-chain equivalent gates a
         // venue's instrument list the same way).
         vm.prank(timelock);
         aave.addInstrument(INSTRUMENT, HAIRCUT_BPS, INITIAL_MARGIN_BPS, MAINT_MARGIN_BPS);
@@ -203,7 +203,7 @@ contract RouterAaveFillE2E is Test {
             router.open_position_via_adapter(AAVE_VENUE_ID, INSTRUMENT, int256(500e6), empty, empty, empty);
         assertEq(venueId, 1, "v1.1 dispatch succeeded");
 
-        // Direct v1.0 call always reverts — pins that the adapter has no live
+        // Direct v1.0 call always reverts, pins that the adapter has no live
         // v1.0 path the Router could fall back to.
         vm.prank(address(coffer));
         vm.expectRevert(AaveHorizonAdapterV11.V10NotSupported.selector);
@@ -223,7 +223,7 @@ contract RouterAaveFillE2E is Test {
         vm.expectRevert(AaveHorizonAdapterV11.Unauthorized.selector);
         aave.setAuthorizedCaller(makeAddr("x"), true);
 
-        // Praetor multisig cannot either — authorization is a parameter-class
+        // Praetor multisig cannot either, authorization is a parameter-class
         // change requiring the 48h timelock veto window.
         vm.prank(praetor);
         vm.expectRevert(AaveHorizonAdapterV11.Unauthorized.selector);
@@ -270,12 +270,12 @@ contract RouterAaveFillE2E is Test {
     // the adapter, but every v1.1 adapter supplies abs(notional). For a
     // cash-equivalent venue these are equal (this test). For a LEVERAGED venue
     // (Hyperliquid/GMX), margin delta < abs(notional) and the adapter would be
-    // under-funded by the leverage factor — that adapter-funding seam is a real
+    // under-funded by the leverage factor, that adapter-funding seam is a real
     // production-design question tracked separately, not papered over here.
     function test_open_via_router_aave_marginDeltaPathFundsAdapterExactly() public {
         bytes memory empty = hex"";
         int256 notional = int256(2_500e6);
-        // Cash-equivalent: required margin == notional (1× — no leverage).
+        // Cash-equivalent: required margin == notional (1×, no leverage).
         plinth.setMarginIncreasePerOpen(2_500e6);
 
         vm.prank(user, user);
@@ -322,7 +322,7 @@ contract RouterAaveFillE2E is Test {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Fakes — narrow Solidity stand-ins for the Stylus Plinth/Coffer/Registry the
+// Fakes, narrow Solidity stand-ins for the Stylus Plinth/Coffer/Registry the
 // Router calls. The Aave adapter + pool + Router are REAL production code.
 // Mirrors the convention in tests/foundry/AtriumRouter.t.sol.
 // ──────────────────────────────────────────────────────────────────────────

@@ -72,7 +72,7 @@ contract AaveHorizonAdapterTest is Test {
         // AaveHorizonAdapter.attest_off_chain_state isn't marked view/pure
         // (unlike CurveAdapter/TradeXyzAdapter) so this test cannot be `view`.
         // Worth noting as a CurveAdapter/AaveHorizonAdapter interface drift
-        // we should normalize in v2 — see follow-up X-1 in audit register.
+        // we should normalize in v2, see follow-up X-1 in audit register.
         assertFalse(adapter.isHybrid());
         assertFalse(adapter.attest_off_chain_state(hex""));
     }
@@ -119,7 +119,7 @@ contract AaveHorizonAdapterTest is Test {
     }
 
     function test_open_rejectsZeroNotional() public {
-        // Aave Horizon doesn't make sense at zero — explicit revert per audit.
+        // Aave Horizon doesn't make sense at zero, explicit revert per audit.
         bytes memory payload = abi.encodePacked(user);
         vm.prank(coffer);
         vm.expectRevert(AaveHorizonAdapter.ZeroNotional.selector);
@@ -154,7 +154,7 @@ contract AaveHorizonAdapterTest is Test {
     }
 
     function test_open_negativeNotional_alsoSupplies() public {
-        // The contract takes abs(notional) and supplies — a negative input
+        // The contract takes abs(notional) and supplies, a negative input
         // doesn't switch to a borrow path in v1. Verify the absolute value
         // pattern so a future v2 short-path doesn't quietly change behavior.
         bytes memory payload = abi.encodePacked(user);
@@ -265,7 +265,7 @@ contract AaveHorizonAdapterTest is Test {
     //
     // Pre-JJJ-8, AaveHorizonAdapter.close_position passed type(uint256).max
     // as the withdraw amount. Aave V3 interprets that as "withdraw entire
-    // aToken balance of the adapter" — across every open position. One
+    // aToken balance of the adapter", across every open position. One
     // user's close drained every other user's principal, reporting it as
     // the closer's PnL.
     //
@@ -279,7 +279,7 @@ contract AaveHorizonAdapterTest is Test {
         vm.prank(coffer);
         uint256 id = adapter.open_position(TBILL_3M, int256(1_000e6), payload);
 
-        // Close it — assert the withdraw call used the supplied amount,
+        // Close it, assert the withdraw call used the supplied amount,
         // NOT type(uint256).max. Pre-fix this assertion fails immediately
         // (value would be type(uint256).max ≈ 1.16e77).
         vm.prank(coffer);

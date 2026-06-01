@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 const TABLET_URL = process.env.TABLET_URL ?? null;
 
 // Audit JJ-5 fix: closed enum gates. Prior code interpolated `jurisdiction`
-// and `year` directly into the upstream URL — a caller could pass values
+// and `year` directly into the upstream URL, a caller could pass values
 // containing `&` (URL-encoded) to inject extra query params at the Tablet
 // service, or stash attacker-controlled content into upstream HTTP logs.
 const ALLOWED_JURISDICTIONS = new Set(['uk', 'us', 'de', 'other']);

@@ -83,10 +83,10 @@ export async function GET(req?: Request) {
       }
     }
     // Audit KK-5 + KK-6 + KK-7 fix: route was doing `Number(big) / 1e6` in
-    // three places — formatAbs() (size column), notionalUsd, entryPrice/
+    // three places, formatAbs() (size column), notionalUsd, entryPrice/
     // markPrice. All lose precision past Number.MAX_SAFE_INTEGER on large
     // notional values. The formatUsd / formatShares helpers preserve it.
-    // entryPriceQ64 is Q64.64 fixed-point — the integer part lives in the
+    // entryPriceQ64 is Q64.64 fixed-point, the integer part lives in the
     // high 64 bits. Number() on a sane price BigInt is safe (< 2^53), so
     // the >> 64n + Number() is intentional and locked here.
     const positions = (data.positions ?? []).map((p) => {
@@ -100,9 +100,9 @@ export async function GET(req?: Request) {
         : Number(entryPriceInt);
       // Audit U-33: subgraph/src/plinth.ts:90 ships entryPriceQ64 = 0 until
       // Plinth's event-extension-v2 emits the entry price on open. Pre-fix
-      // we rendered "$0" for every position's entry — fake-zero matching
+      // we rendered "$0" for every position's entry, fake-zero matching
       // the U-21 mark/PnL pattern. Now null when unmeasured so the UI
-      // shows "—" instead of an honest-looking zero entry.
+      // shows "-" instead of an honest-looking zero entry.
       const entryPriceMeasured = entryPriceInt > 0n;
       const sizeFormatted = formatShares(abs, USDC_DECIMALS);
       // Phase theta audit follow-up: surface the real venue id when the
@@ -126,9 +126,9 @@ export async function GET(req?: Request) {
         // were both presented as measured truth, but neither is sourced
         // (no oracle read for mark, no settlement for PnL). A user with a
         // hedged position saw "entry · entry · $0.00 PnL" and could read
-        // it as "market is exactly at entry, position is breakeven" —
+        // it as "market is exactly at entry, position is breakeven" -
         // dishonest. Now null with `markSource: 'pending'` so the client
-        // renders "—" until the oracle path lands.
+        // renders "-" until the oracle path lands.
         markPrice: null as string | null,
         pnlUsd: null as string | null,
         // Audit U-23: direction null when value null (no measured

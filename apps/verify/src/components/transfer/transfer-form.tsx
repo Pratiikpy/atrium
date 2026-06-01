@@ -32,7 +32,7 @@ interface TransferQuote {
   postedAt: string;
   // 'estimate' = computed testnet estimate (not a live CCIP router read);
   // 'pending' = Aqueduct not deployed. There is no 'aqueduct' live-quote
-  // source yet — see /api/transfer/quote and human_left.md aqueduct-live-quote.
+  // source yet, see /api/transfer/quote and human_left.md aqueduct-live-quote.
   source: 'estimate' | 'pending';
   isLiveQuote?: boolean;
   note?: string;
@@ -173,7 +173,7 @@ export function TransferForm() {
               const v = parseFloat(amount);
               return Number.isFinite(v) && v >= 0
                 ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '—';
+                : '-';
             })()} USD
           </p>
         </label>
@@ -181,10 +181,10 @@ export function TransferForm() {
         <dl className="space-y-1.5 border-t border-divider-soft pt-4 text-xs">
           <Row
             label="Estimated time"
-            value={quote.data?.estimatedSeconds != null ? `${quote.data.estimatedSeconds.toFixed(1)}s` : '—'}
+            value={quote.data?.estimatedSeconds != null ? `${quote.data.estimatedSeconds.toFixed(1)}s` : '-'}
           />
-          <Row label="CCIP fee" value={quote.data?.ccipFeeUsd ?? '—'} />
-          <Row label="Gas · arb-sepolia" value={quote.data?.gasFeeUsd ?? '—'} />
+          <Row label="CCIP fee" value={quote.data?.ccipFeeUsd ?? '-'} />
+          <Row label="Gas · arb-sepolia" value={quote.data?.gasFeeUsd ?? '-'} />
           <Row label="Plinth credit posted" value={quote.data?.postedAt ?? 'on arrival'} />
         </dl>
         <p className="text-[9px] uppercase tracking-wider text-muted">
@@ -259,7 +259,7 @@ function ChainPicker({
         {CHAINS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
       </select>
       <span className="mt-0.5 block font-mono text-[11px] text-muted">
-        Balance {balance?.balanceFormatted ?? '—'}
+        Balance {balance?.balanceFormatted ?? '-'}
       </span>
     </label>
   );

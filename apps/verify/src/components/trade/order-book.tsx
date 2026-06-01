@@ -10,7 +10,7 @@ interface OrderBookLevel {
 interface BookResponse {
   symbol: string;
   midPrice: string;
-  // Iteration 40: was `string` with hardcoded "0.00" default — implied a
+  // Iteration 40: was `string` with hardcoded "0.00" default, implied a
   // measured no-change. Now null when no 24h-delta source is wired.
   midDelta24h: string | null;
   midDeltaDirection: 'up' | 'down' | 'flat' | null;
@@ -22,7 +22,7 @@ interface BookResponse {
 // Audit U-14: venue-aware symbol resolution. Pre-fix the orderbook always
 // fetched `?symbol=HSLA-PERP` regardless of which venue chip was selected.
 // Now the venue id drives the symbol so HL-HIP3 / Trade.xyz / Pendle each
-// show their own market. Map is small enough that hardcoding is fine —
+// show their own market. Map is small enough that hardcoding is fine -
 // adding a new venue is a one-line change here + in @/lib/venues. The
 // resolver is exported so the unit test pins each id → symbol pair.
 const SYMBOL_BY_VENUE: Record<string, string> = {
@@ -48,7 +48,7 @@ async function fetchBook(venue: string): Promise<BookResponse> {
   } catch {
     return {
       symbol,
-      midPrice: '—',
+      midPrice: '-',
       midDelta24h: null,
       midDeltaDirection: null,
       bids: [],
@@ -69,14 +69,14 @@ export function OrderBook({ venue }: { venue: string }) {
     <section className="rounded-md border border-divider bg-parchment p-5">
       <header className="flex items-baseline justify-between">
         <div>
-          <p className="font-mono text-sm text-ink">{data?.symbol ?? '—'}</p>
+          <p className="font-mono text-sm text-ink">{data?.symbol ?? '-'}</p>
           <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">
             {source === 'hyperliquid' ? 'Hyperliquid info feed' : 'orderbook pending'}
           </p>
         </div>
         <div className="text-right">
-          <p className="font-mono text-2xl text-ink">{data?.midPrice ?? '—'}</p>
-          {/* Iteration 40: render "— · 24h" instead of "0.00 · 24h" when no
+          <p className="font-mono text-2xl text-ink">{data?.midPrice ?? '-'}</p>
+          {/* Iteration 40: render "- · 24h" instead of "0.00 · 24h" when no
               24h-delta source is wired. Pre-fix the hardcoded "0.00"
               implied a measured no-change to anyone reading the UI. */}
           <p
@@ -90,7 +90,7 @@ export function OrderBook({ venue }: { venue: string }) {
             }
           >
             {data?.midDeltaDirection === 'up' && '+'}
-            {data?.midDelta24h ?? '—'} · 24h
+            {data?.midDelta24h ?? '-'} · 24h
           </p>
         </div>
       </header>
@@ -114,7 +114,7 @@ export function OrderBook({ venue }: { venue: string }) {
 
       <footer className="mt-6 flex items-center justify-between rounded-md bg-parchment-soft/60 px-4 py-2 text-[10px] uppercase tracking-wider">
         <span className="text-muted">MID</span>
-        <span className="font-mono text-ink">{data?.midPrice ?? '—'}</span>
+        <span className="font-mono text-ink">{data?.midPrice ?? '-'}</span>
       </footer>
     </section>
   );

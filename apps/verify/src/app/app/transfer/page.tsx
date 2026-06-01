@@ -42,7 +42,7 @@ export default function TransferPage() {
       </section>
 
       <section className="mt-8">
-        {/* "View all" button removed — there's no separate /app/transfer/history
+        {/* "View all" button removed, there's no separate /app/transfer/history
             page, and RecentTransfers already shows the full short list. A
             click-to-nowhere button is worse than no button at all. */}
         <header className="mb-3 flex items-baseline justify-between">

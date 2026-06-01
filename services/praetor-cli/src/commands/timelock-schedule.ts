@@ -1,5 +1,5 @@
 /**
- * praetor timelock-schedule — schedules a tx via PraetorTimelock.schedule(target, calldata).
+ * praetor timelock-schedule, schedules a tx via PraetorTimelock.schedule(target, calldata).
  *
  * Usage:
  *   npx tsx services/praetor-cli/src/commands/timelock-schedule.ts \
@@ -63,7 +63,7 @@ async function main() {
   console.log(`[timelock-schedule] delay=${values.delay}s (48h=${172800}s)`);
 
   if (dryRun) {
-    console.log('[timelock-schedule] DRY RUN — simulating schedule call...');
+    console.log('[timelock-schedule] DRY RUN, simulating schedule call...');
     try {
       const { result } = await publicClient.simulateContract({
         address: timelockAddr,

@@ -7,14 +7,14 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagm
  * Faucet claim hook (114-PM3.3 fix).
  *
  * Pre-fix the onboarding "Claim faucet" button's handler was `onNext`, which
- * only advanced the step and wrote localStorage — no tx was ever sent, so the
+ * only advanced the step and wrote localStorage, no tx was ever sent, so the
  * drop that funds the entire downstream deposit/trade journey never arrived
  * while the UI implied a claim happened. This hook dispatches the real
  * `Faucet.claim()` and (per the 058-FE3 lesson) only reports success once the
  * on-chain receipt confirms.
  */
 
-// contracts/faucet/src/Faucet.sol — `function claim() external` (no args).
+// contracts/faucet/src/Faucet.sol, `function claim() external` (no args).
 const FAUCET_CLAIM_ABI = [
   { type: 'function', name: 'claim', stateMutability: 'nonpayable', inputs: [], outputs: [] },
 ] as const;

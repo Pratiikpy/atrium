@@ -105,7 +105,7 @@ describe('buildSigilTypedData', () => {
   });
 
   it('passes through viem hashTypedData without throwing', () => {
-    // The typed-data shape must be valid EIP-712 — viem's hashTypedData
+    // The typed-data shape must be valid EIP-712, viem's hashTypedData
     // throws on malformed structures. This is the same call the production
     // code makes to compute the intent hash.
     const t = buildSigilTypedData(baseEnvelope, 421614, SIGIL);

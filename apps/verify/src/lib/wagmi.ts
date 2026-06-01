@@ -49,11 +49,11 @@ const e2eConnectors =
  * connect flow was structurally broken before any contract deploy.
  *
  * Two real connectors, both Year-1:
- *  - `injected()` — any browser-extension EVM wallet (MetaMask, Rabby, Brave).
+ *  - `injected()`, any browser-extension EVM wallet (MetaMask, Rabby, Brave).
  *    This is what most users + buildathon judges actually have, and it is what
  *    @tenkeylabs/dappwright drives for the real-wallet E2E. Added after the
  *    persona sweep flagged that a plain MetaMask user could not connect at all.
- *  - `coinbaseWallet` with `preference: 'smartWalletOnly'` — the Postern path:
+ *  - `coinbaseWallet` with `preference: 'smartWalletOnly'`, the Postern path:
  *    passkey-bound smart wallets (ERC-4337 + EIP-7702), no extension needed.
  * The connect UI offers both; injected is primary so a MetaMask/Rabby user
  * connects in one click.

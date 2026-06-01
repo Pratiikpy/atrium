@@ -11,7 +11,7 @@ import { VENUES } from '@/lib/venues';
  * Phase theta audit follow-up (2026-05-25): pre-fix this hook called
  * `adapter.close_position` directly from the user's wallet, with the
  * same Unauthorized-revert class as the open path (the user's EOA is
- * not on the adapter's is_authorized_caller list — only the Router is).
+ * not on the adapter's is_authorized_caller list, only the Router is).
  *
  * Now: routes through AtriumRouter.close_position_via_adapter. The
  * Router verifies ownership via plinth.getPosition, dispatches to the
@@ -24,7 +24,7 @@ import { VENUES } from '@/lib/venues';
  * carries both plinthPositionId AND venuePositionId. The hook signature
  * accepts both ids separately. When the venue side hasn't been indexed
  * yet (e.g. fresh open + cold subgraph), the route returns the Plinth
- * id for both fields — the same fallback the pre-fix shape had.
+ * id for both fields, the same fallback the pre-fix shape had.
  */
 
 const ROUTER_ABI = [

@@ -22,11 +22,11 @@
  * Total: 23 scheduled actions, all executable T+48h after this run.
  *
  * 2026-05-29 correction: Block 1 previously scheduled 10x 2-arg
- * setAdapter(address,bool) against each venue adapter — wrong selector AND
+ * setAdapter(address,bool) against each venue adapter, wrong selector AND
  * wrong target. See the Block 1 comment for the contract-verified rationale.
  *
  * Usage:
- *   ATRIUM_KEYDIR=/c/Users/prate/.atrium node scripts/reschedule-phase-b3.mjs
+ *   ATRIUM_KEYDIR=<your-key-dir> node scripts/reschedule-phase-b3.mjs
  *
  * Note: must run AFTER scripts/redeploy-stylus.mjs so deployments
  * registry has the new Coffer address.
@@ -34,13 +34,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const REGISTRY_PATH = resolve(REPO_ROOT, 'deployments/arbitrum_sepolia.json');
 const SCHEDULE_PATH = resolve(REPO_ROOT, '.forge-cache/phase-b3-schedule-corrected.json');
@@ -53,7 +54,7 @@ const ETH_SEPOLIA_SELECTOR = '16015286601757825753'; // CCIP chain selector
 // as adapter_budgets[router].per_block_cap_wei.
 const PER_BLOCK_CAP_USDC_WEI = (10_000n * (10n ** 6n)).toString();
 
-// Adapter venue ids per script/PhaseB3-Schedule.s.sol — preserve the
+// Adapter venue ids per script/PhaseB3-Schedule.s.sol, preserve the
 // mapping the existing PorticoRegistry knows about.
 const VENUES = [
   { id: 1, slug: 'adapter-hyperliquid', name: 'HL HIP-3' },
@@ -88,11 +89,9 @@ async function loadDeployerKey() {
   return { pk, address: envelope.public_address };
 }
 
-const CAST_BIN = process.env.CAST_BIN ?? (process.platform === 'win32'
-  ? 'C:/Users/prate/.foundry/bin/cast.exe'
-  : 'cast');
+const CAST_BIN = process.env.CAST_BIN ?? 'cast';
 
-// Synchronous sleep (no deps) — backoff between sends on a nonce clash.
+// Synchronous sleep (no deps): backoff between sends on a nonce clash.
 function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
@@ -154,7 +153,7 @@ async function main() {
         const tx = r.stdout.match(/transactionHash\s+(0x[a-fA-F0-9]{64})/)?.[1] ?? null;
         const blockNumber = r.stdout.match(/blockNumber\s+(\d+)/)?.[1] ?? null;
         // CRITICAL for execute(): PraetorTimelock derives the operation id as
-        // keccak256(abi.encode(target, data, block.timestamp)) — so execute
+        // keccak256(abi.encode(target, data, block.timestamp)), so execute
         // MUST pass the exact block.timestamp of the schedule tx. Capture the
         // real on-chain timestamp now (the prior wall-clock ISO string would
         // have produced the wrong id and reverted NotScheduled at execute).
@@ -185,12 +184,12 @@ async function main() {
   // The prior version looped over VENUES calling 2-arg
   // `setAdapter(address,bool)` on each venue adapter. That was wrong on BOTH
   // axes:
-  //   1. SELECTOR — Coffer (contracts/coffer/src/lib.rs:615) exports the
+  //   1. SELECTOR: Coffer (contracts/coffer/src/lib.rs:615) exports the
   //      3-arg `setAdapter(address,bool,uint256)` = 0x4de27bea. The 2-arg
   //      form 0x332f6465 is not on the Stylus dispatcher, so
   //      PraetorTimelock.execute (PraetorTimelock.sol:85 target.call(data))
   //      would revert CallFailed even after the 48h wait.
-  //   2. TARGET — coffer.adapter_pull (lib.rs:534) authorizes msg_sender, and
+  //   2. TARGET: coffer.adapter_pull (lib.rs:534) authorizes msg_sender, and
   //      AtriumRouter.sol:252/402 is the ONLY caller of coffer.adapterPull.
   //      So the ROUTER must be approved, exactly once. Approving each venue
   //      adapter would (a) be unnecessary and (b) re-open the direct-pull
@@ -206,7 +205,7 @@ async function main() {
     scheduleAction('Coffer.setAdapter(AtriumRouter, true, cap)', coffer, data);
   }
 
-  // Block 2: <adapter>.setAuthorizedCaller(router, true) — auditor C-3 fix.
+  // Block 2: <adapter>.setAuthorizedCaller(router, true), auditor C-3 fix.
   // Each adapter exposes the same Solidity selector regardless of vendor.
   for (const v of VENUES) {
     const adapter = get(v.slug);
@@ -234,7 +233,7 @@ async function main() {
     scheduleAction(`PorticoRegistry.registerAdapter(${v.name})`, portico, data);
   }
 
-  // Block 4: Aqueduct wiring — 3 actions per the original PhaseB3 list.
+  // Block 4: Aqueduct wiring, 3 actions per the original PhaseB3 list.
   const destData = cast(
     ['calldata', 'setAqueductOnDest(uint64,address)', ETH_SEPOLIA_SELECTOR, aqueductReceiver],
     { captureOutput: true },

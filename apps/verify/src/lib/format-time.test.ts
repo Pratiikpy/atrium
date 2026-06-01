@@ -15,7 +15,7 @@ import { parseTsOrNull, ago } from './format-time';
  *     s/m/h/d breakpoints).
  */
 
-describe('parseTsOrNull — strict numeric parse', () => {
+describe('parseTsOrNull, strict numeric parse', () => {
   it('rejects null', () => {
     expect(parseTsOrNull(null)).toBeNull();
   });
@@ -31,7 +31,7 @@ describe('parseTsOrNull — strict numeric parse', () => {
     expect(parseTsOrNull('abc')).toBeNull();
   });
   it('rejects trailing garbage (parseInt would accept)', () => {
-    // parseInt("123abc", 10) returns 123 — that's the lenient bug
+    // parseInt("123abc", 10) returns 123, that's the lenient bug
     // II-1 guards against.
     expect(parseTsOrNull('123abc')).toBeNull();
   });
@@ -64,7 +64,7 @@ describe('parseTsOrNull — strict numeric parse', () => {
   });
 });
 
-describe('ago — unit breakpoints', () => {
+describe('ago, unit breakpoints', () => {
   const fixedNow = 1_700_000_000; // unix seconds
 
   beforeEach(() => {

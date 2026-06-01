@@ -18,7 +18,7 @@ import { VenueMarginCompare } from './venue-margin-compare';
  * effect on the form's margin preview, the order book's symbol, or the
  * margin-impact panel's read. The hardcoded venue id `hl-hip3` wasn't
  * even valid (the real id is `hyperliquid`), so /api/trade/margin-impact
- * always 404'd to pending — selecting a venue did nothing because nothing
+ * always 404'd to pending, selecting a venue did nothing because nothing
  * was reading the chip.
  */
 export function TradeView() {

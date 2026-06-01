@@ -1,56 +1,54 @@
-# CODEOWNERS — review-required surface map.
+# CODEOWNERS: review-required surface map.
 #
-# Replace @atrium-protocol/founders with real GitHub usernames or team handles.
-# The current @atrium-protocol/founders is a placeholder — create this GitHub
-# team at https://github.com/orgs/atrium-protocol/teams and add members.
+# Owner handle is @Pratiikpy. Add more reviewers or a GitHub team here as the
+# team grows; required-reviewer branch protection enforces this list.
 #
-# F1 = contract + Stylus owner
-# F2 = off-chain services + frontend owner
-# F3 = ops, runbooks, security policy owner
+# Roles (for reference): contracts + Stylus; off-chain services + frontend;
+# ops, runbooks, security policy.
 
-# Contracts — F1 (chain + Stylus owner).
-/contracts/                @atrium-protocol/founders
-/script/                   @atrium-protocol/founders
-/foundry.toml              @atrium-protocol/founders
-/Cargo.toml                @atrium-protocol/founders
-/Cargo.lock                @atrium-protocol/founders
+# Contracts (chain + Stylus owner).
+/contracts/                @Pratiikpy
+/script/                   @Pratiikpy
+/foundry.toml              @Pratiikpy
+/Cargo.toml                @Pratiikpy
+/Cargo.lock                @Pratiikpy
 
-# Payment-critical middleware — requires two founders.
-/services/codex/middleware/ @atrium-protocol/founders
+# Payment-critical middleware.
+/services/codex/middleware/ @Pratiikpy
 
-# Off-chain services + API surface — F2.
-/services/                 @atrium-protocol/founders
-/apps/                     @atrium-protocol/founders
-/apps/verify/src/app/api/  @atrium-protocol/founders
+# Off-chain services + API surface.
+/services/                 @Pratiikpy
+/apps/                     @Pratiikpy
+/apps/verify/src/app/api/  @Pratiikpy
 
 # Subgraph manifest + handlers.
-/subgraph/                 @atrium-protocol/founders
+/subgraph/                 @Pratiikpy
 
 # CI + workflows.
-/.github/workflows/        @atrium-protocol/founders
+/.github/workflows/        @Pratiikpy
 
 # Runbooks + security policy + key rotation.
-/runbooks/                 @atrium-protocol/founders
-/SECURITY.md               @atrium-protocol/founders
-/docs/conventions/security.md @atrium-protocol/founders
+/runbooks/                 @Pratiikpy
+/SECURITY.md               @Pratiikpy
+/docs/conventions/security.md @Pratiikpy
 
-# docs/conventions/ — every founder reviews behavioral changes.
-/docs/conventions/         @atrium-protocol/founders
+# docs/conventions/ behavioral changes.
+/docs/conventions/         @Pratiikpy
 
-# Audit reports — sensitive, require review.
-/audits/                   @atrium-protocol/founders
+# Audit reports (sensitive, require review).
+/audits/                   @Pratiikpy
 
 # Incident post-mortems.
-/incidents/                @atrium-protocol/founders
+/incidents/                @Pratiikpy
 
 # Critical docs.
-/docs/architecture.md      @atrium-protocol/founders
-/docs/deployment.md        @atrium-protocol/founders
-/docs/MASTER_PLAN.md       @atrium-protocol/founders
+/docs/architecture.md      @Pratiikpy
+/docs/deployment.md        @Pratiikpy
+/docs/MASTER_PLAN.md       @Pratiikpy
 
 # Environment config.
-/.env.example              @atrium-protocol/founders
+/.env.example              @Pratiikpy
 
 # Build system.
-/Makefile                  @atrium-protocol/founders
-/docker-compose*.yml       @atrium-protocol/founders
+/Makefile                  @Pratiikpy
+/docker-compose*.yml       @Pratiikpy

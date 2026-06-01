@@ -12,18 +12,19 @@
  * private key never touches a shell arg or stdout. Re-runnable: skips claim if
  * the deployer is inside the 24h faucet cooldown and just deposits any balance.
  *
- * Usage: ATRIUM_KEYDIR=C:/Users/prate/.atrium node scripts/smoke-money-path.mjs
+ * Usage: ATRIUM_KEYDIR=<your-key-dir> node scripts/smoke-money-path.mjs
  */
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
-const CAST = process.env.CAST_BIN ?? (process.platform === 'win32' ? 'C:/Users/prate/.foundry/bin/cast.exe' : 'cast');
+const CAST = process.env.CAST_BIN ?? 'cast';
 
 const DEPLOYER = '0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42';
 const USDC = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';

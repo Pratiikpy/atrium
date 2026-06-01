@@ -1,4 +1,4 @@
-// Coffer — Atrium unified collateral vault
+// Coffer, Atrium unified collateral vault
 //
 // ERC-4626 tokenized vault that holds USDC and issues shares. Extends OZ Rust
 // ERC-4626 (verified at resources/rust-contracts-stylus/contracts/src/token/erc20/extensions/erc4626.rs).
@@ -132,7 +132,7 @@ sol_interface! {
 sol_storage! {
     #[entrypoint]
     pub struct Coffer {
-        // ERC-20 (shares token) — embedded directly per TDD §7.3
+        // ERC-20 (shares token), embedded directly per TDD §7.3
         mapping(address => uint256) share_balances;
         mapping(address => mapping(address => uint256)) share_allowances;
         uint256 total_shares;
@@ -156,7 +156,7 @@ sol_storage! {
         bool is_deposits_paused;
         bool is_withdrawals_paused;
 
-        // Circuit breaker — 1h TVL window
+        // Circuit breaker, 1h TVL window
         uint256 last_tvl_snapshot_wei;
         uint64 last_tvl_snapshot_time;
         uint16 tvl_drop_threshold_bps;       // 3000 (30%)
@@ -369,7 +369,7 @@ impl Coffer {
         // Check USDC isn't paused (M7 fix from TDD audit).
         // Phase theta.1 fix (2026-05-25): pre-fix `.unwrap_or(false)` silently
         // treated USDC as live when `paused()` reverted. A paused-USDC deposit
-        // would then attempt transferFrom which also reverts — but only AFTER
+        // would then attempt transferFrom which also reverts, but only AFTER
         // share-issuance math ran on stale state. New behavior: bubble the
         // RPC failure up as UsdcStateUnreadable, refuse to proceed.
         let usdc = IUsdc::new(self.asset.get());
@@ -387,7 +387,7 @@ impl Coffer {
         // Pull USDC
         //
         // Audit BBB-2 fix: prior code returned `CofferError::ZeroAssets` on
-        // transferFrom failure, which is misleading — the actual failure mode
+        // transferFrom failure, which is misleading, the actual failure mode
         // is "USDC.transferFrom returned false or reverted" (no allowance,
         // sender has insufficient balance, USDC contract paused). The shared
         // `TransferFailed` variant added in ZZ-5 now surfaces the real cause.
@@ -474,8 +474,8 @@ impl Coffer {
         // evasion vector: a user under pending liquidation could trigger a
         // Plinth call failure and withdraw their shares before Vigil seized.
         // Wave-A's Plinth.is_paused-check fix only addressed `adapter_pull`
-        // — withdraw kept the broken pattern. Eighth audit-trail-drift catch.
-        // Now: `map_err` to `PlinthUnreachable` (reused from KKK-3 — same
+        //, withdraw kept the broken pattern. Eighth audit-trail-drift catch.
+        // Now: `map_err` to `PlinthUnreachable` (reused from KKK-3, same
         // error semantics, same withdraw-side blocker). Fail loud, never
         // fail-open on safety-critical pause-state reads.
         let plinth = IPlinth::new(self.plinth_address.get());
@@ -486,7 +486,7 @@ impl Coffer {
             return Err(CofferError::PendingLiquidation(PendingLiquidation { user: owner }));
         }
 
-        // Audit FIRE78-COF1 fix: ERC-4626 spec — withdraw path rounds shares UP.
+        // Audit FIRE78-COF1 fix: ERC-4626 spec, withdraw path rounds shares UP.
         // Pre-fix used the round-down `convert_to_shares` which under-charged
         // share burns and let users accumulate free dust on repeated small
         // withdrawals. Now the user surrenders at least as many shares as
@@ -516,7 +516,7 @@ impl Coffer {
         //   `let _ = usdc.transfer(...)` which SILENTLY DISCARDED the result.
         // If USDC.transfer fails (e.g. USDC contract paused mid-tx, downstream
         // revert, balance race), the function still returned Ok(shares). The
-        // user's shares were already burned by this line — share burn
+        // user's shares were already burned by this line, share burn
         // committed, USDC transfer failed → permanent money loss.
         let usdc = IUsdc::new(self.asset.get());
         let ctx = Call::new_mutating(self);
@@ -575,7 +575,7 @@ impl Coffer {
         }
 
         // Phase 2a fix: gate adapter_pull behind withdrawals pause.
-        // Adapter pulls are economically equivalent to withdrawals — if
+        // Adapter pulls are economically equivalent to withdrawals, if
         // withdrawals are paused (e.g. during incident response), adapter
         // pulls must also be blocked to prevent collateral drain.
         if self.is_withdrawals_paused.get() {
@@ -656,7 +656,7 @@ impl Coffer {
     /// shares for the margin sent to a venue on open; without a symmetric
     /// re-credit on close, the returned collateral raises assets-per-share for
     /// every OTHER holder while the originating user is left with zero shares
-    /// for it — their own collateral is permanently transferred away.
+    /// for it, their own collateral is permanently transferred away.
     ///
     /// Called by the AtriumRouter (an approved orchestrator) AFTER the adapter
     /// has transferred the closing proceeds into Coffer, so `total_assets()`
@@ -684,7 +684,7 @@ impl Coffer {
 
         // The closing proceeds have already been transferred into Coffer, so
         // the live balance includes `amount`. Mint against the pre-return
-        // total to mirror the open-path burn exactly (floor division — never
+        // total to mirror the open-path burn exactly (floor division, never
         // over-mint, never dilute other holders).
         let total_now = self.total_assets();
         if total_now < amount {
@@ -744,7 +744,7 @@ impl Coffer {
         self.approved_adapters.getter(adapter).get()
     }
 
-    /// Unified pause — pauses both deposits and withdrawals. Audit G-6 fix:
+    /// Unified pause, pauses both deposits and withdrawals. Audit G-6 fix:
     /// PraetorTimelock.emergencyPause forwards `IPausable(target).pause(reason)`
     /// so every pausable Atrium contract must expose this uniform ABI.
     /// Accepts caller in {multisig, timelock}.
@@ -760,7 +760,7 @@ impl Coffer {
         Ok(())
     }
 
-    /// Emergency pause — multisig-only, instant (no timelock).
+    /// Emergency pause, multisig-only, instant (no timelock).
     pub fn pause_deposits(&mut self, reason: B256) -> Result<(), CofferError> {
         self.assert_praetor()?;
         self.is_deposits_paused.set(true);
@@ -801,7 +801,7 @@ impl Coffer {
         if caller != self.praetor_multisig.get() {
             return Err(CofferError::Unauthorized(UnauthorizedCaller { caller }));
         }
-        // Refuse the zero address — it would brick emergency pause forever.
+        // Refuse the zero address, it would brick emergency pause forever.
         if new_praetor.is_zero() {
             return Err(CofferError::Unauthorized(UnauthorizedCaller { caller: new_praetor }));
         }
@@ -978,7 +978,7 @@ mod tests {
         let ret = transferFromCall::abi_encode_returns(&success);
         vm.mock_call(usdc_addr(), data, U256::ZERO, Ok(ret));
     }
-    // Kept for the (un-mockable here) happy-path transfer leg — see the caveat
+    // Kept for the (un-mockable here) happy-path transfer leg, see the caveat
     // at the top of this module. Foundry e2e exercises USDC.transfer success.
     #[allow(dead_code)]
     fn mock_usdc_transfer(vm: &TestVM, to: Address, value: U256, success: bool) {
@@ -1015,7 +1015,7 @@ mod tests {
     }
 
     // =====================================================================
-    // ERC-4626 share math — deposit mints shares, supply is monotonic.
+    // ERC-4626 share math, deposit mints shares, supply is monotonic.
     // convert_to_shares is the exact function deposit() uses to size the mint,
     // so asserting its monotonic, positive behavior validates the mint logic
     // without needing the (un-mockable) full deposit success path.
@@ -1187,7 +1187,7 @@ mod tests {
         assert!(s_vic > U256::ZERO, "victim not griefed to 0 shares: {s_vic}");
 
         // And the victim's shares must redeem for a meaningful fraction of what
-        // they put in — bounded loss, not ~100% (the attack's goal).
+        // they put in, bounded loss, not ~100% (the attack's goal).
         // Simulate the victim's post-deposit redemption value.
         let new_supply = U256::from(1_000_000u64) + s_vic;
         let new_live = U256::from(1u64) + donation + victim_assets;
@@ -1306,7 +1306,7 @@ mod tests {
     // =====================================================================
     // Per-adapter per-block cap enforced on adapter_pull, and the budget
     // RESETS across blocks. The cap check runs after getAccount but before the
-    // USDC transfer, so an over-cap pull reverts AdapterCap with no transfer —
+    // USDC transfer, so an over-cap pull reverts AdapterCap with no transfer -
     // fully mockable (getAccount(not-paused) is the only call reached).
     // =====================================================================
     #[test]

@@ -3,7 +3,7 @@ import { PublicNav } from "./PublicNav";
 import { Footer } from "./Footer";
 
 /**
- * MarketingShell (Lovable port, 2026-05-28) — the unified marketing
+ * MarketingShell (Lovable port, 2026-05-28), the unified marketing
  * chrome for every public-facing page that ISN'T the landing page.
  * Wraps page content in PublicNav + Footer. Page content is
  * automatically placed inside a Lovable `.container` for consistent

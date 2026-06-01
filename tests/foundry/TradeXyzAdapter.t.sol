@@ -75,7 +75,7 @@ contract TradeXyzAdapterTest is Test {
     }
 
     function test_metadata_isHybridFalse() public view {
-        // Despite trade.xyz running on Hyperliquid, this adapter is non-hybrid —
+        // Despite trade.xyz running on Hyperliquid, this adapter is non-hybrid -
         // it goes through the on-chain HIP-3 clearinghouse contract, not an
         // off-chain attestation. attest_off_chain_state must therefore return false.
         assertFalse(adapter.isHybrid());
@@ -89,7 +89,7 @@ contract TradeXyzAdapterTest is Test {
         assertEq(inst[1], TSLA_PERP);
     }
 
-    // ── addInstrument() — timelock-only per F-32 (audit EEEEE-1) ─────
+    // ── addInstrument(), timelock-only per F-32 (audit EEEEE-1) ─────
 
     function test_addInstrument_rejectsHostileAndCoffer() public {
         vm.prank(hostile);
@@ -226,7 +226,7 @@ contract TradeXyzAdapterTest is Test {
 
         IPorticoAdapter.PositionView memory view_ = adapter.get_position(id);
         assertEq(view_.notional_signed, int256(-500e6));
-        // Deposit is abs(notional) per the contract — even a short position
+        // Deposit is abs(notional) per the contract, even a short position
         // requires collateral upstream.
         assertEq(clearinghouse.depositOf(user), 500e6);
     }
@@ -265,7 +265,7 @@ contract TradeXyzAdapterTest is Test {
         assertEq(pnl, int256(120e6));
 
         // Audit JJJ-12 fix: pre-fix the adapter withdrew only abs(notional)
-        // and discarded pnl — the user's profit stayed stranded in the
+        // and discarded pnl, the user's profit stayed stranded in the
         // clearinghouse forever. Now the withdraw is `supplied + pnl`, so a
         // +120e6 pnl on a 1_000e6 notional should withdraw 1_120e6.
         assertEq(clearinghouse.lastWithdrawAmount(), 1_120e6);
@@ -388,7 +388,7 @@ contract MockClearinghouse {
     function closePosition(address user, uint256) external returns (int256 realized_pnl) {
         // Audit JJJ-12 fix: real clearinghouse settles pnl into the user's
         // depositOf balance on close. Mock was previously `view` and skipped
-        // this step — fine when the adapter (incorrectly) withdrew only
+        // this step, fine when the adapter (incorrectly) withdrew only
         // `abs(notional)`, but breaks now that the adapter (correctly)
         // withdraws `(supplied + pnl)`. Credit/debit + clamp at zero.
         realized_pnl = _nextClosePnl;

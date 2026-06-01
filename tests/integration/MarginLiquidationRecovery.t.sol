@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title MarginLiquidationRecovery — integration test
+/// @title MarginLiquidationRecovery, integration test
 /// @notice Flow: open position via Router→Plinth→adapter, drift oracle to
 ///         liquidation, vigil-keeper queue + execute partial liquidation,
 ///         vault recovers collateral. Phase 2a partial-liquidation work.

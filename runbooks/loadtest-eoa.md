@@ -49,5 +49,5 @@ doppler secrets set LOADTEST_EOA_KEY=0x<private-key> \
 
 - NEVER use the deployer key (`DEPLOYER_PRIVATE_KEY`) for load testing
 - The loadtest wallet.ts will refuse to start if `LOADTEST_EOA_KEY` equals `DEPLOYER_PRIVATE_KEY`
-- Keep loadtest funds minimal — just enough for a test run
+- Keep loadtest funds minimal, just enough for a test run
 - Rotate after any suspected exposure

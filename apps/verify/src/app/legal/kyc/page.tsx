@@ -20,7 +20,7 @@ export default function KycPage() {
           <p className="mt-3">
             KYC is required only when you request an <strong>Edict tier upgrade</strong> to access
             jurisdiction-restricted venues (e.g. equity perps). Tier 0 (unrestricted venues) does
-            not require KYC. You are never forced to complete KYC — it is opt-in only.
+            not require KYC. You are never forced to complete KYC; it is opt-in only.
           </p>
         </section>
 
@@ -60,7 +60,7 @@ export default function KycPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Your Edict tier remains at 0 (unrestricted venues only).</li>
             <li>Restricted venues remain unavailable.</li>
-            <li>No penalty is applied — you may continue using tier-0 features normally.</li>
+            <li>No penalty is applied; you may continue using tier-0 features normally.</li>
           </ul>
         </section>
 
@@ -71,7 +71,7 @@ export default function KycPage() {
             <li>Request manual review by contacting{' '}
               <a href="mailto:privacy@atrium.fi" className="underline">privacy@atrium.fi</a>.
             </li>
-            <li>Human escalation available — response within 30 days.</li>
+            <li>Human escalation available: response within 30 days.</li>
           </ul>
         </section>
 

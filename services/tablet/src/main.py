@@ -1,4 +1,4 @@
-"""Tablet — tax export service.
+"""Tablet, tax export service.
 
 UK CGT (Month 8), US Form 8949 (Month 11), DE FIFO (Month 11).
 
@@ -56,12 +56,12 @@ async def health() -> HealthResponse:
 # Audit fix (FFF-7 pattern, iteration 26): pre-fix the address check was
 # `startswith("0x") and len == 42` which accepts non-hex (e.g. "0xZZZ...").
 # A non-hex address would get lowercased and forwarded to Scribe, which
-# returns an empty result set — the export would silently say "you have no
+# returns an empty result set, the export would silently say "you have no
 # trades this year." Real users could under-report (no tax owed) or over-
 # report (forced 0). Pin the hex character class.
 _ADDRESS_REGEX = re.compile(r"^0x[0-9a-fA-F]{40}$")
 
-# Same FFF-7 pattern for ISO dates — `datetime.fromisoformat` accepts many
+# Same FFF-7 pattern for ISO dates, `datetime.fromisoformat` accepts many
 # more shapes than the docstring claims ("2024-01-01", "20240101", with
 # timezones, etc.). The downstream `int(.timestamp())` is unaffected by
 # the format, but the response filename leaks the raw input via
@@ -87,7 +87,7 @@ async def export(
     scribe_url = os.environ.get("SCRIBE_URL")
     if not scribe_url:
         # Loud bail instead of KeyError → 500. Operator gets a clear 503.
-        raise HTTPException(503, "SCRIBE_URL not configured — tablet not ready")
+        raise HTTPException(503, "SCRIBE_URL not configured, tablet not ready")
 
     try:
         trades = await fetch_trades_for_year(
@@ -101,7 +101,7 @@ async def export(
         # operator-facing (it's already a curated subset of upstream state,
         # not a raw stack trace).
         raise HTTPException(502, f"Scribe upstream failed: {e}") from e
-    # The `else` branch below the if/elif chain was unreachable — Literal
+    # The `else` branch below the if/elif chain was unreachable, Literal
     # already enforces uk/us/de. Removed to avoid future confusion.
     if jurisdiction == "uk":
         report = calculate_uk_cgt(trades)
@@ -111,7 +111,7 @@ async def export(
         us_report = calculate_us_form_8949(trades)
         csv_text = to_form8949_csv(us_report)
         filename = f"atrium-us-8949-{address[:8]}.csv"
-    else:  # jurisdiction == "de" — Literal enforces this is the only remaining case
+    else:  # jurisdiction == "de", Literal enforces this is the only remaining case
         de_report = calculate_de_fifo(trades)
         csv_text = to_de_fifo_csv(de_report)
         filename = f"atrium-de-fifo-{address[:8]}.csv"

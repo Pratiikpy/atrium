@@ -12,7 +12,7 @@ The `CODEX_PAY_TO_ADDRESS` is the on-chain address that receives x402 USDC payme
    doppler secrets set CODEX_PAY_TO_ADDRESS=0x<address> \
      --project atrium --config staging --group codex
    ```
-3. Deploy the service — it will fail loudly at startup if the address is missing or invalid
+3. Deploy the service, it will fail loudly at startup if the address is missing or invalid
 
 ### Rotation Procedure
 
@@ -40,4 +40,4 @@ curl https://codex.atrium.fi/health
 
 - The pay-to address MUST be controlled by the Praetor multisig (not a single EOA)
 - Never use the deployer EOA as the pay-to address
-- The address is public (visible in x402 payment headers) — security comes from multisig control, not secrecy
+- The address is public (visible in x402 payment headers), security comes from multisig control, not secrecy

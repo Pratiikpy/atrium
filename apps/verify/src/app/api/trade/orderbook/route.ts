@@ -29,13 +29,13 @@ export async function GET(req: NextRequest) {
     const askPx = asks[0] ? parseFloat(asks[0].price) : NaN;
     const mid = Number.isFinite(bidPx) && Number.isFinite(askPx)
       ? ((bidPx + askPx) / 2).toFixed(2)
-      : '—';
+      : '-';
     // Iteration 40 audit fix: pre-fix returned midDelta24h:'0.00' and
     // midDeltaDirection:'flat' as hardcoded constants. There is no 24h-
-    // delta computation in this route — the values were never sourced from
+    // delta computation in this route, the values were never sourced from
     // anywhere. The UI rendered "$X 0.00 · 24h" implying a measured
     // no-change. Now: null in both fields when unmeasured. The component
-    // handles null with "—" instead of fake-zero. Once a 24h-delta source
+    // handles null with "-" instead of fake-zero. Once a 24h-delta source
     // lands (HL info feed has a 24h-price endpoint), wire it here and
     // both fields become real measurements.
     return NextResponse.json({
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json({
       symbol,
-      midPrice: '—',
+      midPrice: '-',
       midDelta24h: null,
       midDeltaDirection: null,
       bids: [],

@@ -13,7 +13,7 @@ import { gql } from '@/lib/scribe-helpers';
  *   v.agent.toLowerCase())` threw TypeError on null Scribe fields
  *   (real during schema rollovers / partial sync). The route's
  *   catch then swallowed the throw and the WHOLE response went
- *   pending — even though most rows were valid. Fix: typeof === 'string'
+ *   pending, even though most rows were valid. Fix: typeof === 'string'
  *   guard, count only valid rows, drop the bad ones.
  * - JJ-7: activeSessionKeys is a Postern concept (ERC-7715 session
  *   keys), distinct from Sigil mandates. Pre-fix both fields
@@ -21,7 +21,7 @@ import { gql } from '@/lib/scribe-helpers';
  *   Postern subgraph entity exists.
  * - iter-37: agentsCopied / agentsByVenues / feesPaidUsd / feeAgentsCount
  *   were hardcoded to 0 in both success AND pending paths. The
- *   client (stat-row.tsx) had `data?.field ?? '—'` which returns 0
+ *   client (stat-row.tsx) had `data?.field ?? '-'` which returns 0
  *   for non-nullish values → UI rendered "0 agents copied" as if
  *   measured. Fix: null in both paths.
  * - iter-37 (critical UX): activeMandates=null in the catch path.
@@ -37,12 +37,12 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/agents/summary — JJ-6 null-agent type-guard', () => {
+describe('GET /api/agents/summary, JJ-6 null-agent type-guard', () => {
   it('counts only string-typed agents from sigilValidations', async () => {
     (gql as any).mockResolvedValue({
       sigilValidations: [
         { agent: '0xaa' },
-        { agent: null }, // bad row — dropped
+        { agent: null }, // bad row, dropped
         { agent: '0xbb' },
         { agent: '0xcc' },
       ],
@@ -85,7 +85,7 @@ describe('GET /api/agents/summary — JJ-6 null-agent type-guard', () => {
   });
 });
 
-describe('GET /api/agents/summary — JJ-7 + iter-37 honesty nulls', () => {
+describe('GET /api/agents/summary, JJ-7 + iter-37 honesty nulls', () => {
   it('returns activeSessionKeys:null in success path (JJ-7)', async () => {
     (gql as any).mockResolvedValue({
       sigilValidations: [{ agent: '0xaa' }],
@@ -128,12 +128,12 @@ describe('GET /api/agents/summary — JJ-7 + iter-37 honesty nulls', () => {
   });
 });
 
-describe('GET /api/agents/summary — iter-37 catch-path UX safety (NO false zero)', () => {
+describe('GET /api/agents/summary, iter-37 catch-path UX safety (NO false zero)', () => {
   it('returns activeMandates:NULL on Scribe failure (NOT 0)', async () => {
     // The load-bearing UX-safety assertion. Pre-iter-37 the catch
     // returned activeMandates:0 → users with real mandates saw "0
     // active mandates" during a Scribe outage and could panic-press
-    // Kill Switch. Null = "we don't know" = UI renders "—" + pending.
+    // Kill Switch. Null = "we don't know" = UI renders "-" + pending.
     (gql as any).mockRejectedValue(new Error('Scribe 503'));
     const { GET } = await import('./route');
     const json = await (await GET()).json();

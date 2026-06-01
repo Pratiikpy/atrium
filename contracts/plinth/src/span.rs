@@ -1,4 +1,4 @@
-// SPAN-style margin computation — pure functions, Kani-verifiable
+// SPAN-style margin computation, pure functions, Kani-verifiable
 //
 // Simplified SPAN: for each correlation class, compute net exposure under a
 // fixed set of price-shock scenarios, take the worst-case loss, then sum
@@ -120,7 +120,7 @@ fn position_pnl_under_price(p: &PositionView, shocked_price: U256) -> I256 {
 }
 
 // =============================================================================
-// Kani harnesses — formal verification of SPAN invariants
+// Kani harnesses, formal verification of SPAN invariants
 // =============================================================================
 #[cfg(kani)]
 mod kani_proofs {

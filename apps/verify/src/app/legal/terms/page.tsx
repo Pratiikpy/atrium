@@ -28,7 +28,7 @@ export default function TermsPage() {
 
         <Section title="1. Service definition">
           <p>
-            Atrium provides &ldquo;Verifier Mode&rdquo; — a web interface for interacting with
+            Atrium provides &ldquo;Verifier Mode&rdquo;, a web interface for interacting with
             testnet smart contracts deployed on Arbitrum Sepolia. Version 1 is <strong>testnet-only</strong>.
             No real funds are involved. Tokens used are testnet USDC with no monetary value.
           </p>
@@ -127,7 +127,7 @@ export default function TermsPage() {
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
             <li>Cuba, Iran, North Korea, Syria, Crimea region</li>
             <li>Any jurisdiction added to the OFAC SDN list</li>
-            <li>Additional restrictions per Edict contract — see live list on-chain</li>
+            <li>Additional restrictions per Edict contract: see live list on-chain</li>
           </ul>
         </Section>
 

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 5 — Kill Switch.
+ * Journey 5, Kill Switch.
  *
  * Per TDD §9.5 + PRD §22.7: one-tap revoke of every active Sigil mandate
  * AND every active Postern session key in a single batched transaction.
@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  * Real DOM (verified against `verifier-step-runner.tsx` lines around handleRun):
  *   - The primary button is "Run step 7" (NOT "Kill Switch" or "Trigger")
  *     because all 7 steps share the same component
- *   - Kill Switch confirmation uses `window.confirm()` — a NATIVE browser
+ *   - Kill Switch confirmation uses `window.confirm()`, a NATIVE browser
  *     dialog, not a DOM element. So we listen via `page.on('dialog', ...)`
  *     rather than `getByRole('dialog')`.
  *   - The confirm message must mention BOTH "revoke" and "cannot be undone"
@@ -18,13 +18,13 @@ import { test, expect } from '@playwright/test';
  */
 const MODE = process.env.E2E_MODE ?? 'local';
 
-test.describe('Journey 5 — Kill Switch', () => {
+test.describe('Journey 5, Kill Switch', () => {
   test('Kill Switch surfaces on the app dashboard @critical @mobile', async ({ page }) => {
     // /app redirects to /app/portfolio. On DESKTOP the always-visible kill
     // switch surface is the "Emergency stop" card (see
     // components/portfolio/emergency-stop-card.tsx). On MOBILE that card is
     // `hidden md:block`, so the only mobile kill-switch entry point is the
-    // KillSwitchFAB — which returns null until a wallet is connected
+    // KillSwitchFAB, which returns null until a wallet is connected
     // (kill-switch-mobile.tsx: `if (!wallet) return null`). This @mobile test
     // therefore needs the wallet harness to surface the FAB on the iPhone
     // project. (Desktop dashboard coverage lives in the non-@mobile test
@@ -35,7 +35,7 @@ test.describe('Journey 5 — Kill Switch', () => {
     await expect(killSwitch).toBeVisible();
   });
 
-  test('Verifier step 7 — Kill Switch — renders the batched-revoke description @critical', async ({ page }) => {
+  test('Verifier step 7, Kill Switch, renders the batched-revoke description @critical', async ({ page }) => {
     await page.goto('/verify/7');
     await expect(page.getByRole('heading', { name: /kill switch revoke/i })).toBeVisible();
     // Honesty: copy names BOTH things it revokes.
@@ -66,10 +66,10 @@ test.describe('Journey 5 — Kill Switch', () => {
     });
 
     // Gated: the "Run step 7" button only renders after a wallet is
-    // connected — VerifierStepRunner shows the "Connect with Postern" empty
+    // connected, VerifierStepRunner shows the "Connect with Postern" empty
     // state otherwise (verifier-step-runner.tsx). So the confirm flow is
     // unreachable in local mode. NOTE for the sepolia path: the confirm is
-    // no longer a native window.confirm() — A11Y-13 replaced it with an
+    // no longer a native window.confirm(), A11Y-13 replaced it with an
     // accessible DOM <ConfirmModal> (role=dialog), whose description names
     // BOTH "revoke" and "cannot be undone". The page.on('dialog', ...) probe
     // below is therefore stale and must be rewired to the modal before this
@@ -104,7 +104,7 @@ test.describe('Journey 5 — Kill Switch', () => {
     expect(unexpectedDialog).toBe(false);
   });
 
-  test('No "Next step" link on step 7 — it is the terminal step @critical', async ({ page }) => {
+  test('No "Next step" link on step 7, it is the terminal step @critical', async ({ page }) => {
     await page.goto('/verify/7');
     // STEP_CONFIG['7'].nextStep = null. Locks the demo end-state.
     const nextLink = page.locator('a', { hasText: /next step/i });

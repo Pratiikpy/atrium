@@ -15,7 +15,7 @@ import { useContractAddress } from '@/lib/use-coffer-address';
  *  - Sigil contract not deployed → 'sigil_not_deployed'
  *  - Wallet not connected → 'wallet_not_connected'
  *  - Already revoked → contract reverts with 'already_revoked' (Sigil
- *    treats this idempotently — the second call is harmless)
+ *    treats this idempotently, the second call is harmless)
  *  - Wallet rejects → wallet error message
  *
  * The kill-switch path (revoke-all) uses a different hook

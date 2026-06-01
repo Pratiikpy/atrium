@@ -14,7 +14,7 @@ import { humanizeWalletError } from '@/lib/humanize-wallet-error';
  * tx link on success. Errors render with the wallet's actual message.
  *
  * Phase theta audit follow-up (2026-05-25): the hook + UI used to ask
- * for share-count input and call `redeem` — Coffer doesn't export
+ * for share-count input and call `redeem`, Coffer doesn't export
  * `redeem`, only `withdraw`. UI now asks for USDC amount; the contract
  * computes the share burn via convert_to_shares_ceil (round-up so the
  * user surrenders at least as many shares as the assets they take).

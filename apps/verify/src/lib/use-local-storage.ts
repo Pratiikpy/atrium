@@ -40,7 +40,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T): [T, (v: T) => 
       try {
         localStorage.setItem(key, JSON.stringify(v));
       } catch {
-        // quota exceeded or private mode — fail silently
+        // quota exceeded or private mode, fail silently
       }
       notify();
     },

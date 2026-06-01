@@ -1,5 +1,5 @@
 /**
- * Auspex tick — basis-trade agent (Phase 6).
+ * Auspex tick, basis-trade agent (Phase 6).
  *
  * Reads perp funding rate from Hyperliquid testnet, T-bill yield from
  * Aave-Horizon. Opens hedged pair when funding > yield + 200bps.

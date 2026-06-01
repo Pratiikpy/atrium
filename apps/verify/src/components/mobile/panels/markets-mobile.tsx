@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * MarketsMobile — Mobile venue browser.
+ * MarketsMobile, Mobile venue browser.
  * Reads canonical VENUES list. 44px touch targets, 88px cards, sheet modal on tap.
  */
 
@@ -29,16 +29,16 @@ export function MarketsMobile() {
       const r = await fetch(walletQuery('/api/protocol/venues', wallet));
       if (!r.ok) throw new Error(`venues_${r.status}`);
       const j = await r.json();
-      return j.venues ?? VENUES.map(v => ({ id: v.id, status: 'live' as const, tvl: '—' }));
+      return j.venues ?? VENUES.map(v => ({ id: v.id, status: 'live' as const, tvl: '-' }));
     },
     refetchInterval: 60_000,
   });
 
-  // Error state (distinct from empty — E2E-47)
+  // Error state (distinct from empty, E2E-47)
   if (error) {
     return (
       <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load — retry</p>
+        <p className="text-[16px] text-neg">Could not load, retry</p>
         <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
           Retry
         </button>
@@ -83,7 +83,7 @@ export function MarketsMobile() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="truncate text-[16px] text-mob-ink">{venue.label}</p>
-              <p className="text-[14px] text-mob-muted">TVL: {vs?.tvl ?? '—'}</p>
+              <p className="text-[14px] text-mob-muted">TVL: {vs?.tvl ?? '-'}</p>
             </div>
             <StatusPill status={vs?.status ?? 'live'} />
             <span className="text-mob-muted text-[18px]">›</span>

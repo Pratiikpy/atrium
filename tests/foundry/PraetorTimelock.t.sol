@@ -51,7 +51,7 @@ contract PraetorTimelockTest is Test {
     function test_execute_revertsBeforeTimelock() public {
         // Audit V-C2 fix: read `scheduledAt` from the contract instead of
         // trusting `uint64(block.timestamp)` to match the timestamp captured
-        // inside `schedule()`. The contract is the source of truth — using
+        // inside `schedule()`. The contract is the source of truth, using
         // the contract's recorded value removes any drift between the test's
         // local view of block.timestamp and what `schedule()` snapshotted.
         bytes memory data = abi.encodeWithSelector(MockPausable.setN.selector, uint256(7));
@@ -93,7 +93,7 @@ contract PraetorTimelockTest is Test {
         timelock.execute(address(target), data, scheduledAt);
 
         vm.prank(multisig);
-        // second execute must fail — `executed[id]` is now set.
+        // second execute must fail, `executed[id]` is now set.
         vm.expectRevert(abi.encodeWithSelector(PraetorTimelock.AlreadyExecuted.selector, id));
         timelock.execute(address(target), data, scheduledAt);
     }
@@ -117,7 +117,7 @@ contract PraetorTimelockTest is Test {
     /// Iter 57 audit fix: pin the FIRE77-PT2 cancel-after-execute revert.
     /// Per PraetorTimelock.sol:83-87, a multisig that called execute and
     /// THEN called cancel on the same id would, pre-fix, have silently
-    /// emitted both Executed AND Cancelled events on the same id —
+    /// emitted both Executed AND Cancelled events on the same id -
     /// polluting the audit trail. The fix reverts with AlreadyExecuted.
     /// Without this test, a refactor stripping the `if (executed[id]) revert`
     /// guard would re-introduce the silent-failure path with no CI signal.
@@ -144,7 +144,7 @@ contract PraetorTimelockTest is Test {
 
     /// Iter 57 audit fix: pin the NotScheduled revert path on `cancel`.
     /// A multisig that calls cancel with the wrong id (typo, off-by-one
-    /// nonce, copy-paste from another schedule) must revert loudly —
+    /// nonce, copy-paste from another schedule) must revert loudly -
     /// otherwise nothing happens and the operator may believe the cancel
     /// landed. This branch existed at PraetorTimelock.sol:82 but had no
     /// test enforcing it.
@@ -157,7 +157,7 @@ contract PraetorTimelockTest is Test {
 
     /// Iter 57 audit fix: pin that successful cancel emits Cancelled. The
     /// existing test_cancel_onlyMultisig checks the scheduledAt reset but
-    /// not the event — and the subgraph (Scribe) listens on Cancelled to
+    /// not the event, and the subgraph (Scribe) listens on Cancelled to
     /// flag aborted parameter changes for the ops dashboard. If a future
     /// refactor dropped the emit, the dashboard would silently fall out
     /// of sync with on-chain state.
@@ -183,7 +183,7 @@ contract PraetorTimelockTest is Test {
 
     function test_schedule_emitsScheduled_iter90() public {
         // Scheduled is the canonical Praetor audit-trail event. Every
-        // parameter change starts with a Scheduled emit — without test
+        // parameter change starts with a Scheduled emit, without test
         // coverage, a dropped emit would silently make every multisig
         // action invisible to Scribe's audit-log indexer.
         bytes memory data = abi.encodeWithSelector(MockPausable.setN.selector, uint256(7));
@@ -217,7 +217,7 @@ contract PraetorTimelockTest is Test {
     }
 
     function test_emergencyPause_emitsEmergencyPaused_iter90() public {
-        // Emergency pause is the "instant action" path — no timelock
+        // Emergency pause is the "instant action" path, no timelock
         // window. The emit signals ops alerts (PagerDuty/Discord), so
         // dropped-emit would silently disable the alert channel for
         // exactly the worst time (a real emergency).
@@ -252,7 +252,7 @@ contract PraetorTimelockTest is Test {
     // Executed, flip executed[id] = true. No state change anywhere; the
     // dashboard reports success.
     //
-    // Pre-LLL-5: same for emergencyPause — IPausable(EOA).pause() compiles
+    // Pre-LLL-5: same for emergencyPause, IPausable(EOA).pause() compiles
     // to a low-level call which returns (true, "") on an EOA. Operators
     // see the EmergencyPaused event and think the subsystem is paused.
     //
@@ -287,7 +287,7 @@ contract PraetorTimelockTest is Test {
         timelock.emergencyPause(eoaTarget, "drill");
 
         // The MockPausable target deployed in setUp must NOT have been
-        // flipped to paused — the wrong-address call hit nothing.
+        // flipped to paused, the wrong-address call hit nothing.
         assertFalse(target.isPaused(), "LLL-5: typo'd target must NOT flip a different contract");
     }
 

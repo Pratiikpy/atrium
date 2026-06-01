@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @title Faucet — onboarding drop for testnet users
+/// @title Faucet, onboarding drop for testnet users
 /// @notice Each address can claim once per `cooldown` seconds. Drops a fixed
 ///         amount of USDC (the Atrium collateral asset on Sepolia) plus a
 ///         small ETH grant so the wallet has gas for follow-up transactions.

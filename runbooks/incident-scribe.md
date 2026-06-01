@@ -38,7 +38,7 @@ state.
 | Symptom | Fix | Rollback safe? |
 |---|---|---|
 | Handler crashed on one event | Patch `subgraph/src/<entity>.ts`; bump version; `pnpm subgraph:deploy` | yes (subgraph is independent of chain) |
-| Indexer slow but no errors | Wait — Graph Studio sometimes throttles free-tier indexing | yes |
+| Indexer slow but no errors | Wait, Graph Studio sometimes throttles free-tier indexing | yes |
 | `SCRIBE_URL` pinned to an old version | Update every Vercel + GHA env that reads `SCRIBE_URL` to the current `v0.0.X` | yes |
 | Subgraph dropped / unavailable | Redeploy the same version; update env vars if the URL changed | yes |
 
@@ -53,4 +53,4 @@ state.
 ## Escalation contacts
 
 - On-call frontend (subgraph owner) per `runbooks/on-call-rotation.md`
-- The Graph Studio support (free tier — best-effort SLA)
+- The Graph Studio support (free tier, best-effort SLA)

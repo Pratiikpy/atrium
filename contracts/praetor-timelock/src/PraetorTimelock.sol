@@ -52,7 +52,7 @@ contract PraetorTimelock {
     }
 
     constructor(address _multisig) {
-        // Audit DDD-5 fix: zero-address multisig would brick the timelock —
+        // Audit DDD-5 fix: zero-address multisig would brick the timelock -
         // no onlyMultisig call could ever succeed. Deploy-script-typo guard.
         require(_multisig != address(0), "zero multisig");
         multisig = _multisig;
@@ -76,7 +76,7 @@ contract PraetorTimelock {
         uint64 ready_at = scheduled_timestamp + TIMELOCK_DURATION;
         if (block.timestamp < ready_at) revert TimelockNotExpired(ready_at, uint64(block.timestamp));
 
-        // Audit LLL-4 fix: low-level call on EOA returns (true, "") — without
+        // Audit LLL-4 fix: low-level call on EOA returns (true, ""), without
         // this check, a typo'd target would emit Executed and flip executed[]
         // without changing any state.
         if (target.code.length == 0) revert TargetNotAContract(target);

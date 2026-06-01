@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title HedgedPairMarginSavings — integration test
+/// @title HedgedPairMarginSavings, integration test
 /// @notice Open long perp + long T-bills via Router.openHedgedPair (Phase 8).
 ///         Assert SPAN-net required margin < sum of isolated margins.
 ///         Proves the value prop of cross-venue portfolio margin.
@@ -126,7 +126,7 @@ contract HedgedPairMarginSavingsTest is Test {
     }
 
     function test_unhedgedPosition_noDiscount() public {
-        // Single perp position — no hedge discount
+        // Single perp position, no hedge discount
         MockSPANEngine.Position[] memory positions = new MockSPANEngine.Position[](1);
         positions[0] = MockSPANEngine.Position(keccak256("ETH-USD-PERP"), 100_000e6, 10_000e6);
 
@@ -135,7 +135,7 @@ contract HedgedPairMarginSavingsTest is Test {
     }
 
     function test_hedgeDiscount_onlyForLongPerpPlusLongTbill() public {
-        // Short perp + long T-bill — not a recognized hedge pair in this model
+        // Short perp + long T-bill, not a recognized hedge pair in this model
         MockSPANEngine.Position[] memory positions = new MockSPANEngine.Position[](2);
         positions[0] = MockSPANEngine.Position(keccak256("ETH-USD-PERP"), -100_000e6, 10_000e6);
         positions[1] = MockSPANEngine.Position(keccak256("US-TBILL-6M"), 100_000e6, 2_000e6);

@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import "forge-std/Test.sol";
 import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdapter.sol";
 
-/// @title IPorticoAdapterConformance — abstract conformance suite
+/// @title IPorticoAdapterConformance, abstract conformance suite
 /// @notice 6 tests every IPorticoAdapter must pass. Concrete adapter test
 ///         contracts inherit this and call setUp_conformance in their setUp().
 ///         Per FULL_AUDIT #52, L-10.
@@ -51,7 +51,7 @@ abstract contract IPorticoAdapterConformance is Test {
 
     /// @notice Paused adapter must block open_position
     function test_conformance_paused_blocks_open() external {
-        // Attempt to pause via timelock — adapters expose pause(bytes32)
+        // Attempt to pause via timelock, adapters expose pause(bytes32)
         // If the adapter doesn't have pause, this test is skipped via try/catch
         (bool success,) = address(adapter).call(
             abi.encodeWithSignature("pause(bytes32)", bytes32("conformance-test"))

@@ -29,8 +29,8 @@ export function ConnectWallet({
   // In an E2E build (NEXT_PUBLIC_E2E=1) the funded-key / mock connector is
   // spread first in wagmiConfig and MUST be the one used; preferring injected
   // there would break the headless real-tx flow. In a normal build, prefer an
-  // injected browser wallet (MetaMask/Rabby) — what most users + judges have,
-  // and what dappwright drives — falling back to the first real connector.
+  // injected browser wallet (MetaMask/Rabby), what most users + judges have,
+  // and what dappwright drives, falling back to the first real connector.
   const isE2E = process.env.NEXT_PUBLIC_E2E === '1';
   const injectedConnector = connectors.find((c) => c.type === 'injected' || c.id === 'injected');
   const coinbaseConnector = connectors.find((c) => c.id === 'coinbaseWalletSDK' || c.id === 'coinbaseWallet');

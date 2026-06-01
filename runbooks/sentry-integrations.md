@@ -1,6 +1,6 @@
 # Sentry Integrations
 
-Phase 12 — Discord + Slack webhook setup for Sentry critical error alerts.
+Phase 12, Discord + Slack webhook setup for Sentry critical error alerts.
 
 ## Discord Integration
 

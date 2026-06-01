@@ -2,7 +2,7 @@
   "name": "@atrium/verify",
   "version": "0.1.0",
   "private": true,
-  "description": "Atrium Verifier Mode — the judge-facing scripted demo surface",
+  "description": "Atrium Verifier Mode, the judge-facing scripted demo surface",
   "scripts": {
     "dev": "next dev --turbo --port 3000",
     "prebuild": "node ../../scripts/download-fonts.mjs && node scripts/build-audit-findings.mjs && node scripts/build-runbooks.mjs",

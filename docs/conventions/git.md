@@ -117,7 +117,7 @@ If you must run a destructive command, list the alternatives first and wait for 
 - Tag annotated with release notes:
 
 ```
-v0.2.0 — plinth dual oracle
+v0.2.0, plinth dual oracle
 
 Highlights:
 - Median(Chainlink, Pyth) with 50bps tolerance

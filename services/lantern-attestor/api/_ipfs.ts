@@ -9,7 +9,7 @@ import type { Tree } from './_merkle.js';
  * (UUU-2). If/when the LanternAttestor contract extension (human_left.md
  * #25) starts carrying the CID on-chain, an unvalidated malformed CID
  * would propagate from this service to the indexer to the UI to the IPFS
- * gateway — the same SSRF surface. Validate at the source.
+ * gateway, the same SSRF surface. Validate at the source.
  */
 const CID_REGEX = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{58,127})$/;
 const PIN_TIMEOUT_MS = 30_000;
@@ -50,7 +50,7 @@ export async function pinTreeToIpfs(tree: Tree): Promise<string> {
   const json = (await r.json()) as { cid?: unknown };
   // Audit XXX-3 fix: validate the returned CID shape before propagating.
   // A malformed CID reaching downstream consumers would be the same SSRF
-  // surface as UUU-2 / R-1 — keep this check in sync with those regexes.
+  // surface as UUU-2 / R-1, keep this check in sync with those regexes.
   if (typeof json.cid !== 'string' || !CID_REGEX.test(json.cid)) {
     throw new Error(`web3.storage returned malformed CID: ${typeof json.cid}`);
   }

@@ -1,5 +1,5 @@
 /**
- * Strict origin allowlist — Phase 3 hardening.
+ * Strict origin allowlist: Phase 3 hardening.
  *
  * Replaces the loose `*.vercel.app` wildcard that previously allowed any
  * Vercel preview deployment to call sensitive routes (chaos, etc.).
@@ -14,7 +14,7 @@ const STATIC_ORIGINS = [
 
 const PREVIEW_REGEX = new RegExp(
   process.env.ATRIUM_ALLOWED_PREVIEW_REGEX ??
-    '^https:\\/\\/atrium-verify-[a-z0-9-]+-(atrium|prateekkumar)\\.vercel\\.app$',
+    '^https:\\/\\/atrium-verify-[a-z0-9-]+-(atrium)\\.vercel\\.app$',
 );
 
 export function isAllowedOrigin(origin: string | null): boolean {

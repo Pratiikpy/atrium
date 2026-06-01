@@ -3,12 +3,12 @@ pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
 
-/// @title Atrium Phase-B.3 — post-deploy admin wiring (timelock-gated)
+/// @title Atrium Phase-B.3, post-deploy admin wiring (timelock-gated)
 /// @notice After Plinth + adapters are live the chain needs:
 ///         1. PorticoRegistry.registerAdapter(venue_id, adapter, bytecode_hash, major)
-///            for each of the 9 adapters — gated by PraetorTimelock (48 h).
+///            for each of the 9 adapters, gated by PraetorTimelock (48 h).
 ///         2. Aqueduct.setAqueductOnDest(chain_selector, address) for each
-///            destination chain we want to bridge to — timelock-gated.
+///            destination chain we want to bridge to, timelock-gated.
 ///         3. AqueductReceiver.setAllowedSource(chain_selector, source_aqueduct)
 ///            on the destination chains.
 ///         4. Aqueduct.setClaimbackRegistry(claimback_addr).
@@ -30,7 +30,7 @@ contract PhaseB3AdminWiring is Script {
     address constant AQUEDUCT_CLAIMBACK   = 0x4d441FCA986d51D17C71f979814E2A492A429382;
 
     // === Adapter registry (venue_id ↔ address) ===
-    // Venue IDs match `ATRIUM_PRD.md §17` — see PorticoRegistry.adapters_by_venue.
+    // Venue IDs match `ATRIUM_PRD.md §17`, see PorticoRegistry.adapters_by_venue.
     address constant ADAPTER_HYPERLIQUID  = 0x87014fbaCe9AdE49BF923bcFAE74b4C858CF371E;
     address constant ADAPTER_AAVE         = 0xE991eC988a62bcc38740f8B8C549E5400dED8D5D;
     address constant ADAPTER_PENDLE       = 0x54a1Bc2c5c73cC531035B0f008c8A252A02Daf7d;
@@ -48,7 +48,7 @@ contract PhaseB3AdminWiring is Script {
     /// Print every schedule/execute call as ABI-encoded calldata. The
     /// multisig operator paste-runs each into the Gnosis Safe transaction
     /// builder. Two passes are needed per action (schedule, then execute
-    /// after 48 h) — calldata is the same shape.
+    /// after 48 h), calldata is the same shape.
     function encode() external view {
         // -- Portico whitelisting -----------------------------------------
         // registerAdapter(uint8 venue, address adapter, bytes32 codehash, uint256 major)
@@ -66,7 +66,7 @@ contract PhaseB3AdminWiring is Script {
         _printRegister(10, ADAPTER_MORPHO,     "Morpho Blue");
 
         // -- Aqueduct cross-chain wiring ----------------------------------
-        // setAqueductOnDest(uint64, address) — for now, point both
+        // setAqueductOnDest(uint64, address), for now, point both
         // testnet destinations at the same address (deploy the receiver
         // pair on each destination chain in a follow-up).
         console.log("");

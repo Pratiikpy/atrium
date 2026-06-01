@@ -6,7 +6,7 @@ import {PosternKeyRegistry} from "../../contracts/postern-kill-switch/src/Poster
 
 /// @title PosternKeyRegistry foundry test suite
 /// @notice Without this registry Kill Switch cannot enumerate "all active session
-///         keys" to revoke them — ERC-7715 has no native enumeration. The judge
+///         keys" to revoke them, ERC-7715 has no native enumeration. The judge
 ///         demo path is:
 ///           1. user (or their Postern wallet) calls recordIssued() at grant time
 ///           2. KillSwitch calls markAllRevoked() to clear every active key in one tx
@@ -138,7 +138,7 @@ contract PosternKeyRegistryTest is Test {
     // ── cleanExpired() ───────────────────────────────────────────────
 
     function test_cleanExpired_anyoneCanPrune() public {
-        // Cleaner pattern — anyone can pay gas to prune expired keys.
+        // Cleaner pattern, anyone can pay gas to prune expired keys.
         address keyShort = makeAddr("expiring-soon");
         address keyLong = makeAddr("expiring-later");
 
@@ -153,7 +153,7 @@ contract PosternKeyRegistryTest is Test {
         vm.expectEmit(true, true, false, false, address(registry));
         emit SessionKeyExpiredCleaned(user, keyShort);
 
-        // Hostile can prune — no caller gate.
+        // Hostile can prune, no caller gate.
         vm.prank(hostile);
         registry.cleanExpired(user);
 
@@ -217,7 +217,7 @@ contract PosternKeyRegistryTest is Test {
 
     // ── Audit MMM-10 lock: constructor zero-check ────────────────────
     // Without this guard, deploying with `address(0)` for the kill-switch
-    // dep would brick `markAllRevoked` forever — the registry can never
+    // dep would brick `markAllRevoked` forever, the registry can never
     // bulk-revoke session keys, defeating the Postern emergency design.
 
     function test_constructor_revertsOnZeroKillSwitch_MMM10() public {

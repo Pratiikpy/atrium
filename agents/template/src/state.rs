@@ -37,10 +37,10 @@ impl AgentState {
 
     pub fn save(&self) -> Result<()> {
         // Audit OOOO-1 fix: atomic write pattern matching deploy.rs I-10.
-        // Pre-fix `std::fs::write` was non-atomic — a crash mid-write would
+        // Pre-fix `std::fs::write` was non-atomic, a crash mid-write would
         // leave a partial JSON file that fails to parse on next load_or_init,
         // forcing the agent to re-init from empty (losing price history +
-        // decision log). Same partial-coverage drift as MMMM-1/NNNN-1 — the
+        // decision log). Same partial-coverage drift as MMMM-1/NNNN-1, the
         // atomic-write fix landed in one place but not another. Tmp-file +
         // rename is atomic on POSIX (and effectively atomic on Windows for
         // small files).

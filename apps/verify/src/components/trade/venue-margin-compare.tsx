@@ -220,7 +220,7 @@ function Drawer({
                       </td>
                       <td className="px-3 py-2.5 text-right font-mono text-muted">{r.haircutPct}%</td>
                       <td className="px-3 py-2.5 text-right font-mono text-ink">
-                        {r.impact.initialMarginUsd ?? '—'}
+                        {r.impact.initialMarginUsd ?? '-'}
                       </td>
                     </tr>
                   ))}

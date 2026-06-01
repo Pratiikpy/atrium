@@ -25,7 +25,7 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/transfer/last — empty / pending', () => {
+describe('GET /api/transfer/last, empty / pending', () => {
   it('returns the 4-step pending shape when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');
@@ -53,7 +53,7 @@ describe('GET /api/transfer/last — empty / pending', () => {
   });
 });
 
-describe('GET /api/transfer/last — lifecycle status', () => {
+describe('GET /api/transfer/last, lifecycle status', () => {
   function makeCredit(overrides: Partial<{ id: string; isSettled: boolean; isClaimedBack: boolean; amountWei: string; createdAtBlock: string; settledAtBlock: string | null }> = {}) {
     return {
       id: '0xtxhash',

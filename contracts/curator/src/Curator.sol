@@ -5,13 +5,13 @@ pragma solidity ^0.8.28;
 /// @notice On-chain grant program for community-built Portico adapters.
 ///         Praetor multisig schedules grant rounds via the timelock; each grant
 ///         is a (grantee, amount, ipfs_attestation_cid) tuple. The grantee
-///         claims by calling `claim` after the timelock readyAt — the timelock
+///         claims by calling `claim` after the timelock readyAt, the timelock
 ///         window doubles as the public objection period.
 ///
 ///         Year-1 budget: $20–50K total per PRD §17. This contract holds USDC
 ///         (or any IERC20 the timelock configures) and pays out on claim. Per
 ///         PRD §17 Day-180 target: "Curator grants funded $20–50K" in the
-///         REALISTIC scenario, $0 in the FLOOR scenario — so this contract
+///         REALISTIC scenario, $0 in the FLOOR scenario, so this contract
 ///         can ship with zero balance and still be honest.
 ///
 ///         Audit pattern coverage (Wave-YYYY / BBBBB / CCCCC sweep lenses):
@@ -95,7 +95,7 @@ contract Curator {
     }
 
     constructor(address _praetor, address _praetor_timelock, address _usdc) {
-        // DDD-5 / BBBBB-1 pattern — every dep zero-checked at deploy.
+        // DDD-5 / BBBBB-1 pattern, every dep zero-checked at deploy.
         require(_praetor != address(0), "zero praetor");
         require(_praetor_timelock != address(0), "zero timelock");
         require(_usdc != address(0), "zero usdc");
@@ -104,7 +104,7 @@ contract Curator {
         usdc = IERC20(_usdc);
     }
 
-    /// @notice Create a grant record. Timelock-only — the 48h window doubles
+    /// @notice Create a grant record. Timelock-only, the 48h window doubles
     /// as the public objection period before the grantee can claim.
     /// The grant exists in storage from this moment; transfer happens at claim.
     function createGrant(
@@ -162,7 +162,7 @@ contract Curator {
         emit GrantClaimed(grant_id, g.grantee, g.amount);
     }
 
-    /// @notice Cancel a grant before it's claimed. Praetor multisig — emergency
+    /// @notice Cancel a grant before it's claimed. Praetor multisig, emergency
     /// path, no timelock (the timelock window happens once at createGrant).
     /// Audit FIRE76-9 fix (sub-agent MEDIUM): cancel cooldown. The grant's
     /// `funded_at` timestamp is recorded at createGrant. Praetor must wait

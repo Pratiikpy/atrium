@@ -3,7 +3,7 @@
 //! Audit YYY-5 fix: pre-fix `publish` was a no-op stub. `praetor backtest
 //! publish` claimed to publish an attestation on-chain but did nothing.
 //! `ResearchAttestation.publish` is timelock-gated, so the right shape is
-//! a `multisig schedule` + 48h wait + `multisig execute` — print both
+//! a `multisig schedule` + 48h wait + `multisig execute`, print both
 //! halves so the operator runs them in order.
 
 use std::process::Command;
@@ -26,14 +26,14 @@ pub async fn run(network: &str, action: BacktestAction) -> Result<()> {
 /// Honor the `is_publishable` flag from span_backtest.py's v2 JSON output.
 /// If json_path is provided, parse + check. Synthetic results (data_mode
 /// = synthetic-pairs, is_publishable = false) must NOT reach the on-chain
-/// ResearchAttestation — see span_backtest.py docstring + the iteration-28
+/// ResearchAttestation, see span_backtest.py docstring + the iteration-28
 /// audit fix that introduced the flag.
 fn check_publishable(json_path: &str) -> Result<()> {
     let text = std::fs::read_to_string(json_path)
         .with_context(|| format!("could not read backtest JSON: {json_path}"))?;
     let parsed: serde_json::Value = serde_json::from_str(&text)
         .with_context(|| format!("backtest JSON is not valid JSON: {json_path}"))?;
-    // schema_version 2+ carries is_publishable. v1 omits it — treat that as
+    // schema_version 2+ carries is_publishable. v1 omits it, treat that as
     // pre-fix output that operators must NOT publish (the v1 era is when
     // synthetic-pairs were silently published).
     let schema_version = parsed
@@ -85,7 +85,7 @@ async fn publish(
 
     // Iteration 29 audit fix: honor the is_publishable flag from
     // span_backtest.py's v2 JSON output. Without this gate, the CLI would
-    // happily build a Safe payload for synthetic-pairs backtests — the
+    // happily build a Safe payload for synthetic-pairs backtests, the
     // operator would paste it into the multisig and synthetic numbers
     // would land on-chain as a real research attestation.
     match json_path {
@@ -93,7 +93,7 @@ async fn publish(
         None => {
             // Allow override but make it loud. The verify-app side gate
             // (Wave-1) will be the second layer; for the CLI an operator
-            // can choose to bypass — but they have to make the choice
+            // can choose to bypass, but they have to make the choice
             // consciously, not by default.
             eprintln!(
                 "WARN: --json-path not provided. The is_publishable gate from \
@@ -116,7 +116,7 @@ async fn publish(
         std::env::var("COLLATERAL_DELTA_BPS").context("COLLATERAL_DELTA_BPS must be set")?;
 
     // ResearchAttestation.publish(bytes32 ipfs_hash, uint256 trades_count,
-    // int256 collateral_delta_bps, string notebook_url) — timelock-only.
+    // int256 collateral_delta_bps, string notebook_url), timelock-only.
     let publish_calldata = Command::new("cast")
         .args([
             "calldata",
@@ -152,7 +152,7 @@ async fn publish(
     // and the multisig::execute fix from iteration 23. A malformed
     // publish_data (truncated hex, missing 0x prefix from upstream) would
     // make `cast calldata` exit non-zero with the real error on stderr and
-    // empty stdout — operator would paste empty schedule_data into the
+    // empty stdout, operator would paste empty schedule_data into the
     // Safe and discover the no-op 48h later.
     if !schedule_calldata.status.success() {
         anyhow::bail!(
@@ -169,14 +169,14 @@ async fn publish(
         );
     }
 
-    println!("Step 1 — submit to the Gnosis Safe (Praetor multisig) NOW:");
+    println!("Step 1, submit to the Gnosis Safe (Praetor multisig) NOW:");
     println!("  to:    {timelock}");
     println!("  value: 0");
     println!("  data:  {schedule_data}");
     println!();
-    println!("Step 2 — wait 48 hours (PraetorTimelock window).");
+    println!("Step 2, wait 48 hours (PraetorTimelock window).");
     println!();
-    println!("Step 3 — after 48h, run `praetor multisig execute --id <id>` with these env vars:");
+    println!("Step 3, after 48h, run `praetor multisig execute --id <id>` with these env vars:");
     println!("  EXEC_TARGET={attestation}");
     println!("  EXEC_DATA={publish_data}");
     println!("  EXEC_SCHEDULED_AT=<schedule timestamp>");
@@ -217,7 +217,7 @@ mod tests {
     //! Honesty-gate tests for `check_publishable`.
     //!
     //! Mirror of `apps/verify/src/app/api/research-attestation/latest/route.test.ts`
-    //! at the praetor-cli boundary — the same five scenarios pin the same
+    //! at the praetor-cli boundary, the same five scenarios pin the same
     //! invariant in Rust. Together they form the cross-language test of
     //! `is_publishable: false MUST bail at every layer that could publish`.
     use super::check_publishable;
@@ -291,7 +291,7 @@ mod tests {
     #[test]
     fn bails_on_schema_v1_pre_honesty_pass() {
         // Pre-iteration-28 output. Missing schema_version (defaults to 1)
-        // and is_publishable — must NOT be publishable since the v1 era
+        // and is_publishable, must NOT be publishable since the v1 era
         // is when synthetic-pairs were silently published.
         let path = write_fixture(
             "schema_v1",
@@ -315,7 +315,7 @@ mod tests {
 
     #[test]
     fn bails_on_missing_is_publishable_field() {
-        // v2 schema but the flag itself is missing — partially-written or
+        // v2 schema but the flag itself is missing, partially-written or
         // hand-edited file. Refuse rather than infer permissive.
         let path = write_fixture(
             "missing_flag",

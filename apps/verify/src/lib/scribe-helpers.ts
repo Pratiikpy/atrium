@@ -21,7 +21,7 @@ export interface CohortPartner {
 // Now: detect the placeholder at the gql() call boundary and surface it as
 // a structured `ScribeNotConfigured` error. The error path is the same
 // shape as other gql failures, so the catch-blocks across routes still
-// render "pending" — but the error message names the missing env so it's
+// render "pending", but the error message names the missing env so it's
 // visible in server logs and any boundary surfacing err.message gets a
 // useful hint. Env read is per-call (not module-load) so test environments
 // can set the env in beforeEach without re-importing.
@@ -44,7 +44,7 @@ export class ScribeNotConfigured extends Error {
 export async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   const scribeUrl = resolveScribeUrl();
   // Fail-loud guard for the iteration-41 audit: don't even attempt the
-  // fetch against the PLACEHOLDER URL — the request would 404 silently and
+  // fetch against the PLACEHOLDER URL, the request would 404 silently and
   // the operator wouldn't know why. Throwing here lands in the route's
   // catch block where it's logged + surfaced as "scribe unavailable" with
   // the config-gap reason instead of a generic network error.

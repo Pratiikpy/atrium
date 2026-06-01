@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ratelimitReadPerIp, ratelimitWritePerIp } from '@/lib/rate-limit';
 
 /**
- * Middleware — Phase 3 hardened.
+ * Middleware, Phase 3 hardened.
  *
  * 1. Rate limiting on /api/* routes via Upstash (skipped if env not set).
  *    Method-aware: reads get a generous per-IP bucket, writes a tight one.

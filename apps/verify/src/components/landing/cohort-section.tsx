@@ -25,7 +25,7 @@ export function CohortSection() {
       id="network"
       eyebrow="Built with"
       headline="Venue and infrastructure partners across the EVM stack, shipping with us from day one."
-      sub="The cohort grows as partners sign onboarding LOIs. Today the page shows the live signed count from Scribe — never an inflated number."
+      sub="The cohort grows as partners sign onboarding LOIs. Today the page shows the live signed count from Scribe, never an inflated number."
     >
       {(!data || data.partners.length === 0) ? (
         <div className="mx-auto max-w-xl rounded-md border border-divider bg-parchment-soft/40 p-8 text-center">

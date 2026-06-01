@@ -78,11 +78,11 @@ contract LanternAttestor {
     /// address including `address(0)`. The constructor's BBBBB-1 guard
     /// explicitly checks `_signing_key != address(0)` (lines 22-39) and
     /// the comment names the recovery cost: "publish() bricked until
-    /// timelock rotates the key" — but the rotate setter had the SAME
+    /// timelock rotates the key", but the rotate setter had the SAME
     /// risk without the SAME guard. A Praetor multisig scheduling a typo
     /// rotation to zero (and 3-of-5 signers approving without catching
-    /// it) would land 48h later, brick publish() — `msg.sender` can never
-    /// equal `address(0)` on EVM — and require another 48h timelock to
+    /// it) would land 48h later, brick publish(), `msg.sender` can never
+    /// equal `address(0)` on EVM, and require another 48h timelock to
     /// recover. During that 96h window the attestor publishes nothing.
     /// Defense in depth: reject zero at the setter boundary too.
     error ZeroAddressKey();
@@ -102,11 +102,11 @@ contract LanternAttestor {
     /// @notice Verify a Merkle inclusion proof against the latest root.
     /// @dev    Sorted-pair hashing per OpenZeppelin MerkleProof convention.
     ///
-    /// Audit FIRE77-L1 fix (sub-agent HIGH — second-preimage attack):
+    /// Audit FIRE77-L1 fix (sub-agent HIGH, second-preimage attack):
     /// pre-fix, the verifier hashed the supplied `leaf` indistinguishably
     /// from an interior node. An attacker could submit a 32-byte interior-
     /// node hash as `leaf` plus the remaining ancestors as `proof`, and the
-    /// verification would succeed against the same `latest_root` — letting
+    /// verification would succeed against the same `latest_root`, letting
     /// them claim a balance they don't own. The OZ MerkleProof convention
     /// (`resources/openzeppelin-contracts/.../MerkleProof.sol:27-29`) requires
     /// leaves be **double-hashed** at the leaf-vs-node boundary so they

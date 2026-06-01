@@ -10,11 +10,11 @@ interface ProtocolMetrics {
   agentsWithOpenPositions: number | null;
   codex24hQueries: number | null;
   // Iteration 35: was `venuesLive: { live, total }`. The count is derived
-  // from the deployments registry — adapters with a non-zero contract
-  // address — NOT from on-chain `get_venue_health()` reads. Renamed to
+  // from the deployments registry, adapters with a non-zero contract
+  // address, NOT from on-chain `get_venue_health()` reads. Renamed to
   // `venuesDeployed` so the field name matches what it actually counts.
-  // Iteration 39: `count` is now `number | null` — null when the registry
-  // is unreachable. UI renders "—" for null instead of fake-zero.
+  // Iteration 39: `count` is now `number | null`, null when the registry
+  // is unreachable. UI renders "-" for null instead of fake-zero.
   venuesDeployed: { count: number | null; total: number };
   source: 'scribe' | 'pending';
 }
@@ -31,7 +31,7 @@ async function fetchMetrics(): Promise<ProtocolMetrics> {
       registeredAgents: null,
       agentsWithOpenPositions: null,
       codex24hQueries: null,
-      // Iteration 39: was `count: 0` in client catch — fake-zero pattern.
+      // Iteration 39: was `count: 0` in client catch, fake-zero pattern.
       venuesDeployed: { count: null, total: VENUE_COUNT },
       source: 'pending',
     };
@@ -64,13 +64,13 @@ export function NumbersSection() {
           // measures deployment-registry presence, not get_venue_health
           // status. Renamed so users aren't misled.
           label="Venue adapters deployed"
-          // Iteration 39: render "— / 7" instead of "0 / 7" when count is
+          // Iteration 39: render "- / 7" instead of "0 / 7" when count is
           // null (registry unreachable). Distinguishes measured-zero from
           // couldn't-measure at the visible-text level.
           value={
             data?.venuesDeployed?.count != null
               ? `${data.venuesDeployed.count} / ${data.venuesDeployed.total}`
-              : `— / ${data?.venuesDeployed?.total ?? VENUE_COUNT}`
+              : `- / ${data?.venuesDeployed?.total ?? VENUE_COUNT}`
           }
           sub="contracts ship Month 1 W2"
         />
@@ -84,7 +84,7 @@ function Cell({ label, value, sub }: { label: string; value: string | null | und
     <div className="bg-parchment-light p-8 md:p-10">
       <p className="text-[10px] uppercase tracking-wider text-muted">{label}</p>
       <p className="mt-3 font-display text-4xl italic text-ink md:text-5xl">
-        {value ?? '—'}
+        {value ?? '-'}
       </p>
       <p className="mt-2 text-xs text-muted">{sub}</p>
     </div>

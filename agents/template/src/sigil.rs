@@ -208,7 +208,7 @@ mod tests {
         // Mirror of `rejects_too_many_venues`. The two limits (MAX_VENUES
         // = MAX_INSTRUMENTS = 8) drift out of sync risk: if one bumps and
         // the other doesn't, the on-chain decoder would reject the
-        // larger one silently — agent would log "submitted" but never
+        // larger one silently, agent would log "submitted" but never
         // land. Pin BOTH boundaries.
         let too_many: Vec<FixedBytes<32>> = (0..9)
             .map(|i| {
@@ -328,7 +328,7 @@ mod tests {
         // treated Ok as "submitted" → operator had no signal the
         // submission path wasn't wired. K-10 made this bail with a
         // descriptive error so the loud-failure path triggers a warn
-        // log at every tick — the gap is OBVIOUS in operator stdout.
+        // log at every tick, the gap is OBVIOUS in operator stdout.
         //
         // When Pimlico wiring lands this test moves to assert success.
         // Until then, asserting the bail keeps the silent-failure

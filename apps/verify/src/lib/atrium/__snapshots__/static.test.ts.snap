@@ -210,7 +210,7 @@ exports[`Static catalog arrays (snapshot) > VENUES matches snapshot 1`] = `
     "type": "Prediction · CTF",
   },
   {
-    "asset": "—",
+    "asset": "-",
     "chain": "Robinhood testnet",
     "id": "rhc",
     "illustrativeCollateral": 0,

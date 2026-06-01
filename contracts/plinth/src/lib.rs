@@ -1,4 +1,4 @@
-// Plinth — Atrium SPAN-style portfolio margin engine
+// Plinth, Atrium SPAN-style portfolio margin engine
 //
 // Stylus (Rust) contract that computes required margin across a user's positions
 // using a SPAN-style scenario matrix. Compute-heavy work targeted at 10-100x
@@ -28,7 +28,7 @@ use stylus_sdk::{
 };
 
 // --- Module: pure math (Kani-verifiable, no storage) ---
-// math.rs gated to test/export-abi builds only — its functions either inlined
+// math.rs gated to test/export-abi builds only, its functions either inlined
 // at call sites or moved to plinth-math/plinth-oracle for the on-chain build.
 // `test-host` exposes it to the external proptest integration test crate
 // (tests/proptest_invariants.rs), which runs as a separate compilation unit
@@ -111,14 +111,14 @@ sol! {
 // Size-optimization (Wave A): collapsed 15 typed errors into a single
 // `PlinthErr(uint16 code)` to fit the 24 KB EIP-170 cap. Saves ~5 KB
 // compressed wasm by reusing one Sol selector/encoder across all revert
-// sites. External decoders map codes back to messages — see ERROR_CODES
+// sites. External decoders map codes back to messages, see ERROR_CODES
 // const below. Restore typed errors when we move to a wasm-aware deployer
 // in Year-2.
 sol! {
     error PlinthErr(uint16 code);
 }
 
-// Error codes — keep in sync with off-chain decoder.
+// Error codes, keep in sync with off-chain decoder.
 pub const ERR_ACCOUNT_PAUSED: u16 = 1;
 pub const ERR_GLOBALLY_PAUSED: u16 = 2;
 pub const ERR_ORACLE_STALE: u16 = 3;
@@ -201,7 +201,7 @@ sol_interface! {
         // agent's running open-notional counter. Lands in Sigil same phase.
         function recordClose(address agent, uint256 amount) external;
     }
-    // Separated SPAN math — see contracts/plinth-math. Plinth calls this
+    // Separated SPAN math, see contracts/plinth-math. Plinth calls this
     // every time it recomputes a user's required margin.
     interface IPlinthMath {
         function requiredMargin(
@@ -306,7 +306,7 @@ impl Plinth {
     /// Audit F-32 fix: `praetor_timelock` stored alongside the multisig; all
     /// subsequent admin checks compare against the timelock, not the
     /// multisig directly.
-    /// Stylus constructor — invoked exactly once at deploy time by the
+    /// Stylus constructor, invoked exactly once at deploy time by the
     /// Stylus deployer factory. We use tx_origin() not msg_sender() to
     /// identify the deployer because the factory itself is the immediate
     /// caller.
@@ -326,7 +326,7 @@ impl Plinth {
     ) {
         // Refuse zero-address admin args. Without this guard a deployer typo
         // could brick all timelock-gated parameter changes (audit F-G).
-        // We can't return an error from a constructor — assert instead.
+        // We can't return an error from a constructor, assert instead.
         assert!(!praetor.is_zero(), "praetor zero");
         assert!(!praetor_timelock.is_zero(), "timelock zero");
         assert!(!plinth_math.is_zero(), "math zero");
@@ -550,7 +550,7 @@ impl Plinth {
                 return Err(e);
             }
         };
-        // Inlined from math::compute_realized_pnl — math module gated to test
+        // Inlined from math::compute_realized_pnl, math module gated to test
         // builds only. PnL = notional * (current - entry) / entry, with the
         // entire path saturating-arithmetic so no panic ever surfaces here.
         let realized_pnl = if entry_price.is_zero() {
@@ -564,7 +564,7 @@ impl Plinth {
             floor_div_i256(notional.saturating_mul(delta), entry_i)
         };
 
-        // Remove from user list (linear scan — bounded by max_positions_per_user)
+        // Remove from user list (linear scan, bounded by max_positions_per_user)
         let mut user_list = self.user_position_ids.setter(owner);
         let mut found = false;
         for i in 0..user_list.len() {
@@ -723,7 +723,7 @@ impl Plinth {
         // Audit PPP-8 fix: cap correlation_class against the SPAN evaluator's
         // hardcoded MAX_CORRELATION_CLASSES window. Without this, a Praetor
         // typo passing class=16+ creates an instrument whose positions
-        // require ZERO margin — silent grant of unbounded leverage.
+        // require ZERO margin, silent grant of unbounded leverage.
         // Phase 2a: also require correlation_class > 0. Class 0 is reserved
         // in PlinthMath as "each position is its own class" (no netting).
         // Instruments must be assigned to a real class (1..max_classes-1).
@@ -741,7 +741,7 @@ impl Plinth {
         Ok(())
     }
 
-    /// Emergency pause. Instant — no timelock for pauses per PRD §13.4 +
+    /// Emergency pause. Instant, no timelock for pauses per PRD §13.4 +
     /// TDD §7.10. Audit G-6 fix: accept caller in {multisig, timelock} so
     /// PraetorTimelock.emergencyPause (which forwards from multisig via
     /// `IPausable(target).pause(reason)`) actually reaches this function;
@@ -761,7 +761,7 @@ impl Plinth {
         Ok(())
     }
 
-    /// Resume. Timelock-only — resuming a pause is a parameter change and
+    /// Resume. Timelock-only, resuming a pause is a parameter change and
     /// gets the full 48h community-veto window.
     pub fn resume(&mut self) -> Result<(), PlinthError> {
         let caller = self.vm().msg_sender();
@@ -845,7 +845,7 @@ impl Plinth {
                 // Agent A audit M3 fix: owner is the FIRST 32 bytes of `intent_sigil`,
                 // not `action_sigil`. The intent envelope is ABI-encoded with the
                 // owner address in slot 0. Reading from action_sigil was a forgery
-                // vector — caller-controlled action bytes could spoof the owner.
+                // vector, caller-controlled action bytes could spoof the owner.
                 if intent_sigil.len() < 32 {
                     return Err(PlinthError::code(ERR_INVALID_ACTION_SIGIL));
                 }
@@ -863,7 +863,7 @@ impl Plinth {
     /// Dual-oracle median + tolerance check. Wave-A.7: implementation moved
     /// to the separate PlinthOracle Stylus contract to fit EIP-170. The
     /// hardening (negative-price refusal, decimals-read failure surfacing,
-    /// freshness/tolerance checks) lives there now — Plinth just forwards.
+    /// freshness/tolerance checks) lives there now, Plinth just forwards.
     fn get_safe_price(
         &self,
         venue_id: u8,
@@ -893,7 +893,7 @@ impl Plinth {
             // back to the matching ERR_* code on this side so external
             // decoders only see PlinthErr(code) regardless of which contract
             // raised it. ERR_ORACLE_STALE is the safest catch-all when the
-            // decode fails — the failure mode for any oracle path is "do
+            // decode fails, the failure mode for any oracle path is "do
             // not trust this price".
             .map_err(|_| PlinthError::code(ERR_ORACLE_STALE))
     }
@@ -908,7 +908,7 @@ impl Plinth {
     /// positions must have 50% buffer above maintenance requirement.
     fn do_update_margin_with_kind(&mut self, user: Address, kind: MarginCheckKind) -> Result<U256, PlinthError> {
         // Read all positions and prices into parallel arrays. We pass these
-        // over staticcall to PlinthMath (split out to fit EIP-170 — see
+        // over staticcall to PlinthMath (split out to fit EIP-170, see
         // Phase A.7 in LAUNCH_READY.md).
         let position_ids = self.get_user_positions(user);
         let mut notionals: Vec<I256> = Vec::with_capacity(position_ids.len());
@@ -930,7 +930,7 @@ impl Plinth {
         }
 
         // Compute required margin via PlinthMath (separate Stylus contract
-        // for code-size reasons). Static call — view function, no state
+        // for code-size reasons). Static call, view function, no state
         // mutation on the math side.
         let math = IPlinthMath::new(self.plinth_math_address.get());
         let min_initial = self.params.min_initial_margin_bps.get().to::<u16>();
@@ -974,7 +974,7 @@ impl Plinth {
         //
         // Audit OOO-2 fix: pre-fix `.unwrap_or(U256::ZERO)` would default the
         // user's collateral to 0 on any Coffer call failure. The very next
-        // block (line below) compares `collateral < required` — if required
+        // block (line below) compares `collateral < required`, if required
         // is non-zero, the user gets auto-paused and Vigil queues a
         // liquidation against a HEALTHY account whose Coffer view merely
         // hiccuped. Wrongful-liquidation trigger. Closes #28 family site 3.
@@ -991,7 +991,7 @@ impl Plinth {
         let block_now = self.vm().block_number();
         let underwater = collateral < required;
 
-        // Persist — single mutable-borrow scope. All writes happen here so the
+        // Persist, single mutable-borrow scope. All writes happen here so the
         // setter `acc` is released before we touch `self.vm()` or external
         // contracts below.
         {
@@ -1029,14 +1029,14 @@ impl Plinth {
             ));
             self.vm().log(AccountPaused { user, reason });
             // Audit AAA-1 fix: prior code did `let _ = vigil.queue_liquidation(...)`
-            // — silently discarded the Result. If Vigil rejected the queue
+            //, silently discarded the Result. If Vigil rejected the queue
             // (Vigil paused, version mismatch, keeper queue full), the
             // account paused but no liquidation job was ever created. The
             // user was frozen out forever with no enforcement path.
             //
             // Now: emit VigilQueueFailed on Err so off-chain monitors can
             // manually re-queue. We DON'T revert here because the account
-            // is already paused (caller-observable state) — reverting would
+            // is already paused (caller-observable state), reverting would
             // undo the pause and leave the user actively losing money on
             // a now-unenforced under-collateralized position. The event is
             // the contract's "ask for help" signal.

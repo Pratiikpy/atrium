@@ -32,12 +32,12 @@ function loadOrCreatePlinthPauseState(): PlinthPauseState {
 }
 
 /**
- * Scribe mapping — Plinth events.
+ * Scribe mapping, Plinth events.
  *
  * Indexes every margin update, position open, position close, and account
  * pause from the Plinth contract. Frontend reads from these entities.
  *
- * No off-chain enrichment — schema is a faithful mirror of contract events
+ * No off-chain enrichment, schema is a faithful mirror of contract events
  * per the "honesty over hype" rule.
  */
 
@@ -53,7 +53,7 @@ export function handleMarginUpdated(event: MarginUpdated): void {
   acc.requiredMarginWei = event.params.required_margin_wei;
   acc.marginVersion = event.params.margin_version;
   // The Graph generates BigInt for uint64 + uint256 Solidity types alike,
-  // so the param is already a BigInt — no fromU64 conversion needed.
+  // so the param is already a BigInt, no fromU64 conversion needed.
   acc.lastUpdateBlock = event.params.block_number;
   acc.save();
 
@@ -130,7 +130,7 @@ export function handlePositionClosed(event: PositionClosed): void {
   // TODO (Phase 2a follow-up, SD-23): When Plinth emits intent_hash on
   // PositionClosed, look up IntentToAgent(intentHash) to get agent, then
   // update Agent(agent).totalPnlSigned += realized_pnl_signed. Currently
-  // Plinth does not emit intent_hash on position events — deferral documented.
+  // Plinth does not emit intent_hash on position events, deferral documented.
 }
 
 export function handleAccountPaused(event: AccountPaused): void {

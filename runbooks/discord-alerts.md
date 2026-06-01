@@ -1,6 +1,6 @@
 # Discord Alerting Topology
 
-Phase 12 — consolidated alerting routes to `#ops-alerts`.
+Phase 12, consolidated alerting routes to `#ops-alerts`.
 
 ## Channel: `#ops-alerts`
 
@@ -95,14 +95,14 @@ All production alerts route to this single channel. Team members with on-call ro
 ### Vigil-Keeper Liquidation
 ```json
 {
-  "content": "⚡ Vigil-keeper executed liquidation for account `0x1a2b...` — margin ratio 0.92"
+  "content": "⚡ Vigil-keeper executed liquidation for account `0x1a2b...`, margin ratio 0.92"
 }
 ```
 
 ### Lantern Publish
 ```json
 {
-  "content": "✅ Lantern published attestation #142 — 3 leaves, root `0xabc1...`"
+  "content": "✅ Lantern published attestation #142, 3 leaves, root `0xabc1...`"
 }
 ```
 

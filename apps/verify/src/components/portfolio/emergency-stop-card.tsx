@@ -72,7 +72,7 @@ export function EmergencyStopCard() {
           ? 'Revoking…'
           : status.kind === 'success'
             ? 'Revoked ✓'
-            : 'Confirm — this is irreversible';
+            : 'Confirm, this is irreversible';
 
   return (
     <div className="rounded-md border bg-parchment p-5" style={{ borderColor: 'oklch(0.5 0.12 30 / 0.4)' }}>
@@ -97,13 +97,13 @@ export function EmergencyStopCard() {
       <div className="mt-4 flex gap-6">
         <div>
           <p className="font-mono text-[18px] text-ink" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {wallet ? (mandates.data?.count ?? '—') : '—'}
+            {wallet ? (mandates.data?.count ?? '-') : '-'}
           </p>
           <p className="text-[11px] uppercase tracking-wider text-muted">Active mandates</p>
         </div>
         <div>
           <p className="font-mono text-[18px] text-ink" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {wallet ? (sessions.data?.count ?? '—') : '—'}
+            {wallet ? (sessions.data?.count ?? '-') : '-'}
           </p>
           <p className="text-[11px] uppercase tracking-wider text-muted">Session keys</p>
         </div>

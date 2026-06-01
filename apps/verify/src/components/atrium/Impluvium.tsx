@@ -5,7 +5,7 @@ import { VENUES, fmtUSD } from "@/lib/atrium/static";
 import { useTweenNumber } from "@/hooks/useTweenNumber";
 
 /**
- * Impluvium — DOM port from Lovable matching the Atriumnew.html design.
+ * Impluvium, DOM port from Lovable matching the Atriumnew.html design.
  * Two rows of 4 venue cards bracket a central glass pool that shows the
  * unified buying-power figure. Animated SVG flow paths connect each card
  * to the pool. A scale rule and leverage slider live in the footer.
@@ -245,7 +245,7 @@ function VenueCard({
         <div className="mono cap" style={{ fontSize: 9.5 }}>{v.short}</div>
       </div>
       <div className="mono cap" style={{ marginTop: 3, fontSize: 9.5 }}>{v.type}</div>
-      <div className="venue-num">{v.pending ? "—" : fmtUSD(v.live)}</div>
+      <div className="venue-num">{v.pending ? "-" : fmtUSD(v.live)}</div>
       <div className="venue-bar">
         <div
           style={{

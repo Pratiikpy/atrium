@@ -1,6 +1,6 @@
 [toolchain]
 # Stylus transitive deps (ruint, wit-bindgen) now require Rust 1.90+. Pinning
-# to 1.92 — the system default — keeps reproducible builds and matches CI.
+# to 1.92, the system default, keeps reproducible builds and matches CI.
 channel = "1.92.0"
 components = ["rustfmt", "clippy"]
 targets = ["wasm32-unknown-unknown"]

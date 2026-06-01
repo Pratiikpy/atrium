@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * robots.txt — generated at build time.
+ * robots.txt, generated at build time.
  * SEO-05: Added /loadtest, /chaos, /monitoring to disallow.
  */
 export default function robots(): MetadataRoute.Robots {

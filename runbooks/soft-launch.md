@@ -1,6 +1,6 @@
 # Soft-Launch Runbook
 
-Phase 12 — go-live procedure for Atrium beta.
+Phase 12, go-live procedure for Atrium beta.
 
 ## Pre-Flight Checklist
 

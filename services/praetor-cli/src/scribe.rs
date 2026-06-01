@@ -3,13 +3,13 @@
 //! Centralizes the HTTP-status + GraphQL-errors + missing-data checks that
 //! were duplicated across `multisig::list` and `keepers::list`. The earlier
 //! versions of those callers swallowed Scribe errors and printed `null` to
-//! the operator — exactly when, e.g., a stalled subgraph would mask a
+//! the operator, exactly when, e.g., a stalled subgraph would mask a
 //! still-pending incident-response timelock.
 //!
 //! Single read path: `query(graphql, "field_name")` returns the JSON value
 //! at `data.field_name` or bails with a precise error message. All four
 //! failure modes (env-missing, HTTP non-2xx, GraphQL errors, missing data
-//! key) are explicit bails — none silently coerce to `null`.
+//! key) are explicit bails, none silently coerce to `null`.
 
 use anyhow::{bail, Context, Result};
 use serde_json::Value;
@@ -18,7 +18,7 @@ const SCRIBE_ENV: &str = "SCRIBE_URL";
 
 /// POST a GraphQL query to Scribe. `data_field` is the top-level field name
 /// to extract from the response (e.g. "keepers", "timelockSchedules").
-/// Returns the JSON value at `data.<data_field>` — typically an array.
+/// Returns the JSON value at `data.<data_field>`, typically an array.
 ///
 /// Bails on any of:
 ///   - SCRIBE_URL env var unset
@@ -59,7 +59,7 @@ pub async fn query(graphql: &str, data_field: &str) -> Result<Value> {
     match data {
         Some(v) if !v.is_null() => Ok(v.clone()),
         _ => bail!(
-            "scribe response missing data.{data_field} — \
+            "scribe response missing data.{data_field}, \
              either the subgraph isn't deployed, the schema changed, or the field name is wrong: {}",
             serde_json::to_string(&resp)?
         ),

@@ -1,5 +1,5 @@
 /**
- * Honeybadger heartbeat ping — Phase 12 observability.
+ * Honeybadger heartbeat ping, Phase 12 observability.
  * Called at the start of every tick to signal liveness.
  */
 export async function heartbeat(name: string): Promise<void> {

@@ -38,12 +38,12 @@ afterEach(() => {
   else process.env.DEMO_WALLET_ADDRESS = ORIGINAL_WALLET;
 });
 
-describe('GET /api/portfolio/activity — KK-8 unix sort', () => {
+describe('GET /api/portfolio/activity, KK-8 unix sort', () => {
   it('sorts activities by unix timestamp desc, not by ago() lexical', async () => {
     // Three margin updates spanning timestamps where the lexical sort
     // of `ago()` would flip the order. Pre-KK-8: "10m ago" < "2m ago"
     // alphabetically. Post-KK-8: 1700000600 > 1700000060 > 1700000000
-    // numerically — order is newest first.
+    // numerically, order is newest first.
     (gql as any).mockResolvedValue({
       marginUpdates: [
         { blockNumber: '100', timestamp: '1700000000' }, // oldest
@@ -83,7 +83,7 @@ describe('GET /api/portfolio/activity — KK-8 unix sort', () => {
   });
 });
 
-describe('GET /api/portfolio/activity — KK-9 corrupt-timestamp drop', () => {
+describe('GET /api/portfolio/activity, KK-9 corrupt-timestamp drop', () => {
   it('drops marginUpdates with empty timestamp', async () => {
     (gql as any).mockResolvedValue({
       marginUpdates: [
@@ -148,7 +148,7 @@ describe('GET /api/portfolio/activity — KK-9 corrupt-timestamp drop', () => {
   });
 });
 
-describe('GET /api/portfolio/activity — KK-10 null-agent drop', () => {
+describe('GET /api/portfolio/activity, KK-10 null-agent drop', () => {
   it('drops sigilValidations where agent is null', async () => {
     (gql as any).mockResolvedValue({
       marginUpdates: [],
@@ -178,7 +178,7 @@ describe('GET /api/portfolio/activity — KK-10 null-agent drop', () => {
   });
 });
 
-describe('GET /api/portfolio/activity — output shape', () => {
+describe('GET /api/portfolio/activity, output shape', () => {
   it('strips tsUnix from the wire response', async () => {
     (gql as any).mockResolvedValue({
       marginUpdates: [{ blockNumber: '100', timestamp: '1700000000' }],
@@ -188,7 +188,7 @@ describe('GET /api/portfolio/activity — output shape', () => {
     const { GET } = await import('./route');
     const json = await (await GET()).json();
     // tsUnix is the internal sort key. It MUST be stripped from the
-    // wire response — otherwise a client could infer "true" timestamps
+    // wire response, otherwise a client could infer "true" timestamps
     // bypassing the human-readable display contract.
     expect(json.activities[0]).not.toHaveProperty('tsUnix');
     expect(json.activities[0]).toHaveProperty('timestamp');
@@ -230,7 +230,7 @@ describe('GET /api/portfolio/activity — output shape', () => {
   });
 });
 
-describe('GET /api/portfolio/activity — pending paths', () => {
+describe('GET /api/portfolio/activity, pending paths', () => {
   it('returns pending when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');

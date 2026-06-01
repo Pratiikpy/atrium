@@ -1,6 +1,6 @@
 [package]
 name = "atrium-vigil"
-description = "Atrium liquidation engine — NMS-aware partial liquidations with keeper economic security"
+description = "Atrium liquidation engine, NMS-aware partial liquidations with keeper economic security"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"

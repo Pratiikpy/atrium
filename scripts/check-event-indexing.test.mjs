@@ -13,7 +13,7 @@ import {
 /**
  * Iter 79 audit fix: pins the helpers that make up the
  * check-event-indexing CI gate. The gate has run 75+ /loop iterations
- * reporting "0 unindexed" — that's strong integration evidence the
+ * reporting "0 unindexed", that's strong integration evidence the
  * helpers work today, but a refactor of any helper could silently
  * relax the gate (false negatives → ghost events ship to production).
  *
@@ -67,7 +67,7 @@ describe('lookupSource', () => {
   });
 
   it('returns null for contracts intentionally NOT indexed', () => {
-    // StoaBlackScholes is pure math — no events. Null is the correct
+    // StoaBlackScholes is pure math, no events. Null is the correct
     // "events go nowhere" signal.
     assert.equal(lookupSource('StoaBlackScholes'), null);
     // AqueductReceiver lives on the destination chain (separate subgraph).
@@ -94,7 +94,7 @@ describe('lookupSource', () => {
   });
 });
 
-describe('isIgnored — wildcard matching', () => {
+describe('isIgnored, wildcard matching', () => {
   it('matches *.EventName wildcard for any contract', () => {
     // INDEXING_IGNORE has '*.PositionOpened'. Every adapter's
     // PositionOpened event must match this wildcard.
@@ -121,7 +121,7 @@ describe('isIgnored — wildcard matching', () => {
     // Aqueduct.LinkUsage30dUpdated is contract-specific (only Aqueduct
     // has it), not a wildcard.
     assert.equal(isIgnored('Aqueduct', 'LinkUsage30dUpdated'), true);
-    // The wildcard doesn't apply — another contract emitting the same
+    // The wildcard doesn't apply, another contract emitting the same
     // event name would NOT be auto-ignored.
     assert.equal(isIgnored('OtherContract', 'LinkUsage30dUpdated'), false);
   });
@@ -183,7 +183,7 @@ describe('CONTRACT_TO_SOURCE shape', () => {
     for (const [contract, source] of Object.entries(CONTRACT_TO_SOURCE)) {
       if (source !== null) {
         assert.equal(source, contract,
-          `CONTRACT_TO_SOURCE[${contract}] = ${source} — alias check (set to null if intentional)`);
+          `CONTRACT_TO_SOURCE[${contract}] = ${source}, alias check (set to null if intentional)`);
       }
     }
   });

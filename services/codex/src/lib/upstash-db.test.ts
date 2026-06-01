@@ -3,7 +3,7 @@ import { maybeUpstashDB } from './upstash-db';
 
 /**
  * Phase theta.2 fix verification. Pre-fix the Vercel Codex deploy used
- * inMemoryDB — per-instance state lost on every cold start, which
+ * inMemoryDB, per-instance state lost on every cold start, which
  * silently disabled x402 replay-dedup + Idempotency-Key dedup. The
  * Upstash shim restores both guarantees by routing the same D1-shaped
  * SQL through Upstash Redis REST.
@@ -33,7 +33,7 @@ function mockUpstash(result: unknown) {
   });
 }
 
-describe('maybeUpstashDB — configuration gate', () => {
+describe('maybeUpstashDB, configuration gate', () => {
   it('returns null when URL is missing', () => {
     expect(maybeUpstashDB({ UPSTASH_REDIS_REST_TOKEN: 'x' })).toBeNull();
   });
@@ -50,7 +50,7 @@ describe('maybeUpstashDB — configuration gate', () => {
   });
 });
 
-describe('UpstashDB — payments replay-dedup', () => {
+describe('UpstashDB, payments replay-dedup', () => {
   const db = maybeUpstashDB(ENV)!;
 
   it('SELECT by tx_hash → GET payments:tx:<lower_hash>', async () => {
@@ -98,7 +98,7 @@ describe('UpstashDB — payments replay-dedup', () => {
   });
 });
 
-describe('UpstashDB — idempotency cache with TTL', () => {
+describe('UpstashDB, idempotency cache with TTL', () => {
   const db = maybeUpstashDB(ENV)!;
 
   it('SELECT from idempotency_cache → GET idem:<key>', async () => {
@@ -138,7 +138,7 @@ describe('UpstashDB — idempotency cache with TTL', () => {
   });
 });
 
-describe('UpstashDB — backtest enumeration', () => {
+describe('UpstashDB, backtest enumeration', () => {
   const db = maybeUpstashDB(ENV)!;
 
   it('all() on backtests uses SMEMBERS + MGET', async () => {
@@ -157,7 +157,7 @@ describe('UpstashDB — backtest enumeration', () => {
   });
 });
 
-describe('UpstashDB — error handling', () => {
+describe('UpstashDB, error handling', () => {
   const db = maybeUpstashDB(ENV)!;
 
   it('throws when Upstash returns non-OK status', async () => {

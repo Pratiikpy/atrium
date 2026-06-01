@@ -18,7 +18,7 @@ function makeRequest(query: string): NextRequest {
   return new NextRequest(url, { method: 'GET' });
 }
 
-describe('GET /api/tax/allowance — UK default', () => {
+describe('GET /api/tax/allowance, UK default', () => {
   it('returns UK allowance labels by default', async () => {
     const json = await (await GET(makeRequest(''))).json();
     expect(json.jurisdictionLabel).toBe('2026/27 CGT allowance · UK');
@@ -40,7 +40,7 @@ describe('GET /api/tax/allowance — UK default', () => {
   });
 });
 
-describe('GET /api/tax/allowance — non-UK jurisdictions', () => {
+describe('GET /api/tax/allowance, non-UK jurisdictions', () => {
   it('returns US "no equivalent exemption" label + all-null fields', async () => {
     const json = await (await GET(makeRequest('jurisdiction=us'))).json();
     expect(json.jurisdictionLabel).toBe('US · no equivalent exemption');
@@ -56,7 +56,7 @@ describe('GET /api/tax/allowance — non-UK jurisdictions', () => {
     expect(json.jurisdictionLabel).toBe('DE FIFO · no exemption');
   });
 
-  it('U-30: rejects the old eu key — falls back to UK', async () => {
+  it('U-30: rejects the old eu key, falls back to UK', async () => {
     // Pre-U-30 (audit U-13) the enum accepted `eu`. Tablet's exporter
     // is specifically German FIFO § 23 EStG, NOT EU-wide, so `de` is
     // the right canonical key. Old `eu` strings now fall back to UK.
@@ -70,7 +70,7 @@ describe('GET /api/tax/allowance — non-UK jurisdictions', () => {
   });
 });
 
-describe('GET /api/tax/allowance — LL-3 year validation', () => {
+describe('GET /api/tax/allowance, LL-3 year validation', () => {
   it('rejects non-4-digit year (falls back to 2026)', async () => {
     const json = await (await GET(makeRequest('year=abc'))).json();
     expect(json.yearLabel).toBe('2026');

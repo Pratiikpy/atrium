@@ -6,17 +6,17 @@ import { safeErrorDetail } from '../lib/error-safe';
  *
  * Year-1 design (audit I-1..I-4 hardened): every payment goes through the
  * on-chain verifier even if Coinbase's facilitator returns valid. The
- * facilitator is a fast-path hint, not an authoritative source — Codex's
+ * facilitator is a fast-path hint, not an authoritative source, Codex's
  * security boundary is the chain, not a third party.
  *
  * Verification steps:
  *   1. Decode the X-PAYMENT header.
- *   2. Reject if older than 5 minutes (was 24h — far too permissive).
- *   3. Reject if tx_hash was previously consumed (D1 `payments` table —
+ *   2. Reject if older than 5 minutes (was 24h, far too permissive).
+ *   3. Reject if tx_hash was previously consumed (D1 `payments` table -
  *      tx_hash is UNIQUE so concurrent retries from different isolates
  *      can't double-spend).
  *   4. Fetch tx receipt + current block; require ≥ CONFIRMATIONS depth.
- *   5. Decode the USDC `Transfer(from,to,amount)` log from receipt.logs —
+ *   5. Decode the USDC `Transfer(from,to,amount)` log from receipt.logs -
  *      NOT `tx.value`, which is native ETH and irrelevant for ERC-20.
  *   6. Assert log.address == USDC, log.topics[2] == payTo, log.data ≥ amount.
  *   7. If all pass, record the tx_hash in D1 (atomic via UNIQUE).
@@ -67,7 +67,7 @@ export const x402PaymentMiddleware: MiddlewareHandler<{ Bindings: X402Env }> = a
   // Audit U-31: explicit `=== false` narrows the discriminated union to
   // `{ ok: false; reason: string }`. Pre-fix `!chainOk.ok` didn't narrow
   // under the typecheck config (the tsconfig didn't exist, so the build
-  // was a no-op — the call shape was unverified). Once the missing tsconfig
+  // was a no-op, the call shape was unverified). Once the missing tsconfig
   // was added (audit U-31), this turned into a real error.
   if (chainOk.ok === false) {
     return c.json({ error: 'payment_invalid', detail: chainOk.reason }, 402);
@@ -90,7 +90,7 @@ async function verifyViaCoinbase(c: any, header: string): Promise<void> {
     });
     // Result is observability-only; the chain decides.
   } catch {
-    // Facilitator down is fine — on-chain path is authoritative.
+    // Facilitator down is fine, on-chain path is authoritative.
   }
 }
 
@@ -157,13 +157,13 @@ async function verifyOnChain(
   // which catches empty string but accepts the zero address `0x0000...0`
   // (truthy in JS). The default `wrangler.toml` ships with
   // `CODEX_PAY_TO_ADDRESS = "0x0000000000000000000000000000000000000000"`
-  // labelled "SET BEFORE PRODUCTION DEPLOY" — but operators forget. With
+  // labelled "SET BEFORE PRODUCTION DEPLOY", but operators forget. With
   // zero-address as expected payTo, an attacker burning USDC to 0x0
   // (USDC's contract permits this) would satisfy `toAddress === expectedPayTo`
   // on line 199 → free Codex API access for the cost of the burned USDC.
   //
   // Now: reject empty string AND zero address AND any non-hex-shaped value.
-  // Defense in depth — wrangler.toml's placeholder remains for backward
+  // Defense in depth, wrangler.toml's placeholder remains for backward
   // compat but the server refuses to verify against any of the unset sentinels.
   const ZERO_ADDR = '0x' + '0'.repeat(40);
   const ADDR_REGEX = /^0x[0-9a-f]{40}$/;
@@ -202,8 +202,8 @@ async function verifyOnChain(
   //
   // Audit BBBB-5 fix: pre-fix this loop matched `topics[2]` (to-address)
   // against `expectedPayTo` and discarded `topics[1]` (from-address). The
-  // payment-record then bound `wallet_address = decoded.from` — i.e. the
-  // user-supplied claim in the X-PAYMENT payload — without verifying it
+  // payment-record then bound `wallet_address = decoded.from`, i.e. the
+  // user-supplied claim in the X-PAYMENT payload, without verifying it
   // matched the chain's actual Transfer sender. **Payment-theft
   // front-run:** Alice broadcasts a USDC tx to Atrium. Bob (or a mempool
   // bot) sees it pending, races to submit `X-PAYMENT { tx_hash:
@@ -214,7 +214,7 @@ async function verifyOnChain(
   //
   // Fix: capture the chain-truth `from` from topics[1], reject if it
   // disagrees with the user-supplied `decoded.from` (when present), and
-  // BIND the payment record to the chain `from` — never the user-claim.
+  // BIND the payment record to the chain `from`, never the user-claim.
   let matched = false;
   let chainFrom = '';
   for (const log of receipt.logs ?? []) {
@@ -241,7 +241,7 @@ async function verifyOnChain(
 
   // Audit BBBB-5 fix: if the user volunteered a `from`, it must match the
   // chain. Reject silent payer-spoofing. (When `decoded.from` is absent we
-  // still bind to `chainFrom` below — never to 'unknown' — so a missing
+  // still bind to `chainFrom` below, never to 'unknown', so a missing
   // claim can't be used to evade attribution.)
   if (decoded.from && decoded.from.toLowerCase() !== chainFrom) {
     return { ok: false, reason: 'from_address_mismatch' };
@@ -266,7 +266,7 @@ async function verifyOnChain(
     .catch((e: any) => ({ error: String(e?.message ?? e) }));
   if ('error' in (insert as any)) {
     // UNIQUE constraint trip-out means a concurrent request just consumed
-    // this tx_hash. Refuse — exactly one request gets the payment.
+    // this tx_hash. Refuse, exactly one request gets the payment.
     return { ok: false, reason: 'on_chain_replay_concurrent' };
   }
 

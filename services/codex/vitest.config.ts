@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
 /**
- * Vitest config — Codex service unit tests.
+ * Vitest config, Codex service unit tests.
  *
  * Iter 73 audit fix: services/codex had zero tests pre-iter-73.
  * Multiple HIGH-severity audit fixes live in src/middleware/x402.ts

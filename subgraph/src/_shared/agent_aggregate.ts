@@ -6,7 +6,7 @@ import { Agent } from '../../generated/schema';
  *
  * The `Agent` entity is defined in schema.graphql and queried by three
  * verify-app surfaces (rostrum-leaderboard, agents/leaderboard,
- * portfolio/activity), but pre-fix no handler ever wrote it — the
+ * portfolio/activity), but pre-fix no handler ever wrote it, the
  * leaderboards silently returned empty arrays forever. Found by the
  * iteration-16 silent-failure audit.
  *
@@ -25,7 +25,7 @@ import { Agent } from '../../generated/schema';
  * AGENT that triggered the action. The link runs through Sigil.intent_hash:
  * IntentValidated emits (owner, agent, intent_hash), and the eventual
  * PositionOpened can be matched to that intent via Plinth's action_sigil
- * payload — but that mapping isn't currently indexed. Year-1 leaves
+ * payload, but that mapping isn't currently indexed. Year-1 leaves
  * totalPnlSigned at the default 0 with this gap noted; the
  * verify-app leaderboards advertise themselves as "actions + reputation
  * leaderboard" rather than "PnL leaderboard" until the gap closes.

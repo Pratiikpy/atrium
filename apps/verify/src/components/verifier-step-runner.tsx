@@ -177,7 +177,7 @@ export function VerifierStepRunner({ step }: { step: number }) {
     try {
       // Audit U-16: dispatch the real action per step config. Step 1
       // (Coffer deposit) shipped first because it shares its write path
-      // with /app/vault. Other steps surface the named blocker — the
+      // with /app/vault. Other steps surface the named blocker, the
       // button is disabled when the contract isn't deployed, but if the
       // operator manually flips ready=true in the registry for a step
       // we haven't wired, this error message names exactly what's missing.
@@ -249,7 +249,7 @@ export function VerifierStepRunner({ step }: { step: number }) {
 
       {/* Audit QQ-1 + SS-1 fix: shared arbiscanTxUrl helper regex-gates the
           hash + builds the URL. Failed-regex returns null so we fall through
-          to no link displayed — matches "no fake success states". */}
+          to no link displayed, matches "no fake success states". */}
       {run.status === 'success' && (() => {
         const url = arbiscanTxUrl(run.txHash);
         return url ? (

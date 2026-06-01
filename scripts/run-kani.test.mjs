@@ -10,7 +10,7 @@ import { CRATES } from './run-kani.mjs';
  * Kani-proof suite unrun.
  */
 
-describe('run-kani CRATES — config shape', () => {
+describe('run-kani CRATES, config shape', () => {
   it('is a non-empty array of relative paths', () => {
     assert.ok(Array.isArray(CRATES));
     assert.ok(CRATES.length > 0);

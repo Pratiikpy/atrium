@@ -1,5 +1,5 @@
 /**
- * /team — workstreams, not invented people. We do not ship placeholder founder
+ * /team, workstreams, not invented people. We do not ship placeholder founder
  * identities or dead GitHub links (CLAUDE.md red line: never invent a person or
  * relationship). The founding team is named in person at the Founder House; until
  * then the open repository is the credential.
@@ -67,7 +67,7 @@ export default function TeamPage() {
             <li><strong className="text-ink">Best product option, no compromise.</strong> When two paths fork, take the one that makes the product more correct, trustworthy, and defensible.</li>
             <li><strong className="text-ink">Live dashboards never inflate.</strong> If two of three keepers are up, the page shows two of three.</li>
             <li><strong className="text-ink">Tripwires beat silent slips.</strong> Scope cuts get announced the same day they happen.</li>
-            <li><strong className="text-ink">No fake immutability.</strong> Contracts are upgradeable today behind a multisig and a 48-hour timelock — we say so out loud.</li>
+            <li><strong className="text-ink">No fake immutability.</strong> Contracts are upgradeable today behind a multisig and a 48-hour timelock, we say so out loud.</li>
           </ul>
           <Link href="/manifesto" className="mt-6 inline-block text-sm text-ink underline-offset-2 hover:underline">
             Read the manifesto →
@@ -80,7 +80,7 @@ export default function TeamPage() {
             Security disclosure: <code className="font-mono text-ink">security@atrium.fi</code> (PGP key linked from <Link href="/security" className="underline">/security</Link>).
           </p>
           <p className="mt-2 text-sm text-ink-soft">
-            Partnerships and integrations are scoped through the Cohort programme — see <Link href="/cohort" className="underline">/cohort</Link>.
+            Partnerships and integrations are scoped through the Cohort programme, see <Link href="/cohort" className="underline">/cohort</Link>.
           </p>
         </section>
       </div>

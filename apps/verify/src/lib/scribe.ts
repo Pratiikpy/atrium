@@ -21,8 +21,8 @@ import { gql } from './scribe-helpers';
 /**
  * Audit VV-1: previously this hook queried `{ count: ${entityKey}Count }`
  * which is NOT a query The Graph auto-generates. Every call would have
- * thrown at gql-time. The hook is currently unused — `LiveCounter` defines
- * the consumer but no page renders it — so the bug was dormant. The hook
+ * thrown at gql-time. The hook is currently unused, `LiveCounter` defines
+ * the consumer but no page renders it, so the bug was dormant. The hook
  * stays here as a typed surface for the future, but the query is now valid:
  * it reads the first entity record and treats existence as a 0-or-N signal.
  * Real count surfaces need a `Counter @entity` aggregation added to the
@@ -32,7 +32,7 @@ export function useScribeCount(entityKey: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['scribeCount', entityKey],
     queryFn: async () => {
-      // Defensive query — pulls 1 entity to verify the entity name exists.
+      // Defensive query, pulls 1 entity to verify the entity name exists.
       // A real count needs Counter entities populated by mapping handlers.
       const json = await gql<Record<string, unknown[]>>(
         `{ items: ${entityKey}(first: 1) { id } }`,
@@ -58,7 +58,7 @@ export interface ResearchAttestation {
    * `is_publishable: true` (schema v2+ from span_backtest.py).
    *
    * Consumers MUST refuse to render numbers as live claims when this is
-   * false — synthetic-pairs backtests can satisfy the on-chain
+   * false, synthetic-pairs backtests can satisfy the on-chain
    * ResearchAttestation contract but produce trivially-inflated savings
    * figures (perfectly-hedged pairs always show large savings). The
    * verify-app honesty contract requires UI surfaces to surface the
@@ -72,7 +72,7 @@ export interface ResearchAttestation {
    *   - data_mode = synthetic-pairs explicitly
    */
   isPublishable?: boolean;
-  /** "real-trades" | "synthetic-pairs" | "unknown" — surfaced for UI tags. */
+  /** "real-trades" | "synthetic-pairs" | "unknown", surfaced for UI tags. */
   dataMode?: string;
   /** Operator-facing warning when the attestation can't be rendered as live. */
   honestyWarning?: string;
@@ -84,7 +84,7 @@ export interface ResearchAttestation {
  * can't be done from the client (cache-friendly server fetch + gateway
  * config). Pre-iteration-30 this hook queried Scribe directly and
  * consumers had no way to distinguish synthetic-pairs attestations from
- * real-trades — UI would render synthetic numbers as live.
+ * real-trades, UI would render synthetic numbers as live.
  */
 export function useResearchAttestation() {
   return useQuery<ResearchAttestation | null>({

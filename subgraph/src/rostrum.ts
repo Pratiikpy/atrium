@@ -21,7 +21,7 @@ import { setReputation } from './_shared/agent_aggregate';
  * Rostrum copy-trade indexer.
  *
  * Pre-fix the Rostrum contract was fully shipped (all 7 events fire from
- * real code paths) but had no subgraph wiring — the entire copy-trade
+ * real code paths) but had no subgraph wiring, the entire copy-trade
  * subsystem was invisible to the verify-app leaderboard.
  *
  * Design note: RostrumFollow is mutable (FollowStarted creates, FollowEnded
@@ -124,16 +124,16 @@ export function handleReputationUpdated(event: ReputationUpdated): void {
     r = new RostrumReputation(id);
     r.agent = event.params.agent;
   }
-  // The Graph maps Solidity uint64 to BigInt — no fromU64 conversion needed.
+  // The Graph maps Solidity uint64 to BigInt, no fromU64 conversion needed.
   r.previousScore = event.params.previous;
   r.currentScore = event.params.next;
   r.lastUpdatedAtBlock = event.block.number;
   r.lastUpdatedAtTimestamp = event.block.timestamp;
   r.save();
-  // Silent-failure fix (iteration 16) — comment corrected iteration 47.
+  // Silent-failure fix (iteration 16), comment corrected iteration 47.
   // Mirror the score into the Agent aggregate so the leaderboards see it.
   // Agent.reputationScore is Int! (i32, max ~2.1B). The iter-16 comment
-  // CLAIMED Rostrum.sol caps scores at REPUTATION_MAX=1_000_000 — that
+  // CLAIMED Rostrum.sol caps scores at REPUTATION_MAX=1_000_000, that
   // was wrong; no such on-chain cap exists. The 2B clamp below is a pure
   // AssemblyScript representation safety net (uint64 → i32 narrowing),
   // not a domain bound. If a real REPUTATION_MAX constant lands in

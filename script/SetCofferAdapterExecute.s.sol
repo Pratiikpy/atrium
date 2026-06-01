@@ -3,9 +3,9 @@ pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
 
-/// @title  Phase ϑ.followup — execute the Coffer.setAdapter timelock job.
+/// @title  Phase ϑ.followup, execute the Coffer.setAdapter timelock job.
 /// @notice Pair of SetCofferAdapterSchedule.s.sol. Must run AT LEAST 48h
-///         after the schedule tx confirms — PraetorTimelock will revert
+///         after the schedule tx confirms, PraetorTimelock will revert
 ///         `TimelockNotReady` before the window passes.
 ///
 ///         The encoded inner-call MUST match the schedule tx byte-for-

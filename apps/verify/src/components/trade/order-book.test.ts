@@ -9,7 +9,7 @@ import { VENUES } from '@/lib/venues';
  *
  * Invariants:
  *   1. Every entry in VENUES has a symbol mapping (no silent default for
- *      a known venue — only unknown ids fall back to HSLA-PERP).
+ *      a known venue, only unknown ids fall back to HSLA-PERP).
  *   2. The mapping is deterministic across renders.
  *   3. Unknown ids degrade safely (no throw) but to a named symbol so the
  *      UI doesn't render empty state.
@@ -31,7 +31,7 @@ describe('symbolForVenue', () => {
       expect(sym).toBeTruthy();
       // If a new venue is added to VENUES without updating the map, this
       // test fails because the fallback `HSLA-PERP` is shared with the
-      // hyperliquid id — distinguish by checking that the symbol is not
+      // hyperliquid id, distinguish by checking that the symbol is not
       // the fallback for non-hyperliquid venues.
       if (v.id !== 'hyperliquid') {
         expect(sym).not.toBe('HSLA-PERP');

@@ -98,7 +98,7 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
     error ScaffoldNotImplemented();
 
     // Audit DDDDD-4 fix: validator-set rotation must be observable. Pre-fix
-    // the rotation flipped storage silently — subgraph + ops dashboards
+    // the rotation flipped storage silently, subgraph + ops dashboards
     // couldn't track validator-quorum changes.
     event ValidatorSetUpdated(address[] new_validators, uint16 new_required);
     // Audit EEEEE-3 fix: emit on instrument additions.
@@ -348,7 +348,7 @@ contract HyperliquidHybridAdapter is IPorticoAdapter, ReentrancyGuard {
             // (via a setValidators with zero in the array), an attacker
             // could submit any 65-byte garbage with `claimed = address(0)`
             // and pass the validator check: address(0) == address(0).
-            // Defense in depth — both this site AND setValidators below
+            // Defense in depth, both this site AND setValidators below
             // reject the zero address.
             if (recovered == address(0) || recovered != claimed) continue;
             // Deduplicate

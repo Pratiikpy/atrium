@@ -12,8 +12,8 @@ const PROCESSORS = [
   { name: 'Sentry', url: 'https://sentry.io', purpose: 'Error monitoring, session replay (consent-gated)', data: 'Error context, device fingerprints, scrubbed stack traces', location: 'United States', dpa: 'https://sentry.io/legal/dpa/' },
   { name: 'SimpleAnalytics', url: 'https://simpleanalytics.com', purpose: 'Privacy-friendly page analytics', data: 'Aggregated page views (no individual records, no cookies)', location: 'Netherlands, EU', dpa: 'https://simpleanalytics.com/dpa' },
   { name: 'Sumsub', url: 'https://sumsub.com', purpose: 'KYC identity verification (opt-in only)', data: 'Government ID, selfie, biometric data', location: 'United Kingdom / EU', dpa: 'https://sumsub.com/dpa/' },
-  { name: 'Doppler', url: 'https://doppler.com', purpose: 'Secrets management', data: 'No user PII — internal secrets only', location: 'United States', dpa: 'https://www.doppler.com/legal/dpa' },
-  { name: 'DigitalOcean', url: 'https://digitalocean.com', purpose: 'Daemon hosting (vigil-keeper, lantern-attestor)', data: 'No user PII — service-to-service only', location: 'United States', dpa: 'https://www.digitalocean.com/legal/data-processing-agreement' },
+  { name: 'Doppler', url: 'https://doppler.com', purpose: 'Secrets management', data: 'No user PII, internal secrets only', location: 'United States', dpa: 'https://www.doppler.com/legal/dpa' },
+  { name: 'DigitalOcean', url: 'https://digitalocean.com', purpose: 'Daemon hosting (vigil-keeper, lantern-attestor)', data: 'No user PII, service-to-service only', location: 'United States', dpa: 'https://www.digitalocean.com/legal/data-processing-agreement' },
   { name: 'The Graph', url: 'https://thegraph.com', purpose: 'Subgraph indexer (Scribe)', data: 'Public on-chain data only (no PII)', location: 'Decentralized', dpa: null },
   { name: 'Web3.storage', url: 'https://web3.storage', purpose: 'IPFS pinning for Lantern Merkle roots', data: 'Public Merkle roots only (no PII)', location: 'United States', dpa: null },
 ] as const;

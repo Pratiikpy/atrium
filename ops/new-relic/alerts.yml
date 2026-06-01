@@ -1,4 +1,4 @@
-# New Relic Alert Policy — Atrium Observability (Phase 12)
+# New Relic Alert Policy, Atrium Observability (Phase 12)
 #
 # Import via NerdGraph mutation `alertsPolicyCreate` + `alertsNrqlConditionStaticCreate`,
 # or configure manually in the New Relic UI.

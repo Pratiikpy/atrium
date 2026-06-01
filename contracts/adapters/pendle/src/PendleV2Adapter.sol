@@ -132,7 +132,7 @@ contract PendleV2Adapter is IPorticoAdapter, ReentrancyGuard {
 
     // Audit EEEEE-3 fix: emit on instrument additions so the subgraph + UI
     // can render the listing lifecycle. None of the 6 adapters emitted
-    // pre-fix — the listing was invisible to all observers.
+    // pre-fix, the listing was invisible to all observers.
     event InstrumentAdded(
         bytes32 indexed instrument_id,
         uint16 haircut_bps,
@@ -177,7 +177,7 @@ contract PendleV2Adapter is IPorticoAdapter, ReentrancyGuard {
         assembly { originator := shr(96, calldataload(venue_payload.offset)) }
         bytes calldata pendle_payload = venue_payload[20:];
 
-        // Decode Pendle swap params from the suffix — UI computes approxParams.
+        // Decode Pendle swap params from the suffix, UI computes approxParams.
         (uint256 min_pt_out, IPendleRouter.ApproxParams memory approx, IPendleRouter.TokenInput memory input) =
             abi.decode(pendle_payload, (uint256, IPendleRouter.ApproxParams, IPendleRouter.TokenInput));
 

@@ -51,5 +51,5 @@ debug = ["stylus-sdk/debug"]
 contract-client-gen = []
 
 # cargo-stylus 0.5.x ships its own optimized release profile that produced
-# 25.9 KB for Coffer — adding any [profile.release] here made it bigger
+# 25.9 KB for Coffer, adding any [profile.release] here made it bigger
 # (28.8 KB with opt-level=z+thin LTO). Leave it default; tune via Stylus.toml.

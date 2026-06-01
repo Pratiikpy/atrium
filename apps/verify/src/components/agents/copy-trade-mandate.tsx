@@ -40,7 +40,7 @@ export function CopyTradeMandate() {
   return (
     <NewMandateButton
       prefill={match.caps}
-      prefillLabel={`Copying ${match.label} — recommended caps prefilled`}
+      prefillLabel={`Copying ${match.label}, recommended caps prefilled`}
       autoOpen
     />
   );

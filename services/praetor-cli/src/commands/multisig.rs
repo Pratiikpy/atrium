@@ -76,7 +76,7 @@ async fn execute(network: &str, id: &str) -> Result<()> {
     // real error on stderr and empty stdout. Without the check we'd print
     // `data: ` (empty) to the Safe-submission output; the founder would
     // paste empty calldata into the Safe and the execute call would land
-    // on-chain as a no-op against PraetorTimelock — a 12-hour wait to
+    // on-chain as a no-op against PraetorTimelock, a 12-hour wait to
     // discover the timelock didn't fire. Bail loud so the founder fixes
     // the EXEC_* env vars before pasting.
     if !exec_calldata.status.success() {

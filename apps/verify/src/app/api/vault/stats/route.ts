@@ -36,7 +36,7 @@ export async function GET(req?: Request) {
     const coffer = getContract({ address: cofferAddress as `0x${string}`, abi: COFFER_ABI, client });
     // Audit S-1: USDC has 6 decimals; Coffer is an ERC-4626 over USDC so
     // share decimals = asset decimals = 6 (not 18). The constant + the
-    // formatter helpers in `lib/format-usd.ts` lock this invariant —
+    // formatter helpers in `lib/format-usd.ts` lock this invariant -
     // see `format-usd.test.ts` for the regression coverage.
     const USDC_DECIMALS = 6;
     // viem generates strict types from the ABI: zero-arg functions take

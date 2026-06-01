@@ -28,7 +28,7 @@ export function handleCancelled(event: Cancelled): void {
 
 /**
  * Ops alert. The Praetor multisig's instant-pause path bypasses the 48h
- * timelock — used for incident response. Without indexing, the bypass had
+ * timelock, used for incident response. Without indexing, the bypass had
  * no operator visibility (audit human_left.md #26 noted this as HIGH; the
  * gap survived multiple subsequent iterations because the per-source
  * matching bug in check-event-indexing.mjs masked it). Feeds the
@@ -44,7 +44,7 @@ export function handleEmergencyPaused(event: EmergencyPaused): void {
   a.detail = 'Emergency pause invoked via Praetor timelock bypass';
   a.blockNumber = event.block.number;
   a.timestamp = event.block.timestamp;
-  // Reuse `adapter` for the paused target — semantically it's the
+  // Reuse `adapter` for the paused target, semantically it's the
   // address being affected by the action, which is the same shape as
   // adapter_emergency_deregistered above.
   a.adapter = event.params.target;

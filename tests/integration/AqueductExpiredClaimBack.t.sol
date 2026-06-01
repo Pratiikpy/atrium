@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title AqueductExpiredClaimBack — integration test
+/// @title AqueductExpiredClaimBack, integration test
 /// @notice Send to dest, dest doesn't ack within window, source user calls
 ///         claimBack. Time-warp via vm.warp past expires_at. Asserts
 ///         CrossChainCredit.isClaimedBack flips, claimedBackAmountWei matches.

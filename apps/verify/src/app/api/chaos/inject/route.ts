@@ -23,7 +23,7 @@ import { requireChaosBearer } from '@/lib/chaos-auth';
  * Phase theta audit follow-up (2026-05-25): pre-fix the file's
  * top-of-file doc-comment claimed "Auth: pass `Authorization: Bearer
  * ${CHAOS_DRILL_KEY}` in the request. Without the header set +
- * matching, the route returns 401." That was a lie — the
+ * matching, the route returns 401." That was a lie, the
  * implementation only checked CHAOS_PRIVATE_KEY env, not any header.
  * Anyone reading the doc believed there was a gate that wasn't there.
  * Fixed by both updating the doc to reflect reality and adding the
@@ -60,7 +60,7 @@ function arbiscan(tx: string): string {
 
 // In-memory per-IP rate limiter (Year-1 testnet posture; per-instance
 // only, but enough to make drive-by spam unproductive). Map<ip, lastTs>.
-// Vercel cold-starts wipe state — that's fine for a chaos drill surface.
+// Vercel cold-starts wipe state, that's fine for a chaos drill surface.
 const chaosLastCall = new Map<string, number>();
 const CHAOS_MIN_INTERVAL_MS = 30_000;
 
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
         // the leaked deployer EOA (rotated in Phase η.4) as the demo keeper
         // to mark. Now: read from CHAOS_DEMO_KEEPER env (set to the actual
         // current keeper EOA on the Vercel project) and fall back to the
-        // chaos signer's own address — marking-yourself-missed is a no-op
+        // chaos signer's own address, marking-yourself-missed is a no-op
         // but produces a real on-chain tx the audit trail can show.
         const keeper =
           (process.env.CHAOS_DEMO_KEEPER as `0x${string}` | undefined) ??

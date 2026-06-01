@@ -49,9 +49,9 @@ export default function AgentsMarketplacePage() {
 
       <section className="mt-12">
         <h2 className="font-display text-2xl text-ink">Reference agents</h2>
-        {/* Phase 6 honesty banner — remove when strategy logic ships */}
+        {/* Phase 6 honesty banner, remove when strategy logic ships */}
         <div className="mt-4 rounded-md border border-[oklch(0.85_0.08_85)] bg-[oklch(0.95_0.03_85)] p-4 text-sm text-[oklch(0.35_0.05_60)]">
-          Reference agents — strategy logic ships in Phase 6 of the launch plan. PnL columns show <em>pending</em> until then.
+          Reference agents, strategy logic ships in Phase 6 of the launch plan. PnL columns show <em>pending</em> until then.
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {REFERENCE.map((a) => (

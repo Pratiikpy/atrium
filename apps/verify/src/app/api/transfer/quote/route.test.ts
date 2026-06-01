@@ -27,7 +27,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/transfer/quote — pending paths', () => {
+describe('GET /api/transfer/quote, pending paths', () => {
   it('returns pending when Aqueduct undeployed', async () => {
     (loadContractAddress as any).mockResolvedValue(null);
     const { GET } = await import('./route');
@@ -55,13 +55,13 @@ describe('GET /api/transfer/quote — pending paths', () => {
   });
 });
 
-describe('GET /api/transfer/quote — happy path quote shape', () => {
+describe('GET /api/transfer/quote, happy path quote shape', () => {
   beforeEach(() => {
     (loadContractAddress as any).mockResolvedValue('0x' + '1'.repeat(40));
   });
 
   it('returns source:estimate + fee/gas fields when Aqueduct deployed', async () => {
-    // Honesty fix (2026-05-29): source is 'estimate', not 'aqueduct' — the
+    // Honesty fix (2026-05-29): source is 'estimate', not 'aqueduct', the
     // seconds/fees are computed here, not read from a live CCIP router. The
     // isLiveQuote:false flag + note let the UI caption it truthfully.
     const { GET } = await import('./route');

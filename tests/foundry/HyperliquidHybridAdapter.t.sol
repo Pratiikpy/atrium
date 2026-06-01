@@ -132,7 +132,7 @@ contract HyperliquidHybridAdapterTest is Test {
     }
 
     /// Iter 60 audit fix: pin setAuthorizedCaller auth + event. Mirror
-    /// of iter 60 cross-adapter sweep — same observability invariant.
+    /// of iter 60 cross-adapter sweep, same observability invariant.
     event AuthorizedCallerUpdated(address indexed caller, bool authorized);
     function test_setAuthorizedCaller_rejectsHostile_iter60() public {
         vm.prank(hostile);
@@ -293,7 +293,7 @@ contract HyperliquidHybridAdapterTest is Test {
         assertEq(view_.owner, user, "originator must come from payload prefix");
         assertEq(view_.notional_signed, int256(1_000e6));
         assertTrue(adapter.next_venue_position_id() == 1);
-        // Pre-attestation, entry/current price are zero — attestation sets them.
+        // Pre-attestation, entry/current price are zero, attestation sets them.
         assertEq(view_.entry_price_q64, 0);
         assertEq(view_.current_price_q64, 0);
         assertEq(view_.unrealized_pnl_signed, 0);
@@ -361,7 +361,7 @@ contract HyperliquidHybridAdapterTest is Test {
         adapter.close_position(id, hex"");
     }
 
-    // ── attest_off_chain_state — security-critical hybrid surface ────
+    // ── attest_off_chain_state, security-critical hybrid surface ────
 
     function test_attest_revertsOnDuplicate() public {
         uint256 id = _openPosition(int256(1_000e6), user);
@@ -508,7 +508,7 @@ contract HyperliquidHybridAdapterTest is Test {
     /// silent-failure shape on every adapter that takes the three uint16
     /// bps params. Without this test, a refactor that swapped two of the
     /// argument-to-mapping writes would silently corrupt Plinth's margin
-    /// math on every Hyperliquid position — no revert, no event-level
+    /// math on every Hyperliquid position, no revert, no event-level
     /// signal, just wrong numbers.
     function test_addInstrument_routesBpsArgsCorrectly_iter56() public {
         bytes32 newInst = keccak256("HL-SOL-USD-PERP");
@@ -526,7 +526,7 @@ contract HyperliquidHybridAdapterTest is Test {
 
     // ── Constructor zero-checks (audit NNNN-1) ───────────────────────
     // Audit TTTT-1: pin every revert branch added by NNNN-1.
-    // required_signatures is a uint16, not an address — zero is a valid
+    // required_signatures is a uint16, not an address, zero is a valid
     // (if unsafe) quorum value and is not constructor-checked.
 
     function test_constructor_revertsOnZeroBridge() public {
@@ -672,7 +672,7 @@ contract HyperliquidHybridAdapterTest is Test {
         vm.prank(coffer);
         uint256 id = adapterB.open_position(BTC_PERP, int256(100e6), openPayload);
 
-        // Build an attestation signed under adapterA's domain — the
+        // Build an attestation signed under adapterA's domain, the
         // helper _digestForAttHash uses `adapter` (adapterA).
         bytes32 attHash = keccak256("g8-cross-adapter-replay");
         bytes memory replayAtt = _buildAttestation(

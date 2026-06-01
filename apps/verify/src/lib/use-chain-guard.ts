@@ -7,7 +7,7 @@ import { arbitrumSepolia } from 'wagmi/chains';
  * Chain guard hook. Returns whether the connected wallet is on the
  * expected chain (Arbitrum Sepolia) and a function to switch.
  *
- * Every write hook should check `ok` before submitting — if false,
+ * Every write hook should check `ok` before submitting, if false,
  * the tx would revert or hit the wrong contracts.
  */
 export function useChainGuard() {

@@ -55,13 +55,13 @@ export function LatestAttestationCard() {
         <div className="rounded-md border border-divider px-4 py-3">
           <p className="text-[10px] uppercase tracking-wider text-muted">IPFS CID</p>
           <p className="mt-1 break-all font-mono text-ink">
-            {data?.ipfsCid ? data.ipfsCid : '—'}
+            {data?.ipfsCid ? data.ipfsCid : '-'}
           </p>
         </div>
         <div className="rounded-md border border-divider px-4 py-3">
           <p className="text-[10px] uppercase tracking-wider text-muted">Signed</p>
           <p className="mt-1 font-mono text-ink">
-            {data?.timestampIso ? new Date(data.timestampIso).toLocaleString() : '—'}
+            {data?.timestampIso ? new Date(data.timestampIso).toLocaleString() : '-'}
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@
   "name": "@atrium/codex",
   "version": "0.1.0",
   "private": true,
-  "description": "Codex — x402-payable HTTP API gateway for Atrium",
+  "description": "Codex, x402-payable HTTP API gateway for Atrium",
   "license": "MIT",
   "type": "module",
   "scripts": {

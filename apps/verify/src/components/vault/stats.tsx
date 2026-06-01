@@ -30,9 +30,9 @@ export function VaultStats() {
   const sourceCaption = data?.source === 'coffer' ? 'from Coffer · live RPC' : 'coffer pending · deploy Month 1 W2';
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      <Tile label="Vault TVL" value={data?.vaultTvlUsd ?? '—'} sub="from Coffer.totalAssets()" source={sourceCaption} />
-      <Tile label="Your shares" value={data?.userSharesFormatted ?? '—'} sub="from Coffer.balanceOf(you)" source={sourceCaption} />
-      <Tile label="Share price" value={data?.sharePriceUsd ?? '—'} sub="assets / shares (4626)" source={sourceCaption} />
+      <Tile label="Vault TVL" value={data?.vaultTvlUsd ?? '-'} sub="from Coffer.totalAssets()" source={sourceCaption} />
+      <Tile label="Your shares" value={data?.userSharesFormatted ?? '-'} sub="from Coffer.balanceOf(you)" source={sourceCaption} />
+      <Tile label="Share price" value={data?.sharePriceUsd ?? '-'} sub="assets / shares (4626)" source={sourceCaption} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-"""US Form 8949 — short-term vs long-term capital gains classification.
+"""US Form 8949, short-term vs long-term capital gains classification.
 
 Rules (per IRS Publication 544):
   - Short-term: held ≤ 1 year (365 days)
@@ -92,7 +92,7 @@ def calculate_us_form_8949(trades: Iterable[Trade]) -> Form8949Report:
                     disallowed_total += abs(prev_row.gain)
             if disallowed_total > 0 and inventory[key]:
                 # Add disallowed loss to the basis of the just-acquired lot
-                # (the most recently appended item — index -1).
+                # (the most recently appended item, index -1).
                 replacement = inventory[key][-1]
                 # `Trade.price` is per-unit; convert disallowed amount to
                 # per-unit basis bump using replacement quantity.

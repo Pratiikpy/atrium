@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IPorticoAdapter} from "./IPorticoAdapter.sol";
 
-/// @title PorticoRegistry — whitelist + version pinning for IPorticoAdapter implementations
+/// @title PorticoRegistry, whitelist + version pinning for IPorticoAdapter implementations
 /// @notice Adapter bytecode is checked against an immutable expected hash at
 ///         whitelist time. Upgrade = re-whitelist with 3-reviewer Curator approval.
 contract PorticoRegistry {
@@ -102,7 +102,7 @@ contract PorticoRegistry {
     /// Pre-fix, deregistering a known-vulnerable adapter required the 48h
     /// timelock window, during which Coffer's 1%-per-block notional cap
     /// (`security.md`) was the only defense. For a live exploit this is
-    /// too slow. Praetor multisig can now deregister in one tx — no upgrade
+    /// too slow. Praetor multisig can now deregister in one tx, no upgrade
     /// power, just delisting. The path emits a distinct event so operators
     /// + the subgraph can flag emergency actions vs routine timelock ones.
     /// Mirror of the emergency-pause pattern in `Aqueduct.pause`.

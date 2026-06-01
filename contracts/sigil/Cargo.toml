@@ -1,6 +1,6 @@
 [package]
 name = "atrium-sigil"
-description = "Atrium agent mandate contract — EIP-712 IntentSigil + ActionSigil"
+description = "Atrium agent mandate contract, EIP-712 IntentSigil + ActionSigil"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"

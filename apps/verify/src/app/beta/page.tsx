@@ -19,12 +19,12 @@ export default function BetaPage() {
           <h2 className="font-medium">Get started</h2>
           <ul className="list-disc list-inside space-y-2 text-sm text-neutral-700">
             <li>
-              <a href="/" className="underline hover:text-black">Open Verifier Mode</a> — explore the full app
+              <a href="/" className="underline hover:text-black">Open Verifier Mode</a>, explore the full app
             </li>
             <li>
               <a href="https://discord.gg/atrium" className="underline hover:text-black" target="_blank" rel="noopener noreferrer">
                 Join Discord
-              </a> — find us in <code>#beta-feedback</code>
+              </a>, find us in <code>#beta-feedback</code>
             </li>
             <li>
               Send feedback to{' '}

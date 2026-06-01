@@ -1,6 +1,6 @@
 # New Relic Setup
 
-Phase 12 observability — APM + RUM for all Atrium services.
+Phase 12 observability, APM + RUM for all Atrium services.
 
 ## Prerequisites
 

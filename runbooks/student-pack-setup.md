@@ -1,11 +1,11 @@
-# Runbook — GitHub Student Pack tool activation
+# Runbook, GitHub Student Pack tool activation
 
 Priority-ordered checklist for activating Student Pack tools.
-Complete in order — later tools depend on earlier ones (Doppler stores all tokens).
+Complete in order, later tools depend on earlier ones (Doppler stores all tokens).
 
 ---
 
-## 1. Doppler (secrets management) — FIRST
+## 1. Doppler (secrets management), FIRST
 
 - **Activation URL:** https://education.github.com/pack → search "Doppler" → claim
 - **What to grab:** Organization auth token + per-project service tokens
@@ -22,7 +22,7 @@ Complete in order — later tools depend on earlier ones (Doppler stores all tok
 ## 2. Sentry (error tracking)
 
 - **Activation URL:** https://education.github.com/pack → search "Sentry" → claim Student tier
-- **What to grab:** DSN (already exists — verify Student tier quota bump: 50K errors/100K txns)
+- **What to grab:** DSN (already exists, verify Student tier quota bump: 50K errors/100K txns)
 - **Setup:** Confirm org is on Student plan. Check DSN matches `apps/verify/sentry.client.config.ts`.
 - **Doppler config:** `verify-app` → `SENTRY_DSN`
 
@@ -58,7 +58,7 @@ Complete in order — later tools depend on earlier ones (Doppler stores all tok
 ## 6. SimpleAnalytics (privacy-friendly analytics)
 
 - **Activation URL:** https://education.github.com/pack → search "SimpleAnalytics" → claim Starter (1 year)
-- **What to grab:** Site script tag (no token needed — script is public)
+- **What to grab:** Site script tag (no token needed, script is public)
 - **Setup:** Add `<script src="https://scripts.simpleanalyticscdn.com/latest.js">` to verify-app layout. Configure custom domain if desired.
 - **Doppler config:** N/A (public script, no secret)
 

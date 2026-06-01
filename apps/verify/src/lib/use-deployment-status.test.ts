@@ -22,7 +22,7 @@ describe('readinessMessage()', () => {
       required_contracts: ['Coffer'],
       missing: [],
     };
-    // If the action is ready, no helper copy is shown — the button speaks for itself.
+    // If the action is ready, no helper copy is shown, the button speaks for itself.
     expect(readinessMessage(ready, 'Deposit')).toBeNull();
   });
 
@@ -74,7 +74,7 @@ describe('readinessMessage()', () => {
       missing: ['Coffer'],
     };
     const msg = readinessMessage(notReady, 'Deposit')!;
-    // Honesty discipline — the message names a real planning doc with the
+    // Honesty discipline, the message names a real planning doc with the
     // phase, not a vague "coming soon". The roadmap doc was renamed
     // ATRIUM_12_MONTH_ROADMAP.md → docs/MASTER_PLAN.md; accept either.
     expect(msg).toMatch(/ROADMAP|Month 1 W2|MASTER_PLAN/);

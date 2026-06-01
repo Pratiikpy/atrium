@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {IPorticoAdapter} from "../../../portico-registry/src/IPorticoAdapter.sol";
 import {ReentrancyGuard} from "../../../portico-registry/src/ReentrancyGuard.sol";
 
-/// Synthetix V3 perpetual markets — partial interface. Full set in
+/// Synthetix V3 perpetual markets, partial interface. Full set in
 /// resources/synthetix-v3/markets/perps-market/contracts/.
 interface ISynthetixV3PerpsMarket {
     /// Modify a position by a signed size delta. Returns the perp position id
@@ -25,7 +25,7 @@ interface IERC20 {
 /// @title SynthetixV3Adapter
 /// @notice Portico adapter for Synthetix V3 perpetual markets.
 ///
-///         **Status:** Phase-2 conditional per PRD §17 / TDD §13 — Month-8 ship
+///         **Status:** Phase-2 conditional per PRD §17 / TDD §13, Month-8 ship
 ///         contingent on the Stylus Sprint grant landing by Month 7. This scaffold
 ///         freezes the contract shape so deploy chain (PorticoRegistry → adapter
 ///         list → Verifier UI → subgraph) doesn't need changes when Phase-2
@@ -77,7 +77,7 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     /// Phase theta-followup (2026-05-25): the scaffold can no longer accept
     /// open_position calls. Pre-fix, calling open via the Router would pull
     /// USDC from Coffer (per adapterPull) but the scaffold never deployed
-    /// the USDC into Synthetix V3 — the funds would strand in the adapter.
+    /// the USDC into Synthetix V3, the funds would strand in the adapter.
     /// Block the entry until the real Synthetix open lands (Year-2).
     error ScaffoldNotImplemented();
 
@@ -148,7 +148,7 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
     {
         // Phase theta-followup (2026-05-25): scaffold blocks entry. Pre-fix
         // a call would pull USDC via Coffer.adapterPull, record position
-        // metadata, and never deploy into Synthetix V3 — the USDC would
+        // metadata, and never deploy into Synthetix V3, the USDC would
         // strand in the adapter and Coffer's share accounting would
         // permanently disagree with on-chain reality. Real Synthetix V3
         // commitOrder + sUSD-vs-USDC bridging lands Year-2.
@@ -187,7 +187,7 @@ contract SynthetixV3Adapter is IPorticoAdapter, ReentrancyGuard {
         if (pos.owner == address(0)) revert PositionNotFound();
         // Scaffold pre-fix never returned USDC to Coffer; the matching
         // open_position fix below makes it impossible to enter this state
-        // for new positions. Existing pre-fix positions can still close —
+        // for new positions. Existing pre-fix positions can still close -
         // the venue side is a no-op (Synthetix never recorded them).
         realized_pnl_signed = 0;
         emit PositionClosed(venue_position_id, realized_pnl_signed);

@@ -1,7 +1,7 @@
 [project]
 name = "atrium-archive"
 version = "0.1.0"
-description = "Archive — Atrium risk lab + backtest research"
+description = "Archive, Atrium risk lab + backtest research"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Atrium Contributors" }]

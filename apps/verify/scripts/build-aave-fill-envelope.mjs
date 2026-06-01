@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * build-aave-fill-envelope.mjs — construct + sign the EIP-712 intent + action
+ * build-aave-fill-envelope.mjs, construct + sign the EIP-712 intent + action
  * Sigil envelopes for a real venue-2 (Aave Horizon) trade-fill through
  * AtriumRouter.open_position_via_adapter, and flat-encode them the way the
  * Stylus Plinth/Sigil contracts decode them.
@@ -19,7 +19,7 @@
  *   eip712.rs does; the flat encoders mirror encode_intent/encode_action in
  *   contracts/sigil/src/tests.rs. `--selfcheck` prints the SAME values the Rust
  *   test `prints_eip712_reference_for_aave_fill_crosscheck` prints for identical
- *   fixed inputs — diff them to prove the JS signer is wire-compatible with the
+ *   fixed inputs, diff them to prove the JS signer is wire-compatible with the
  *   on-chain decoder (the WW-1 tripwire). `--build` additionally checks each
  *   signature recovers the signing address before emitting the envelopes.
  *

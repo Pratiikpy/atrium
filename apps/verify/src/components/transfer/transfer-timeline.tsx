@@ -96,14 +96,14 @@ export function TransferTimeline() {
                 {s.status === 'complete' ? 'complete' : s.status === 'in_progress' ? 'in progress' : 'pending'}
               </p>
             </div>
-            <span className="font-mono text-[11px] text-muted">{s.delta ?? '—'}</span>
+            <span className="font-mono text-[11px] text-muted">{s.delta ?? '-'}</span>
           </li>
         ))}
       </ol>
 
       {/* Audit U-22: the only honest measurement we have is blocks-elapsed
           between source-commit and dest-settle. Surface it when present;
-          omit when null rather than render "—" next to a "settled" badge. */}
+          omit when null rather than render "-" next to a "settled" badge. */}
       {data?.blocksElapsed != null && (
         <p className="mt-4 text-[10px] uppercase tracking-wider text-muted">
           {data.blocksElapsed} blocks between source commit and dest settle

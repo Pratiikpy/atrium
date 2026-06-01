@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
  * caller could GET another user's prefs (Telegram chat id, email,
  * webhook URL) or POST overwrite them. The Bearer-auth fix added a
  * constant-time comparison against ATRIUM_INTERNAL_KEY (or the legacy
- * NOTIFIER_INTERNAL_KEY fallback) — these tests pin that contract.
+ * NOTIFIER_INTERNAL_KEY fallback), these tests pin that contract.
  *
  * Coverage: 401 on missing header, 401 on wrong token, 503 on missing
  * env, success on the right token + valid wallet. The constant-time
@@ -24,7 +24,7 @@ const VALID_USER = '0x' + 'A'.repeat(40);
 beforeEach(() => {
   process.env.ATRIUM_INTERNAL_KEY = VALID_TOKEN;
   delete process.env.NOTIFIER_INTERNAL_KEY;
-  // Clear KV config so the path falls into the unconfigured branch —
+  // Clear KV config so the path falls into the unconfigured branch -
   // that's enough to validate the auth gate without standing up a KV mock.
   delete process.env.ATRIUM_KV_REST_URL;
   delete process.env.ATRIUM_KV_REST_TOKEN;
@@ -50,7 +50,7 @@ function makeRequest(headers: Record<string, string> = {}, body?: unknown): Requ
   });
 }
 
-describe('GET /api/settings/notifications — Bearer auth', () => {
+describe('GET /api/settings/notifications, Bearer auth', () => {
   it('returns 401 when no Authorization header', async () => {
     const { GET } = await import('./route');
     const r = await GET(makeRequest());
@@ -113,7 +113,7 @@ describe('GET /api/settings/notifications — Bearer auth', () => {
   });
 });
 
-describe('POST /api/settings/notifications — Bearer auth', () => {
+describe('POST /api/settings/notifications, Bearer auth', () => {
   const validBody = {
     user: VALID_USER,
     channels: [
@@ -144,7 +144,7 @@ describe('POST /api/settings/notifications — Bearer auth', () => {
     const r = await POST(
       makeRequest({ Authorization: `Bearer ${VALID_TOKEN}` }, validBody),
     );
-    // 503 because KV is unconfigured — auth passed, body validated.
+    // 503 because KV is unconfigured, auth passed, body validated.
     expect(r.status).toBe(503);
     const j = await r.json();
     expect(j.error).toBe('storage_not_configured');

@@ -34,14 +34,14 @@ Key local paths:
 
 ## Faucets
 
-**Ethereum Sepolia** — claim testnet ETH on Sepolia, then bridge it to Arbitrum Sepolia using the bridge.
+**Ethereum Sepolia**, claim testnet ETH on Sepolia, then bridge it to Arbitrum Sepolia using the bridge.
 
 - https://sepoliafaucet.com/
 - https://arbitrum.faucet.dev/
 - https://www.infura.io/faucet/sepolia
 - https://sepolia-faucet.pk910.de/
 
-**Arbitrum Sepolia** — claim testnet ETH directly on Arbitrum Sepolia:
+**Arbitrum Sepolia**, claim testnet ETH directly on Arbitrum Sepolia:
 
 - https://arbitrum.faucet.dev/
 - https://faucet.quicknode.com/arbitrum/sepolia
@@ -67,14 +67,14 @@ Arbitrum One mainnet:
 
 The cloned upstreams below are mirrored locally under `resources/`; see `RESOURCES.md` for paths and pinned commits.
 
-- Arbitrum Docs — https://docs.arbitrum.io/
-- Arbitrum SDK — https://github.com/OffchainLabs/arbitrum-sdk
-- Stylus Docs — https://docs.arbitrum.io/stylus
-- Stylus By Example — https://stylus-by-example.org *(external only, not mirrored)*
-- Stylus CLI (`cargo-stylus`) — https://github.com/OffchainLabs/cargo-stylus
-- Stylus Rust SDK — https://github.com/OffchainLabs/stylus-sdk-rs
-- OpenZeppelin Rust Contracts for Stylus — https://github.com/OpenZeppelin/rust-contracts-stylus
-- OpenZeppelin Solidity Contracts — https://github.com/OpenZeppelin/openzeppelin-contracts
+- Arbitrum Docs, https://docs.arbitrum.io/
+- Arbitrum SDK, https://github.com/OffchainLabs/arbitrum-sdk
+- Stylus Docs, https://docs.arbitrum.io/stylus
+- Stylus By Example, https://stylus-by-example.org *(external only, not mirrored)*
+- Stylus CLI (`cargo-stylus`), https://github.com/OffchainLabs/cargo-stylus
+- Stylus Rust SDK, https://github.com/OffchainLabs/stylus-sdk-rs
+- OpenZeppelin Rust Contracts for Stylus, https://github.com/OpenZeppelin/rust-contracts-stylus
+- OpenZeppelin Solidity Contracts, https://github.com/OpenZeppelin/openzeppelin-contracts
 
 ## Suggested Reading Order
 

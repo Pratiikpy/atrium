@@ -6,7 +6,7 @@ import {Curator} from "../../contracts/curator/src/Curator.sol";
 
 /// @title Curator foundry test suite
 /// @notice PRD §17 Day-180 deliverable. Year-1 budget $20–50K in REALISTIC,
-///         $0 in FLOOR — the contract ships either way.
+///         $0 in FLOOR, the contract ships either way.
 contract CuratorTest is Test {
     Curator internal curator;
     MockUSDC internal usdc;
@@ -131,7 +131,7 @@ contract CuratorTest is Test {
 
     function test_createGrant_revertsOnOverCommit_FIRE76_6() public {
         // Audit FIRE76-6 fix (sub-agent MEDIUM): the pool was pre-funded
-        // with 500K. Schedule 4 grants of 200K each — the 4th must reject
+        // with 500K. Schedule 4 grants of 200K each, the 4th must reject
         // with InsufficientFundsForCommitment because 4 * 200K = 800K > 500K.
         vm.startPrank(timelock);
         curator.createGrant(makeAddr("g1"), 200_000e6, keccak256("a"));
@@ -204,8 +204,8 @@ contract CuratorTest is Test {
         vm.expectRevert(abi.encodeWithSelector(Curator.UsdcTransferFailed.selector, grantee, uint256(25_000e6)));
         curator.claim(1);
 
-        // claimed_at must NOT be stamped — revert rolled back the storage write.
-        // total_disbursed_wei must NOT include this grant — same rollback.
+        // claimed_at must NOT be stamped, revert rolled back the storage write.
+        // total_disbursed_wei must NOT include this grant, same rollback.
         (,,,, uint64 claimedAt,) = curator.getGrant(1);
         assertEq(uint256(claimedAt), 0, "transfer-fail must NOT mark the grant claimed");
         assertEq(curator.total_disbursed_wei(), 0, "total_disbursed must roll back");
@@ -226,7 +226,7 @@ contract CuratorTest is Test {
         vm.prank(timelock);
         curator.createGrant(grantee, 25_000e6, CID);
 
-        // FIRE76-9: cooldown — warp past it before cancelling.
+        // FIRE76-9: cooldown, warp past it before cancelling.
         vm.warp(block.timestamp + 7 hours);
 
         vm.expectEmit(true, false, false, true, address(curator));
@@ -252,12 +252,12 @@ contract CuratorTest is Test {
         curator.cancelGrant(1, "too-late");
     }
 
-    /// FIRE76-9 lock — cancel-cooldown enforced.
+    /// FIRE76-9 lock, cancel-cooldown enforced.
     function test_cancelGrant_rejectsBeforeCooldown_FIRE76_9() public {
         vm.prank(timelock);
         curator.createGrant(grantee, 25_000e6, CID);
 
-        // Immediate cancel attempt — must revert.
+        // Immediate cancel attempt, must revert.
         uint64 cancellable_at = uint64(block.timestamp) + curator.CANCEL_COOLDOWN_SECONDS();
         vm.prank(praetor);
         vm.expectRevert(
@@ -368,7 +368,7 @@ contract CuratorTest is Test {
         // Re-create at the same amount must succeed.
         vm.prank(timelock);
         uint256 secondId = curator.createGrant(grantee, 25_000e6, CID);
-        // Different ID — next_grant_id keeps incrementing per grant.
+        // Different ID, next_grant_id keeps incrementing per grant.
         assertEq(secondId, firstId + 1, "iter84: cancelled IDs are NOT reused");
         assertEq(curator.total_committed_wei(), 25_000e6);
     }
@@ -394,7 +394,7 @@ contract CuratorTest is Test {
         assertEq(curator.total_committed_wei(), 25_000e6);
     }
 
-    /// FIRE76-8 lock — canonical funding path emits + tracks.
+    /// FIRE76-8 lock, canonical funding path emits + tracks.
     function test_fund_emitsAndIncrementsTotal_FIRE76_8() public {
         // Mint to test contract + approve curator.
         usdc.mint(address(this), 100_000e6);
@@ -424,13 +424,13 @@ contract CuratorTest is Test {
         usdc.approve(address(curator), 1_000e6);
         vm.expectRevert(Curator.ZeroAmount.selector);
         curator.fund(0);
-        // Funded total stays at 0 — no event emitted.
+        // Funded total stays at 0, no event emitted.
         assertEq(curator.total_funded_wei(), 0, "iter55: zero-amount fund() must NOT advance total");
     }
 
     /// Iter 55 audit fix: symmetric GGG-1 coverage. `claim` is pinned for
     /// `transfer returns false` at test_claim_revertsOnTransferReturnsFalse
-    /// (line 195) — but `fund` does the same return-value check on
+    /// (line 195), but `fund` does the same return-value check on
     /// `transferFrom` at Curator.sol:200-201 and that branch had no test.
     /// USDT on mainnet famously returns void instead of bool, but other
     /// real ERC-20s (and any future Praetor-configured asset) may return

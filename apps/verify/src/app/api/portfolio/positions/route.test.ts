@@ -11,7 +11,7 @@ import { gql } from '@/lib/scribe-helpers';
  * fixes on /api/portfolio/positions. Pre-iter-63 zero tests pinned
  * any of them.
  *
- * - KK-5/6/7: route was doing `Number(big) / 1e6` in three places —
+ * - KK-5/6/7: route was doing `Number(big) / 1e6` in three places -
  *   size, notional, entryPrice. All lose precision past
  *   Number.MAX_SAFE_INTEGER on large notionals. formatUsd /
  *   formatShares preserve via BigInt + formatUnits.
@@ -59,7 +59,7 @@ function makePosition(overrides: Partial<{
   };
 }
 
-describe('GET /api/portfolio/positions — KK-5/6/7 precision', () => {
+describe('GET /api/portfolio/positions, KK-5/6/7 precision', () => {
   it('renders size via formatShares (KK-5)', async () => {
     (gql as any).mockResolvedValue({
       positions: [makePosition({ notionalSigned: '5500000' })], // 5.5 USDC
@@ -90,7 +90,7 @@ describe('GET /api/portfolio/positions — KK-5/6/7 precision', () => {
   });
 });
 
-describe('GET /api/portfolio/positions — Q64.64 entry-price extraction', () => {
+describe('GET /api/portfolio/positions, Q64.64 entry-price extraction', () => {
   it('extracts integer entry price via >> 64n', async () => {
     // $250 in Q64.64 = 250 << 64. The route shifts right 64 and renders.
     (gql as any).mockResolvedValue({
@@ -108,10 +108,10 @@ describe('GET /api/portfolio/positions — Q64.64 entry-price extraction', () =>
     const { GET } = await import('./route');
     const json = await (await GET()).json();
     // Pre-U-21 the route shipped `markPrice = entryPrice` and
-    // `pnlUsd = '$0.00'` — both presented as measured truth even though
+    // `pnlUsd = '$0.00'`, both presented as measured truth even though
     // no oracle reads or P&L settlement existed. Protocol integrity rule:
     // "never display a placeholder number that looks real." Now null so
-    // the UI renders "—" with a named pending caption.
+    // the UI renders "-" with a named pending caption.
     expect(json.positions[0].entryPrice).toBe('$1,234');
     expect(json.positions[0].markPrice).toBeNull();
     expect(json.positions[0].pnlUsd).toBeNull();
@@ -130,8 +130,8 @@ describe('GET /api/portfolio/positions — Q64.64 entry-price extraction', () =>
   it('U-33: returns entryPrice=null when subgraph ships entryPriceQ64=0', async () => {
     // subgraph/src/plinth.ts:90 ships entryPriceQ64 = 0 until Plinth's
     // event-extension-v2 emits the entry price on open. Pre-U-33 the
-    // route rendered "$0" for every position — fake-zero. Now null so
-    // the table shows "—" with a named pending tooltip.
+    // route rendered "$0" for every position, fake-zero. Now null so
+    // the table shows "-" with a named pending tooltip.
     (gql as any).mockResolvedValue({
       positions: [makePosition({ entryPriceQ64: '0' })],
     });
@@ -168,7 +168,7 @@ describe('GET /api/portfolio/positions — Q64.64 entry-price extraction', () =>
   });
 });
 
-describe('GET /api/portfolio/positions — negative-notional sign rendering', () => {
+describe('GET /api/portfolio/positions, negative-notional sign rendering', () => {
   it('renders short positions with leading minus on size', async () => {
     // Two's-complement negative bigint serialized as decimal: prefix "-".
     (gql as any).mockResolvedValue({
@@ -193,7 +193,7 @@ describe('GET /api/portfolio/positions — negative-notional sign rendering', ()
   });
 });
 
-describe('GET /api/portfolio/positions — venue label resolution', () => {
+describe('GET /api/portfolio/positions, venue label resolution', () => {
   it('resolves recognized venueId to its venue label', async () => {
     (gql as any).mockResolvedValue({
       positions: [makePosition({ venueId: 1 })],
@@ -215,7 +215,7 @@ describe('GET /api/portfolio/positions — venue label resolution', () => {
   });
 });
 
-describe('GET /api/portfolio/positions — pending paths', () => {
+describe('GET /api/portfolio/positions, pending paths', () => {
   it('returns pending when wallet env unset', async () => {
     delete process.env.DEMO_WALLET_ADDRESS;
     const { GET } = await import('./route');

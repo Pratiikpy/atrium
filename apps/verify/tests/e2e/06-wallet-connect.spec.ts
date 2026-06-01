@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 6 — Wallet connect + connected-state reads.
+ * Journey 6, Wallet connect + connected-state reads.
  *
  * Drives the connect flow via the E2E mock connector (present only in a
- * NEXT_PUBLIC_E2E=1 build — see src/lib/wagmi.ts). The production connector is
+ * NEXT_PUBLIC_E2E=1 build, see src/lib/wagmi.ts). The production connector is
  * the Coinbase Smart Wallet passkey/hosted flow, which cannot be driven
  * headlessly; the mock connector connects a deterministic address and the app
  * reads REAL Arbitrum Sepolia state for it.
@@ -41,7 +41,7 @@ test.describe('Wallet connect (E2E mock connector)', () => {
     await page.waitForTimeout(2500);
     const body = (await page.textContent('body')) ?? '';
     // Connected, the dashboard must still be honest: any unbacked value is a
-    // named pending/—, never a fabricated number. Guard the prototype mocks.
+    // named pending/-, never a fabricated number. Guard the prototype mocks.
     for (const mock of ['$4.20M', '$12.3M', '42,392', '37 agents']) {
       expect(body).not.toContain(mock);
     }

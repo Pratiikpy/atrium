@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title AdapterPullPauseRespect — integration test
+/// @title AdapterPullPauseRespect, integration test
 /// @notice Pause Coffer withdrawals, attempt adapter pull, assert revert
 ///         WithdrawalsPausedError (Phase 2b/2a coordination). Then resume,
 ///         assert pull succeeds.

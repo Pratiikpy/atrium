@@ -10,7 +10,7 @@ export async function GET() {
     // `.toLowerCase()` on a presumed-string and silently threw TypeError when
     // Scribe returned null fields (real during schema rollovers / partial
     // sync). The route's catch then swallowed the throw into the pending
-    // fallback — but the data WAS available, just one bad row corrupted the
+    // fallback, but the data WAS available, just one bad row corrupted the
     // whole response.
     const data = await gql<{
       sigilValidations: Array<{ agent: string | null }>;
@@ -41,14 +41,14 @@ export async function GET() {
       totalCapacityUsd: null,
       capacityUsedPct: null,
       // Iteration 37 audit fix: agentsCopied + feeAgentsCount were
-      // hardcoded to 0 in BOTH success and pending paths — never measured
+      // hardcoded to 0 in BOTH success and pending paths, never measured
       // against any data source. Audit TTT-1 fixed the client-side stat-row
       // catch (→ nulls) but missed the server route, so the server returned
       // 0 → client passed through → UI rendered "0 agents copied" as if
       // measured. Same partial-coverage shape as iter 18's
       // multisig::execute (audit fix applied to schedule but not execute).
       // Now: null in both paths. UI fallback (stat-row.tsx) already
-      // handles null → "—" + "pending" sub-label.
+      // handles null → "-" + "pending" sub-label.
       agentsCopied: null,
       agentsByVenues: null,
       feesPaidUsd: null,
@@ -59,7 +59,7 @@ export async function GET() {
     return NextResponse.json({
       // Iteration 37: catch path matches stat-row.tsx's local fallback.
       // Pre-fix had activeMandates:0 which would render "0 active mandates"
-      // on any Scribe outage — a user with real mandates would see "0" and
+      // on any Scribe outage, a user with real mandates would see "0" and
       // might panic-press Kill Switch thinking delegations were revoked.
       activeMandates: null,
       activeSessionKeys: null,

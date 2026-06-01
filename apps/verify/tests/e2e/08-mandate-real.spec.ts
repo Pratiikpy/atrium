@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 8 — REAL agent-mandate signature through the UI (funded-key connector).
+ * Journey 8, REAL agent-mandate signature through the UI (funded-key connector).
  *
  * The mandate is a single EIP-712 IntentSigil signature (no broadcast): clicking
  * "Sign mandate" routes through the funded-key connector's eth_signTypedData_v4,

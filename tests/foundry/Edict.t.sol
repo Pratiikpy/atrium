@@ -95,7 +95,7 @@ contract EdictTest is Test {
         vm.expectRevert(Edict.Unauthorized.selector);
         edict.assignTier(user, Edict.UserTier.Tier3, keccak256("proof"));
 
-        // Timelock cannot directly assign — only Sumsub or Praetor.
+        // Timelock cannot directly assign, only Sumsub or Praetor.
         vm.prank(timelock);
         vm.expectRevert(Edict.Unauthorized.selector);
         edict.assignTier(user, Edict.UserTier.Tier3, keccak256("proof"));
@@ -128,7 +128,7 @@ contract EdictTest is Test {
         edict.assignTier(user, Edict.UserTier.Tier3, proof);
         assertEq(uint256(edict.tierOf(user)), uint256(Edict.UserTier.Tier3));
 
-        // Same proof, second time — must revert.
+        // Same proof, second time, must revert.
         address otherUser = makeAddr("other-user");
         vm.prank(sumsub);
         vm.expectRevert(abi.encodeWithSelector(Edict.ProofReplay.selector, proof));
@@ -162,7 +162,7 @@ contract EdictTest is Test {
         vm.prank(praetor);
         edict.assignTier(user, Edict.UserTier.Tier4, bytes32(0));
 
-        // No revert — Tier4 satisfies any lower requirement.
+        // No revert, Tier4 satisfies any lower requirement.
         edict.requireTier(user, Edict.UserTier.Tier1);
         edict.requireTier(user, Edict.UserTier.Tier2);
         edict.requireTier(user, Edict.UserTier.Tier3);
@@ -172,7 +172,7 @@ contract EdictTest is Test {
     // ── setSumsubVerifier() gating (F-32 fix) ─────────────────────────
 
     function test_setSumsubVerifier_onlyTimelock() public {
-        // Multisig direct call must revert — parameter change requires the
+        // Multisig direct call must revert, parameter change requires the
         // 48h objection window. This is the F-32 audit fix locked in.
         vm.prank(praetor);
         vm.expectRevert(Edict.Unauthorized.selector);

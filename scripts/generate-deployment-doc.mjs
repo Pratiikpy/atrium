@@ -21,7 +21,7 @@ function status(entry) {
 }
 
 function sourcifyLink(entry, name) {
-  if (!entry.address) return '—';
+  if (!entry.address) return '-';
   // Stylus WASM contracts are not yet supported by Sourcify
   if (/^(plinth|coffer|sigil|vigil|plinth-math|plinth-oracle)$/.test(name)) {
     return '⚠️ Stylus';
@@ -47,7 +47,7 @@ for (const [name, entry] of Object.entries(registry.contracts)) {
 }
 
 const lines = [];
-lines.push('# Deployment registry — Arbitrum Sepolia');
+lines.push('# Deployment registry, Arbitrum Sepolia');
 lines.push('');
 lines.push('> This file is generated from `deployments/arbitrum_sepolia.json` by `scripts/generate-deployment-doc.mjs`. Do not edit by hand.');
 lines.push('');
@@ -69,11 +69,11 @@ for (const cat of ORDER) {
   lines.push('| Name | Address | Tx | Block | Kind | Version | Status | Sourcify | Notes |');
   lines.push('|------|---------|-----|-------|------|---------|--------|----------|-------|');
   for (const e of entries) {
-    const addr = e.address ? `[\`${e.address.slice(0, 10)}…\`](${ARBISCAN}/address/${e.address})` : '—';
-    const tx = e.tx ? `[\`${e.tx.slice(0, 10)}…\`](${ARBISCAN}/tx/${e.tx})` : '—';
-    const block = e.block ?? '—';
-    const kind = e.kind ?? '—';
-    const version = e.version ?? '—';
+    const addr = e.address ? `[\`${e.address.slice(0, 10)}…\`](${ARBISCAN}/address/${e.address})` : '-';
+    const tx = e.tx ? `[\`${e.tx.slice(0, 10)}…\`](${ARBISCAN}/tx/${e.tx})` : '-';
+    const block = e.block ?? '-';
+    const kind = e.kind ?? '-';
+    const version = e.version ?? '-';
     const st = status(e);
     const srcfy = sourcifyLink(e, e.name);
     const note = (e.note || '').replace(/\|/g, '·').slice(0, 80) + ((e.note || '').length > 80 ? '…' : '');
@@ -86,7 +86,7 @@ lines.push('---');
 lines.push('');
 lines.push('### Sourcify verification');
 lines.push('');
-lines.push('Solidity contracts are verified on [Sourcify](https://sourcify.dev) (full match). Stylus WASM contracts (Plinth, Coffer, Sigil, Vigil, Plinth-Math, Plinth-Oracle) are not yet supported by Sourcify — verification is done via `cargo stylus verify` against the Arbitrum Stylus verifier.');
+lines.push('Solidity contracts are verified on [Sourcify](https://sourcify.dev) (full match). Stylus WASM contracts (Plinth, Coffer, Sigil, Vigil, Plinth-Math, Plinth-Oracle) are not yet supported by Sourcify, verification is done via `cargo stylus verify` against the Arbitrum Stylus verifier.');
 lines.push('');
 lines.push('---');
 lines.push('');

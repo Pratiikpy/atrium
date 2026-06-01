@@ -26,4 +26,4 @@ attack pre-condition. -->
 ## Bounty preference
 
 - [ ] I'd like to be considered for the [bug bounty program](https://verify.atrium.fi/security/bounty)
-- [ ] No bounty needed — just want it fixed
+- [ ] No bounty needed, just want it fixed

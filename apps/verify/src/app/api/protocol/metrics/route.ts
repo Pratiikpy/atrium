@@ -34,8 +34,8 @@ export async function GET() {
     //
     // Iteration 35 audit fix: the field was previously named `venuesLive`
     // and consumers rendered it as "Live venues N/7." But the count was
-    // measured from the deployment registry — adapters with a non-zero
-    // contract address — NOT from on-chain `get_venue_health()` reads. A
+    // measured from the deployment registry, adapters with a non-zero
+    // contract address, NOT from on-chain `get_venue_health()` reads. A
     // deployed-but-broken adapter (depegged oracle, paused, rate-limited)
     // would show as "live" alongside a healthy one. Renamed to
     // `venuesDeployed` so the field name matches what the count actually
@@ -47,7 +47,7 @@ export async function GET() {
       testnetTvlDelta30d: null,
       // Iteration 36 audit fix: these were hardcoded to 0 in the success
       // path, NOT measured from any data source. The UI rendered them as
-      // "Registered agents 0" — looks identical to a real measured zero.
+      // "Registered agents 0", looks identical to a real measured zero.
       // Same label-lie shape as iteration 35's venuesLive: the field name
       // implied a measurement the code wasn't making.
       //
@@ -84,17 +84,17 @@ export async function GET() {
 async function countDeployedAdapters(): Promise<number> {
   // Wave-II refactor: registry path-walk lives in lib/deployments-registry.ts.
   // Counts adapters with a non-zero contract address in the deployments
-  // registry. This is "deployed" — present on chain at a known address. It
-  // is NOT "operational" — the adapter may be deployed but paused, oracle-
+  // registry. This is "deployed", present on chain at a known address. It
+  // is NOT "operational", the adapter may be deployed but paused, oracle-
   // depegged, or otherwise unable to route. A separate read of each
   // adapter's `get_venue_health()` via RPC is needed for operational
   // status; not done here to keep the metrics endpoint at a single-source-
   // of-truth cost (registry file read, no RPC fanout).
   //
   // Audit U-28: pre-fix the slug list was hardcoded ['aave-horizon',
-  // 'hyperliquid', 'pendle', 'curve', 'trade-xyz', 'polymarket'] — adding
+  // 'hyperliquid', 'pendle', 'curve', 'trade-xyz', 'polymarket'], adding
   // a new venue to @/lib/venues silently failed to update the count.
-  // Now we count VENUES whose adapter contract is in the registry — a
+  // Now we count VENUES whose adapter contract is in the registry, a
   // venue is "deployed" when its adapter slug has a non-zero address.
   // HIP-3 and HIP-4 both count when adapter-hyperliquid lands because
   // they share that contract. Total matches VENUE_COUNT for symmetry

@@ -1,5 +1,5 @@
 /**
- * x402 configuration — Codex pay-to address (Phase 6, FULL_AUDIT #49).
+ * x402 configuration, Codex pay-to address (Phase 6, FULL_AUDIT #49).
  *
  * Reads CODEX_PAY_TO_ADDRESS from environment (Doppler-managed).
  * Fails loudly at import time if not set, preventing the service from
@@ -15,7 +15,7 @@ export function loadPayToAddress(env: Record<string, string | undefined>): strin
       '[codex] FATAL: CODEX_PAY_TO_ADDRESS is not configured. ' +
         'Set it in Doppler (atrium-staging/atrium-prod codex config) to a ' +
         'Coffer-deposit-derived address controlled by Praetor. ' +
-        'Refusing to start — every x402 payment would fail.',
+        'Refusing to start, every x402 payment would fail.',
     );
   }
   if (!ADDRESS_REGEX.test(addr)) {

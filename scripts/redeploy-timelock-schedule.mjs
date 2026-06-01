@@ -9,20 +9,21 @@
  * Records each op's (target, calldata, scheduledAt) to .forge-cache/timelock-ops.json
  * so execute() can recompute the exact id.
  *
- * Usage: ATRIUM_KEYDIR=C:/Users/prate/.atrium node scripts/redeploy-timelock-schedule.mjs
+ * Usage: ATRIUM_KEYDIR=<your-key-dir> node scripts/redeploy-timelock-schedule.mjs
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const OUT_PATH = resolve(REPO_ROOT, '.forge-cache/timelock-ops.json');
-const CAST = process.env.CAST_BIN ?? (process.platform === 'win32' ? 'C:/Users/prate/.foundry/bin/cast.exe' : 'cast');
+const CAST = process.env.CAST_BIN ?? 'cast';
 
 const TIMELOCK = '0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4';
 const COFFER = '0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3';

@@ -1,4 +1,4 @@
-"""Unit tests for US Form 8949 calculator — IRS Publication 544 + IRC §1091.
+"""Unit tests for US Form 8949 calculator, IRS Publication 544 + IRC §1091.
 
 Iter 76 audit fix: pins the I-8 wash-sale fix on
 src/jurisdictions/us.py. Pre-iter-76 zero tests pinned it despite
@@ -9,7 +9,7 @@ invariant for any US user with offsetting buys around losses.
   body, so wash sales were never marked (`wash_sale_flag` stayed
   False) AND the disallowed loss never propagated forward to the
   replacement-share basis. Users would receive Form 8949 rows
-  reporting a loss the IRS would have disallowed — a tax-fraud
+  reporting a loss the IRS would have disallowed, a tax-fraud
   audit risk on its face.
 """
 
@@ -192,7 +192,7 @@ def test_wash_sale_does_not_double_flag_same_disposal():
         t(0, "buy", 100, 10.0),
         t(5, "sell", 100, 8.0),     # $200 loss
         t(10, "buy", 100, 9.0),     # replacement A
-        t(20, "buy", 100, 9.0),     # replacement B — must NOT re-flag
+        t(20, "buy", 100, 9.0),     # replacement B, must NOT re-flag
     ]
     report = calculate_us_form_8949(trades)
     # Only the day-5 disposal exists. Flagged once.

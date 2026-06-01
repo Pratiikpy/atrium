@@ -25,7 +25,7 @@ export function handleKillSwitchActivated(event: KillSwitchActivated): void {
 // Tier-2 defensive observability. Partial-failure path of the kill switch:
 // per-agent revoke failed (Sigil paused / agent already revoked in stale
 // nonce / future upgrade quirk). The user needs to know which agents the
-// kill switch did NOT successfully revoke — without this indexing, the
+// kill switch did NOT successfully revoke, without this indexing, the
 // kill-switch UI would render "everything revoked" when it actually wasn't.
 export function handleSigilRevokeSkipped(event: SigilRevokeSkipped): void {
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString();

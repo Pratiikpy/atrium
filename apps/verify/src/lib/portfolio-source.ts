@@ -10,7 +10,7 @@
  *   - Registry path-walk now lives in `lib/deployments-registry.ts`
  *     (audit HH-2 tested, zero-address sentinel rejected).
  *   - Cache key now includes the resolved Plinth address. The prior cache
- *     was time-only — if Praetor rotated Plinth's address mid-deploy,
+ *     was time-only, if Praetor rotated Plinth's address mid-deploy,
  *     subsequent reads served stale data against the OLD contract for 60s.
  *     Now any address change invalidates the cache immediately.
  */
@@ -29,7 +29,7 @@ let cachedAt = 0;
 export async function tryGetPlinth(): Promise<PlinthReadClient | null> {
   const plinthAddress = await loadContractAddress('plinth');
   if (!plinthAddress) {
-    // Address gone (rare but possible — e.g. registry file deleted mid-rotation).
+    // Address gone (rare but possible, e.g. registry file deleted mid-rotation).
     // Clear the cache so the next deploy doesn't read through a stale client.
     cachedClient = null;
     cachedAddress = null;

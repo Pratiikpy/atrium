@@ -1,4 +1,4 @@
-// Plinth — pure math (Kani-verifiable, no storage)
+// Plinth, pure math (Kani-verifiable, no storage)
 //
 // Functions here have no host calls, no storage access, no I/O.
 // They are pure and can be model-checked by Kani.
@@ -76,7 +76,7 @@ pub fn compute_realized_pnl(
 }
 
 // =============================================================================
-// Kani harnesses — formal verification of pure-math invariants
+// Kani harnesses, formal verification of pure-math invariants
 // =============================================================================
 #[cfg(kani)]
 mod kani_proofs {
@@ -120,7 +120,7 @@ mod kani_proofs {
     ///
     /// For any reading where `now.saturating_sub(last_publish_time) > freshness`,
     /// the freshness predicate evaluates to "stale" (and the caller must
-    /// reject). Pure-arithmetic invariant — no contract state needed.
+    /// reject). Pure-arithmetic invariant, no contract state needed.
     ///
     /// This proof exercises the exact saturating-sub branch the Plinth
     /// price-read path uses at `lib.rs:715`.
@@ -140,7 +140,7 @@ mod kani_proofs {
             // saturating_sub is 0 when last_publish > now (clock skew); in
             // that case lag = 0 which is < any freshness > 0, so we're in
             // the "not stale" branch. Guard against the underflow case:
-            // if now < last_publish, lag = 0 ≤ freshness — that's accepted
+            // if now < last_publish, lag = 0 ≤ freshness, that's accepted
             // by the freshness rule, but is_not_stale should also imply
             // that now is sane. The Plinth caller separately validates
             // that the oracle answer is non-zero; we don't need to model

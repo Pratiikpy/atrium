@@ -14,7 +14,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
  * result panel. Tx links open Arbiscan.
  *
  * If JS fails or the user has no wallet, the page still renders with a
- * clear empty state — per docs/conventions/ui.md (empty + error + loading + permission states required).
+ * clear empty state, per docs/conventions/ui.md (empty + error + loading + permission states required).
  */
 
 export const STEP_CONFIG = {
@@ -31,7 +31,7 @@ export const STEP_CONFIG = {
     // (paired with the AtriumRouter batch-open helper). Until then the
     // copy describes the single-leg path the user actually runs.
     title: 'Open a position',
-    body: 'Open a position through AtriumRouter — Plinth records the margin row, Coffer routes USDC to the selected venue adapter, the adapter opens the venue side. Hedged batch flow lands in a follow-up release.',
+    body: 'Open a position through AtriumRouter, Plinth records the margin row, Coffer routes USDC to the selected venue adapter, the adapter opens the venue side. Hedged batch flow lands in a follow-up release.',
     contract: 'AtriumRouter.open_position_via_adapter',
     nextStep: 3,
   },
@@ -57,7 +57,7 @@ export const STEP_CONFIG = {
     title: 'Verify proof of reserves',
     // Phase theta-followup (2026-05-25): cadence updated. Pre-fix said
     // "hourly Merkle roots" but Phase θ.3 moved Lantern from Vercel
-    // daily cron to a GHA cron running every 10 minutes — 6× the
+    // daily cron to a GHA cron running every 10 minutes, 6× the
     // resolution.
     body: 'Lantern publishes a fresh Merkle root every 10 minutes via GHA cron. The page shows your balance as a Merkle leaf with a verifiable inclusion proof against the latest root.',
     contract: 'Lantern.AttestationPublished',

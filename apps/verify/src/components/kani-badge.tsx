@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 /**
- * Kani CI badge — judge-facing surface per ui.md §Verifier Mode rules.
+ * Kani CI badge, judge-facing surface per ui.md §Verifier Mode rules.
  *
  * A11Y-07: Wrapped in a persistent aria-live region so status transitions
  * (checking → pass/fail/unknown) are announced to screen readers.

@@ -5,7 +5,7 @@ import { useAccount, useWriteContract, useConfig } from 'wagmi';
 import { waitForTransactionReceipt } from 'wagmi/actions';
 
 /**
- * Postern Kill Switch — the single button that revokes every Sigil mandate
+ * Postern Kill Switch, the single button that revokes every Sigil mandate
  * and cancels every Postern session key for the connected wallet.
  *
  * Calls `PosternKillSwitch.activate(address[] agents_to_revoke)` with the
@@ -63,7 +63,7 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
     // wallet through to the API so the kill switch operates on the
     // CONNECTED user's mandates, not the demo wallet's. Pre-fix any
     // connected user clicking kill-switch would have revoked the demo
-    // wallet's mandates and left their own intact — the opposite of
+    // wallet's mandates and left their own intact, the opposite of
     // the user's intent.
     let agents: `0x${string}`[];
     try {

@@ -48,7 +48,7 @@ interface ICoffer {
     /// user keeps zero shares for it. Stylus exports as
     /// adapterReturn(uint256,address)(uint256).
     function adapterReturn(uint256 amount, address to_user) external returns (uint256);
-    /// The vault's underlying asset (USDC) — used to measure the exact amount
+    /// The vault's underlying asset (USDC), used to measure the exact amount
     /// the adapter returned this tx. Stylus exports as asset()(address).
     function asset() external view returns (address);
 }
@@ -104,7 +104,7 @@ interface ICofferApprovedQuery {
 ///           builds are locally blocked on Windows MSVC (`human_left.md` #11).
 ///           Option C is a pure Solidity contract, locally buildable and
 ///           testable via Foundry today.
-///         - Adapters move from `onlyCoffer` to `onlyAuthorizedCaller` — a
+///         - Adapters move from `onlyCoffer` to `onlyAuthorizedCaller`, a
 ///           small mapping settable by Praetor that approves Coffer + Router.
 ///           See `CurveAdapter` for the canonical migration; remaining
 ///           adapters (Pendle, Aave V11, TradeXyz, Polymarket, Hyperliquid)
@@ -119,7 +119,7 @@ contract AtriumRouter is ReentrancyGuard {
     bool public is_paused;
 
     /// @notice Emitted on every successful end-to-end open via the Router.
-    /// Pre-Router this event channel was non-existent — the only on-chain
+    /// Pre-Router this event channel was non-existent, the only on-chain
     /// trace of an "atomic open" was the four separate per-contract events.
     event PositionOpenedViaRouter(
         address indexed user,
@@ -247,10 +247,10 @@ contract AtriumRouter is ReentrancyGuard {
         if (adapter_addr == address(0)) revert VenueNotRegistered(venue_id);
 
         // Audit iteration 50 fix: the FIRE78-COF2 check that the file-header
-        // docstring (line 47-55) PROMISED — but the code never built. Pre-fix
+        // docstring (line 47-55) PROMISED, but the code never built. Pre-fix
         // the Router declared `ICofferApprovedQuery`, declared
         // `AdapterAlsoApprovedAsOrchestrator`, and described the defense-in-
-        // depth contract — and then never called the interface. A
+        // depth contract, and then never called the interface. A
         // misconfigured Coffer (sub-adapter ALSO in approved_adapters
         // alongside the Router) would let that adapter call
         // `coffer.adapter_pull` directly, bypassing Router-level position
@@ -334,7 +334,7 @@ contract AtriumRouter is ReentrancyGuard {
         if (adapter_addr == address(0)) revert VenueNotRegistered(venue_id);
 
         // Iter 50: FIRE78-COF2 mirror on the close path. Same defense-in-
-        // depth as open_position_via_adapter — if the adapter is also on
+        // depth as open_position_via_adapter, if the adapter is also on
         // Coffer's approved-orchestrators list, refuse to route through it.
         // Close path matters too: a malicious sub-adapter could call
         // coffer.adapter_pull during close_position to drain more than the
@@ -347,14 +347,14 @@ contract AtriumRouter is ReentrancyGuard {
         // we can re-credit the user's vault shares for it. The adapter
         // transfers closing proceeds into Coffer during close_position; pre-fix
         // that USDC sat in the pool raising assets-per-share for every OTHER
-        // holder while the originating user kept zero shares for it — their own
+        // holder while the originating user kept zero shares for it, their own
         // collateral was permanently transferred away.
         address usdc = coffer.asset();
         uint256 cofferUsdcBefore = IERC20Balance(usdc).balanceOf(address(coffer));
 
         // Step 1: adapter closes the venue-side position and returns PnL.
         // The adapter transfers received USDC to Coffer in its own
-        // close_position (per audit JJJ-9 + JJJ-12 patterns — the redeemed
+        // close_position (per audit JJJ-9 + JJJ-12 patterns, the redeemed
         // amount routes back to atrium_coffer, not to the Router).
         //
         // Phase theta.1 fix: same v1.0 vs v1.1 dispatch as on the open
@@ -388,7 +388,7 @@ contract AtriumRouter is ReentrancyGuard {
         );
     }
 
-    /// @notice Open two positions atomically in a single tx — the "hedged pair"
+    /// @notice Open two positions atomically in a single tx, the "hedged pair"
     /// pattern for Verifier Step 2. Both legs succeed or both revert.
     /// Phase 8 addition (Option A): avoids two separate tx confirmations in the
     /// demo flow. ~200 bytes of glue, well within EIP-170 budget.
@@ -472,7 +472,7 @@ contract AtriumRouter is ReentrancyGuard {
     /// @dev    Deliberately uses a low-level staticcall + decode rather than
     ///         a try/catch on the typed selector. Reason: a v1.0 adapter
     ///         missing the `open_position_v11` selector would also revert
-    ///         in a blind-try design, but with empty-data — indistinguishable
+    ///         in a blind-try design, but with empty-data, indistinguishable
     ///         from a legitimate downstream revert (e.g. user out of margin).
     ///         The version() probe is single-source-of-truth and lets real
     ///         reverts propagate untouched.

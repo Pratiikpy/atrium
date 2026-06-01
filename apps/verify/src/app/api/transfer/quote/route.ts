@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
  *   - gasFeeUsd: l2 gas estimate (Postern sponsored on testnet)
  *
  * Until Aqueduct deploys, returns source=pending with null values so the
- * Transfer form renders "—" honestly.
+ * Transfer form renders "-" honestly.
  */
 export async function GET(req: NextRequest) {
   const amountStr = req.nextUrl.searchParams.get('amount') ?? '0';
@@ -37,13 +37,13 @@ export async function GET(req: NextRequest) {
   // Honesty fix (2026-05-29 audit): these are ESTIMATES, not a live CCIP
   // quote. The previous response labelled them source:'aqueduct' which
   // implied they came from the deployed CCIP router via IRouterClient.getFee
-  // — they did not; the seconds + fees are computed here. A real live quote
+  //, they did not; the seconds + fees are computed here. A real live quote
   // needs Aqueduct to expose a getFee passthrough (tracked in human_left.md
   // `aqueduct-live-quote`). Until then we return source:'estimate' + a note
   // so the Transfer form can caption it truthfully and never present a
   // fabricated figure as an on-chain quote. Testnet CCIP fees are genuinely
   // ~0 (LINK faucet) and L2 gas is Postern-sponsored, so the values are
-  // honest estimates — just not a live read.
+  // honest estimates, just not a live read.
   return NextResponse.json({
     estimatedSeconds,
     ccipFeeUsd: '$0.00',
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     postedAt: 'on arrival',
     source: 'estimate' as const,
     isLiveQuote: false,
-    note: 'Testnet estimate — not a live CCIP router quote.',
+    note: 'Testnet estimate, not a live CCIP router quote.',
   }, { headers: noCacheHeaders });
 }
 

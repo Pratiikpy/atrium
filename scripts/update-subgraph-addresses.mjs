@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Update subgraph/subgraph.yaml with deployed contract addresses + startBlocks
- * from deployments/<network>.json. Idempotent — only touches data sources
+ * from deployments/<network>.json. Idempotent, only touches data sources
  * whose contract slug is present in the deployments registry.
  *
  * Data sources for not-yet-deployed contracts (Stylus suite) stay at
@@ -63,7 +63,7 @@ for (const [name, slug] of Object.entries(NAME_TO_SLUG)) {
     updates += 1;
     console.log(`  ${name.padEnd(22)} ${addr}  block ${startBlock}`);
   } else {
-    console.warn(`  ${name.padEnd(22)} no match — pattern drifted or already updated`);
+    console.warn(`  ${name.padEnd(22)} no match, pattern drifted or already updated`);
   }
 }
 

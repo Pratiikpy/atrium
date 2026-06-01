@@ -28,7 +28,7 @@ export function LiveQuote({
   }
 
   // Audit PP-3 fix: prior code accepted `data?.collateralDeltaBps` alone as
-  // "ready". But `baselineUsd` is the second required number — the
+  // "ready". But `baselineUsd` is the second required number, the
   // ResearchAttestation contract event doesn't carry it (only ipfsHash +
   // tradesCount + collateralDeltaBps + notebookUrl). Without baselineUsd, the
   // atrium-savings math evaluates to `0 * (1 - savedPercent) = 0` and both
@@ -49,13 +49,13 @@ export function LiveQuote({
   // IPFS-pinned JSON behind ipfsHash. If isPublishable is false (or the
   // IPFS gateway couldn't confirm it), surface that explicitly rather
   // than rendering the synthetic figure. Per internal rules "Never invent a
-  // number" — a synthetic-pairs backtest's savings figure is structurally
+  // number", a synthetic-pairs backtest's savings figure is structurally
   // wrong by 5-10x, so silently rendering it would inflate Atrium's
   // claimed performance on the landing-page hook.
   if (data.isPublishable === false) {
     return (
       <span
-        title={`Source: ${sourceLabel} — synthetic backtest (${data.dataMode ?? 'unknown'}); honest mode pending real-trades archive`}
+        title={`Source: ${sourceLabel}, synthetic backtest (${data.dataMode ?? 'unknown'}); honest mode pending real-trades archive`}
         className="text-ink-soft"
       >
         {placeholder}
@@ -77,7 +77,7 @@ export function LiveQuote({
   }
   // Audit PP-1 fix: prior code did `Math.abs(deltaBps)` which destroyed the
   // sign. A LOSS backtest (deltaBps < 0) would display as if Atrium saved
-  // money — exactly inverted from reality. Sign matters: positive bps = atrium
+  // money, exactly inverted from reality. Sign matters: positive bps = atrium
   // requires less collateral, negative bps = atrium requires more.
   const fraction = data.collateralDeltaBps / 10_000;
   const atrium = Math.max(0, baseline * (1 - fraction));

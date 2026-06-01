@@ -2,7 +2,7 @@
 
 Manual pre-launch checklist. Run through each item on the day of launch.
 
-## Public routes — confirm 200 + valid metadata
+## Public routes, confirm 200 + valid metadata
 
 | Route | Expected title | Expected status |
 |-------|---------------|-----------------|
@@ -29,7 +29,7 @@ Manual pre-launch checklist. Run through each item on the day of launch.
 | `/benchmarks` | Atrium · Benchmarks | 200 |
 | `/rostrum` | Atrium · Rostrum | 200 |
 
-## Auth-protected routes — confirm 401 without session
+## Auth-protected routes, confirm 401 without session
 
 | Route | Expected |
 |-------|----------|

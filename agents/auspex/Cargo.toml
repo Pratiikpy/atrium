@@ -1,6 +1,6 @@
 [package]
 name = "atrium-auspex"
-description = "Auspex — basis-trade reference agent for Atrium (Pendle YT vs Aave T-bill)"
+description = "Auspex, basis-trade reference agent for Atrium (Pendle YT vs Aave T-bill)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

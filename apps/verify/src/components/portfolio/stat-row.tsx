@@ -6,17 +6,17 @@ import { VENUE_COUNT } from '@/lib/venues';
 import { HelpTip } from '@/components/ui/help-tip';
 
 /**
- * Portfolio stat row — port of design/Atrium App.standalone.html#portfolio
+ * Portfolio stat row, port of design/Atrium App.standalone.html#portfolio
  * top section. Four big stacked cards with Geist 500 bold-sans numbers
  * and concrete trader labels:
- *   - BUYING POWER       (PRIMARY) — at 3.0x portfolio margin
- *   - TOTAL COLLATERAL   — across N live venues
- *   - OPEN NOTIONAL      — % utilisation
- *   - P&L · 24H          — % on collateral (green/red)
+ *   - BUYING POWER       (PRIMARY), at 3.0x portfolio margin
+ *   - TOTAL COLLATERAL  , across N live venues
+ *   - OPEN NOTIONAL     , % utilisation
+ *   - P&L · 24H         , % on collateral (green/red)
  *
  * Pre-rewrite the labels were 'Total acct value / Total req margin / ...'
  * and the numbers rendered tiny on small cards. Design intent: this is
- * the trader's home page — every number must read at a glance.
+ * the trader's home page, every number must read at a glance.
  */
 interface SummaryResponse {
   totalAccountValueUsd: string | null;
@@ -46,7 +46,7 @@ export function PortfolioStatRow() {
     refetchInterval: 30_000,
   });
 
-  // Derived sublines — fall back to honest pending state when live data
+  // Derived sublines, fall back to honest pending state when live data
   // hasn't arrived. The card SHELLS render always so the layout shape
   // matches the design contract; only the numeric content swaps in.
   const sourceLive = data?.source === 'plinth';
@@ -129,7 +129,7 @@ function BigStatCard({
   direction?: 'up' | 'down' | 'flat' | null;
   emphasis?: boolean;
 }) {
-  const display = loading ? null : value ?? '—';
+  const display = loading ? null : value ?? '-';
   const valueColor =
     direction === 'up'
       ? 'oklch(0.58 0.13 145)'

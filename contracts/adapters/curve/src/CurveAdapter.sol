@@ -30,7 +30,7 @@ contract CurveAdapter is IPorticoAdapter, ReentrancyGuard {
     // change that must pass through the 48h timelock veto window.
     address public immutable praetor_timelock;
     // Audit EEEE-1 fix (`human_left.md` #31): the original `onlyCoffer`
-    // gate was too narrow — it precluded any orchestrator (e.g. AtriumRouter)
+    // gate was too narrow, it precluded any orchestrator (e.g. AtriumRouter)
     // from reaching the adapter. The Router was added so that Plinth →
     // Coffer.adapter_pull → adapter.open_position could be a single atomic
     // path. This mapping replaces the single-address gate.

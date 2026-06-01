@@ -5,7 +5,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseUnits, erc20Abi } from 'viem';
 // Audit U-39: shared testnet-token constants. Pre-fix this file
 // hardcoded the same USDC address as /api/transfer/chain-balance/route.ts
-// — two literals → drift risk on address rotation.
+//, two literals → drift risk on address rotation.
 import { ARB_SEPOLIA_USDC, USDC_DECIMALS } from '@/lib/testnet-tokens';
 
 /**
@@ -88,7 +88,7 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
     query: { enabled: Boolean(account && cofferAddress) },
   });
 
-  // wagmi's receipt hook is reactive — pass the tx hash that's currently
+  // wagmi's receipt hook is reactive, pass the tx hash that's currently
   // pending and the hook tells us when it's mined.
   const pendingHash =
     status.kind === 'approving' || status.kind === 'depositing' ? status.hash : undefined;
@@ -146,7 +146,7 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
         setStatus({ kind: 'approving', hash: approveHash });
         // Defer the deposit until the user can read approve confirmation.
         // The component renders the approve tx link first, then a second
-        // click on Deposit triggers the actual mint — this prevents the
+        // click on Deposit triggers the actual mint, this prevents the
         // wallet from popping a second signature prompt before the user
         // realises the first one fired.
         return;

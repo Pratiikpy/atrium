@@ -83,7 +83,7 @@ function Step({
   title: string;
   body: string;
   /**
-   * Optional fragment anchor — used by cross-page links like
+   * Optional fragment anchor, used by cross-page links like
    * `/learn#adapters` so the browser scrolls the relevant Step into view.
    * Pre-fix those links existed but had no matching id, so the browser
    * landed at the top of the page silently (audit U-19).

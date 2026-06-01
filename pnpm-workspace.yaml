@@ -1,7 +1,7 @@
 packages:
   - "apps/*"
   # Audit XX-4 fix: services/* glob matched 3 non-Node members (archive +
-  # praetor-cli + tablet — Python + Rust). pnpm install errors on
+  # praetor-cli + tablet, Python + Rust). pnpm install errors on
   # `services/archive/package.json` not found. List the Node services explicitly.
   - "services/codex"
   - "services/lantern-attestor"

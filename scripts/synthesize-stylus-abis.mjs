@@ -6,12 +6,12 @@
  * generic arg0 names would fail typecheck.
  *
  * Why this script exists: the Stylus contracts can't build under Rust 1.92
- * (stylus-sdk 0.6 const-eval bug — see STYLUS_MIGRATION_PLAN.md), so the
+ * (stylus-sdk 0.6 const-eval bug, see STYLUS_MIGRATION_PLAN.md), so the
  * normal ABI extraction path returns empty. The source files are then the
  * next-most-authoritative spec for what events exist.
  *
  * After the Stylus migration ships, scripts/extract-abis.mjs becomes
- * authoritative — its output replaces these stubs with the full ABI.
+ * authoritative, its output replaces these stubs with the full ABI.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';

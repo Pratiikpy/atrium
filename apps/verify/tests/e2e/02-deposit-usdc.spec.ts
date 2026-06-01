@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 2 — Deposit USDC into Coffer.
+ * Journey 2, Deposit USDC into Coffer.
  *
  * Per TDD §9.2: user lands on /app/vault, sees the Deposit card, enters
  * an amount, and submits. Pre-deployment the deposit button is disabled
@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  * Real assertions match what `apps/verify/src/components/vault/deposit-card.tsx`
  * actually renders:
  *   - Button label: `Deposit {amount || '0'} USDC` (e.g. "Deposit 0 USDC")
- *   - Helper text: from `readinessMessage()` — names "Coffer" or "registry"
+ *   - Helper text: from `readinessMessage()`, names "Coffer" or "registry"
  *   - Amount input: `<input type="number" inputMode="decimal" />`
  *
  * Locks the **real-data discipline** invariants from the audit:
@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
  *   - No dead buttons (the Deposit button is *disabled*, not silently broken)
  *   - Helper copy names the actual contract that hasn't deployed
  */
-test.describe('Journey 2 — Deposit USDC', () => {
+test.describe('Journey 2, Deposit USDC', () => {
   test('Vault page loads with Deposit and Withdraw cards @critical @mobile', async ({ page }) => {
     await page.goto('/app/vault', { waitUntil: 'load' });
 
@@ -28,7 +28,7 @@ test.describe('Journey 2 — Deposit USDC', () => {
     //      iPhone project that stream can abort (net::ERR_ABORTED), leaving only
     //      the root shell. Reload once if the AppShell hasn't attached.
     //   2. AppShell SSRs the desktop slot, then swaps to the mobile slot after
-    //      hydration — so scope to `.atrium-mobile-only` and use toContainText
+    //      hydration, so scope to `.atrium-mobile-only` and use toContainText
     //      (retries the whole subtree) to target VaultMobile's deposit/withdraw,
     //      not the transient CSS-hidden SSR desktop slot.
     // (Product verified: a direct iPhone-viewport dump shows "USDC BALANCE …
@@ -94,7 +94,7 @@ test.describe('Journey 2 — Deposit USDC', () => {
     // Audit R-9 / use-deployment-status.ts: readinessMessage returns either
     // "Deposit waits on Coffer to deploy…" or "Deposit is wired but the
     // deployment registry is empty…". Either string must mention a contract
-    // or the registry — never silent.
+    // or the registry, never silent.
     await page.goto('/app/vault');
 
     const body = (await page.textContent('body')) ?? '';

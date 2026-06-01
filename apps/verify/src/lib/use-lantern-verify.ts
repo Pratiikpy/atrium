@@ -6,7 +6,7 @@ import { useAccount } from 'wagmi';
 /**
  * Lantern proof-of-reserves inclusion verifier.
  *
- * Read-only flow — no contract write. Steps:
+ * Read-only flow, no contract write. Steps:
  *   1. GET /api/lantern/latest → root + ipfsCid + blockNumber
  *   2. POST /api/lantern/verify-inclusion with {root, ipfsCid, wallet}
  *      → server fetches tree.json from the configured IPFS gateway, finds
@@ -16,7 +16,7 @@ import { useAccount } from 'wagmi';
  * Honest failure modes:
  *   - No wallet → `wallet_not_connected`
  *   - No attestation yet → `no_attestation_yet`
- *   - Wallet not in tree → `wallet_not_found` (legitimate negative — user
+ *   - Wallet not in tree → `wallet_not_found` (legitimate negative, user
  *     never deposited or attestation pre-dates their deposit)
  *   - IPFS gateway down → `gateway_unreachable`
  *

@@ -97,7 +97,7 @@ export default function BountyPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li><strong>90-day responsible disclosure window.</strong></li>
             <li>Report to <a href="mailto:security@atrium.fi" className="underline">security@atrium.fi</a>.</li>
-            <li>PGP encryption optional — see <code className="font-mono text-ink">runbooks/pgp-key-generation.md</code>.</li>
+            <li>PGP encryption optional. See <code className="font-mono text-ink">runbooks/pgp-key-generation.md</code>.</li>
             <li>We acknowledge within 48 hours. Critical issues triaged same-day.</li>
             <li>Do not publicly disclose until the 90-day window expires or we publish a fix.</li>
           </ul>

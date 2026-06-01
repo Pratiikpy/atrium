@@ -3,7 +3,7 @@
  *
  * If lagBlocks > 100 (~25s on Arbitrum L2), skip the tick. A stale
  * subgraph could report accounts as paused when they've already been
- * resumed — executing a liquidation against a resumed account wastes
+ * resumed, executing a liquidation against a resumed account wastes
  * gas and logs a confusing revert.
  */
 

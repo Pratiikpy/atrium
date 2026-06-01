@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-/// @title AqueductSendSettle — integration test
+/// @title AqueductSendSettle, integration test
 /// @notice Happy CCIP path: source Aqueduct.send, dest receiver mints credit,
 ///         settle. Verifies AqueductReceiver.ccipReceive's nonReentrant modifier
 ///         (Phase 2b) by attempting reentrancy.
@@ -99,7 +99,7 @@ contract MockAqueductReceiver {
         assembly { codeSize := extcodesize(caller()) }
         if (codeSize > 0) {
             (bool ok,) = msg.sender.call(abi.encodeWithSignature("onCcipReceived(bytes32,address,uint256)", messageId, user, amount));
-            ok; // result intentionally ignored — hook is best-effort
+            ok; // result intentionally ignored, hook is best-effort
         }
         emit CreditMinted(messageId, user, amount);
     }
@@ -123,7 +123,7 @@ contract ReentrantAttacker {
         try target.ccipReceive(messageId, address(this), 1_000e6) {
             reentrySucceeded = true;
         } catch {
-            // reentrancy blocked — expected
+            // reentrancy blocked, expected
         }
     }
 }

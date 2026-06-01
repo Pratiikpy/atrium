@@ -2,7 +2,7 @@
  * Upstash REST-backed D1Database shim.
  *
  * Phase theta.2 fix (2026-05-25). Pre-fix the Vercel deploy of Codex used
- * `inMemoryDB` — per-instance state that is lost on every cold start. This
+ * `inMemoryDB`, per-instance state that is lost on every cold start. This
  * silently disabled x402 replay-dedup, HMAC dedup, and idempotency caching
  * on the Vercel surface: a paying customer who hit a cold Vercel instance
  * could replay any x402 payment proof and re-trigger the paid endpoint,
@@ -20,7 +20,7 @@
  *   - Smaller bundle (Edge functions get faster cold starts)
  *   - No new dependency in services/codex/package.json
  *   - The same fetch pattern is used in apps/verify/src/app/api/settings/
- *     notifications/route.ts:69 for Vercel KV — single discipline across
+ *     notifications/route.ts:69 for Vercel KV, single discipline across
  *     all KV-shaped backends
  *
  * Failure mode: when UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are
@@ -174,7 +174,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
     },
 
     async run() {
-      // DELETE expired idempotency rows is a no-op under Upstash —
+      // DELETE expired idempotency rows is a no-op under Upstash -
       // TTL is enforced by Redis itself. Return success so the caller
       // does not branch on a misleading failure.
       if (trimmed.startsWith('DELETE FROM idempotency_cache')) {
@@ -196,7 +196,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
         return { success: true, meta: { rows_written: 1 } };
       }
 
-      // INSERT payment — bind order MUST match the x402 middleware INSERT
+      // INSERT payment, bind order MUST match the x402 middleware INSERT
       // (src/middleware/x402.ts): 6 columns, omitting the nullable
       // facilitator_response: (id, wallet_address, path, amount_usdc_wei,
       // tx_hash, received_at). Destructuring 7 mis-read received_at into
@@ -230,7 +230,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
         };
         const rowJson = JSON.stringify(row);
         if (txHash) {
-          // SETNX returns 1 on success, 0 if the key already existed —
+          // SETNX returns 1 on success, 0 if the key already existed -
           // this is the canonical replay-dedup primitive.
           const acquired = await upstash<number>(cfg, [
             'SETNX',
@@ -266,7 +266,7 @@ function makeStatement(cfg: UpstashConfig, sql: string): D1Statement {
  * and UPSTASH_REDIS_REST_TOKEN are both set in process.env. Returns null
  * otherwise so the caller can fall back to inMemoryDB with a loud warning.
  */
-/// Structural env type — does not depend on @types/node, so the codex
+/// Structural env type, does not depend on @types/node, so the codex
 /// package can stay on the Workers/Edge type surface while still typing
 /// `process.env` correctly under the Vercel deploy.
 export type EnvLike = Record<string, string | undefined>;

@@ -1,6 +1,6 @@
 [package]
 name = "atrium-haruspex"
-description = "Haruspex — momentum reference agent for Atrium"
+description = "Haruspex, momentum reference agent for Atrium"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

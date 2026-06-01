@@ -44,7 +44,7 @@ function validBody(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('POST /api/agents/issue-mandate — Phase-3 CSRF origin gate', () => {
+describe('POST /api/agents/issue-mandate, Phase-3 CSRF origin gate', () => {
   it('rejects a request with no Origin header (403)', async () => {
     const req = new Request('http://localhost/api/agents/issue-mandate', {
       method: 'POST',
@@ -70,7 +70,7 @@ describe('POST /api/agents/issue-mandate — Phase-3 CSRF origin gate', () => {
   });
 });
 
-describe('POST /api/agents/issue-mandate — input validation', () => {
+describe('POST /api/agents/issue-mandate, input validation', () => {
   it('rejects a non-JSON body', async () => {
     const req = new Request('http://localhost/api/agents/issue-mandate', {
       method: 'POST',
@@ -127,7 +127,7 @@ describe('POST /api/agents/issue-mandate — input validation', () => {
   });
 
   it('rejects when total open cap < per-action cap (invariant)', async () => {
-    // The total open cap is the ceiling on outstanding position notional —
+    // The total open cap is the ceiling on outstanding position notional -
     // it must be ≥ the per-action cap or a single allowed trade would
     // breach it on entry.
     const res = await POST(
@@ -176,15 +176,15 @@ describe('POST /api/agents/issue-mandate — input validation', () => {
   });
 });
 
-describe('POST /api/agents/issue-mandate — pending-state response (audit S-4)', () => {
+describe('POST /api/agents/issue-mandate, pending-state response (audit S-4)', () => {
   it('valid payload (no signature) returns ok:false with sign-via-wagmi guidance', async () => {
     // Phase theta audit follow-up (2026-05-25): the legacy "Sigil contract
-    // not deployed" copy was a lie — Sigil IS deployed. Updated copy
+    // not deployed" copy was a lie, Sigil IS deployed. Updated copy
     // explains that the signed envelope completes issuance (IntentSigil
     // mandates are off-chain by design; only validateAction runs on-chain
     // at execution time).
     const res = await POST(makeRequest(validBody()) as never);
-    // 200 — request was well-formed; ok=false because the client hasn't
+    // 200, request was well-formed; ok=false because the client hasn't
     // signed yet (wagmi EIP-712 signing happens client-side).
     expect(res.status).toBe(200);
     const json = await res.json();

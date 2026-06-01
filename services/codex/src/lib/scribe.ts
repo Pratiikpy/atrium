@@ -1,12 +1,12 @@
 /**
  * Minimal GraphQL client for Scribe (the Atrium subgraph).
  *
- * Codex handlers should never reach into chain RPC directly for read paths —
+ * Codex handlers should never reach into chain RPC directly for read paths -
  * everything routes through Scribe so the user-facing API is consistent with
  * the dashboard reality (no race conditions between API and UI).
  *
  * Audit ZZZ-3 fix: pre-fix had no AbortSignal timeout. Matches the
- * verify-app `scribe-helpers.ts` P-7 fix — without a timeout, a slow
+ * verify-app `scribe-helpers.ts` P-7 fix, without a timeout, a slow
  * Scribe stacks hanging fetches across every /v1/* route that uses gql,
  * eating Worker isolate capacity even though Workers themselves auto-kill
  * at ~30s. Match the 3s budget set in the verify-app companion so the
@@ -16,7 +16,7 @@
  * the wrangler.toml default of "REPLACE_BEFORE_DEPLOY__..." (changed from
  * the PLACEHOLDER URL in the same iteration), `fetch()` would throw with a
  * cryptic "invalid URL" message. The route's catch turns that into a 503
- * with `scribe_unavailable` — but the underlying reason (config not set)
+ * with `scribe_unavailable`, but the underlying reason (config not set)
  * is buried in safeErrorDetail's redaction. Mirror the verify-app fix:
  * detect the placeholder pattern and throw a typed `ScribeNotConfigured`
  * error so the operator gets a precise "set SCRIBE_URL" signal.

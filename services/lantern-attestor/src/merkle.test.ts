@@ -16,10 +16,10 @@ import { buildTree, rootOf, inclusionProof, type Leaf } from './merkle';
  *   inclusion proof. OZ MerkleProof convention.
  * - Canonical ABI encoding: leaf = keccak(keccak(abi.encode(address,
  *   uint256, bytes32))). Encoding shape must match the on-chain
- *   verifier exactly — any drift here silently fails every proof.
+ *   verifier exactly, any drift here silently fails every proof.
  * - Power-of-two padding: leaves padded to next power of 2 with
  *   zero leaves for deterministic depth.
- * - hashPair sorts siblings before concatenation (OZ convention) —
+ * - hashPair sorts siblings before concatenation (OZ convention) -
  *   without sort, left/right ordering would have to be transmitted
  *   in the proof, breaking the OZ-compatible verifier.
  */
@@ -32,7 +32,7 @@ function makeLeaf(user: string, balance: bigint, saltSeed: number): Leaf {
   };
 }
 
-describe('buildTree — basic construction', () => {
+describe('buildTree, basic construction', () => {
   it('produces a 32-byte root for any leaf count', () => {
     const tree = buildTree([
       makeLeaf('0x' + 'a'.repeat(40), 1_000_000n, 1),
@@ -90,7 +90,7 @@ describe('buildTree — basic construction', () => {
   });
 });
 
-describe('buildTree — FIRE77-L1 deterministic encoding invariant', () => {
+describe('buildTree, FIRE77-L1 deterministic encoding invariant', () => {
   it('produces identical root for identical leaf sets', () => {
     const a = buildTree([
       makeLeaf('0x' + 'a'.repeat(40), 1_000_000n, 1),
@@ -138,7 +138,7 @@ describe('buildTree — FIRE77-L1 deterministic encoding invariant', () => {
   });
 });
 
-describe('inclusionProof — proof shape', () => {
+describe('inclusionProof, proof shape', () => {
   it('returns path + positions arrays of equal length', () => {
     const tree = buildTree(
       Array.from({ length: 8 }, (_, i) =>

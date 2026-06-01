@@ -15,7 +15,7 @@ import { checkScribeHealth } from './scribe-health';
 import { buildLeaves } from './leaves';
 import { heartbeat } from './heartbeat';
 
-// Fail loudly at startup if any required env is missing — otherwise the
+// Fail loudly at startup if any required env is missing, otherwise the
 // service silently produces empty attestations: fetchCofferBalances would
 // resolve to [], buildTree → empty root, and the operator gets a happy
 // "tick complete" log while no attestation actually reaches the chain.
@@ -36,7 +36,7 @@ const isUrl = (v: string) => /^https?:\/\/[a-z0-9.\-:]+(\/.*)?$/i.test(v);
 // extended LanternAttestor.publish to take 5 args (added leafCount +
 // ipfsCid) but the off-chain service ABI here was left at the 3-arg
 // shape. Every Lantern tick would build the Merkle tree, compute the
-// IPFS CID, call publish() — and the tx would revert at the EVM
+// IPFS CID, call publish(), and the tx would revert at the EVM
 // dispatch table with 'no matching function' because the selector
 // computed from this 3-arg ABI does not match the deployed 5-arg
 // selector. Same selector-mismatch class as Sumsub assignTier(2-arg vs
@@ -74,7 +74,7 @@ export async function publishOnce(): Promise<void> {
   await heartbeat('lantern-attestor');
 
   // Phase 4 (SD-3): Check Scribe health before fetching balances.
-  // If lagBlocks > 50 (~12s), abort — stale tree could miss recent deposits.
+  // If lagBlocks > 50 (~12s), abort, stale tree could miss recent deposits.
   try {
     const health = await checkScribeHealth(SCRIBE_URL);
     if (health.isStale) {
@@ -91,7 +91,7 @@ export async function publishOnce(): Promise<void> {
     return;
   }
 
-  // Phase 6: RPC fanout — every leaf reads convertToAssets(balanceOf(user))
+  // Phase 6: RPC fanout, every leaf reads convertToAssets(balanceOf(user))
   if (!COFFER_ADDRESS) {
     console.error('[lantern] COFFER_ADDRESS not set; cannot build leaves from RPC');
     return;
@@ -125,7 +125,7 @@ export async function publishOnce(): Promise<void> {
     message: { raw: root },
   });
 
-  // When IPFS pin failed, pass empty string — the contract stores it
+  // When IPFS pin failed, pass empty string, the contract stores it
   // verbatim and the event consumer renders "ipfs:none" downstream.
   // The contract has no constraint on this field; null-as-empty keeps
   // the publish path alive even when the pinning service is degraded.

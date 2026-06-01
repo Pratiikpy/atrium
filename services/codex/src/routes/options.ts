@@ -6,7 +6,7 @@ import { safeErrorDetail } from '../lib/error-safe';
 /**
  * Options pricing endpoint, wired to the Stoa Black-Scholes contract.
  *
- * **Status:** the underlying Stoa module is a Phase-2 scaffold per PRD §17 —
+ * **Status:** the underlying Stoa module is a Phase-2 scaffold per PRD §17 -
  * it returns 0 from price_call/price_put and conservative-upper-bound from
  * margin_for_long_call until the Trailblazer AI grant lands. This endpoint
  * surfaces the scaffold state honestly via the `module_status` field on every
@@ -72,7 +72,7 @@ const STOA_ABI = [
 ] as const;
 
 // Decimal-integer string (Stoa takes 1e18 fixed-point). Reject scientific notation
-// and floats — they would silently coerce in BigInt() and the caller would
+// and floats, they would silently coerce in BigInt() and the caller would
 // over- or under-pay margin without a clear error.
 const FIXED_POINT_REGEX = /^\d{1,40}$/;
 
@@ -230,7 +230,7 @@ optionsRouter.get('/status', async (c) => {
     // Audit U-31: viem 2.48 ReadContractParameters typedef requires
     // `authorizationList` for EIP-7702 compatibility but it's optional at
     // runtime. The `as never` short-circuit silences the strict-mode
-    // check without weakening the inferred return type — viem's runtime
+    // check without weakening the inferred return type, viem's runtime
     // ignores the missing field. Same shape at every readContract call
     // site in this file.
     const status = await client.readContract({

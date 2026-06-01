@@ -8,7 +8,7 @@ import { RegisterSW } from '@/components/register-sw';
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { NewRelicLoader } from '@/components/new-relic-loader';
 
-/* PERF-03: Self-hosted via next/font/google — eliminates external Google Fonts
+/* PERF-03: Self-hosted via next/font/google, eliminates external Google Fonts
    request, removes SRI concern (websec F3), and enables font subsetting. */
 const geist = Geist({
   subsets: ['latin'],

@@ -5,12 +5,12 @@
  * cannot be driven headlessly. To verify the REAL transaction flows (deposit,
  * trade, mandate-sign, kill-switch) through the UI end to end, this builds a
  * wagmi `injected` connector backed by a local viem account from a private
- * key — so clicking "Deposit"/"Sign mandate" produces a REAL signature / tx
+ * key, so clicking "Deposit"/"Sign mandate" produces a REAL signature / tx
  * on Arbitrum Sepolia.
  *
  * STRICTLY gated: only constructed when BOTH `NEXT_PUBLIC_E2E === '1'` AND
  * `NEXT_PUBLIC_E2E_PRIVATE_KEY` are set (see wagmi.ts). The key must be a
- * THROWAWAY testnet key (it ends up in the E2E build bundle) — never a real
+ * THROWAWAY testnet key (it ends up in the E2E build bundle), never a real
  * or admin key, never committed, never in a production build.
  */
 import { injected } from 'wagmi/connectors';

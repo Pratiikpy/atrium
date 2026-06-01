@@ -27,7 +27,7 @@ export function MerkleStructureCard() {
         <p className="font-display text-xl italic text-ink">Merkle structure</p>
         <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">
           {data?.leafCount != null
-            ? `${data.leafCount.toLocaleString('en-US')} leaves · depth ${data.depth ?? '—'}`
+            ? `${data.leafCount.toLocaleString('en-US')} leaves · depth ${data.depth ?? '-'}`
             : 'tree depth: pending'}
         </p>
       </header>
@@ -65,7 +65,7 @@ export function MerkleStructureCard() {
       </svg>
 
       <p className="mt-3 text-[11px] text-muted">
-        Schematic of the attested tree — the boxes show its shape, not specific leaves (real
+        Schematic of the attested tree, the boxes show its shape, not specific leaves (real
         leaves are per-account balance hashes). Leaf count and depth above are read live from the
         latest on-chain Lantern attestation. Use Verify my balance to check your own inclusion.
       </p>

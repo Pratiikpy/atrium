@@ -1,4 +1,4 @@
-// Atrium — typed mock domain (Lovable port, 2026-05-28)
+// Atrium, typed mock domain (Lovable port, 2026-05-28)
 // Source: Lovable prototype src/lib/atrium/types.ts (verbatim port).
 // These types back the landing-page visual mocks. Live data still flows
 // through wagmi/viem + Scribe queries on the /app/* routes.
@@ -113,9 +113,9 @@ export const BLOCKER = {
   safety: "Safety contracts deploy Month 1 W2",
   verifier: "Agent verifier deploys Month 1 W2",
   lantern: "Lantern publisher starts Month 6",
-  recovery: "Recovery — coming Month 8",
-  notifications: "Notifications — coming Month 5",
-  network: "Network settings — coming Month 3",
-  account: "Account settings — coming Month 4",
+  recovery: "Recovery, coming Month 8",
+  notifications: "Notifications, coming Month 5",
+  network: "Network settings, coming Month 3",
+  account: "Account settings, coming Month 4",
   postern: "Postern session-key indexing pending",
 } as const;

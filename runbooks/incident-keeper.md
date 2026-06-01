@@ -1,4 +1,4 @@
-# Incident — keeper failure
+# Incident, keeper failure
 
 Trigger: `vigil.keeper.miss.count` > 0, or fewer than 2 of 3 keepers reporting healthy.
 

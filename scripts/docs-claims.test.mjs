@@ -11,7 +11,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /**
  * Iter 81 audit fix: pins documentation-vs-filesystem consistency.
  *
- * README.md makes structural claims — "code lives at X",
+ * README.md makes structural claims, "code lives at X",
  * "see file Y", "the layout is Z". A future rename / move would
  * silently leave docs pointing at vanished paths. New contributors
  * read the README first; broken-link rot here is the worst onboarding
@@ -29,7 +29,7 @@ const FUTURE_STATE_PATHS = new Map([
 function extractBacktickedPaths(text) {
   // Match backticked tokens that look like file paths (have at least one
   // slash or recognized extension). Filter generic word-only backticks
-  // (e.g. `pnpm`, `bigint`) — we only care about path-shaped tokens.
+  // (e.g. `pnpm`, `bigint`), we only care about path-shaped tokens.
   const re = /`([a-zA-Z][a-zA-Z0-9_\/.\-]+\.(?:sol|rs|ts|tsx|md|json|yaml|toml|mjs|js|html|graphql))`/g;
   const out = new Set();
   for (const m of text.matchAll(re)) {
@@ -42,7 +42,7 @@ async function readDoc(name) {
   return await readFile(resolve(REPO_ROOT, name), 'utf8');
 }
 
-describe('README.md — every backticked file path exists', () => {
+describe('README.md, every backticked file path exists', () => {
   it('all README file-path references resolve on disk', async () => {
     const text = await readDoc('README.md');
     const paths = extractBacktickedPaths(text);
@@ -57,20 +57,20 @@ describe('README.md — every backticked file path exists', () => {
 
   it('FUTURE_STATE_PATHS keys appear in README (anti-stale-allow-list check)', async () => {
     // If we allow-listed a future-state path, it MUST still be referenced
-    // somewhere — otherwise it's stale and should be removed from the
+    // somewhere, otherwise it's stale and should be removed from the
     // allow-list (keeping the allow-list tight is the whole point).
     const text = await readDoc('README.md');
     for (const futurePath of FUTURE_STATE_PATHS.keys()) {
       assert.ok(
         text.includes(futurePath),
-        `FUTURE_STATE_PATHS includes "${futurePath}" but README doesn't mention it — remove the allow-list entry`,
+        `FUTURE_STATE_PATHS includes "${futurePath}" but README doesn't mention it, remove the allow-list entry`,
       );
     }
   });
 });
 
 
-describe('README.md — repo layout ASCII tree directories all exist', () => {
+describe('README.md, repo layout ASCII tree directories all exist', () => {
   it('every directory line in the "Repo layout" tree resolves', async () => {
     const text = await readDoc('README.md');
     // Repo layout uses Unicode tree characters "├──". Each line names a

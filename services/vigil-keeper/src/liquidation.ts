@@ -4,7 +4,7 @@
  * Plinth (not the keeper) queues liquidations inside `update_margin`
  * (contracts/plinth/src/lib.rs calls Vigil.queue_liquidation, which Vigil
  * gates to plinth_address). The keeper's only on-chain job is to EXECUTE
- * already-queued jobs once their deadline block has passed — it must never
+ * already-queued jobs once their deadline block has passed, it must never
  * call queueLiquidation itself (that path reverts Unauthorized for any
  * non-Plinth caller).
  *
@@ -13,11 +13,11 @@
 
 export interface QueuedJob {
   jobId: bigint;
-  /** Vigil.jobs(jobId).user — the underwater account. */
+  /** Vigil.jobs(jobId).user, the underwater account. */
   user: string;
-  /** Vigil.jobs(jobId).deadline_block — execution allowed at/after this block. */
+  /** Vigil.jobs(jobId).deadline_block, execution allowed at/after this block. */
   deadlineBlock: bigint;
-  /** Vigil.jobs(jobId).is_complete — already executed. */
+  /** Vigil.jobs(jobId).is_complete, already executed. */
   isComplete: boolean;
 }
 

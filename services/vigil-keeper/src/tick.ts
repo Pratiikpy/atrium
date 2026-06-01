@@ -156,7 +156,7 @@ export async function tickOnce(): Promise<void> {
         }
         validatedPaused.push(acct);
       } catch {
-        // RPC failure — include the account (fail-open for liveness)
+        // RPC failure, include the account (fail-open for liveness)
         validatedPaused.push(acct);
       }
     }
@@ -198,7 +198,7 @@ export async function tickOnce(): Promise<void> {
   // 083-BE10 fix (2026-05-30): pre-fix the keeper called queueLiquidation from
   // the keeper EOA. Vigil gates queue_liquidation to plinth_address
   // (contracts/vigil/src/lib.rs:253), so every queue write reverted
-  // Unauthorized and executeLiquidation was never reached — the only on-chain
+  // Unauthorized and executeLiquidation was never reached, the only on-chain
   // liquidation path the keeper shipped was non-functional. Now the keeper
   // discovers queued jobs from the on-chain LiquidationTriggered logs (the
   // subgraph has no queryable pending-job entity), reads jobs(job_id) for live

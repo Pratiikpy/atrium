@@ -1,5 +1,5 @@
 /**
- * Public status endpoint — no auth required.
+ * Public status endpoint, no auth required.
  * Returns the last tick of each agent so the verify-app can render
  * "agents are alive" badges in the /app/agents panel.
  */
@@ -24,7 +24,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (agents.length === 0) {
     return Response.json({
       status: 'pending',
-      detail: 'no ticks recorded on this instance yet — cron fires every 5 min',
+      detail: 'no ticks recorded on this instance yet, cron fires every 5 min',
       agents: [
         { agent: 'augur', last: null, count: 0 },
         { agent: 'haruspex', last: null, count: 0 },

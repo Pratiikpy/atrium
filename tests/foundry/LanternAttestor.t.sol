@@ -53,7 +53,7 @@ contract LanternAttestorTest is Test {
         vm.prank(signingKey);
         lantern.publish(keccak256("root-1"), 1_000_000, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
-        // Same block number must revert — strict-greater required.
+        // Same block number must revert, strict-greater required.
         vm.prank(signingKey);
         vm.expectRevert(
             abi.encodeWithSelector(LanternAttestor.StaleAttestation.selector, uint64(1_000_000), uint64(1_000_000))
@@ -121,7 +121,7 @@ contract LanternAttestorTest is Test {
     // ── rotateSigningKey() gating ───────────────────────────────────────
 
     function test_rotateSigningKey_onlyTimelock() public {
-        // Direct multisig call is rejected — only the timelock contract can
+        // Direct multisig call is rejected, only the timelock contract can
         // rotate. Forces the 48h objection window for every key rotation.
         vm.prank(praetor);
         vm.expectRevert(LanternAttestor.Unauthorized.selector);
@@ -192,7 +192,7 @@ contract LanternAttestorTest is Test {
         assertTrue(lantern.verifyInclusion(leafB, proofForB), "bob's proof must verify");
     }
 
-    /// FIRE77-L1 — second-preimage attack must be rejected.
+    /// FIRE77-L1, second-preimage attack must be rejected.
     function test_verifyInclusion_rejectsInteriorNodeAsLeaf_FIRE77_L1() public {
         bytes32 leafA = keccak256("alice-balance");
         bytes32 leafB = keccak256("bob-balance");
@@ -228,7 +228,7 @@ contract LanternAttestorTest is Test {
         vm.prank(signingKey);
         lantern.publish(root, 10, TEST_LEAF_COUNT, TEST_IPFS_CID, hex"");
 
-        // Hostile leaf with the same sibling must not verify — the judge demo
+        // Hostile leaf with the same sibling must not verify, the judge demo
         // hinges on this being unforgeable.
         bytes32 tampered = keccak256("inflated-balance");
         bytes32[] memory proof = new bytes32[](1);
@@ -272,7 +272,7 @@ contract LanternAttestorTest is Test {
     // ── Audit iteration 43 lock: rotateSigningKey zero + no-op guards ─
     //
     // Constructor's BBBBB-1 fix guards `_signing_key != address(0)` but
-    // the rotate setter had the same risk without the same guard — a
+    // the rotate setter had the same risk without the same guard, a
     // Praetor multisig accidentally scheduling a rotation to zero would
     // brick publish() (msg.sender is never address(0)) for 48h (timelock
     // recovery) + 48h (next rotation landing). 96h of broken attestations

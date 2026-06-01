@@ -95,7 +95,7 @@ git -C resources/<repo-name> fetch --unshallow
 Re-clone everything from scratch (if a repo gets into a bad state):
 
 ```bash
-cd "C:/Users/prate/Downloads/arb builder/resources"
+cd resources
 # Edit the list below to match
 for repo in \
   "OffchainLabs/arbitrum-docs" \

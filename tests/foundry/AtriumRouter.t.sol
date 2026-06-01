@@ -6,7 +6,7 @@ import {AtriumRouter} from "../../contracts/atrium-router/src/AtriumRouter.sol";
 import {CurveAdapter} from "../../contracts/adapters/curve/src/CurveAdapter.sol";
 import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdapter.sol";
 
-/// @title AtriumRouter — end-to-end integration test
+/// @title AtriumRouter, end-to-end integration test
 /// @notice Closes `human_left.md` #31 (Wave-EEEE finding): pre-Router the
 ///         Plinth → Coffer → adapter chain was unwired. PRD Verifier-Mode
 ///         Step 2 ("Open hedged position") had no working code path.
@@ -14,7 +14,7 @@ import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdap
 ///         This suite exercises the four-step Router orchestration end-to-
 ///         end through a fake Coffer and fake Plinth, with the real
 ///         CurveAdapter. The fake stand-ins faithfully implement the
-///         narrow interfaces the Router actually calls — adapter_pull,
+///         narrow interfaces the Router actually calls, adapter_pull,
 ///         open_position, getAccount. The CurveAdapter is real so the
 ///         migration from `onlyCoffer` → `onlyAuthorizedCaller` is
 ///         exercised against production code, not a mock.
@@ -141,7 +141,7 @@ contract AtriumRouterTest is Test {
         bytes memory empty = hex"";
 
         // User A opens a position.
-        vm.prank(user, user); // (sender, tx.origin) — FakePlinth records origin
+        vm.prank(user, user); // (sender, tx.origin), FakePlinth records origin
         (uint256 plinthId, uint256 venueId) =
             router.open_position_via_adapter(CURVE_VENUE_ID, INSTRUMENT, int256(1_000e6), empty, empty, empty);
 
@@ -193,7 +193,7 @@ contract AtriumRouterTest is Test {
 
     /// Iter 91: pin PositionClosedViaRouter emit. The open-side event
     /// has been asserted since the iter-50-era happy-path test; the
-    /// close-side emit was not. Subgraph indexes both — dropped close
+    /// close-side emit was not. Subgraph indexes both, dropped close
     /// emit would silently desync the position-lifecycle dashboard.
     event PositionClosedViaRouter(
         address indexed user,
@@ -224,7 +224,7 @@ contract AtriumRouterTest is Test {
     /// collateral the adapter returns. Pre-fix the Router never called back
     /// into Coffer on close, so returned collateral sat in the pool raising
     /// assets-per-share for every OTHER holder while the originating user kept
-    /// zero shares for it — permanent loss of their own collateral.
+    /// zero shares for it, permanent loss of their own collateral.
     function test_close_via_router_reCreditsUserShares_027SC6() public {
         bytes memory empty = hex"";
         uint256 sharesBefore = coffer.shares(user);
@@ -295,7 +295,7 @@ contract AtriumRouterTest is Test {
         vm.expectRevert(CurveAdapter.Unauthorized.selector);
         curve.setAuthorizedCaller(makeAddr("other-router"), true);
 
-        // Praetor can't set this — onlyTimelock, because authorization
+        // Praetor can't set this, onlyTimelock, because authorization
         // decisions are parameter-class changes requiring 48h veto window.
         vm.prank(praetor);
         vm.expectRevert(CurveAdapter.Unauthorized.selector);
@@ -348,7 +348,7 @@ contract AtriumRouterTest is Test {
     // Router would refuse to route through an adapter that is also
     // independently on Coffer's approved-adapters list. The
     // ICofferApprovedQuery interface, AdapterAlsoApprovedAsOrchestrator
-    // error, and the FIRE78-COF2 audit comment all existed — but the
+    // error, and the FIRE78-COF2 audit comment all existed, but the
     // actual `is_adapter_approved` call site didn't. The defense was
     // documented but unbuilt. Iteration 50 added the check at both open
     // + close paths.
@@ -379,7 +379,7 @@ contract AtriumRouterTest is Test {
     function test_close_via_router_rejectsAdapterAlsoApprovedAsOrchestrator_iter53() public {
         // Symmetric to the open-path test above. Iter 50 added the FIRE78-COF2
         // check to BOTH open and close paths but only added the open-path
-        // test — same partial-coverage shape as iter 18 multisig::execute
+        // test, same partial-coverage shape as iter 18 multisig::execute
         // and iter 43 LanternAttestor.rotateSigningKey. The close path
         // matters too: a malicious sub-adapter could call coffer.adapter_pull
         // during close_position to drain more than the position's actual
@@ -431,7 +431,7 @@ contract AtriumRouterTest is Test {
         bytes memory empty = hex"";
 
         // Configure FakePlinth so opening this position raises
-        // required_margin by 10k — i.e., a 10× leveraged 100k position.
+        // required_margin by 10k, i.e., a 10× leveraged 100k position.
         plinth.setMarginIncreasePerOpen(10_000e6);
 
         vm.prank(user, user);
@@ -459,7 +459,7 @@ contract AtriumRouterTest is Test {
         assertEq(required_after, 10_000e6, "iter58: FakePlinth required-margin tracker landed");
     }
 
-    /// Iter 97: fuzz the FIRE76-2 margin-delta invariant — Coffer pull
+    /// Iter 97: fuzz the FIRE76-2 margin-delta invariant, Coffer pull
     /// amount must EQUAL the margin delta (when non-zero), regardless of
     /// notional size. Pre-FIRE76-2 the Router pulled raw notional → fuzz
     /// across random (notional, margin_delta) pairs to catch any drift.
@@ -494,12 +494,12 @@ contract AtriumRouterTest is Test {
     /// triggers a 0 margin-delta, the Router falls back to abs(notional)
     /// at AtriumRouter.sol:210-212. The existing happy-path test
     /// (test_open_via_router_endToEnd_chainExecutes) already exercises
-    /// this branch — this test names it explicitly so a future refactor
+    /// this branch, this test names it explicitly so a future refactor
     /// removing the fallback can't be misread as "no path covered."
     function test_open_via_router_fallsBackToNotional_whenMarginDeltaZero_iter58() public {
         bytes memory empty = hex"";
 
-        // marginIncreasePerOpen defaults to 0 — required_after = required_before = 0.
+        // marginIncreasePerOpen defaults to 0, required_after = required_before = 0.
         vm.prank(user, user);
         router.open_position_via_adapter(
             CURVE_VENUE_ID,
@@ -540,7 +540,7 @@ contract AtriumRouterTest is Test {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// Fake dependencies — narrow implementations of the interfaces the Router
+// Fake dependencies, narrow implementations of the interfaces the Router
 // actually calls. Real Plinth + Coffer are Stylus; locally building them
 // is blocked on Windows MSVC (`human_left.md` #11). The fakes encode the
 // behavior the Router contractually expects.
@@ -553,7 +553,7 @@ contract FakePlinth {
     /// Iter 58 / FIRE76-2 test support: per-user required-margin tracker
     /// so getAccount returns a non-zero `required` second tuple entry.
     /// When marginIncreasePerOpen > 0, every open_position call
-    /// increments requiredMarginByUser[tx.origin] by that amount — which
+    /// increments requiredMarginByUser[tx.origin] by that amount, which
     /// is exactly what the Router's required_after - required_before
     /// delta-pull math reads to size the Coffer pull.
     mapping(address => uint256) public requiredMarginByUser;

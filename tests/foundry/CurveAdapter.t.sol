@@ -6,7 +6,7 @@ import {CurveAdapter} from "../../contracts/adapters/curve/src/CurveAdapter.sol"
 import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdapter.sol";
 
 /// @title CurveAdapter foundry test suite
-/// @notice Reference Portico adapter — Curve stableswap LP. CurveAdapter is the
+/// @notice Reference Portico adapter, Curve stableswap LP. CurveAdapter is the
 ///         simplest of the seven adapters (no off-chain attestation, single
 ///         instrument, no leverage). The test patterns here transfer to every
 ///         other adapter so this also doubles as the adapter-compliance template.
@@ -16,7 +16,7 @@ import {IPorticoAdapter} from "../../contracts/portico-registry/src/IPorticoAdap
 ///           2. onlyCoffer gate on open/close
 ///           3. Originator extraction from venue_payload (audit G-5 fix)
 ///           4. Position lifecycle: open → state → close emits PnL event
-///           5. modify_position reverts ("v1") — locked v1 behavior
+///           5. modify_position reverts ("v1"), locked v1 behavior
 ///           6. setRiskParams onlyPraetor
 ///           7. attest_off_chain_state returns false (non-hybrid)
 contract CurveAdapterTest is Test {
@@ -76,7 +76,7 @@ contract CurveAdapterTest is Test {
 
     function test_metadata_versionV1() public view {
         // Pure functions still require a deployed instance for the dispatch
-        // path — calling `CurveAdapter(address(0)).version()` does a CALL
+        // path, calling `CurveAdapter(address(0)).version()` does a CALL
         // to empty code and reverts. Call through the real instance.
         (uint256 major, uint256 minor, uint256 patch) = adapter.version();
         assertEq(major, 1);
@@ -121,7 +121,7 @@ contract CurveAdapterTest is Test {
 
     function test_open_happyPath_extractsOriginator() public {
         // The originator address is the first 20 bytes of venue_payload (audit
-        // G-5 fix — explicit originator, not tx.origin). Verify the position is
+        // G-5 fix, explicit originator, not tx.origin). Verify the position is
         // owned by that address even when msg.sender is the Coffer.
         bytes memory payload = abi.encodePacked(user);
 
@@ -204,7 +204,7 @@ contract CurveAdapterTest is Test {
     // ── modify_position locked in v1 ─────────────────────────────────
 
     function test_modify_position_revertsV1() public {
-        // v1 of the adapter doesn't support modify — must revert "v1".
+        // v1 of the adapter doesn't support modify, must revert "v1".
         // Locks the version-1 behavior so a future v2 implementation has a
         // clear breaking-change marker.
         vm.expectRevert(bytes("v1"));
@@ -267,7 +267,7 @@ contract CurveAdapterTest is Test {
     }
 
     function test_riskParams_defaultZero() public view {
-        // Before any setRiskParams call, all three queries return zero — the
+        // Before any setRiskParams call, all three queries return zero, the
         // Curator review is the gate that publishes real numbers.
         assertEq(adapter.get_haircut_bps(INSTRUMENT), 0);
         assertEq(adapter.get_initial_margin_bps(INSTRUMENT), 0);
@@ -296,7 +296,7 @@ contract CurveAdapterTest is Test {
     // ── JJJ-9 transfer-return-false revert path (audit UUUU-1) ────────
     // The JJJ-9 fix was to capture the `IERC20.transfer` return value at
     // close_position and revert with UsdcTransferFailed when it returns
-    // false. Pre-UUUU this revert branch had ZERO asserting tests — the
+    // false. Pre-UUUU this revert branch had ZERO asserting tests, the
     // mock always returned true. Pin the revert + verify state is NOT
     // mutated (position must NOT be deleted, PnL must NOT be emitted).
 
@@ -316,7 +316,7 @@ contract CurveAdapterTest is Test {
         );
         adapter.close_position(id, hex"");
 
-        // Position must still exist — the revert rolls back the storage
+        // Position must still exist, the revert rolls back the storage
         // delete + the PositionClosed emit. Pre-JJJ-9 the position was
         // deleted before the transfer line, so USDC was stranded in the
         // adapter with no record of the position. This is the load-bearing
@@ -329,7 +329,7 @@ contract CurveAdapterTest is Test {
     // ── Constructor zero-checks (audit NNNN-1) ───────────────────────
     // Audit TTTT-1: NNNN-1 added five `require(_X != address(0))` guards
     // to the constructor. Every existing test used the happy-path setUp
-    // and never asserted the revert path — a partial-coverage drift the
+    // and never asserted the revert path, a partial-coverage drift the
     // SSSS-1 test-coverage-gap lens flagged. These five pins close it.
 
     function test_constructor_revertsOnZeroPool() public {
@@ -436,7 +436,7 @@ contract MockERC20 {
 
     function transfer(address to, uint256 v) external returns (bool) {
         if (transferReturnsFalse) {
-            // Don't move balance — mimic USDT's silent-fail return.
+            // Don't move balance, mimic USDT's silent-fail return.
             return false;
         }
         require(balanceOf[msg.sender] >= v, "balance");

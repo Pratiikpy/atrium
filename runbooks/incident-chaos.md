@@ -21,16 +21,16 @@ stays paused after the demo.
 - /lantern dashboard banner stays red after the demo concludes
 - Sentry events tagged `chaos: misfire`
 
-## Triage (5 min target — demo is live)
+## Triage (5 min target, demo is live)
 
 1. Confirm whether the chaos tx landed at all:
    `cast tx <hash>` against the Praetor multisig.
 2. If the tx landed but no `EmergencyPaused` event fired, the target
-   is wrong — check `praetor pause <contract>` in the CLI; the
+   is wrong, check `praetor pause <contract>` in the CLI; the
    `<contract>` slug must resolve to a live address in
    `deployments/arbitrum_sepolia.json`.
 3. If the pause landed but resume() reverts, check the `Resumed`
-   event handler in `services/agents/api/chaos.ts` — confirm it
+   event handler in `services/agents/api/chaos.ts`, confirm it
    targets the same contract slug.
 
 ## Mitigations
@@ -40,7 +40,7 @@ stays paused after the demo.
 | Chaos tx never sent | Re-fire from Praetor multisig; verify CLI args | yes |
 | Wrong target | Update target slug; re-fire | yes |
 | Pause stuck on (resume reverts) | Direct multisig call to `<contract>.resume()`; bypass the CLI | yes |
-| Cascading pause (paused one contract, blocked the chained next-step) | Resume in the correct order — Plinth before Coffer before Aqueduct | yes |
+| Cascading pause (paused one contract, blocked the chained next-step) | Resume in the correct order, Plinth before Coffer before Aqueduct | yes |
 | Demo-time misfire | Switch to the Loom backup recorded per `runbooks/demo-day.md` | yes |
 
 ## Resolution checklist

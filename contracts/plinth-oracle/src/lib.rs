@@ -1,4 +1,4 @@
-// PlinthOracle — dual-oracle price reader extracted from Plinth.
+// PlinthOracle, dual-oracle price reader extracted from Plinth.
 //
 // The caller (Plinth) passes in the feed addresses + tolerance + freshness;
 // this contract reads Chainlink Data Streams + Pyth, applies all the same
@@ -49,7 +49,7 @@ sol_interface! {
 }
 
 // =============================================================================
-// Errors — caller maps to its own typed enum
+// Errors, caller maps to its own typed enum
 // =============================================================================
 sol! {
     error OracleErr(uint16 code);
@@ -148,7 +148,7 @@ impl PlinthOracle {
 }
 
 // =============================================================================
-// Pure helpers — copied verbatim from plinth::math so the oracle service is
+// Pure helpers, copied verbatim from plinth::math so the oracle service is
 // fully self-contained. (Plinth keeps a separate copy for its other math needs.)
 // =============================================================================
 const Q64_SCALE: U256 = U256::from_limbs([0, 1, 0, 0]); // 2^64
@@ -175,7 +175,7 @@ fn normalize_pyth(price_i64: i64, expo_i32: i32) -> U256 {
 
 /// Phase 2a fix: symmetric abs_diff_bps. Divides by max(a, b) instead of just `a`
 /// so that abs_diff_bps(a, b) == abs_diff_bps(b, a). Previously dividing by `a`
-/// meant the tolerance check was asymmetric — a 5% difference measured from the
+/// meant the tolerance check was asymmetric, a 5% difference measured from the
 /// lower price is larger than 5% measured from the higher price.
 fn abs_diff_bps(a: U256, b: U256) -> u16 {
     let max_val = if a > b { a } else { b };

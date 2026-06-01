@@ -29,7 +29,7 @@ vi.mock('viem/chains', () => ({
  * Iter 72 audit fix: pins the Wave-II address-rotation cache safety
  * on tryGetPlinth(). Pre-iter-72 zero tests pinned this even though
  * a stale-cache bug on rotation would serve old data against the
- * NEW contract address for 60 seconds — and the route's catch handler
+ * NEW contract address for 60 seconds, and the route's catch handler
  * masks the resulting failure as "pending" with no operator signal.
  *
  * Contract:
@@ -53,7 +53,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('tryGetPlinth — null on missing deployment', () => {
+describe('tryGetPlinth, null on missing deployment', () => {
   it('returns null when loadContractAddress returns null', async () => {
     mocks.loadContractAddress.mockResolvedValue(null);
     vi.resetModules();
@@ -71,7 +71,7 @@ describe('tryGetPlinth — null on missing deployment', () => {
   });
 });
 
-describe('tryGetPlinth — happy path + cache', () => {
+describe('tryGetPlinth, happy path + cache', () => {
   it('constructs a client when address present', async () => {
     const addr = '0x' + '1'.repeat(40);
     mocks.loadContractAddress.mockResolvedValue(addr);
@@ -96,7 +96,7 @@ describe('tryGetPlinth — happy path + cache', () => {
     await tryGetPlinth();
     await tryGetPlinth();
     await tryGetPlinth();
-    // Cache hit on call 2 and 3 — viem constructors only called once.
+    // Cache hit on call 2 and 3, viem constructors only called once.
     expect(mocks.createPublicClient).toHaveBeenCalledTimes(1);
     expect(mocks.getContract).toHaveBeenCalledTimes(1);
   });
@@ -114,7 +114,7 @@ describe('tryGetPlinth — happy path + cache', () => {
     await tryGetPlinth();
     expect(mocks.createPublicClient).toHaveBeenCalledTimes(1);
 
-    // Praetor rotates Plinth. Same in-process module — the cache must
+    // Praetor rotates Plinth. Same in-process module, the cache must
     // notice the address changed and rebuild immediately, not serve
     // a stale client tied to the OLD address.
     mocks.loadContractAddress.mockResolvedValue(addr2);
@@ -147,7 +147,7 @@ describe('tryGetPlinth — happy path + cache', () => {
   });
 });
 
-describe('tryGetPlinth — viem construction error', () => {
+describe('tryGetPlinth, viem construction error', () => {
   it('returns null when getContract throws', async () => {
     mocks.loadContractAddress.mockResolvedValue('0x' + '1'.repeat(40));
     mocks.getContract.mockImplementation(() => {

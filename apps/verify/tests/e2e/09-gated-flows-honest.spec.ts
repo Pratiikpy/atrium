@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Journey 9 — kill-switch + trade flows handle their gated on-chain states
+ * Journey 9, kill-switch + trade flows handle their gated on-chain states
  * HONESTLY (funded-key connector, real connected wallet).
  *
- * These two flows can't complete on-chain in the current state — by design,
+ * These two flows can't complete on-chain in the current state, by design,
  * not by bug:
  *  - kill-switch: revokes active mandates; with no active on-chain mandate the
  *    flow must surface an honest "nothing to revoke", never a fake success.
@@ -25,14 +25,14 @@ async function connect(page: import('@playwright/test').Page) {
   await expect(page.getByText(new RegExp(ADDR_PREFIX, 'i')).first()).toBeVisible({ timeout: 20_000 });
 }
 
-test.describe('Gated flows — honest handling (funded-key connector)', () => {
+test.describe('Gated flows, honest handling (funded-key connector)', () => {
   test.skip(!RUN, 'needs the funded-key build (E2E_KEY_BUILD=1)');
 
   test('kill-switch surfaces an honest state, never a fake revoke @critical', async ({ page }) => {
     test.setTimeout(120_000);
     await connect(page);
     await page.goto('/app/portfolio');
-    // EmergencyStopCard: "Activate kill switch" → "Confirm — this is irreversible" → activate.
+    // EmergencyStopCard: "Activate kill switch" → "Confirm, this is irreversible" → activate.
     const kill = page.getByRole('button', { name: /activate kill switch|confirm.*irreversible|revoke/i }).first();
     await expect(kill).toBeVisible({ timeout: 20_000 });
     await kill.click().catch(() => {});
@@ -41,7 +41,7 @@ test.describe('Gated flows — honest handling (funded-key connector)', () => {
     if (await confirm.isVisible().catch(() => false)) await confirm.click().catch(() => {});
     await page.waitForTimeout(8_000);
     const body = (await page.textContent('body')) ?? '';
-    // Honest terminal state: nothing-to-revoke, revoked, or an explicit error —
+    // Honest terminal state: nothing-to-revoke, revoked, or an explicit error -
     // and NEVER a fabricated "12 mandates revoked"-style number.
     expect(/nothing to revoke|no active mandate|revoked|revoke every|emergency stop/i.test(body)).toBe(true);
     expect(body).not.toMatch(/\b\d+ mandates revoked\b/i);

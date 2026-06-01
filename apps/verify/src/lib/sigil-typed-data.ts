@@ -56,7 +56,7 @@ export interface SigilTypedDataPayload {
 
 /**
  * Encode a venue id (1..255) as a 32-byte hex word with the byte at
- * position 31 — matches `padded[31] = v` in contracts/sigil/src/eip712.rs
+ * position 31, matches `padded[31] = v` in contracts/sigil/src/eip712.rs
  * line 109.
  */
 export function venueIdToBytes32(venueId: number): `0x${string}` {

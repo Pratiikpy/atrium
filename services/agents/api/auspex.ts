@@ -1,5 +1,5 @@
 /**
- * Auspex — funding-carry agent. TS port of agents/auspex/. Watches
+ * Auspex, funding-carry agent. TS port of agents/auspex/. Watches
  * Hyperliquid HIP-3 funding rates, takes the funded side of high-
  * conviction divergences.
  */

@@ -4,7 +4,7 @@ import type { MiddlewareHandler } from 'hono';
  * Per-IP / per-wallet / per-agent rate limit. Most restrictive applies.
  *
  * Year-1: Cloudflare Workers in-memory cache (per-isolate, ephemeral). Acceptable
- * for testnet since the Codex free tier caps at 100K req/day total — DOS surface
+ * for testnet since the Codex free tier caps at 100K req/day total, DOS surface
  * is limited by the CF account budget.
  *
  * Year-2: Cloudflare Durable Object backing store, or Redis (Upstash free tier).
@@ -15,11 +15,11 @@ import type { MiddlewareHandler } from 'hono';
  * PRUNE_EVERY_N requests, plus a hard ceiling that evicts the oldest bucket
  * when the map exceeds MAX_BUCKETS.
  *
- * Audit FFF-5 fix: pre-fix, `X-Wallet-Address` was accepted as-is — an
+ * Audit FFF-5 fix: pre-fix, `X-Wallet-Address` was accepted as-is, an
  * attacker could either rotate random hex per request to reset their bucket,
  * or claim another wallet's address to grief that wallet's bucket. We now
  * format-validate to 0x-prefixed 40-hex. Spoofing is still possible without
- * a signed payload (see security.md — known testnet limit), but at least
+ * a signed payload (see security.md, known testnet limit), but at least
  * the cardinality surface is bounded.
  */
 type Bucket = { count: number; window_start_ms: number };
@@ -42,7 +42,7 @@ const LIMITS: Record<string, { rpm: number }> = {
   '/v1/agents': { rpm: 30 },
   '/v1/backtest': { rpm: 5 },
   '/v1/attestation/latest': { rpm: 120 },
-  // Stoa options endpoints — read-only contract calls. Cheap on the RPC
+  // Stoa options endpoints, read-only contract calls. Cheap on the RPC
   // side, but still rate-limited to discourage probing while Stoa is in
   // Phase-2 scaffold mode (every call returns the same sentinel).
   '/v1/options': { rpm: 60 },
@@ -73,7 +73,7 @@ export const rateLimit: MiddlewareHandler = async (c, next) => {
   for (const id of [`ip:${ip}:${path}`, `wallet:${wallet}:${path}`]) {
     const b = buckets.get(id);
     if (!b || now - b.window_start_ms > windowMs) {
-      // FFF-4: cap total size — if at ceiling, drop oldest before inserting.
+      // FFF-4: cap total size, if at ceiling, drop oldest before inserting.
       if (buckets.size >= MAX_BUCKETS) {
         const oldestKey = buckets.keys().next().value;
         if (oldestKey) buckets.delete(oldestKey);

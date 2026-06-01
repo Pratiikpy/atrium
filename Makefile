@@ -47,7 +47,7 @@ demo-frontend:
 	@cd apps/verify && pnpm dev &
 	@sleep 5
 	@(which xdg-open >/dev/null 2>&1 && xdg-open http://localhost:3000) || (which open >/dev/null 2>&1 && open http://localhost:3000) || (which start >/dev/null 2>&1 && start http://localhost:3000) || echo "Open http://localhost:3000 manually"
-	@echo "==> Frontend demo running on http://localhost:3000 — Verifier shows live deployment status per step"
+	@echo "==> Frontend demo running on http://localhost:3000, Verifier shows live deployment status per step"
 
 install:
 	@echo "==> Installing dependencies"

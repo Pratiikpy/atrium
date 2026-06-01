@@ -1,4 +1,4 @@
-// PlinthMath — SPAN margin compute, extracted from Plinth.
+// PlinthMath, SPAN margin compute, extracted from Plinth.
 //
 // This contract is the stateless compute side of the Plinth split that was
 // forced by the EIP-170 24 KB code-size cap. Plinth (the storage contract)
@@ -17,7 +17,7 @@ use alloy_sol_types::sol;
 use stylus_sdk::prelude::*;
 
 // =============================================================================
-// Errors — Phase 2a: replace silent U256::ZERO returns with typed reverts
+// Errors, Phase 2a: replace silent U256::ZERO returns with typed reverts
 // =============================================================================
 sol! {
     error ArrayLengthMismatch();
@@ -36,7 +36,7 @@ sol_storage! {
 }
 
 // =============================================================================
-// Constants — must match the off-chain risk model
+// Constants, must match the off-chain risk model
 // =============================================================================
 const SCENARIOS_BPS: [(i32, u16); 7] = [
     (1, 1_000),
@@ -54,7 +54,7 @@ const MAX_CORRELATION_CLASSES: usize = 16;
 const MAX_ENTRY_PRICE_Q64: U256 = U256::from_limbs([0, 0, 1, 0]); // 2^128
 
 // =============================================================================
-// Public ABI — Plinth calls this via staticcall
+// Public ABI, Plinth calls this via staticcall
 // =============================================================================
 #[public]
 impl PlinthMath {
@@ -148,7 +148,7 @@ impl PlinthMath {
         }
 
         // Phase 2a fix #5: handle correlation_class == 0 positions individually.
-        // Each class-0 position is treated as its own independent class — no
+        // Each class-0 position is treated as its own independent class, no
         // netting across positions. This prevents the "all class-0 positions net
         // together" bug where unrelated instruments cancel each other's risk.
         //
@@ -230,7 +230,7 @@ fn signed_floor_div(numerator: I256, denominator: I256) -> I256 {
     let q = numerator / denominator;
     let r = numerator % denominator;
     // If remainder is non-zero and signs of numerator and denominator differ,
-    // the truncated quotient is above the floor — subtract 1.
+    // the truncated quotient is above the floor, subtract 1.
     if !r.is_zero() && ((numerator ^ denominator).is_negative()) {
         q - I256::try_from(1i64).unwrap_or(I256::ZERO)
     } else {

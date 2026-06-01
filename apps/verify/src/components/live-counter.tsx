@@ -5,7 +5,7 @@ import { useScribeCount } from '@/lib/scribe';
 /**
  * A counter rendered from a live Scribe (subgraph) query. If the count is
  * zero or the query fails, shows the empty-state fallback. Never invents a
- * number — per internal database conventions.
+ * number, per internal database conventions.
  */
 export function LiveCounter({
   label,

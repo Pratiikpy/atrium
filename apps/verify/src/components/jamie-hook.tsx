@@ -1,12 +1,12 @@
 import { LiveQuote } from './live-quote';
 
 /**
- * The Jamie hook — opening of the demo runbook per PRD §26.1 line 0:00–0:30.
+ * The Jamie hook, opening of the demo runbook per PRD §26.1 line 0:00–0:30.
  *
  * Both numbers (today's isolated margin AND the Atrium-netted margin) read
  * from the most recent on-chain ResearchAttestation. If the attestation has
  * not been published yet, both panels show placeholders that label themselves
- * as such — no hardcoded numbers presented as fact (audit D-26 fix).
+ * as such, no hardcoded numbers presented as fact (audit D-26 fix).
  */
 export function JamieHook() {
   return (

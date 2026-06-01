@@ -9,13 +9,13 @@ import { fileURLToPath } from 'node:url';
  * "unleash", "robust", "empower", "seamless", "streamline",
  * "cutting-edge", "state-of-the-art", "revolutionize").
  *
- * Two banned terms — "leverage" and "harness" — are legitimate domain
+ * Two banned terms, "leverage" and "harness", are legitimate domain
  * vocabulary (leverage = derivatives ratio; harness = formal-verification
  * test rig) and are excluded from the scan. The other ten are
  * exclusively marketing-speak with no domain meaning in our context.
  *
  * Scope: only user-facing source (.tsx in components/ + app/). Test
- * files are excluded — they can mention banned words in test strings
+ * files are excluded, they can mention banned words in test strings
  * to document the rule.
  */
 

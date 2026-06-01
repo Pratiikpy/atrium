@@ -1,4 +1,4 @@
-name: Atrium loadtest — nightly k6 + gas
+name: Atrium loadtest, nightly k6 + gas
 
 on:
   schedule:

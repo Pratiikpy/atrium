@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Script.sol";
 
-/// @title Seed — local demo state for `make demo`.
+/// @title Seed, local demo state for `make demo`.
 /// @notice Invoked by `praetor seed` (services/praetor-cli/src/commands/seed.rs).
 ///         Closes `human_left.md` #30 (YYY-7). PRD §26.2 + TDD Tenet 8
 ///         require a ≤90s clone-to-running stack; this script is the final
@@ -18,7 +18,7 @@ import "forge-std/Script.sol";
 ///   4. Publish a placeholder backtest CID via ResearchAttestation.
 ///
 /// All four steps are wrapped in `vm.startBroadcast` so they execute as real
-/// txs on the local anvil fork — the verifier UI sees them via Scribe.
+/// txs on the local anvil fork, the verifier UI sees them via Scribe.
 contract Seed is Script {
     address constant USDC_SEPOLIA = 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d; // Arbitrum Sepolia USDC
     uint256 constant SEED_USDC = 100_000e6;
@@ -33,7 +33,7 @@ contract Seed is Script {
         address router = vm.parseJsonAddress(json, ".contracts.\"atrium-router\".address");
         address researchAttestation = vm.parseJsonAddress(json, ".contracts.\"research-attestation\".address");
 
-        // 3 demo wallets — deterministic per anvil index (foundry default mnemonic).
+        // 3 demo wallets, deterministic per anvil index (foundry default mnemonic).
         address[3] memory wallets = [
             vm.addr(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d),
             vm.addr(0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a),
@@ -96,7 +96,7 @@ contract Seed is Script {
                 "publish(bytes32,uint256,int256,string)",
                 cid,
                 uint256(1234), // trades_count placeholder
-                int256(4200), // collateral_delta_bps — 42% saving placeholder
+                int256(4200), // collateral_delta_bps, 42% saving placeholder
                 "ipfs://Qm.../local-demo-backtest.ipynb"
             )
         );

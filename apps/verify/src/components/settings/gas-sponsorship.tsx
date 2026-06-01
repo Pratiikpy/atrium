@@ -14,7 +14,7 @@ interface Gas {
 // on any API failure, contradicting the "pending" status pill. The cap
 // (10) is a static product parameter sourced from the header copy
 // ("first ten UserOperations") and stays; only the user-specific count
-// becomes nullable so the UI renders "— / 10" honestly.
+// becomes nullable so the UI renders "- / 10" honestly.
 async function fetchGas(): Promise<Gas> {
   try {
     const r = await fetch('/api/settings/gas');
@@ -49,7 +49,7 @@ export function GasSponsorshipCard() {
       <div className="mt-4 flex items-baseline justify-between text-[10px] uppercase tracking-wider text-muted">
         <span>UserOps sponsored</span>
         <span className="font-mono text-sm text-ink">
-          {data?.sponsored ?? '—'} / {data?.cap ?? 10}
+          {data?.sponsored ?? '-'} / {data?.cap ?? 10}
         </span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-pill bg-divider-soft">

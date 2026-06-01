@@ -12,7 +12,7 @@ describe('isLiquidityError', () => {
     expect(isLiquidityError('no liquidity at venue')).toBe(true);
     expect(isLiquidityError('InsufficientLiquidity')).toBe(true);
     expect(isLiquidityError('execution reverted: depth too low')).toBe(true);
-    expect(isLiquidityError('thin market — no_buyer for 1000')).toBe(true);
+    expect(isLiquidityError('thin market, no_buyer for 1000')).toBe(true);
     expect(isLiquidityError('venue reverted on close')).toBe(true);
   });
 

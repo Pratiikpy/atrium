@@ -2,7 +2,7 @@
 /**
  * Generate raster brand assets from the canonical SVGs shipped under
  * apps/verify/public/brand/assets/. Uses sharp (already in the
- * monorepo's lockfile via Next image optimization) — no GUI tools.
+ * monorepo's lockfile via Next image optimization), no GUI tools.
  *
  * Phase eta.10 (2026-05-25): the /brand Download section linked to
  * PNG/ICO files that did not exist. SVGs ship from the codex E.2

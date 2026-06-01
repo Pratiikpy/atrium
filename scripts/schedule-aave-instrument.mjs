@@ -15,19 +15,20 @@
  * Records (target, calldata, scheduledAt) to .forge-cache/aave-instrument-ops.json
  * so an execute pass can recompute each id after scheduledAt + 48h.
  *
- * Usage: ATRIUM_KEYDIR=C:/Users/prate/.atrium node scripts/schedule-aave-instrument.mjs
+ * Usage: ATRIUM_KEYDIR=<your-key-dir> node scripts/schedule-aave-instrument.mjs
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const OUT_PATH = resolve(REPO, '.forge-cache/aave-instrument-ops.json');
-const CAST = process.env.CAST_BIN ?? (process.platform === 'win32' ? 'C:/Users/prate/.foundry/bin/cast.exe' : 'cast');
+const CAST = process.env.CAST_BIN ?? 'cast';
 
 const TIMELOCK = '0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4';
 const PLINTH = '0xd86f579ec880eaab27dfa698ae056d1893ec7553';   // new post-cutover Plinth

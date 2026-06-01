@@ -13,25 +13,24 @@
  * AlreadyExecuted, which this script catches and skips.
  *
  * Usage:
- *   ATRIUM_KEYDIR=/c/Users/prate/.atrium node scripts/execute-phase-b3.mjs
+ *   ATRIUM_KEYDIR=<your-key-dir> node scripts/execute-phase-b3.mjs
  *
  * Run on or after the executableAfter timestamp in the schedule json.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createDecipheriv, scryptSync } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const KEYDIR = process.env.ATRIUM_KEYDIR ?? 'C:/Users/prate/.atrium';
+const KEYDIR = process.env.ATRIUM_KEYDIR ?? join(homedir(), '.atrium');
 const RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 const SCHEDULE_PATH = resolve(REPO_ROOT, '.forge-cache/phase-b3-schedule-corrected.json');
 const EXECUTED_PATH = resolve(REPO_ROOT, '.forge-cache/phase-b3-executed.json');
-const CAST_BIN = process.env.CAST_BIN ?? (process.platform === 'win32'
-  ? 'C:/Users/prate/.foundry/bin/cast.exe'
-  : 'cast');
+const CAST_BIN = process.env.CAST_BIN ?? 'cast';
 
 async function loadDeployerKey() {
   const envelope = JSON.parse(await readFile(resolve(KEYDIR, 'lantern-key-deployer.json'), 'utf8'));
@@ -50,7 +49,7 @@ async function loadDeployerKey() {
   return '0x' + plain.toString('hex');
 }
 
-// Synchronous backoff between sends — the deployer EOA is shared with the
+// Synchronous backoff between sends. The deployer EOA is shared with the
 // Lantern cron, so a cron tick can bump the nonce mid-batch.
 function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -121,7 +120,7 @@ async function main() {
         sleepSync(5000);
         continue;
       }
-      break; // success, non-nonce error, or last attempt — handled below
+      break; // success, non-nonce error, or last attempt, handled below
     }
     if (r.status !== 0) {
       const stderr = r.stderr ?? '';

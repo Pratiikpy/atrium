@@ -13,7 +13,7 @@ import { gql } from '@/lib/scribe-helpers';
  *   asked for `lanternAttestations`. Type mismatch + any cast meant
  *   no compile-time check on the actual shape.
  * - NN-3: Scribe returns numeric fields as strings (BigInt-as-string).
- *   Prior code typed them as number and let downstream coerce —
+ *   Prior code typed them as number and let downstream coerce -
  *   `new Date(malformed * 1000)` rendered "Invalid Date" in UI.
  *   Now: strict-numeric parse, return 404 if any field is corrupt.
  * - TT-17: LanternAttestor.publish() does NOT carry ipfsCid in its
@@ -50,7 +50,7 @@ function validRow(overrides: Partial<{
   };
 }
 
-describe('GET /api/lantern/latest — 404 empty states', () => {
+describe('GET /api/lantern/latest, 404 empty states', () => {
   it('returns 404 + exists:false when no attestation indexed', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
@@ -144,7 +144,7 @@ describe('GET /api/lantern/latest — 404 empty states', () => {
   });
 });
 
-describe('GET /api/lantern/latest — happy path', () => {
+describe('GET /api/lantern/latest, happy path', () => {
   it('returns wire-shape JSON on valid row', async () => {
     (gql as any).mockResolvedValue({
       lanternAttestations: [validRow()],
@@ -174,7 +174,7 @@ describe('GET /api/lantern/latest — happy path', () => {
   });
 });
 
-describe('GET /api/lantern/latest — 503 on Scribe outage', () => {
+describe('GET /api/lantern/latest, 503 on Scribe outage', () => {
   it('returns 503 + scribe_unavailable (NOT silent 404)', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe down'));
     const { GET } = await import('./route');

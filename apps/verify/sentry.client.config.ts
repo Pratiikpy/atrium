@@ -1,4 +1,4 @@
-// Sentry browser-side init — Phase 3 hardened.
+// Sentry browser-side init, Phase 3 hardened.
 // Gated on user consent; scrubs wallet addresses from all telemetry.
 import * as Sentry from '@sentry/nextjs';
 import { hasConsent } from './src/lib/consent';

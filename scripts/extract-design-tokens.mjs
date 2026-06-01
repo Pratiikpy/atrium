@@ -13,7 +13,7 @@
 //
 // Run: node scripts/extract-design-tokens.mjs
 //
-// For perfect fidelity, run the Browser Extraction snippet instead — see
+// For perfect fidelity, run the Browser Extraction snippet instead, see
 // scripts/extract-design-tokens.browser.js. Open the HTML in Chrome, paste
 // that snippet into DevTools console, save the output.
 

@@ -42,7 +42,7 @@ function getOrCreateBalance(user: Bytes, blockNumber: BigInt): CofferUserBalance
     b.user = user;
     b.balanceWei = BigInt.zero();
     b.netDepositedAssetsWei = BigInt.zero();
-    // Per-user salt = keccak256(user) — deterministic, private (off-chain caller must know the address)
+    // Per-user salt = keccak256(user), deterministic, private (off-chain caller must know the address)
     b.salt = Bytes.fromByteArray(crypto.keccak256(ByteArray.fromHexString(user.toHexString())));
     b.lastUpdatedBlock = blockNumber;
   }

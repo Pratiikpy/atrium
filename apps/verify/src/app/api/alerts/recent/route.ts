@@ -22,9 +22,9 @@ export const dynamic = 'force-dynamic';
  * each contract individually.
  *
  * Query params:
- *   ?limit=50   — max 100, default 25
- *   ?kind=...   — optional filter to a single alert kind (closed-enum below)
- *   ?since=...  — unix-seconds timestamp; only return alerts newer than this
+ *   ?limit=50  , max 100, default 25
+ *   ?kind=...  , optional filter to a single alert kind (closed-enum below)
+ *   ?since=... , unix-seconds timestamp; only return alerts newer than this
  */
 const VALID_KINDS = new Set([
   'oracle_disagreement',

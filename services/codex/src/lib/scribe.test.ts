@@ -24,7 +24,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('Codex gql — iter-42 placeholder detection', () => {
+describe('Codex gql, iter-42 placeholder detection', () => {
   it('throws ScribeNotConfigured on the canonical placeholder string', async () => {
     const env = { SCRIBE_URL: 'REPLACE_BEFORE_DEPLOY__SET_SCRIBE_URL' };
     await expect(gql(env, 'query{}')).rejects.toBeInstanceOf(ScribeNotConfigured);
@@ -72,7 +72,7 @@ describe('Codex gql — iter-42 placeholder detection', () => {
   });
 });
 
-describe('Codex gql — request shape + ZZZ-3 timeout', () => {
+describe('Codex gql, request shape + ZZZ-3 timeout', () => {
   it('POSTs JSON body containing query + variables', async () => {
     let capturedInit: RequestInit | undefined;
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (_, init) => {
@@ -104,7 +104,7 @@ describe('Codex gql — request shape + ZZZ-3 timeout', () => {
   });
 });
 
-describe('Codex gql — response error handling', () => {
+describe('Codex gql, response error handling', () => {
   it('throws "Scribe <status>" on non-2xx', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('', { status: 503 }));
     await expect(gql({ SCRIBE_URL: 'https://scribe.example.com' }, 'query{}')).rejects.toThrow(/Scribe 503/);

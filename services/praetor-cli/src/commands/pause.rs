@@ -1,16 +1,16 @@
 //! Praetor emergency pause + resume.
 //!
 //! Per security.md §"Authentication and authorization": emergency pause is
-//! multisig-only with NO timelock — pause-only (cannot upgrade). Resume is
+//! multisig-only with NO timelock, pause-only (cannot upgrade). Resume is
 //! also multisig-only (or, on subsystems that expose it, multisig-direct via
 //! the subsystem's own `resume()`).
 //!
 //! Audit YYY-3 fix: pre-fix `run` and `resume` were no-op stubs that logged
 //! "emergency pause" and returned Ok(()) without doing anything. A founder
 //! running `praetor pause coffer` during an incident would think the
-//! contract was paused — but the contract kept running. Real exploit damage
+//! contract was paused, but the contract kept running. Real exploit damage
 //! would continue while the incident-response dashboard showed "paused".
-//! Now: same multisig-tx-blob pattern as `multisig.rs` — the CLI builds
+//! Now: same multisig-tx-blob pattern as `multisig.rs`, the CLI builds
 //! the `cast calldata` blob and prints the Safe-submission payload. Real
 //! signing happens in the founder Safe UI per `human_left.md` #2.
 
@@ -25,7 +25,7 @@ pub async fn run(network: &str, contract: &str, reason: &str) -> Result<()> {
     let target = load_address(network, contract)?;
     let rpc = network_rpc(network)?;
 
-    // PraetorTimelock.emergencyPause(target, reason) — multisig-only, no
+    // PraetorTimelock.emergencyPause(target, reason), multisig-only, no
     // timelock per security.md.
     let calldata_output = Command::new("cast")
         .args([
@@ -89,7 +89,7 @@ pub async fn resume(network: &str, contract: &str, action: Option<&str>) -> Resu
     // Resume-selector dispatch. Pre-fix this hardcoded `resume()` for every
     // contract; a Safe submission against Coffer with `resume()` calldata
     // would land but revert on execution because Coffer exposes split paths
-    // `resumeDeposits()` and `resumeWithdrawals()` — no plain `resume()`.
+    // `resumeDeposits()` and `resumeWithdrawals()`, no plain `resume()`.
     // Wrong-calldata Safe txs waste signer attention and burn submission
     // time in incidents. Now: route per-contract.
     //

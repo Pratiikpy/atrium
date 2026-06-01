@@ -33,7 +33,7 @@ async function call(stepParam: string | null) {
   };
 }
 
-describe('GET /api/deployments/status — step clamping', () => {
+describe('GET /api/deployments/status, step clamping', () => {
   it('defaults to step 1 when no param is provided', async () => {
     const json = await call(null);
     expect(json.step).toBe(1);
@@ -68,7 +68,7 @@ describe('GET /api/deployments/status — step clamping', () => {
   });
 });
 
-describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
+describe('GET /api/deployments/status, STEP_REQUIREMENTS mapping', () => {
   it('step 1 → coffer (deposit path)', async () => {
     const json = await call('1');
     expect(json.required_contracts).toEqual(['coffer']);
@@ -105,8 +105,8 @@ describe('GET /api/deployments/status — STEP_REQUIREMENTS mapping', () => {
   });
 });
 
-describe('GET /api/deployments/status — response invariants', () => {
-  it('always returns a complete StepStatus object — never throws', async () => {
+describe('GET /api/deployments/status, response invariants', () => {
+  it('always returns a complete StepStatus object, never throws', async () => {
     for (let i = 0; i <= 8; i++) {
       const json = await call(String(i));
       expect(json).toHaveProperty('step');

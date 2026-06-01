@@ -3,13 +3,13 @@ pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
 
-/// @title  Phase ϑ.followup — schedule Coffer.setAdapter(AtriumRouter, true).
+/// @title  Phase ϑ.followup, schedule Coffer.setAdapter(AtriumRouter, true).
 /// @notice Closes audit task #337. Without this, every Router-driven
 ///         deposit/withdraw routed through `Coffer.adapterPull(...)`
 ///         reverts `UnauthorizedCaller` because the Router isn't on the
 ///         approved-orchestrators list.
 ///
-///         `Coffer.set_adapter` is timelock-gated (`assert_timelock()` —
+///         `Coffer.set_adapter` is timelock-gated (`assert_timelock()` -
 ///         see contracts/coffer/src/lib.rs:633). 48h wait required.
 ///
 ///         Stylus 0.10 auto-converts `set_adapter` → camelCase selector

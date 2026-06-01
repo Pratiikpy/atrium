@@ -3,7 +3,7 @@ import { gql } from '../lib/scribe';
 // Audit U-30 fix: pre-fix this file referenced `safeErrorDetail` on lines
 // 39, 73, 178 (all catch blocks for Scribe errors) without importing it.
 // At runtime any Scribe outage on any of three endpoints would throw
-// `ReferenceError: safeErrorDetail is not defined` — the route's honest-
+// `ReferenceError: safeErrorDetail is not defined`, the route's honest-
 // 503 fallback path silently became a 500. The other Codex routes
 // (risk.ts, venues.ts, attestation.ts, positions.ts, options.ts, etc.)
 // all import this helper; agents.ts was the lone gap.
@@ -25,7 +25,7 @@ export const agentsRouter = new Hono<{
 // Audit EEE-1/2/3 fix: every user-controlled parameter that flows into a gql
 // query must be validated. Pre-fix, malformed cursors / since-timestamps /
 // addresses were passed straight through, causing The Graph to either 400
-// or silently coerce — neither honest nor defensive.
+// or silently coerce, neither honest nor defensive.
 const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
 function parseUintOrNull(s: string | undefined): string | null {
   if (s == null || !/^\d+$/.test(s)) return null;
@@ -62,7 +62,7 @@ agentsRouter.get('/leaderboard', async (c) => {
 agentsRouter.get('/:address/history', async (c) => {
   // Audit EEE-1: validate the address shape before lowercasing + querying.
   // A non-hex path param would otherwise pass straight to The Graph with
-  // empty results — wasted query + ambiguous error to the caller.
+  // empty results, wasted query + ambiguous error to the caller.
   const addressRaw = c.req.param('address');
   if (!ADDRESS_REGEX.test(addressRaw)) {
     return c.json({ error: 'invalid_address', detail: 'address must be 0x-prefixed 40-hex' }, 400);
@@ -94,7 +94,7 @@ agentsRouter.get('/:address/history', async (c) => {
 });
 
 /**
- * Audit Month-1 #160 — Codex endpoint expansion.
+ * Audit Month-1 #160, Codex endpoint expansion.
  *
  * POST /v1/agents/intent-validation
  *
@@ -109,7 +109,7 @@ agentsRouter.get('/:address/history', async (c) => {
  *
  * Returns the failure reason if any check fails. Agents call this before
  * submitting an on-chain `validate_action` to avoid burning gas on a
- * doomed call. The on-chain Sigil contract is the ultimate authority —
+ * doomed call. The on-chain Sigil contract is the ultimate authority -
  * this endpoint is a hint, not a guarantee.
  */
 agentsRouter.post('/intent-validation', async (c) => {

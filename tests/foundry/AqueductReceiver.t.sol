@@ -207,7 +207,7 @@ contract AqueductReceiverTest is Test {
     // revert happens AFTER `processed[...] = true` (which is set at line
     // 114, BEFORE the transfer at line 139), the revert MUST roll back
     // that storage write or the user can't retry. EVM atomic-revert
-    // semantics guarantee this — but the assertion makes the property
+    // semantics guarantee this, but the assertion makes the property
     // visible to a future reader.
 
     function test_ccipReceive_revertsAndRollsBackOnTransferReturnsFalse() public {
@@ -237,7 +237,7 @@ contract AqueductReceiverTest is Test {
     function test_ccipReceive_rescuePathExpiredCredit_alsoRevertsOnTransferFail() public {
         // Same fix applies to the expired-credit branch (coffer_or_zero set
         // but block.timestamp > expires_at). Construct a credit with expiry
-        // in the past — receiver falls into the else-branch.
+        // in the past, receiver falls into the else-branch.
         vm.prank(timelock);
         receiver.setAllowedSource(1, sourceAq);
         usdc.mint(address(receiver), 1_000_000);
@@ -291,13 +291,13 @@ contract AqueductReceiverTest is Test {
     // AqueductReceiver pre-fix accepted any address for 4 of 5 constructor
     // params (only _coffer_or_zero is intentionally zero-allowed for testnet
     // bootstrap). Worst-case _praetor_timelock=0 leaves the contract
-    // permanently unconfigurable — setAllowedSource + setSourceClaimbackRegistry
+    // permanently unconfigurable, setAllowedSource + setSourceClaimbackRegistry
     // are both onlyTimelock and msg.sender can never equal address(0) on EVM.
     // Same DDD-5 / NNNN-1 / BBBBB-1 / LLL-1 partial-coverage pattern.
 
     function test_constructor_revertsOnZeroRouter_iter46() public {
         // The parent CCIPReceiverBase reverts with InvalidRouter(address(0))
-        // BEFORE our body runs. Lock that contract — the property we need
+        // BEFORE our body runs. Lock that contract, the property we need
         // is "zero router rejected at deploy"; the specific selector lives
         // in the parent and we don't duplicate the require to avoid
         // ambiguity with the parent's error message.
@@ -388,7 +388,7 @@ contract AqueductReceiverTest is Test {
     /// `block.timestamp <= expires_at`. At exactly the boundary the
     /// inclusive `<=` keeps the credit on the Coffer path. A future
     /// "consistency cleanup" toward strict `<` would silently route
-    /// at-boundary credits to the rescue path one second early — the
+    /// at-boundary credits to the rescue path one second early, the
     /// user-facing UX surprise of "credit expired one second before
     /// the dashboard said it would."
     function test_ccipReceive_atExactExpiresAt_routesToCoffer_iter85() public {
@@ -467,7 +467,7 @@ contract MockCoffer {
         usdc = _usdc;
     }
 
-    /// Must return uint256 to match ICoffer.deposit signature — without
+    /// Must return uint256 to match ICoffer.deposit signature, without
     /// the return value, the ABI-strict caller reverts on decoded-bytes.
     function deposit(uint256 amount, address onBehalfOf) external returns (uint256) {
         MockUSDC(usdc).transferFromForMock(msg.sender, address(this), amount);

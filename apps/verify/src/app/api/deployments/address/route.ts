@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Public deploy-address lookup. Components that need a contract address
  * for `useWriteContract` reads call this. Returns `{ address: null }`
  * when the contract isn't deployed (zero-address sentinel or missing
- * registry entry) — clients should not attempt to write in that case.
+ * registry entry), clients should not attempt to write in that case.
  *
  * Slug enum is closed so a caller can't probe arbitrary keys from the
  * registry JSON via this endpoint.
@@ -38,8 +38,8 @@ const ALLOWED_SLUGS = new Set([
   'postern-key-registry',
   // Audit U-20 + U-28: per-adapter Portico slugs for the Trade button
   // wiring. Slug values match `Venue.adapterSlug` (NOT venue id) so
-  // venues that share a contract — Hyperliquid HIP-3 and HIP-4 both
-  // route through `adapter-hyperliquid` — resolve to the same address.
+  // venues that share a contract, Hyperliquid HIP-3 and HIP-4 both
+  // route through `adapter-hyperliquid`, resolve to the same address.
   // The deploy script writes one contract per unique adapter slug.
   'adapter-hyperliquid',
   'adapter-aave-horizon',
@@ -53,7 +53,7 @@ const ALLOWED_SLUGS = new Set([
   'adapter-gmx',
   'adapter-morpho',
   'adapter-synthetix',
-  // Wave A.7 split-contract slugs — Plinth's SPAN compute and oracle
+  // Wave A.7 split-contract slugs, Plinth's SPAN compute and oracle
   // reading live in separate Stylus contracts to fit EIP-170. Front end
   // never needs to call these directly (Plinth proxies the calls), but
   // the verifier/diagnostic page can show their deploy state.
@@ -66,7 +66,7 @@ const ALLOWED_SLUGS = new Set([
   // SOURCE-chain refund path when the message expires.
   'aqueduct-receiver',
   'aqueduct-claimback',
-  // Curator + Edict + Stoa + Research-attestation from Phase 0 — added
+  // Curator + Edict + Stoa + Research-attestation from Phase 0, added
   // so the Cohort/Brand-Kit pages can stop hardcoding their addresses.
   'curator',
   'edict',

@@ -30,10 +30,10 @@ import { VENUE_COUNT } from '@/lib/venues';
  *   adapter would have shown as "live."
  * - Iter-36 / registeredAgents: success path returns `null`, not a
  *   hardcoded `0`. The hardcoded 0 was indistinguishable from a
- *   real measured zero — same label-lie shape as iter-35.
+ *   real measured zero, same label-lie shape as iter-35.
  * - Iter-39 / venuesDeployed.count on Scribe outage: error path
  *   returns `count: null`, not `0`. Pre-fix the landing rendered
- *   "0 / 7 deployed" during a Scribe outage — a fake-zero shape.
+ *   "0 / 7 deployed" during a Scribe outage, a fake-zero shape.
  * - MM-1 / formatUsd: aggregated TVL across N margin accounts in
  *   micro-USDC can exceed Number.MAX_SAFE_INTEGER. formatUsd uses
  *   BigInt division to preserve precision.
@@ -47,7 +47,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
+describe('GET /api/protocol/metrics, happy path (iter 35/36 + MM-1)', () => {
   it('uses venuesDeployed field name (not venuesLive) per iter-35', async () => {
     (gql as any).mockResolvedValue({
       counter: { totalTvlWei: '1000000', openPositionsCount: '0', activeAgentsCount: '0' },
@@ -115,7 +115,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
   });
 
   it('handles large TVL via formatUsd (MM-1 BigInt precision)', async () => {
-    // 1e16 micro-USDC = $10B — past Number.MAX_SAFE_INTEGER at the
+    // 1e16 micro-USDC = $10B, past Number.MAX_SAFE_INTEGER at the
     // micro-USDC scale. formatUsd uses BigInt division so the value is
     // exact (the MM-1 fix). The Counter's totalTvlWei is itself a BigInt
     // string maintained by the subgraph.
@@ -133,7 +133,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
     // Audit U-28: pre-fix the counter iterated a hardcoded slug list and
     // returned the number of UNIQUE adapter contracts. Now it iterates
     // VENUES and counts each venue whose adapterSlug has a registered
-    // contract — HIP-3 and HIP-4 both count when adapter-hyperliquid
+    // contract, HIP-3 and HIP-4 both count when adapter-hyperliquid
     // lands (they share the contract via Venue.adapterSlug).
     (gql as any).mockResolvedValue({ counter: null });
     (loadDeploymentRegistry as any).mockResolvedValue({
@@ -157,7 +157,7 @@ describe('GET /api/protocol/metrics — happy path (iter 35/36 + MM-1)', () => {
   });
 });
 
-describe('GET /api/protocol/metrics — Scribe outage (iter 39)', () => {
+describe('GET /api/protocol/metrics, Scribe outage (iter 39)', () => {
   it('returns venuesDeployed.count:null on gql failure per iter-39', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe 503'));
 

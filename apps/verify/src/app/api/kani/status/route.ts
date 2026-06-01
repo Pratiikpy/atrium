@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * Kani CI status — read by the badge in the layout. Audit J-C1 fix: the
+ * Kani CI status, read by the badge in the layout. Audit J-C1 fix: the
  * badge previously rendered a hardcoded "3 of 5" green dot regardless of
  * actual CI state, which violated the testing rule "CI badge must reflect
  * the real state."
@@ -30,7 +30,7 @@ interface KaniStatus {
   /**
    * Iteration 38 audit fix: was `number` with a `?? 0` fallback when the
    * upstream didn't provide the field. That meant the route returned
-   * `passed: 0` when no measurement existed — UI rendered "Kani CI · 0 of
+   * `passed: 0` when no measurement existed, UI rendered "Kani CI · 0 of
    * 6" which looks like "all 6 proofs failed" but actually means "no
    * measurement taken." Now `number | null`; null = unmeasured. The badge
    * distinguishes the two cases visually.
@@ -95,12 +95,12 @@ export async function GET(): Promise<NextResponse<KaniStatus>> {
       source: 'public/kani-status.json',
     });
   } catch {
-    // File not present (yet) — fall through to honest unknown.
+    // File not present (yet), fall through to honest unknown.
   }
 
   return NextResponse.json<KaniStatus>({
     state: 'unknown',
-    // Honest pending — no source configured, no measurement to report.
+    // Honest pending, no source configured, no measurement to report.
     passed: null,
     total: KANI_PROOF_FLOOR,
     last_run_at: null,

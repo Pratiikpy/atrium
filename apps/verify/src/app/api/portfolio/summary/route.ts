@@ -42,7 +42,7 @@ export async function GET(req?: Request) {
       totalRequiredMarginUsd: formatUsd(required, USDC_DECIMALS),
       totalNotionalUsd: formatUsd(notional, USDC_DECIMALS),
       // Audit U-23: pre-fix the success path returned `pnl24hUsd: null` with
-      // `pnl24hDirection: 'flat'` — direction implies "we measured a flat
+      // `pnl24hDirection: 'flat'`, direction implies "we measured a flat
       // PnL" but the value is null because we never measured. The pending
       // path correctly returned `pnl24hDirection: null`; success now
       // matches so consumers can rely on `direction != null` ↔ value != null.

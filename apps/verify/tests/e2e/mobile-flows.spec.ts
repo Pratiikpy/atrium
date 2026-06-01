@@ -7,7 +7,7 @@ const MODE = process.env.E2E_MODE ?? 'local';
 test.describe('Mobile flows @mobile', () => {
   // Describe-level gate: these flows use devices['iPhone 14'] (WebKit) AND a
   // connected wallet. Skipping at the describe level (not per-test) prevents
-  // the WebKit browser from even launching in local/pending mode — a per-test
+  // the WebKit browser from even launching in local/pending mode, a per-test
   // skip runs only AFTER the browser fixture, which fails if WebKit isn't
   // installed. Runs fully under E2E_MODE=sepolia with the Rabby harness.
   test.skip(MODE === 'local', 'mobile wallet flows need the wallet harness + WebKit (E2E_MODE=sepolia + Rabby)');

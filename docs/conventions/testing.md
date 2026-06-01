@@ -4,12 +4,12 @@
 
 From the floor up. Every layer must be green before a feature ships.
 
-1. **Unit** — Rust `#[test]` for contract pure functions. Foundry `forge test` for Solidity helpers.
-2. **Property** — `proptest` for state machines (ERC-4626 monotonicity, copy trade math).
-3. **Formal** — Kani `#[kani::proof]` on pure margin math and Sigil validation. See TDD §14.2.
-4. **Integration** — Foundry on Sepolia fork. Stylus contracts via `stylus_sdk::testing::TestVM`.
-5. **End to end** — Playwright against deployed Sepolia. Five user journeys from TDD §9.
-6. **Demo rehearsal** — Ten dress runs with random fault injection by F3 before judge day.
+1. **Unit**, Rust `#[test]` for contract pure functions. Foundry `forge test` for Solidity helpers.
+2. **Property**, `proptest` for state machines (ERC-4626 monotonicity, copy trade math).
+3. **Formal**, Kani `#[kani::proof]` on pure margin math and Sigil validation. See TDD §14.2.
+4. **Integration**, Foundry on Sepolia fork. Stylus contracts via `stylus_sdk::testing::TestVM`.
+5. **End to end**, Playwright against deployed Sepolia. Five user journeys from TDD §9.
+6. **Demo rehearsal**, Ten dress runs with random fault injection by F3 before judge day.
 
 A feature is not done until every relevant layer passes.
 

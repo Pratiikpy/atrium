@@ -94,7 +94,7 @@ contract TestableReentrant is ReentrancyGuard {
     /// Call an arbitrary external. Used to model a malicious adapter
     /// venue that tries to reenter the guarded path. Bubble the child's
     /// revert data so a ReentrantCall() child reverts the parent with
-    /// the same selector — otherwise the test sees a generic require
+    /// the same selector, otherwise the test sees a generic require
     /// string and can't distinguish reentry from any other failure.
     function callOut(address target) external nonReentrant {
         (bool ok, bytes memory ret) = target.call(abi.encodeWithSignature("hit(address)", address(this)));
@@ -107,7 +107,7 @@ contract TestableReentrant is ReentrancyGuard {
     }
 }
 
-/// @dev Malicious external — reenters the guarded contract.
+/// @dev Malicious external, reenters the guarded contract.
 contract Reenterer {
     TestableReentrant public target;
     constructor(TestableReentrant _t) { target = _t; }
@@ -118,7 +118,7 @@ contract Reenterer {
     }
 }
 
-/// @dev Benign external — doesn't try to reenter. Confirms the guard
+/// @dev Benign external, doesn't try to reenter. Confirms the guard
 /// doesn't accidentally block legitimate external calls.
 contract BenignChild {
     function hit(address) external pure {

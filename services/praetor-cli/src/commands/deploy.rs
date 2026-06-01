@@ -1,4 +1,4 @@
-//! Real deploy command — invokes forge create + cargo-stylus deploy, records
+//! Real deploy command, invokes forge create + cargo-stylus deploy, records
 //! addresses in `deployments/{network}.json`. Audit C-16 fix: no more stub.
 
 use std::path::PathBuf;
@@ -81,7 +81,7 @@ const WAVE_3: &[(&str, &str)] = &[
     ),
 ];
 
-/// Wave 4 — orchestration (audit EEEE-1 + Fire 74). Must run AFTER all 6
+/// Wave 4, orchestration (audit EEEE-1 + Fire 74). Must run AFTER all 6
 /// adapters + Plinth + Coffer + PorticoRegistry. AtriumRouter's constructor
 /// takes those four addresses as args. Post-deploy, the Praetor multisig
 /// still has to call `coffer.set_adapter(router, approved=true)` plus
@@ -92,7 +92,7 @@ const WAVE_4: &[(&str, &str)] = &[(
     "contracts/atrium-router/src/AtriumRouter.sol:AtriumRouter",
 )];
 
-/// Wave 5 — Phase-2 conditional contracts. Ship only when the gating grant
+/// Wave 5, Phase-2 conditional contracts. Ship only when the gating grant
 /// lands (Trailblazer AI for Stoa, Stylus Sprint for the Phase-2 adapters)
 /// AND PorticoRegistry's curator multisig has formally approved each
 /// adapter's bytecode hash. Per PRD §17, default `deploy --all` skips this
@@ -190,7 +190,7 @@ fn deploy_one(
     } else if path.contains(".sol") {
         forge_create(name, path, network)?
     } else {
-        warn!(name, "unknown deploy target type — skipping");
+        warn!(name, "unknown deploy target type, skipping");
         return Ok(());
     };
 
@@ -213,7 +213,7 @@ fn forge_create(name: &str, path: &str, network: &str) -> Result<String> {
     // Audit I-5 partial-mitigation: prefer keystore path over raw key in argv.
     // If DEPLOYER_KEYSTORE is set, use that + DEPLOYER_KEYSTORE_PASSWORD env.
     // Fallback to DEPLOYER_PRIVATE_KEY in argv is acceptable for Year-1
-    // testnet (test wallets, no real funds) — see `human_left.md` #12. For
+    // testnet (test wallets, no real funds), see `human_left.md` #12. For
     // mainnet, the keystore path is mandatory.
     let mut cmd = Command::new("forge");
     cmd.args(["create", path, "--rpc-url", &rpc, "--broadcast"]);
@@ -361,7 +361,7 @@ mod tests {
     #[test]
     fn network_rpc_supports_polygon_amoy_unique_to_deploy() {
         // The load-bearing invariant: deploy.rs has polygon_amoy. The
-        // other 4 copies DO NOT — see iter-75 grep. If this fails, a
+        // other 4 copies DO NOT, see iter-75 grep. If this fails, a
         // refactor accidentally dropped Polymarket's deploy-side RPC.
         let prev = std::env::var("POLYGON_AMOY_RPC_URL").ok();
         std::env::remove_var("POLYGON_AMOY_RPC_URL");
@@ -424,7 +424,7 @@ mod tests {
         save_registry(&reg).expect("save");
         let loaded = load_registry(&net).expect("load");
         assert_eq!(loaded.network, net);
-        // Modify and re-save — the atomic-rename approach must not leave
+        // Modify and re-save, the atomic-rename approach must not leave
         // stale state from the first write.
         reg.contracts.insert(
             "coffer".to_string(),

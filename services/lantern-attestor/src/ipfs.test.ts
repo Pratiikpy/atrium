@@ -13,7 +13,7 @@ import { buildTree, type Leaf } from './merkle';
  * - XXX-3: CID returned by web3.storage is regex-validated. A
  *   malformed CID reaching downstream consumers (subgraph → /api/
  *   lantern/verify-inclusion → IPFS gateway URL) would be SSRF
- *   surface — same shape as UUU-2 / R-1.
+ *   surface, same shape as UUU-2 / R-1.
  * - Token-missing soft-fallback: if WEB3_STORAGE_TOKEN unset,
  *   returns '' and logs a warn rather than throwing. Lets the
  *   attestor's hourly cron survive without IPFS pinning during
@@ -42,7 +42,7 @@ afterEach(() => {
   else process.env.WEB3_STORAGE_TOKEN = ORIGINAL_TOKEN;
 });
 
-describe('pinTreeToIpfs — token-missing soft fallback', () => {
+describe('pinTreeToIpfs, token-missing soft fallback', () => {
   it('returns empty string + does NOT fetch when WEB3_STORAGE_TOKEN unset', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const cid = await pinTreeToIpfs(validTree());
@@ -59,7 +59,7 @@ describe('pinTreeToIpfs — token-missing soft fallback', () => {
   });
 });
 
-describe('pinTreeToIpfs — XXX-3 CID validation', () => {
+describe('pinTreeToIpfs, XXX-3 CID validation', () => {
   it('returns the CID when web3.storage responds with a valid v0 CID', async () => {
     process.env.WEB3_STORAGE_TOKEN = 'test-token';
     const validCidV0 = 'Qm' + 'a'.repeat(44);
@@ -112,7 +112,7 @@ describe('pinTreeToIpfs — XXX-3 CID validation', () => {
   });
 });
 
-describe('pinTreeToIpfs — XXX-2 request shape + error handling', () => {
+describe('pinTreeToIpfs, XXX-2 request shape + error handling', () => {
   it('POSTs with Bearer token + JSON Content-Type', async () => {
     process.env.WEB3_STORAGE_TOKEN = 'secret-token';
     let capturedInit: RequestInit | undefined;
@@ -159,7 +159,7 @@ describe('pinTreeToIpfs — XXX-2 request shape + error handling', () => {
     expect(body.root).toMatch(/^0x[0-9a-f]{64}$/);
     expect(body.leafCount).toBe(3);
     expect(body.leaves).toHaveLength(3);
-    // balanceWei is BigInt — must be serialized as string, not "[object]".
+    // balanceWei is BigInt, must be serialized as string, not "[object]".
     expect(typeof body.leaves[0].balanceWei).toBe('string');
     expect(body.leaves[0].balanceWei).toBe('1000');
   });

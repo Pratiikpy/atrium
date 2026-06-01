@@ -8,11 +8,11 @@ import { GET } from './route';
  * - KK-2: pre-fix `(parseFloat(bids[0].price) + parseFloat(asks[0].price)) / 2`
  *   shipped the literal string "NaN" to the UI when either side's
  *   price was malformed. Fix: validate both parse to finite numbers,
- *   fall back to "—" otherwise.
+ *   fall back to "-" otherwise.
  * - iter-40: midDelta24h was hardcoded to '0.00' + midDeltaDirection
  *   'flat' even though nothing measured the 24h delta. The UI rendered
  *   "$X 0.00 · 24h" implying a real no-change. Fix: null in both
- *   fields, UI fallback handles null → "—".
+ *   fields, UI fallback handles null → "-".
  */
 
 function makeRequest(query: string = ''): NextRequest {
@@ -27,18 +27,18 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/trade/orderbook — KK-2 NaN guard', () => {
-  it('returns mid:"—" when both bid and ask are missing', async () => {
+describe('GET /api/trade/orderbook, KK-2 NaN guard', () => {
+  it('returns mid:"-" when both bid and ask are missing', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ levels: [[], []] }), { status: 200 }),
     );
     const json = await (await GET(makeRequest())).json();
-    expect(json.midPrice).toBe('—');
+    expect(json.midPrice).toBe('-');
     expect(json.source).toBe('hyperliquid');
     fetchSpy.mockRestore();
   });
 
-  it('returns mid:"—" when bid price is malformed (KK-2)', async () => {
+  it('returns mid:"-" when bid price is malformed (KK-2)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -52,11 +52,11 @@ describe('GET /api/trade/orderbook — KK-2 NaN guard', () => {
     );
     const json = await (await GET(makeRequest())).json();
     // Pre-KK-2: midPrice would have been the literal string "NaN".
-    expect(json.midPrice).toBe('—');
+    expect(json.midPrice).toBe('-');
     fetchSpy.mockRestore();
   });
 
-  it('returns mid:"—" when ask price is malformed', async () => {
+  it('returns mid:"-" when ask price is malformed', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -69,7 +69,7 @@ describe('GET /api/trade/orderbook — KK-2 NaN guard', () => {
       ),
     );
     const json = await (await GET(makeRequest())).json();
-    expect(json.midPrice).toBe('—');
+    expect(json.midPrice).toBe('-');
     fetchSpy.mockRestore();
   });
 
@@ -91,7 +91,7 @@ describe('GET /api/trade/orderbook — KK-2 NaN guard', () => {
   });
 });
 
-describe('GET /api/trade/orderbook — iter-40 null delta honesty', () => {
+describe('GET /api/trade/orderbook, iter-40 null delta honesty', () => {
   it('returns midDelta24h:null + midDeltaDirection:null in success path', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ levels: [[], []] }), { status: 200 }),
@@ -113,7 +113,7 @@ describe('GET /api/trade/orderbook — iter-40 null delta honesty', () => {
   });
 });
 
-describe('GET /api/trade/orderbook — orderbook formatting', () => {
+describe('GET /api/trade/orderbook, orderbook formatting', () => {
   it('caps bids and asks at 12 levels each', async () => {
     const levels = Array.from({ length: 20 }, (_, i) => ({ px: String(100 + i), sz: '1' }));
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
@@ -165,12 +165,12 @@ describe('GET /api/trade/orderbook — orderbook formatting', () => {
   });
 });
 
-describe('GET /api/trade/orderbook — error paths', () => {
+describe('GET /api/trade/orderbook, error paths', () => {
   it('returns pending on HL info feed 5xx', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('', { status: 502 }));
     const json = await (await GET(makeRequest())).json();
     expect(json.source).toBe('pending');
-    expect(json.midPrice).toBe('—');
+    expect(json.midPrice).toBe('-');
     expect(json.bids).toEqual([]);
     expect(json.asks).toEqual([]);
     fetchSpy.mockRestore();

@@ -13,11 +13,11 @@ import {PolymarketAdapter} from "../contracts/adapters/polymarket/src/Polymarket
 import {SynthetixV3Adapter} from "../contracts/adapters/synthetix/src/SynthetixV3Adapter.sol";
 import {TradeXyzAdapter} from "../contracts/adapters/trade-xyz/src/TradeXyzAdapter.sol";
 
-/// @title Atrium Phase-C — 9 venue adapters (Plinth + Coffer now live)
+/// @title Atrium Phase-C, 9 venue adapters (Plinth + Coffer now live)
 /// @notice For venues with no Arbitrum-Sepolia testnet contract (most
 ///         perp venues), the adapter is wired to a deployer-EOA placeholder.
 ///         The adapter deploys + has a real address; calls to its venue-
-///         specific endpoint will revert with "call to non-contract" — the
+///         specific endpoint will revert with "call to non-contract", the
 ///         honest "venue not on this testnet" failure mode. When a venue
 ///         publishes a testnet contract, run a setVenue(address) Praetor
 ///         action to repoint.
@@ -38,7 +38,7 @@ contract PhaseC is Script {
 
         // Venue addresses without an Arbitrum-Sepolia testnet contract get
         // the deployer's address as a placeholder. Adapter deploys cleanly;
-        // venue-call reverts with NoCode — honest "not wired on this chain".
+        // venue-call reverts with NoCode, honest "not wired on this chain".
         address venuePlaceholder = deployer;
 
         vm.startBroadcast(pk);
@@ -52,7 +52,7 @@ contract PhaseC is Script {
         // ---- 2. Curve ----
         // _usdc_index=0 (USDC is conventionally slot 0 in 3pool-style LPs).
         // _instrument is a deterministic id (keccak256("curve.3pool.usdc"))
-        // used to scope the adapter's haircut config — must be non-zero.
+        // used to scope the adapter's haircut config, must be non-zero.
         CurveAdapter curve = new CurveAdapter(
             venuePlaceholder, USDC, venuePlaceholder, int128(0), COFFER, deployer, PRAETOR_TIMELOCK,
             keccak256("curve.3pool.usdc")

@@ -65,7 +65,7 @@ const BANNED: { pattern: RegExp; reason: string }[] = [
   // the design/ prototype. Real async state should flow from network
   // events (fetch, wagmi tx receipts) or TanStack Query intervals.
   { pattern: /\bsetTimeout\s*\(/, reason: 'setTimeout banned in production code (fake-latency anti-pattern)' },
-  { pattern: /\bsetInterval\s*\(/, reason: 'setInterval banned — use TanStack Query refetchInterval instead' },
+  { pattern: /\bsetInterval\s*\(/, reason: 'setInterval banned, use TanStack Query refetchInterval instead' },
   // Math.random: invented data. crypto.getRandomValues is fine.
   { pattern: /\bMath\.random\s*\(/, reason: 'Math.random banned (fake-data anti-pattern); use crypto.getRandomValues for nonces' },
 ];

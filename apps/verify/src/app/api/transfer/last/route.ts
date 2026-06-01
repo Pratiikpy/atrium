@@ -47,11 +47,11 @@ export async function GET(req?: Request) {
     const amount = formatShares(BigInt(c.amountWei), USDC_DECIMALS);
     // Audit U-22: pre-fix the four per-step `delta` fields were hardcoded
     // (`'0.0s'`, `'1.2s'`, `'3.4s'`, `'8.4s'`) and presented next to real
-    // status badges from Scribe — every CCIP transfer rendered identical
+    // status badges from Scribe, every CCIP transfer rendered identical
     // step timings regardless of how long the message actually took.
     // CrossChainCredit doesn't expose per-step timestamps (only the source
     // block and the settled block), so the honest answer is null deltas.
-    // We DO compute the total block-delta when settled — the only thing we
+    // We DO compute the total block-delta when settled, the only thing we
     // can measure without inventing data.
     const blocksElapsed =
       c.isSettled && c.settledAtBlock
@@ -94,7 +94,7 @@ function emptyResponse() {
     to: 'RHC',
     amount: '0',
     asset: 'USDC',
-    // Audit U-22: pre-fix status was 'SETTLED' — implying a completed
+    // Audit U-22: pre-fix status was 'SETTLED', implying a completed
     // transfer even when no transfer exists. Now null so the timeline
     // shell renders neutral pending pills.
     status: null,

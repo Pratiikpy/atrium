@@ -31,7 +31,7 @@ export default function PrivacyPage() {
 
         <Section title="1. Data controller">
           <p>
-            The data controller is <strong>Atrium</strong> (entity registration pending —
+            The data controller is <strong>Atrium</strong> (entity registration pending;
             the Atrium project team operates as an unincorporated team until entity formation is
             complete; see <Link href="/team" className="underline">/team</Link> for individuals).
           </p>
@@ -43,10 +43,10 @@ export default function PrivacyPage() {
 
         <Section title="2. Lawful basis (GDPR Art. 6)">
           <ul className="list-disc space-y-1 pl-5">
-            <li><strong>Legitimate interest</strong> — analytics (SimpleAnalytics, aggregated, no personal IDs). You may opt out via the cookie consent banner.</li>
-            <li><strong>Contract</strong> — service delivery (rendering your portfolio, executing transactions you initiate).</li>
-            <li><strong>Consent</strong> — Sentry error replay, marketing communications (if any). Revocable at any time.</li>
-            <li><strong>Vital interest / legal obligation</strong> — fraud prevention, AML record-keeping where KYC is triggered.</li>
+            <li><strong>Legitimate interest</strong>: analytics (SimpleAnalytics, aggregated, no personal IDs). You may opt out via the cookie consent banner.</li>
+            <li><strong>Contract</strong>: service delivery (rendering your portfolio, executing transactions you initiate).</li>
+            <li><strong>Consent</strong>: Sentry error replay, marketing communications (if any). Revocable at any time.</li>
+            <li><strong>Vital interest / legal obligation</strong>: fraud prevention, AML record-keeping where KYC is triggered.</li>
           </ul>
         </Section>
 
@@ -56,8 +56,8 @@ export default function PrivacyPage() {
             <li>IP addresses (Codex API logs, retained 24h)</li>
             <li>User-agent strings (Codex API logs)</li>
             <li>Device fingerprints (Sentry, only with consent)</li>
-            <li>Error context — stack traces, breadcrumbs (Sentry, scrubbed of wallet addresses)</li>
-            <li>KYC documents — government ID, selfie, biometric (Sumsub, only if user opts into tier upgrade)</li>
+            <li>Error context: stack traces, breadcrumbs (Sentry, scrubbed of wallet addresses)</li>
+            <li>KYC documents: government ID, selfie, biometric (Sumsub, only if user opts into tier upgrade)</li>
           </ul>
         </Section>
 
@@ -87,28 +87,28 @@ export default function PrivacyPage() {
             Summary:
           </p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
-            <li><a href="https://vercel.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">Vercel</a> — hosting</li>
-            <li><a href="https://www.cloudflare.com/privacypolicy/" className="underline" target="_blank" rel="noreferrer">Cloudflare</a> — DNS, DDoS protection</li>
-            <li><a href="https://sentry.io/privacy/" className="underline" target="_blank" rel="noreferrer">Sentry</a> — error monitoring (consent-gated)</li>
-            <li><a href="https://simpleanalytics.com/privacy-policy" className="underline" target="_blank" rel="noreferrer">SimpleAnalytics</a> — analytics (EU-based, GDPR-friendly)</li>
-            <li><a href="https://sumsub.com/privacy-notice/" className="underline" target="_blank" rel="noreferrer">Sumsub</a> — KYC (only if user opts in)</li>
-            <li><a href="https://www.doppler.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">Doppler</a> — secrets management (no user PII)</li>
-            <li><a href="https://www.digitalocean.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">DigitalOcean</a> — daemon hosting (no user PII)</li>
-            <li><a href="https://thegraph.com/privacy/" className="underline" target="_blank" rel="noreferrer">The Graph</a> — subgraph indexer (public chain data only)</li>
-            <li><a href="https://web3.storage/terms/" className="underline" target="_blank" rel="noreferrer">Web3.storage</a> — IPFS pinning (public Merkle roots only)</li>
+            <li><a href="https://vercel.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">Vercel</a>: hosting</li>
+            <li><a href="https://www.cloudflare.com/privacypolicy/" className="underline" target="_blank" rel="noreferrer">Cloudflare</a>: DNS, DDoS protection</li>
+            <li><a href="https://sentry.io/privacy/" className="underline" target="_blank" rel="noreferrer">Sentry</a>: error monitoring (consent-gated)</li>
+            <li><a href="https://simpleanalytics.com/privacy-policy" className="underline" target="_blank" rel="noreferrer">SimpleAnalytics</a>: analytics (EU-based, GDPR-friendly)</li>
+            <li><a href="https://sumsub.com/privacy-notice/" className="underline" target="_blank" rel="noreferrer">Sumsub</a>: KYC (only if user opts in)</li>
+            <li><a href="https://www.doppler.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">Doppler</a>: secrets management (no user PII)</li>
+            <li><a href="https://www.digitalocean.com/legal/privacy-policy" className="underline" target="_blank" rel="noreferrer">DigitalOcean</a>: daemon hosting (no user PII)</li>
+            <li><a href="https://thegraph.com/privacy/" className="underline" target="_blank" rel="noreferrer">The Graph</a>: subgraph indexer (public chain data only)</li>
+            <li><a href="https://web3.storage/terms/" className="underline" target="_blank" rel="noreferrer">Web3.storage</a>: IPFS pinning (public Merkle roots only)</li>
           </ul>
         </Section>
 
         <Section title="6. Your rights (GDPR Art. 15–22 + CCPA §1798.100)">
           <ul className="list-disc space-y-1 pl-5">
-            <li><strong>Access</strong> — request a copy of data we hold about you.</li>
-            <li><strong>Rectification</strong> — correct inaccurate data.</li>
-            <li><strong>Erasure</strong> — request deletion. Note: on-chain data is immutable; we erase off-chain mirrors only.</li>
-            <li><strong>Portability</strong> — receive your data in a structured, machine-readable format.</li>
-            <li><strong>Objection</strong> — object to processing based on legitimate interest.</li>
-            <li><strong>Restriction</strong> — request we limit processing.</li>
-            <li><strong>Right to lodge complaint</strong> — with your supervisory authority (e.g. ICO, CNIL, BfDI).</li>
-            <li><strong>California-specific</strong> — do not sell my personal information. We do not sell personal information.</li>
+            <li><strong>Access</strong>: request a copy of data we hold about you.</li>
+            <li><strong>Rectification</strong>: correct inaccurate data.</li>
+            <li><strong>Erasure</strong>: request deletion. Note: on-chain data is immutable; we erase off-chain mirrors only.</li>
+            <li><strong>Portability</strong>: receive your data in a structured, machine-readable format.</li>
+            <li><strong>Objection</strong>: object to processing based on legitimate interest.</li>
+            <li><strong>Restriction</strong>: request we limit processing.</li>
+            <li><strong>Right to lodge complaint</strong>: with your supervisory authority (e.g. ICO, CNIL, BfDI).</li>
+            <li><strong>California-specific</strong>: do not sell my personal information. We do not sell personal information.</li>
           </ul>
         </Section>
 

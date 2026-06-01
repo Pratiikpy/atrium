@@ -24,7 +24,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('GET /api/protocol/subsystems — empty / pending', () => {
+describe('GET /api/protocol/subsystems, empty / pending', () => {
   it('returns source:pending + live:[] when no contracts deployed', async () => {
     (listLiveContracts as any).mockResolvedValue([]);
     const { GET } = await import('./route');
@@ -34,7 +34,7 @@ describe('GET /api/protocol/subsystems — empty / pending', () => {
   });
 });
 
-describe('GET /api/protocol/subsystems — populated', () => {
+describe('GET /api/protocol/subsystems, populated', () => {
   it('maps live contracts to their slug list', async () => {
     (listLiveContracts as any).mockResolvedValue([
       { slug: 'coffer', address: '0x' + '1'.repeat(40) },
@@ -54,7 +54,7 @@ describe('GET /api/protocol/subsystems — populated', () => {
     ]);
     const { GET } = await import('./route');
     const json = await (await GET()).json();
-    // Order is the load-bearing semantic — landing page renders the
+    // Order is the load-bearing semantic, landing page renders the
     // subsystem tiles in the order returned. Sort upstream if needed,
     // not here.
     expect(json.live[0]).toBe('aqueduct');

@@ -1,5 +1,5 @@
 /**
- * Scribe client for Lantern (Vercel api/ path) — user list only.
+ * Scribe client for Lantern (Vercel api/ path), user list only.
  *
  * Mirrors src/scribe.ts. Balance authority is on-chain (see _leaves.ts,
  * which reads convertToAssets(balanceOf(user))); Scribe only lists which
@@ -9,7 +9,7 @@
  * query and used the subgraph's raw `balanceWei` (net deposits) as the leaf
  * balance. Two bugs: (1) >1000 users were silently dropped from the
  * proof-of-reserves tree; (2) net deposits != redeemable value, so roots
- * were wrong. Now paginates by `id_gt` cursor and returns user+salt only —
+ * were wrong. Now paginates by `id_gt` cursor and returns user+salt only -
  * _leaves.ts computes the redeemable balance on-chain.
  */
 export interface UserSalt {

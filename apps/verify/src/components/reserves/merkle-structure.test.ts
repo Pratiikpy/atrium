@@ -5,7 +5,7 @@ import path from 'node:path';
 /**
  * 065-FE10 regression. The Merkle SVG used to hardcode four hash-shaped leaf
  * labels ("0x01…".."0x04…") synthesized from the map index, sat beside real
- * Scribe leafCount/depth, and never read sampleNodes — fabricated hashes shown
+ * Scribe leafCount/depth, and never read sampleNodes, fabricated hashes shown
  * as real attested leaves. Lock the fix at the source level.
  */
 describe('merkle-structure card', () => {

@@ -17,7 +17,7 @@ type TabId = (typeof TABS)[number]['id'];
 
 /**
  * Parent client view for /app/agents. Owns the tab state so all four
- * tabs actually switch the rendered content — the old AgentTabBar was a
+ * tabs actually switch the rendered content, the old AgentTabBar was a
  * dead control: it toggled visual state but always showed Marketplace.
  *
  * Pixel-matched to `design/Atrium App.standalone.html` file10.js (Agents).
