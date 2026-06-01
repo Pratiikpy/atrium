@@ -1,4 +1,4 @@
-# Atrium .gitignore — keep the repo clean
+# Atrium .gitignore, keep the repo clean
 
 # Node + pnpm
 node_modules/
@@ -198,3 +198,10 @@ map.md
 docs/MASTER_PLAN.md
 docs/plan-tracker.md
 docs/FOUNDER-RUNBOOK.md
+
+# Local cutover rollback backups (timestamped deployment snapshots)
+deployments/*.bak
+apps/verify/public/deployments/*.bak
+
+# Kiro IDE workspace
+.kiro/

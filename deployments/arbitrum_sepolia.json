@@ -49,30 +49,30 @@
       "block": 270408479
     },
     "coffer": {
-      "address": "0xd169554caf920f1fbcffbafcff3068a84892b0d8",
+      "address": "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3",
       "tx": "0x07ae5e44df7b6ada1a390af825389c8b37804421031f18f71490c2dee3a0e04b",
       "block": 270800974,
       "kind": "stylus",
       "deployed_at": "2026-05-24T15:17:02.917Z",
-      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, and initialize() was called immediately after deploy."
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "sigil": {
-      "address": "0xc9933ebe7dc8c4849a1720b2e5b33e381442c873",
+      "address": "0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9",
       "tx": "0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371",
       "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
       "block": 270801710,
       "kind": "stylus",
       "deployed_at": "2026-05-24T15:21:15.358Z",
-      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, pause(bytes32) emergency-pause hook, and initialize() was called immediately after deploy."
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "vigil": {
-      "address": "0x08f3d3a878a75aa454be6bd07f0b74d3e6e46dc8",
+      "address": "0x5ccd3422f430f6d034ff46715b41509de9d0deed",
       "tx": "0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e",
       "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
       "block": 270802353,
       "kind": "stylus",
       "deployed_at": "2026-05-24T15:24:46.090Z",
-      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, pause(bytes32) emergency-pause hook, and initialize() was called immediately after deploy."
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "plinth-math": {
       "address": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
@@ -91,18 +91,19 @@
       "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) — Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
-      "address": "0xef31b4b75badc0faf323e3448248585b57a78ecd",
+      "address": "0xd86f579ec880eaab27dfa698ae056d1893ec7553",
       "tx": "0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0",
       "block": 270803107,
       "kind": "stylus",
-      "note": "Redeployed 2026-05-24 (Audit C-2/C-7 fix): new bytecode adds is_updating reentrancy guard, praetor_multisig() init-state getter, and multi-fragment factory deploy via cargo-stylus 0.10.7.",
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror.",
       "deployed_at": "2026-05-24T15:28:58.569Z"
     },
     "atrium-router": {
-      "address": "0xf134127cc2762d3ebc5645aba6c99cd5a8b82717",
+      "address": "0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
-      "kind": "solidity"
+      "kind": "solidity",
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "rostrum": {
       "address": "0xbaf348e61fb555844973398b51332d93f674b0af",
@@ -111,12 +112,12 @@
       "kind": "solidity"
     },
     "adapter-aave-horizon": {
-      "address": "0x826dc4FE429d0Df6454E11dAeA10f2975b551042",
+      "address": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1",
       "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
       "deployed_at": "2026-05-25T19:25:00.000Z",
       "kind": "solidity",
       "version": "v1.1.1",
-      "note": "Redeployed 2026-05-25 (Phase zeta.3). Same AaveHorizonAdapterV11 bytecode, but pool address now points at MockAavePool (0x2e1360fa...) so Step 2 of the demo actually moves USDC. PorticoRegistry deregister(2) + register(2, this) scheduled on PraetorTimelock, executable 2026-05-27T19:30Z. Until then registry still points at v1.1 0xa68361... (pool=deployer placeholder)."
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "mock-aave-pool": {
       "address": "0x2e1360faE80c7937e684067450202D921F72555B",
@@ -197,10 +198,11 @@
       "kind": "solidity"
     },
     "aqueduct-receiver": {
-      "address": "0x9a66c9cb43dcfafa696cec66b33bec74c94ddc70",
+      "address": "0x49Bd2AF2d2ee1844235bb6500Ba4EC6F24704b42",
       "tx": "0x196108115a52f667d03232d3e8a691e62754cd5c7014f885d07159ddb3e1fd28",
       "block": 270683161,
-      "kind": "solidity"
+      "kind": "solidity",
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
     },
     "aqueduct-claimback": {
       "address": "0x4d441fca986d51d17c71f979814e2a492a429382",
@@ -239,5 +241,6 @@
       "note": "DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence. Kept for reference; do not point UI at it."
     }
   },
-  "lastUpdated": "2026-05-24T22:00:00.000Z"
+  "lastUpdated": "2026-05-30T12:34:21.142Z",
+  "_staged": "Staged for the 2026-05-30 cutover. Root+mirror stay on OLD addresses until the timelock ops in .forge-cache/timelock-ops.json execute, then copy this over root+mirror and redeploy verify-app + subgraph."
 }
