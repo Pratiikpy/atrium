@@ -28,6 +28,10 @@ interface AttestationWire {
   timestamp: number;
   leafCount: number;
   ipfsCid: string;
+  // false when the Merkle tree has not been pinned to IPFS (e.g. published with
+  // no WEB3_STORAGE_TOKEN). The on-chain root is still real and shown; only the
+  // user-inclusion-verify sub-feature needs the pinned tree.
+  ipfsPinned: boolean;
 }
 
 interface ScribeLatest {
@@ -83,18 +87,20 @@ export async function GET() {
     // once the verify-app's LANTERN_ATTESTOR_ADDRESS env points at the
     // v2 deploy and Coffer-balance > 0 triggers the first v2 publish,
     // every row carries a real CID.
-    if (!latest.ipfsCid || typeof latest.ipfsCid !== 'string' || latest.ipfsCid.length < 10) {
-      return NextResponse.json(
-        { exists: false, reason: 'missing_ipfs_cid' },
-        { status: 404 },
-      );
-    }
+    // A real on-chain attestation with no IPFS CID is still a VALID attestation:
+    // the LanternAttestor contract + the publish path explicitly allow an empty
+    // CID (tree not pinned). 404-ing it hides a real published root. Instead,
+    // return the root with ipfsPinned=false so the dashboard shows it honestly;
+    // only the user-inclusion-verify needs the pinned tree (WEB3_STORAGE_TOKEN).
+    const ipfsCid =
+      typeof latest.ipfsCid === 'string' && latest.ipfsCid.length >= 10 ? latest.ipfsCid : '';
     const wire: AttestationWire = {
       root: latest.root as `0x${string}`,
       blockNumber,
       timestamp,
       leafCount,
-      ipfsCid: latest.ipfsCid,
+      ipfsCid,
+      ipfsPinned: ipfsCid.length > 0,
     };
     return NextResponse.json(wire);
   } catch (err) {

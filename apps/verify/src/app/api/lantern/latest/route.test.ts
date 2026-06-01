@@ -116,26 +116,31 @@ describe('GET /api/lantern/latest — 404 empty states', () => {
     expect(json.reason).toBe('corrupt_root');
   });
 
-  it('returns 404 missing_ipfs_cid on absent ipfsCid (TT-17)', async () => {
+  it('returns 200 + ipfsPinned:false on absent ipfsCid (real root, tree not pinned)', async () => {
+    // A real on-chain attestation with no IPFS pin must be SHOWN, not 404'd
+    // (the contract + publish path allow an empty CID). Only the inclusion-
+    // verify sub-feature needs the pinned tree.
     (gql as any).mockResolvedValue({
       lanternAttestations: [validRow({ ipfsCid: '' })],
     });
     const { GET } = await import('./route');
     const res = await GET();
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.reason).toBe('missing_ipfs_cid');
+    expect(json.ipfsPinned).toBe(false);
+    expect(json.root).toBeDefined();
+    expect(json.ipfsCid).toBe('');
   });
 
-  it('returns 404 missing_ipfs_cid on short ipfsCid (< 10 chars)', async () => {
+  it('returns 200 + ipfsPinned:false on short ipfsCid (< 10 chars)', async () => {
     (gql as any).mockResolvedValue({
       lanternAttestations: [validRow({ ipfsCid: 'short' })],
     });
     const { GET } = await import('./route');
     const res = await GET();
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.reason).toBe('missing_ipfs_cid');
+    expect(json.ipfsPinned).toBe(false);
   });
 });
 

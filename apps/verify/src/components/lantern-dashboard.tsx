@@ -10,6 +10,7 @@ interface Attestation {
   timestamp: number;
   leafCount: number;
   ipfsCid: string;
+  ipfsPinned: boolean;
 }
 
 async function fetchLatest(): Promise<Attestation | null> {
@@ -129,12 +130,21 @@ export function LanternDashboard() {
           </div>
           <div>
             <dt className="text-muted">IPFS CID</dt>
-            <dd className="text-ink truncate">{data.ipfsCid}</dd>
+            <dd className="text-ink truncate">{data.ipfsPinned ? data.ipfsCid : 'tree pin pending'}</dd>
           </div>
         </dl>
       </div>
 
-      {address ? (
+      {!data.ipfsPinned ? (
+        <div className="rounded-md border border-testnet/30 bg-testnet/5 p-6">
+          <p className="text-sm font-medium text-testnet">Inclusion verification pending IPFS pin</p>
+          <p className="mt-2 text-sm text-ink-soft">
+            The signed Merkle root above is committed on-chain and indexed. Verifying your own
+            balance against it needs the full tree pinned to IPFS, which lights up once the attestor
+            runs with a web3.storage token.
+          </p>
+        </div>
+      ) : address ? (
         <div className="rounded-md border border-divider bg-parchment p-6">
           <p className="text-sm text-ink-soft">Verify your own balance is included in the latest tree.</p>
           <button
