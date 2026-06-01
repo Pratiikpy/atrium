@@ -121,7 +121,9 @@ describe('GET /api/deployments/status — response invariants', () => {
       expect(typeof json.ready).toBe('boolean');
       expect(['initialized', 'uninitialized', 'unknown']).toContain(json.init_state);
     }
-  });
+    // 9 live on-chain init-state probes; give a realistic budget so RPC latency
+    // does not flake the invariant (was a flaky 5s default).
+  }, 30_000);
 
   it('ready=false when missing.length > 0', async () => {
     for (let i = 1; i <= 7; i++) {
@@ -130,7 +132,7 @@ describe('GET /api/deployments/status — response invariants', () => {
         expect(json.ready).toBe(false);
       }
     }
-  });
+  }, 30_000);
 
   it('ready=false when blocker is non-null', async () => {
     for (let i = 1; i <= 7; i++) {
@@ -139,5 +141,5 @@ describe('GET /api/deployments/status — response invariants', () => {
         expect(json.ready).toBe(false);
       }
     }
-  });
+  }, 30_000);
 });
