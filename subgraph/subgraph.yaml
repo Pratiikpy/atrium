@@ -7,7 +7,7 @@ dataSources:
     name: Plinth
     network: arbitrum-sepolia
     source:
-      address: "0xef31b4b75badc0faf323e3448248585b57a78ecd"
+      address: "0xd86f579ec880eaab27dfa698ae056d1893ec7553"
       abi: Plinth
       startBlock: 270803107
     mapping:
@@ -51,7 +51,7 @@ dataSources:
     name: Vigil
     network: arbitrum-sepolia
     source:
-      address: "0x08f3d3a878a75aa454be6bd07f0b74d3e6e46dc8"
+      address: "0x5ccd3422f430f6d034ff46715b41509de9d0deed"
       abi: Vigil
       startBlock: 270802353
     mapping:
@@ -90,7 +90,7 @@ dataSources:
     name: Coffer
     network: arbitrum-sepolia
     source:
-      address: "0xd169554caf920f1fbcffbafcff3068a84892b0d8"
+      address: "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3"
       abi: Coffer
       startBlock: 270800974
     mapping:
@@ -196,7 +196,7 @@ dataSources:
     name: Sigil
     network: arbitrum-sepolia
     source:
-      address: "0xc9933ebe7dc8c4849a1720b2e5b33e381442c873"
+      address: "0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9"
       abi: Sigil
       startBlock: 270801710
     mapping:
@@ -305,7 +305,7 @@ dataSources:
     name: PosternKillSwitch
     network: arbitrum-sepolia
     source:
-      address: "0xb90a51a726740065bd0dbc20cd79306b30d8b676"
+      address: "0xcd899f715462a33ae880310d72b37bde102ab0b7"
       abi: PosternKillSwitch
       startBlock: 270683177
     mapping:
@@ -381,7 +381,7 @@ dataSources:
     name: Rostrum
     network: arbitrum-sepolia
     source:
-      address: "0xbaf348e61fb555844973398b51332d93f674b0af"
+      address: "0x748a0a4e53f3e94f9a279bfdc5ecbf8a7c88f093"
       abi: Rostrum
       startBlock: 270726103
     mapping:
@@ -418,7 +418,7 @@ dataSources:
     name: AtriumRouter
     network: arbitrum-sepolia
     source:
-      address: "0xf134127cc2762d3ebc5645aba6c99cd5a8b82717"
+      address: "0xf593e012196bde8a58ccdbf685f7a74fd3bd35e0"
       abi: AtriumRouter
       startBlock: 270726101
     mapping:
