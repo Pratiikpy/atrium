@@ -246,7 +246,17 @@ export async function tickOnce(): Promise<void> {
   let highestBlock = lastBlock;
   for (const alert of alerts) {
     if (alert.blockNumber && alert.blockNumber > highestBlock) highestBlock = alert.blockNumber;
-    if (!alert.user) continue;
+    if (!alert.user) {
+      // System-wide alerts (usdc_paused, emergency_pause_invoked,
+      // oracle_disagreement, vigil_queue_failed, link_balance_low,
+      // adapter_emergency_deregistered) have no per-user recipient. Pre-fix
+      // these were silently dropped at this `continue`. Now they are surfaced
+      // to ops: logged at warn level (so they reach the log/Sentry pipeline)
+      // and posted to NOTIFIER_OPS_WEBHOOK when configured.
+      console.warn(JSON.stringify({ ts: new Date().toISOString(), event: 'system_alert', kind: alert.kind, severity: alert.severity, title: alert.title }));
+      await deliverSystemAlert(alert);
+      continue;
+    }
     const prefs = await fetchPrefs(alert.user);
     if (!prefs) continue;
     const results = await routeAlert(alert, prefs);
@@ -280,6 +290,32 @@ function severityFor(kind: AlertKind): Alert['severity'] {
 
 function humanTitle(kind: AlertKind): string {
   return kind.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/**
+ * Deliver a system-wide alert (no per-user recipient) to the operator ops
+ * channel, configured via NOTIFIER_OPS_WEBHOOK. The URL is operator-supplied
+ * (not user input), so no SSRF guard is needed. If unset, the warn-level log
+ * in the tick loop is the record. Never throws into the tick.
+ */
+async function deliverSystemAlert(alert: Alert): Promise<void> {
+  const url = process.env.NOTIFIER_OPS_WEBHOOK;
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        kind: alert.kind,
+        severity: alert.severity,
+        title: alert.title,
+        body: alert.body,
+        link: alert.link,
+      }),
+    });
+  } catch (err) {
+    console.error(JSON.stringify({ ts: new Date().toISOString(), event: 'system_alert_delivery_fail', kind: alert.kind, error: String(err) }));
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}` || (process.argv[1]?.endsWith('tick.ts') ?? false)) {

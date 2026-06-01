@@ -129,9 +129,19 @@ contract Rostrum is ReentrancyGuard {
             expires_at_timestamp: expires_at,
             is_paused_by_follower: false
         });
+        // Dedup: re-following a leader you already follow updates the terms in
+        // place. Pre-fix, a second follow() pushed a duplicate entry into
+        // leader_followers[leader] and overwrote followerIndex, so the keeper
+        // iterated the same follower twice and endFollow's swap-and-pop left a
+        // dangling entry. A live follow is identifiable because its `follower`
+        // field equals msg.sender (the zero-value default + endFollow's delete
+        // both leave it address(0)).
+        bool alreadyFollowing = follows[msg.sender][leader].follower == msg.sender;
         follows[msg.sender][leader] = f;
-        followerIndex[leader][msg.sender] = leader_followers[leader].length;
-        leader_followers[leader].push(msg.sender);
+        if (!alreadyFollowing) {
+            followerIndex[leader][msg.sender] = leader_followers[leader].length;
+            leader_followers[leader].push(msg.sender);
+        }
         emit FollowStarted(msg.sender, leader, allocation_bps, expires_at);
     }
 

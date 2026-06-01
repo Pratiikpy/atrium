@@ -44,14 +44,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
+# Run as a dedicated non-root user (security hardening — the runtime only
+# needs to execute the binaries and write its state dir).
+RUN useradd --system --uid 10001 --user-group --no-create-home atrium
+
 WORKDIR /app
 COPY --from=builder /build/target/release/augur /app/augur
 COPY --from=builder /build/target/release/haruspex /app/haruspex
 COPY --from=builder /build/target/release/auspex /app/auspex
 
-# State persistence directory — bind-mounted from the host so restarts
-# don't lose accumulated state (mean-reversion baselines, etc.).
-RUN mkdir -p /var/atrium/state
+# State persistence directory. Bind-mounted from the host, so the host path
+# must be writable by uid 10001 (chown the mount, or set `user: "10001"` on
+# the docker-compose service).
+RUN mkdir -p /var/atrium/state && chown -R atrium:atrium /var/atrium/state /app
+
+USER atrium
 
 # Default to a no-op CMD; docker-compose overrides per-service.
 CMD ["/bin/sh", "-c", "echo 'set CMD via compose to choose an agent'; exit 1"]

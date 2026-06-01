@@ -112,6 +112,42 @@ contract RostrumTest is Test {
         assertEq(alloc, 10_000);
     }
 
+    /// Dedup: re-following a leader you already follow updates the terms in
+    /// place and must NOT push a duplicate entry into leader_followers (which
+    /// would make the keeper iterate the same follower twice and leave a
+    /// dangling entry after endFollow's swap-and-pop).
+    function test_follow_reFollow_updatesInPlace_noDuplicate() public {
+        uint64 exp = uint64(block.timestamp + 1 days);
+        vm.prank(follower);
+        rostrum.follow(leader, 5_000, 100, 50, 1_000e6, 50e6, exp);
+        // Re-follow the same leader with new terms.
+        vm.prank(follower);
+        rostrum.follow(leader, 8_000, 200, 50, 2_000e6, 80e6, exp);
+
+        // Terms updated in place.
+        (, , uint16 alloc, uint16 slip, , , , , ) = rostrum.follows(follower, leader);
+        assertEq(alloc, 8_000, "re-follow updates allocation");
+        assertEq(slip, 200, "re-follow updates slippage");
+        // Exactly one entry in leader_followers: index 0 is the follower,
+        // index 1 is out of bounds (array length 1, not 2).
+        assertEq(rostrum.leader_followers(leader, 0), follower, "single follower entry");
+        vm.expectRevert();
+        rostrum.leader_followers(leader, 1);
+    }
+
+    /// After endFollow, re-following must re-add to leader_followers (the
+    /// dedup guard keys on the zeroed `follower` field that delete leaves).
+    function test_follow_afterEndFollow_reAdds() public {
+        uint64 exp = uint64(block.timestamp + 1 days);
+        vm.prank(follower);
+        rostrum.follow(leader, 5_000, 100, 50, 1_000e6, 50e6, exp);
+        vm.prank(follower);
+        rostrum.endFollow(leader, "done");
+        vm.prank(follower);
+        rostrum.follow(leader, 6_000, 100, 50, 1_000e6, 50e6, exp);
+        assertEq(rostrum.leader_followers(leader, 0), follower, "re-added after endFollow");
+    }
+
     /// Iter 86: pin max_slippage_bps == 1000 (exactly 10%) accepted.
     /// Check is `> 1_000` strict; 1000 must pass.
     function test_follow_acceptsSlippageAt10Pct_iter86() public {
