@@ -4,6 +4,16 @@ Cross-venue portfolio margin for the EVM. One wallet posts collateral once and t
 
 Currently deployed on Arbitrum Sepolia testnet. Robinhood Chain testnet support lands when the upstream SDK ships.
 
+**[Run the live demo at verify.atrium.fi →](https://verify.atrium.fi)**
+
+## Why it matters
+
+A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin twice — isolated margin needs about $2M total. Atrium nets the hedge under one SPAN-style margin calculation: same risk, about $900K, roughly 55% of the collateral freed. No venue cross-margins across other venues today; Atrium is the substrate that does.
+
+## How it works
+
+`Coffer` (ERC-4626 vault) holds collateral once. `Plinth` (SPAN margin engine) computes one portfolio margin number across venues, netting correlated exposure. `AtriumRouter` opens a position across margin → vault → venue adapter in a single tx. `Sigil` (EIP-712 mandates) + `Postern` (session keys) make AI agents first-class users, with a one-click Kill Switch that revokes every delegation in one batched tx. `Lantern` publishes an hourly proof-of-reserves Merkle root any user can verify. The compute-heavy core (Plinth, Vigil, Coffer, Sigil) is written in **Arbitrum Stylus (Rust)**; adapters and CCIP are Solidity. Audit history and the self-audit register live under [`audits/`](./audits/) and [`docs/AUDIT_FINDINGS.md`](./docs/AUDIT_FINDINGS.md).
+
 ## Quick start
 
 ```bash
