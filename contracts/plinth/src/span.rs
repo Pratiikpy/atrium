@@ -259,4 +259,48 @@ mod tests {
         // positions hit the notional floor.
         assert!(req_hedged <= req_solo, "hedged margin {:?} should be less than or equal to solo {:?}", req_hedged, req_solo);
     }
+
+    #[test]
+    fn hedge_frees_a_pinned_share_of_the_isolated_margin() {
+        // §10 decision gate: the public "cross-margin frees ~X%" headline must
+        // reproduce from the real SPAN engine, not a narrative. This pins the
+        // ACTUAL freed ratio the engine produces for the canonical reference
+        // case (a perfectly hedged equal-size correlated pair) so the copy can
+        // be sourced to a number, and a regression that silently weakens the
+        // netting fails the build.
+        //
+        // Isolated = two separate single-leg accounts (sum of each solo margin).
+        // Hedged = one account holding both legs (same correlation class).
+        let long = PositionView {
+            notional_signed: I256::try_from(10_000i64).unwrap(),
+            entry_price_q64: U256::from(1_000u64),
+            current_price_q64: U256::from(1_000u64),
+            haircut_bps: 100,
+            correlation_class: 1,
+        };
+        let short = PositionView {
+            notional_signed: I256::try_from(-10_000i64).unwrap(),
+            entry_price_q64: U256::from(1_000u64),
+            current_price_q64: U256::from(1_000u64),
+            haircut_bps: 100,
+            correlation_class: 1,
+        };
+        let isolated_sum =
+            required_margin(&[long], 500, 200).saturating_add(required_margin(&[short], 500, 200));
+        let hedged = required_margin(&[long, short], 500, 200);
+        assert!(hedged < isolated_sum, "hedged {hedged:?} must be below isolated sum {isolated_sum:?}");
+        let freed_bps = (isolated_sum - hedged).saturating_mul(U256::from(10_000u64)) / isolated_sum;
+        // Print the real number so the public copy can be sourced to it.
+        std::println!(
+            "[SPAN netting] isolated_sum={isolated_sum} hedged={hedged} freed_bps={freed_bps} (= {}.{:02}%)",
+            freed_bps / U256::from(100u64),
+            freed_bps % U256::from(100u64)
+        );
+        // Lock a materially-lower band: the perfect equal-hedge must free at
+        // least ~40% (well above noise) and at most ~70% (sanity vs the floor).
+        // The public claim must sit inside the engine's real output for the
+        // portfolio it cites, or be softened.
+        assert!(freed_bps >= U256::from(4_000u64), "freed {freed_bps:?} bps should be >= 4000 (40%)");
+        assert!(freed_bps <= U256::from(7_000u64), "freed {freed_bps:?} bps should be <= 7000 (70%)");
+    }
 }

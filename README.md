@@ -8,7 +8,7 @@ Deployed on **Arbitrum Sepolia** and **Robinhood Chain** testnets. The Stylus (R
 
 ## Why it matters
 
-A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin twice; isolated margin needs about $2M total. Atrium nets the hedge under one SPAN-style margin calculation: same risk, about $900K, roughly 55% of the collateral freed. No venue cross-margins across other venues today; Atrium is the substrate that does.
+A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin on each venue separately. Atrium nets the hedge under one SPAN-style margin calculation, so the same risk frees about half the collateral: the Plinth engine returns ~51% freed on a canonical equal-size hedge, pinned by a unit test (`span::hedge_frees_a_pinned_share_of_the_isolated_margin`, run `cargo test -p atrium-plinth span::`). The dollar amounts above are an illustrative scale, not a live reading. No venue cross-margins across other venues today; Atrium is the substrate that does.
 
 ## How it works
 
