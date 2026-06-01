@@ -46,13 +46,15 @@ test.describe('Journey 4 — Lantern attestation', () => {
     // only when there's a successful attestation to verify against; assert
     // either it's visible OR the page is in a recognized empty/error state.
     // Lantern dashboard is a client component that fetches /api/lantern/latest
-    // then renders one of: the verify button (data + wallet), "No attestation
-    // published yet" (no data), "Connect a wallet to verify…" (data, no wallet),
-    // or "Lantern source unavailable" (error). Wait for it to settle before
-    // reading the body, or we race the fetch and see neither state.
+    // then renders one of: the verify button (data + wallet + IPFS-pinned tree),
+    // "Inclusion verification pending IPFS pin" (real root indexed but the tree
+    // is not pinned — the honest state today, no WEB3_STORAGE_TOKEN), "No
+    // attestation published yet" (no data), "Connect a wallet to verify…" (data,
+    // no wallet), or "Lantern source unavailable" (error). Wait for it to settle
+    // before reading the body, or we race the fetch and see neither state.
     await expect(
       page
-        .getByText(/no attestation published yet|verify my inclusion|connect a wallet to verify|lantern source unavailable|not indexed/i)
+        .getByText(/no attestation published yet|verify my inclusion|connect a wallet to verify|lantern source unavailable|not indexed|inclusion verification pending|pending ipfs pin/i)
         .first(),
     ).toBeVisible({ timeout: 12_000 });
     const verifyButton = page.getByRole('button', { name: /verify my inclusion/i });
