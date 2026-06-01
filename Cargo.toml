@@ -32,7 +32,7 @@ repository = "https://github.com/atrium-fi/atrium"
 # Standard host deps used by agents and CLI
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 anyhow = "1.0"
 tokio = { version = "1.40", features = ["full"] }
 tracing = "0.1"
