@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createPublicClient, http } from 'viem';
 import { arbitrumSepolia } from 'viem/chains';
 
-const COFFER = '0xd169554caf920f1fbcffbafcff3068a84892b0d8' as const;
+const COFFER = '0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3' as const; // live post-cutover Coffer
 const ERC20_BALANCE_ABI = [
   { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ name: 'a', type: 'address' }], outputs: [{ type: 'uint256' }] },
 ] as const;
