@@ -95,14 +95,30 @@ interface TopbarProps {
 
 export function AppShell({
   children,
+  mobile,
+  desktop,
   active,
   breadcrumb,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  /**
+   * Optional viewport-specific content slots. When a page passes `mobile` and
+   * `desktop` separately, AppShell mounts ONLY the slot for the active
+   * viewport — so the two layouts never both mount and the page's data hooks
+   * fire once, not twice. (Pre-slot pages crammed both layouts into `children`;
+   * the #44 fix mounts `children` in one branch, but `children` still held both
+   * layouts, so each /api read fired twice. The slots close that gap without a
+   * flash: only the active branch renders, and SSR defaults to desktop.)
+   * Pages that don't pass slots fall back to `children` (unchanged behaviour).
+   */
+  mobile?: React.ReactNode;
+  desktop?: React.ReactNode;
   active?: string;
   breadcrumb?: TopbarProps['breadcrumb'];
 }) {
-  // Audit fix (#44): mount {children} in exactly one branch (see useIsMobile).
+  // Audit fix (#44): mount the active branch in exactly one place (see
+  // useIsMobile). With slots, each branch renders only its own viewport's
+  // content; without slots, both fall back to {children}.
   const isMobile = useIsMobile();
   return (
     <>
@@ -125,7 +141,7 @@ export function AppShell({
             testnet
           </span>
         </header>
-        <main style={{ padding: '16px', paddingBottom: '80px' }}>{isMobile ? children : null}</main>
+        <main style={{ padding: '16px', paddingBottom: '80px' }}>{isMobile ? (mobile ?? children) : null}</main>
         {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
             never rendered one - the built MobileBottomNav was orphaned, leaving
             mobile users with no in-app navigation between screens. Now wired. */}
@@ -200,7 +216,7 @@ export function AppShell({
 
           {/* View content. Audit fix (#44): mounted only on the desktop
               viewport so {children} renders once across both branches. */}
-          <div className="view">{!isMobile ? children : null}</div>
+          <div className="view">{!isMobile ? (desktop ?? children) : null}</div>
         </div>
       </div>
     </>

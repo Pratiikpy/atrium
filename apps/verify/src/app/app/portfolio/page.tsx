@@ -45,13 +45,16 @@ export default function PortfolioPage() {
         { label: 'Portfolio' },
         { label: 'Unified margin · Plinth' },
       ]}
-    >
-      {/* Mobile (< md): canonical Mobile App Home panel (hero buying-power
-          card + 4-action grid + positions + activity), all reading the same
-          /api/portfolio/* endpoints as the desktop layout below. */}
-      <PortfolioMobile />
-
-      {/* Desktop (md+): existing dense layout. */}
+      // Viewport slots: only the active layout mounts, so /api/portfolio/*
+      // fires once per load instead of twice (mobile panel + desktop block
+      // both used to mount and poll). See AppShell slot docs.
+      mobile={
+        /* Canonical Mobile App Home panel (hero buying-power card + 4-action
+           grid + positions + activity), reading the same /api/portfolio/*
+           endpoints as the desktop layout. */
+        <PortfolioMobile />
+      }
+      desktop={
       <div className="hidden md:block">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -141,6 +144,7 @@ export default function PortfolioPage() {
         </aside>
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

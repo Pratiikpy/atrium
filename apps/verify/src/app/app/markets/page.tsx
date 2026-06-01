@@ -100,12 +100,13 @@ const VENUES = [
 
 export default function MarketsPage() {
   return (
-    <AppShell active="/app/markets">
-      {/* Audit fix (#74): mobile gets the thumb-friendly venue browser (was the
-          cramped desktop list). Desktop unchanged below.
-          Audit fix (#45 regression): md:hidden wrapper so the panel (and all its
-          loading/error/empty branches) never renders on desktop. */}
-      <div className="md:hidden"><MarketsMobile /></div>
+    <AppShell
+      active="/app/markets"
+      // Viewport slots: only the active layout mounts (mobile gets the
+      // thumb-friendly venue browser, desktop the dense list), so neither
+      // double-mounts the other's hooks.
+      mobile={<div className="md:hidden"><MarketsMobile /></div>}
+      desktop={
       <div className="hidden md:block">
       <section>
         <p className="text-xs uppercase tracking-wider text-muted">Markets</p>
@@ -184,6 +185,7 @@ export default function MarketsPage() {
         </Link>
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

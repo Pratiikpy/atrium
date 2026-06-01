@@ -22,8 +22,8 @@ export default function TradePage() {
         { label: 'Trade' },
         { label: 'Venue execution · Portico' },
       ]}
-    >
-      <TradeMobile />
+      mobile={<TradeMobile />}
+      desktop={
       <div className="hidden md:block">
       <header className="flex items-start justify-between">
         <div>
@@ -40,6 +40,7 @@ export default function TradePage() {
 
       <TradeView />
       </div>
-    </AppShell>
+      }
+    />
   );
 }

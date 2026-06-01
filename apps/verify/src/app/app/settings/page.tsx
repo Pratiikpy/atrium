@@ -23,8 +23,8 @@ export default function SettingsPage() {
         { label: 'Settings' },
         { label: 'Wallet · Postern' },
       ]}
-    >
-      <SettingsMobile />
+      mobile={<SettingsMobile />}
+      desktop={
       <div className="hidden md:block">
       <header>
         <p className="eyebrow">Settings · Postern</p>
@@ -57,6 +57,7 @@ export default function SettingsPage() {
         </SettingsTabs>
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

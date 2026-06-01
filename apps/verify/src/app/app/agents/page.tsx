@@ -32,8 +32,8 @@ export default function AgentsPage() {
         { label: 'Agents' },
         { label: 'Mandates · Sigil & Rostrum' },
       ]}
-    >
-      <AgentsMobile />
+      mobile={<AgentsMobile />}
+      desktop={
       <div className="hidden md:block">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
@@ -63,6 +63,7 @@ export default function AgentsPage() {
         <AgentsView />
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

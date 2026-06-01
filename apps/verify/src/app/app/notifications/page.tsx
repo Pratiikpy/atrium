@@ -20,10 +20,10 @@ export default function NotificationsPage() {
       breadcrumb={[
         { label: 'Notifications' },
       ]}
-    >
-      {/* Audit fix (#74): mobile gets the thumb-friendly inbox panel.
-          Audit fix (#45 regression): md:hidden wrapper (guards all panel branches). */}
-      <div className="md:hidden"><NotificationsMobile /></div>
+      // Viewport slots: only the active layout mounts, so the inbox query
+      // fires once instead of on both the mobile panel and desktop list.
+      mobile={<div className="md:hidden"><NotificationsMobile /></div>}
+      desktop={
       <div className="hidden md:block">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
@@ -42,6 +42,7 @@ export default function NotificationsPage() {
         <NotificationsList />
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

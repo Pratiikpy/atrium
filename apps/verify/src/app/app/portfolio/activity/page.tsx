@@ -21,10 +21,10 @@ export default function ActivityPage() {
         { label: 'Portfolio', href: '/app/portfolio' },
         { label: 'Activity' },
       ]}
-    >
-      {/* Audit fix (#74/#45): mobile gets the thumb-friendly activity timeline.
-          Audit fix (#45 regression): md:hidden wrapper (guards all panel branches). */}
-      <div className="md:hidden"><ActivityMobile /></div>
+      // Viewport slots: only the active layout mounts, so the activity feed
+      // query fires once instead of on both panel + desktop timeline.
+      mobile={<div className="md:hidden"><ActivityMobile /></div>}
+      desktop={
       <div className="hidden md:block">
       <header>
         <p className="eyebrow">Activity</p>
@@ -40,6 +40,7 @@ export default function ActivityPage() {
         <ActivityFeedFull />
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

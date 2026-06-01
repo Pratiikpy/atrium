@@ -15,10 +15,10 @@ export default function TaxPage() {
         { label: 'Tax' },
         { label: 'Tablet · exports' },
       ]}
-    >
-      {/* Audit fix (#74): mobile gets the thumb-friendly tax dashboard panel.
-          Audit fix (#45 regression): md:hidden wrapper (guards all panel branches). */}
-      <div className="md:hidden"><TaxMobile /></div>
+      // Viewport slots: only the active layout mounts, so the tax dataset
+      // query fires once instead of on both panel + desktop view.
+      mobile={<div className="md:hidden"><TaxMobile /></div>}
+      desktop={
       <div className="hidden md:block">
       <TaxView />
 
@@ -27,6 +27,7 @@ export default function TaxPage() {
         Signed Merkle root proves the export was produced from the same dataset that Lantern attested for the relevant block.
       </p>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

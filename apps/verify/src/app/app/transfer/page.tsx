@@ -18,8 +18,8 @@ export default function TransferPage() {
         { label: 'Transfer' },
         { label: 'Cross-chain · Aqueduct' },
       ]}
-    >
-      <TransferMobile />
+      mobile={<TransferMobile />}
+      desktop={
       <div className="hidden md:block">
       <header>
         <div className="flex items-start justify-between">
@@ -51,6 +51,7 @@ export default function TransferPage() {
         <RecentTransfers />
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }

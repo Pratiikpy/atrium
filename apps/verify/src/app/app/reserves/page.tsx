@@ -19,10 +19,8 @@ export default function ReservesPage() {
         { label: 'Lantern' },
         { label: 'proof-of-reserves' },
       ]}
-    >
-      {/* Mobile (< md): ReservesMobile panel */}
-      <ReservesMobile />
-
+      mobile={/* Mobile (< md): ReservesMobile panel */ <ReservesMobile />}
+      desktop={
       <div className="hidden md:block">
       <header className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
@@ -55,6 +53,7 @@ export default function ReservesPage() {
         <RecentAttestationsSection />
       </section>
       </div>
-    </AppShell>
+      }
+    />
   );
 }
