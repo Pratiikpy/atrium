@@ -2,7 +2,7 @@
 
 Cross-venue portfolio margin for the EVM. One wallet posts collateral once and trades across multiple onchain venues with a single margin number.
 
-Currently deployed on Arbitrum Sepolia testnet. Robinhood Chain testnet support lands when the upstream SDK ships.
+Deployed on **Arbitrum Sepolia** and **Robinhood Chain** testnets. The Stylus (Rust) contracts compile and activate natively on both; addresses in [`docs/deployment.md`](./docs/deployment.md) (Sepolia) and [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json) (Robinhood Chain).
 
 **[Run the live demo at verify.atrium.fi →](https://verify.atrium.fi)**
 

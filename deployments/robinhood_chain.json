@@ -1,0 +1,53 @@
+{
+  "network": "robinhood_chain_testnet",
+  "chainId": 46630,
+  "rpc": "https://rpc.testnet.chain.robinhood.com",
+  "deployedAt": "2026-06-01",
+  "note": "Atrium deployed to Robinhood Chain testnet (Arbitrum L2). Stylus (Rust) contracts compile + activate natively here, confirming Robinhood Chain has Stylus enabled. The three #[constructor] Stylus contracts (Coffer, Vigil, Plinth) require the canonical StylusDeployer contract, which is not yet present on this chain (eth_getCode(0xcEcba2F1...) == 0x); they are a documented follow-on. The Solidity stack + the initialize()-based Stylus contracts are live.",
+  "contracts": {
+    "praetor-timelock": {
+      "address": "0x0dAd24d7feb2bB797e0f69e02c2F32104FCF22d4",
+      "tx": "0x8d9aa7d89729fb4f1f0c606419488716f63e7eaa1575ce45bd4fe13155669d6b",
+      "kind": "solidity"
+    },
+    "portico-registry": {
+      "address": "0x9A9aF6e50491Cd4694699d48564bBFF18f9B40BC",
+      "kind": "solidity"
+    },
+    "mock-aave-pool": {
+      "address": "0x900a9fb4BAb7576fc11E4bB3C002D89Dbe261168",
+      "kind": "solidity",
+      "note": "Testnet pool stub (no real Aave on Robinhood Chain testnet)."
+    },
+    "mock-chainlink-usd-feed": {
+      "address": "0x21c5ecC5b3aD6B066eF32145a06eD1B688D3103D",
+      "kind": "solidity",
+      "note": "USDC/USD price stub ($1.00, 8dp, always-fresh) for the Plinth dual-oracle Chainlink leg."
+    },
+    "plinth-oracle": {
+      "address": "0x66577042b4d47312e554bbfa5e29ae20f55dd631",
+      "tx": "0x42f54d46fff4e0bdae2b35bf29aedd4153d3885d3766b31b14432d27cb041cea",
+      "activationTx": "0x83586daadb2ed1982d26293c53d3c3e5a92dac43a5f4baf71f7ea9de9d8d77c7",
+      "kind": "stylus",
+      "note": "Dual-oracle (Chainlink + Pyth) median price reader, Rust/Stylus. Live + activated."
+    },
+    "plinth-math": {
+      "address": "0x6d655803bac4bf61ad5ad26fd3b88429671cb5db",
+      "tx": "0xf823fd5a04ae67faefe41d8721cab8276c2420dbe3abfa254d0a8c248b27d0ab",
+      "activationTx": "0x2cb98ab63ead91efaa0af066a09b39a968a9331e615b1b16c248bce5f2351844",
+      "kind": "stylus",
+      "note": "SPAN margin compute, Rust/Stylus. Live + activated."
+    },
+    "sigil": {
+      "address": "0xede8444c622b8ae28364e86784749744bd0a1c23",
+      "tx": "0x6b56b0dc7b829457df92180a9361e308a745200a059885b0c6205f40ff937d34",
+      "activationTx": "0xc97a0cd5aaf7d1bc420aa4bbd954049439dd98c340627c6ebda36f19aaaf446b",
+      "initializeTx": "0x1429f596f614f040aad0657dfe7abb406370f1424b635ae0ce7b4a6075cdd923",
+      "kind": "stylus",
+      "note": "EIP-712 agent-mandate contract, Rust/Stylus. Live + activated + initialized (praetor_multisig = deployer)."
+    }
+  },
+  "pending": {
+    "note": "Coffer, Vigil, Plinth use #[constructor] and need the canonical StylusDeployer on Robinhood Chain; AtriumRouter + adapters wire on top of those. Follow-on: deploy the StylusDeployer (or upgrade cargo-stylus to a version that auto-deploys it), then deploy the trio + Router + AaveHorizonAdapter, mirroring the Arbitrum Sepolia stack."
+  }
+}
