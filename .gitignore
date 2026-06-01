@@ -186,3 +186,15 @@ atrium-site-tokens.json
 # document the state of the repo.
 *.stackdump
 .e2e-test-key.json
+
+# Internal planning / audit / readiness docs (kept local, out of the public repo)
+BUILD_PLAN.md
+DO_NOW_PLAN.md
+FEATURE_COMPLETION.md
+FOUNDER_ACTIONS.md
+PRODUCT_GAP_AUDIT.md
+QA_LAUNCH_READINESS.md
+map.md
+docs/MASTER_PLAN.md
+docs/plan-tracker.md
+docs/FOUNDER-RUNBOOK.md

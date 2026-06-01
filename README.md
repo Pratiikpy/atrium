@@ -12,7 +12,7 @@ A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as coll
 
 ## How it works
 
-`Coffer` (ERC-4626 vault) holds collateral once. `Plinth` (SPAN margin engine) computes one portfolio margin number across venues, netting correlated exposure. `AtriumRouter` opens a position across margin → vault → venue adapter in a single tx. `Sigil` (EIP-712 mandates) + `Postern` (session keys) make AI agents first-class users, with a one-click Kill Switch that revokes every delegation in one batched tx. `Lantern` publishes an hourly proof-of-reserves Merkle root any user can verify. The compute-heavy core (Plinth, Vigil, Coffer, Sigil) is written in **Arbitrum Stylus (Rust)**; adapters and CCIP are Solidity. Audit history and the self-audit register live under [`audits/`](./audits/) and [`docs/AUDIT_FINDINGS.md`](./docs/AUDIT_FINDINGS.md).
+`Coffer` (ERC-4626 vault) holds collateral once. `Plinth` (SPAN margin engine) computes one portfolio margin number across venues, netting correlated exposure. `AtriumRouter` opens a position across margin → vault → venue adapter in a single tx. `Sigil` (EIP-712 mandates) + `Postern` (session keys) make AI agents first-class users, with a one-click Kill Switch that revokes every delegation in one batched tx. `Lantern` publishes an hourly proof-of-reserves Merkle root any user can verify. The compute-heavy core (Plinth, Vigil, Coffer, Sigil) is written in **Arbitrum Stylus (Rust)**; adapters and CCIP are Solidity.
 
 ## Quick start
 
