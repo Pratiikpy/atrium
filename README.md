@@ -8,7 +8,7 @@ Deployed on **Arbitrum Sepolia** and **Robinhood Chain** testnets. The Stylus (R
 
 ## Why it matters
 
-A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin twice — isolated margin needs about $2M total. Atrium nets the hedge under one SPAN-style margin calculation: same risk, about $900K, roughly 55% of the collateral freed. No venue cross-margins across other venues today; Atrium is the substrate that does.
+A hedged trader opens a $3M perp on one venue and holds $500K of T-bills as collateral on another. To stay hedged today they post margin twice; isolated margin needs about $2M total. Atrium nets the hedge under one SPAN-style margin calculation: same risk, about $900K, roughly 55% of the collateral freed. No venue cross-margins across other venues today; Atrium is the substrate that does.
 
 ## How it works
 
@@ -26,7 +26,7 @@ make demo-frontend   # frontend only, works on Windows MSVC
 
 `make demo` deploys the contracts to a local Arbitrum Sepolia fork, seeds test data, and opens Verifier Mode in your browser.
 
-**Precondition:** Stylus contracts (`plinth`, `coffer`, `sigil`, `vigil`) need a linker that resolves Stylus WASM host symbols. Linux, macOS, and WSL work; Windows MSVC does not — use `make demo-frontend` on Windows to boot the Next.js dev server against the deployed Sepolia contracts.
+**Precondition:** Stylus contracts (`plinth`, `coffer`, `sigil`, `vigil`) need a linker that resolves Stylus WASM host symbols. Linux, macOS, and WSL work; Windows MSVC does not, so use `make demo-frontend` on Windows to boot the Next.js dev server against the deployed Sepolia contracts.
 
 ## Docs
 
@@ -98,7 +98,7 @@ make clean         # Remove all build artifacts
 
 ## License
 
-MIT for Atrium code — see [`LICENSE`](./LICENSE). Dependencies under `resources/` carry their own licenses (GPL-3.0 for EntryPoint, BUSL for Aave V3, etc.) — integration only, no forking.
+MIT for Atrium code, see [`LICENSE`](./LICENSE). Dependencies under `resources/` carry their own licenses (GPL-3.0 for EntryPoint, BUSL for Aave V3, etc.); integration only, no forking.
 
 ## Security
 
