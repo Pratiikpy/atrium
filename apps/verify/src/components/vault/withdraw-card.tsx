@@ -2,10 +2,22 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useAccount, useReadContract } from 'wagmi';
+import { formatUnits } from 'viem';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { USDC_DECIMALS } from '@/lib/testnet-tokens';
+
+// Read the connected wallet's redeemable USDC: Coffer.balanceOf(user) shares
+// -> convertToAssets. Used to gate an over-balance withdraw client-side (the
+// withdraw form previously had NO balance gate, so a user could submit more
+// than they hold and eat a raw chain revert — caught by the launch audit).
+const COFFER_READ_ABI = [
+  { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ name: 'a', type: 'address' }], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'convertToAssets', stateMutability: 'view', inputs: [{ name: 'shares', type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+] as const;
 
 /**
  * Vault · Withdraw. Audit U-15 follow-on to deposit-card.tsx: previously
@@ -21,14 +33,36 @@ import { humanizeWalletError } from '@/lib/humanize-wallet-error';
  */
 export function VaultWithdraw() {
   const [amount, setAmount] = useState('');
+  const { address } = useAccount();
   const { data: deployment } = useDeploymentStatus(1);
   const { data: cofferAddress } = useContractAddress('coffer');
   const { status, withdraw, reset } = useVaultWithdraw(cofferAddress ?? null);
 
+  // Redeemable USDC = convertToAssets(balanceOf(user)). Gates over-balance.
+  const { data: shares } = useReadContract({
+    address: cofferAddress ?? undefined,
+    abi: COFFER_READ_ABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: { enabled: !!cofferAddress && !!address },
+  });
+  const { data: redeemableRaw } = useReadContract({
+    address: cofferAddress ?? undefined,
+    abi: COFFER_READ_ABI,
+    functionName: 'convertToAssets',
+    args: shares != null ? [shares] : undefined,
+    query: { enabled: !!cofferAddress && shares != null },
+  });
+  const redeemableUsd =
+    redeemableRaw != null ? Number(formatUnits(redeemableRaw as bigint, USDC_DECIMALS)) : null;
+
   const helper = readinessMessage(deployment, 'Withdraw');
-  // >= 1 micro-USDC: a sub-precision amount floors to 0 on-chain and would
-  // revert, so never enable an amount that can only round to zero.
-  const ready = deployment?.ready === true && parseFloat(amount) >= 0.000001;
+  // >= 1 micro-USDC floor (sub-precision floors to 0 on-chain) AND <= redeemable
+  // balance (a connected user must not be able to submit more than they hold and
+  // eat a raw chain revert — launch-audit defect).
+  const overBalance = redeemableUsd != null && parseFloat(amount) > redeemableUsd + 1e-9;
+  const ready =
+    deployment?.ready === true && parseFloat(amount) >= 0.000001 && !overBalance;
   const busy = status.kind === 'submitting';
 
   return (
@@ -48,7 +82,19 @@ export function VaultWithdraw() {
         }}
       >
         <label className="block">
-          <span className="text-[10px] uppercase tracking-wider text-muted">USDC to withdraw</span>
+          <span className="flex items-baseline justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-muted">USDC to withdraw</span>
+            {redeemableUsd != null && (
+              <button
+                type="button"
+                disabled={busy || redeemableUsd <= 0}
+                onClick={() => setAmount(String(redeemableUsd))}
+                className="text-[10px] uppercase tracking-wider text-ink-soft underline disabled:opacity-40"
+              >
+                Max {redeemableUsd.toFixed(2)}
+              </button>
+            )}
+          </span>
           <input
             type="number"
             inputMode="decimal"
@@ -58,6 +104,11 @@ export function VaultWithdraw() {
             disabled={busy}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-lg text-ink min-h-[44px] focus:border-ink/40 focus:outline-none"
           />
+          {overBalance && (
+            <span className="mt-1 block text-[11px] text-neg">
+              Exceeds your redeemable balance ({redeemableUsd?.toFixed(2)} USDC).
+            </span>
+          )}
         </label>
         <button
           type="submit"
