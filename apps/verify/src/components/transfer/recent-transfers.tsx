@@ -32,6 +32,7 @@ export function RecentTransfers() {
     queryKey: ['transfers', wallet],
     queryFn: () => fetchTransfers(wallet),
     refetchInterval: 30_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   if (isLoading) {

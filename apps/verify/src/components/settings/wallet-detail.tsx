@@ -42,6 +42,7 @@ export function WalletDetailCard() {
     queryKey: ['settings-wallet', scopedWallet],
     queryFn: () => fetchWallet(scopedWallet),
     refetchInterval: 60_000,
+    enabled: scopedWallet != null, // disconnected -> no authed fetch (no 401)
   });
   // 063-FE8 fix: the green signal reflects the REAL on-chain session-key
   // registry being live, not a fabricated "ERC-4337 · 7702 ready" claim

@@ -56,6 +56,7 @@ export function TransferTimeline() {
     queryKey: ['last-transfer', wallet],
     queryFn: () => fetchLast(wallet),
     refetchInterval: 5_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
   return (
     <section className="rounded-md border border-divider bg-parchment p-5">

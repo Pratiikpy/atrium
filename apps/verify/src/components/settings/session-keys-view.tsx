@@ -82,6 +82,7 @@ export function SessionKeysView() {
       return r.json();
     },
     refetchInterval: 30_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   const keys = data?.keys ?? [];

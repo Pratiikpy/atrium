@@ -30,6 +30,7 @@ export function NotificationsList() {
     queryKey: ['notifications', wallet],
     queryFn: () => fetchN(wallet),
     refetchInterval: 30_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
   if (isLoading) {
     return <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-16 rounded-md" />)}</div>;

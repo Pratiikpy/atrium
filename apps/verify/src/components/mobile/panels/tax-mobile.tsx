@@ -48,6 +48,7 @@ export function TaxMobile() {
       return r.json();
     },
     refetchInterval: 60_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   const events = useQuery({
@@ -58,6 +59,7 @@ export function TaxMobile() {
       return r.json();
     },
     refetchInterval: 60_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   // Error state (distinct from empty, E2E-50)

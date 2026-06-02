@@ -42,6 +42,7 @@ export function ActivityMobile() {
       return r.json() as Promise<{ activities: Activity[]; source: string }>;
     },
     refetchInterval: 30_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   const filtered = (data?.activities ?? []).filter(a => filter === 'all' || a.kind === filter);

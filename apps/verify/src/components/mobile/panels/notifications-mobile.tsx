@@ -32,6 +32,7 @@ export function NotificationsMobile() {
       return r.json();
     },
     refetchInterval: 30_000,
+    enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
   const unreadCount = (data?.notifications ?? []).filter(n => !n.read).length;
