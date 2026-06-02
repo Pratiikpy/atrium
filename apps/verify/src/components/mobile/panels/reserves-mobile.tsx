@@ -25,11 +25,20 @@ async function fetchLatest(): Promise<Attestation | null> {
   return r.json();
 }
 
-async function fetchRecent(): Promise<Attestation[]> {
+type RecentRow = { root: string; time: string };
+async function fetchRecent(): Promise<RecentRow[]> {
   const r = await fetch('/api/reserves/recent?window=24h');
   if (!r.ok) return [];
   const j = await r.json();
-  return j.attestations ?? [];
+  // /api/reserves/recent returns { rootHash, attestationTime } (a preformatted
+  // string), not the latest endpoint's { root, timestamp }. Map to the row shape
+  // the list renders so `a.root.slice()` never reads undefined.
+  return (j.attestations ?? []).map(
+    (a: { rootHash?: string; root?: string; attestationTime?: string }) => ({
+      root: a.rootHash ?? a.root ?? '0x',
+      time: a.attestationTime ?? '',
+    }),
+  );
 }
 
 function timeAgo(ts: number): string {
@@ -182,7 +191,7 @@ export function ReservesMobile() {
             {(recent.data ?? []).map((a, i) => (
               <li key={i} className="rounded-xl border border-mob-line bg-mob-bg-card px-4 py-3 text-[14px]">
                 <span className="font-mono text-mob-ink">{a.root.slice(0, 10)}…{a.root.slice(-4)}</span>
-                <span className="ml-2 text-mob-muted">{timeAgo(a.timestamp)}</span>
+                <span className="ml-2 text-mob-muted">{a.time}</span>
               </li>
             ))}
           </ul>
