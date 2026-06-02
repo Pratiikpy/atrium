@@ -88,7 +88,7 @@
       "activationTx": "0x69bff2c17e520de5a7ebe2081d01821eadf42922508c4a49d946c898b6cb7248",
       "block": 270688421,
       "kind": "stylus",
-      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + median + 50bps tolerance"
+      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) \u00e2\u20ac\u201d Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
       "address": "0xd86f579ec880eaab27dfa698ae056d1893ec7553",
@@ -103,13 +103,14 @@
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
+      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror. | SUPERSEDED 2026-06-02: points at DEAD old plinth 0x485218e3 + 4-arg pre-V11 source; replaced by atrium-router-v2 (pending 48h adapter-auth cutover)."
     },
     "rostrum": {
-      "address": "0xbaf348e61fb555844973398b51332d93f674b0af",
-      "tx": "0x0106d5cbe7852a6877678161e32fb99abc5639942bad95efd49aa45285a49a33",
+      "address": "0x748A0a4E53F3E94f9a279bfDC5eCbF8A7c88f093",
+      "tx": "0x1eb99f9f0b3b31f21057eed99eadfff03216e305c8bd154cad28f37d3886d727",
       "block": 270726103,
-      "kind": "solidity"
+      "kind": "solidity",
+      "note": "Redeployed 2026-06-01 post-cutover: constructor plinth = live Plinth 0xd86f579e (was the dead 99-byte pre-cutover Plinth)."
     },
     "adapter-aave-horizon": {
       "address": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1",
@@ -217,10 +218,11 @@
       "kind": "solidity"
     },
     "postern-kill-switch": {
-      "address": "0xb90a51a726740065bd0dbc20cd79306b30d8b676",
-      "tx": "0x3f6ef96a4c24f3408c811b688e158ba55b9fd1cb39d4d470776de90ec90885e3",
+      "address": "0xCD899f715462A33Ae880310d72b37bde102ab0b7",
+      "tx": "0x4a8705786d1841283050dc4206b078b4c6596ef11cd57097d6ecedb7c5a9f6b1",
       "block": 270683177,
-      "kind": "solidity"
+      "kind": "solidity",
+      "note": "Redeployed 2026-06-01 post-cutover: constructor sigil = live Sigil 0xdba97d39, so the Kill Switch revokes against the live mandate contract."
     },
     "faucet": {
       "address": "0x7f3a714c824c0926ae98ecfb2e59513e78d82bbc",
@@ -239,6 +241,13 @@
       "block": 270691652,
       "kind": "solidity",
       "note": "DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence. Kept for reference; do not point UI at it."
+    },
+    "atrium-router-v2-current-source": {
+      "address": "0x09BE855e5CA0fB3c11c4D0d2708660Dcc963a004",
+      "tx": "0xcd6b93bcd6c64f7cc7012f0b3f4f6f72efd9ba739b72a186ec403730293ac379",
+      "kind": "solidity",
+      "verified": true,
+      "note": "2026-06-02 redeploy from current audited source (5-arg, V11-routing, timelock-gated). plinth=LIVE 0xd86f579e, coffer=0xc7bf, registry=0x9a9af6e5, timelock=0x0dad24d7. Verified on Arbiscan. PENDING CUTOVER: adapters need setAuthorizedCaller(this) (onlyTimelock, 48h) + app/subgraph repoint before it is the live router. Do as part of the ~June-4 fill (task #432)."
     }
   },
   "lastUpdated": "2026-05-30T12:34:21.142Z",

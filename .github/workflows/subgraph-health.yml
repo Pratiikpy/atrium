@@ -21,17 +21,24 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with: { node-version: 20 }
-      - name: Check health
+      - name: Check health (block-lag)
         id: health
         env:
           SCRIBE_URL: ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
         run: node scripts/check-scribe-health.mjs
-      - name: Alert on sustained lag
+      # Foundry gives us `cast` for the on-chain reads the reconciler does.
+      - uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773 # v1.2.0
+      - name: Reconcile chain <-> Scribe <-> deployment manifests (drift guard)
+        env:
+          SCRIBE_URL: ${{ secrets.SCRIBE_URL }}
+          ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
+        run: node scripts/reconcile-chain-scribe.mjs
+      - name: Alert on health/reconcile failure
         if: failure()
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
         run: |
           curl -s -X POST "$DISCORD_OPS_WEBHOOK" \
             -H "Content-Type: application/json" \
-            -d '{"content":"⚠️ Scribe indexer lag > 200 blocks for 2 consecutive checks. Check https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
+            -d '{"content":"⚠️ Subgraph health or chain/Scribe reconcile failed (block-lag or address drift). Check https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
