@@ -125,15 +125,20 @@ export function AppShell({
       {/* Mobile branch: minimal chrome wrapping the
           actual page content. Renders `{children}` only when the viewport is
           mobile so the tree mounts once. */}
-      <div className="atrium-mobile-only" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      {/* Audit fix (use-everything sweep 2026-06-02): design/Mobile App.html is a
+          fully dark OLED layout (--bg oklch(8%), body #000), but the shell rendered
+          the dark mob-* cards on the LIGHT parchment --bg, so every mobile page
+          mixed a light header/canvas with dark cards. Render the shell dark to
+          match the contract (dark cards now sit on the intended OLED canvas). */}
+      <div className="atrium-mobile-only" style={{ minHeight: '100vh', background: 'var(--color-mob-bg)', color: 'var(--color-mob-ink)' }}>
         <header
           className="atrium-nav"
-          style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--hairline)' }}
+          style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-mob-bg)', color: 'var(--color-mob-ink)', borderBottom: '1px solid var(--color-mob-line)' }}
         >
           {/* Audit fix (#16): mobile header wordmark links to /app, not the
               marketing landing - tapping it shouldn't bounce a logged-in user
               out of the app. */}
-          <Link href="/app" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none' }}>
+          <Link href="/app" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none', color: 'var(--color-mob-ink)' }}>
             Atrium
           </Link>
           <span className="pill testnet" style={{ fontSize: 9 }}>
