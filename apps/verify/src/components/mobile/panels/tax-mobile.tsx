@@ -43,7 +43,7 @@ export function TaxMobile() {
   const stats = useQuery({
     queryKey: ['tax-stats-mobile', jurisdiction, year, wallet],
     queryFn: async (): Promise<TaxStats> => {
-      const r = await fetch(walletQuery(`/api/tax/stats?jurisdiction=${jurisdiction}&year=${year}`, wallet));
+      const r = await fetch(walletQuery(`/api/tax/summary?jurisdiction=${jurisdiction}&year=${year}`, wallet));
       if (!r.ok) throw new Error(`tax_stats_${r.status}`);
       return r.json();
     },

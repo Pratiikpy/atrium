@@ -7,8 +7,8 @@ import { NewMandateButton } from '@/components/agents/new-mandate-button';
 /**
  * AgentsMobile  the Agents panel for /app/agents at < md.
  * Source: design/Mobile App.html:1185-1259. Active mandate banner +
- * Rostrum top-7d list (5 rows). Reads /api/agents/mandates and
- * /api/agents/rostrum-leaderboard. Renders honest pending when those
+ * Rostrum top-7d list (5 rows). Reads /api/agents/my-mandates and
+ * /api/agents/leaderboard. Renders honest pending when those
  * endpoints return empty.
  */
 
@@ -37,12 +37,12 @@ async function fetchJSON<T>(url: string): Promise<T> {
 export function AgentsMobile() {
   const mandates = useQuery({
     queryKey: ['mobile-mandates'],
-    queryFn: () => fetchJSON<{ mandates: Mandate[]; source: string }>('/api/agents/mandates'),
+    queryFn: () => fetchJSON<{ mandates: Mandate[]; source: string }>('/api/agents/my-mandates'),
     refetchInterval: 60_000,
   });
   const board = useQuery({
     queryKey: ['mobile-rostrum'],
-    queryFn: () => fetchJSON<{ rows: LeaderboardRow[]; source: string }>('/api/agents/rostrum-leaderboard'),
+    queryFn: () => fetchJSON<{ rows: LeaderboardRow[]; source: string }>('/api/agents/leaderboard'),
     refetchInterval: 60_000,
   });
 

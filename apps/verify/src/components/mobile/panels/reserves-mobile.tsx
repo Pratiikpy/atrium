@@ -26,7 +26,7 @@ async function fetchLatest(): Promise<Attestation | null> {
 }
 
 async function fetchRecent(): Promise<Attestation[]> {
-  const r = await fetch('/api/lantern/recent?hours=24');
+  const r = await fetch('/api/reserves/recent?window=24h');
   if (!r.ok) return [];
   const j = await r.json();
   return j.attestations ?? [];

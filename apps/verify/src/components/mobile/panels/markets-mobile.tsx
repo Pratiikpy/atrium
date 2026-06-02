@@ -26,7 +26,7 @@ export function MarketsMobile() {
   const { data: statuses, isLoading, error, refetch } = useQuery({
     queryKey: ['venue-statuses', wallet],
     queryFn: async (): Promise<VenueStatus[]> => {
-      const r = await fetch(walletQuery('/api/protocol/venues', wallet));
+      const r = await fetch(walletQuery('/api/protocol/subsystems', wallet));
       if (!r.ok) throw new Error(`venues_${r.status}`);
       const j = await r.json();
       return j.venues ?? VENUES.map(v => ({ id: v.id, status: 'live' as const, tvl: '-' }));
