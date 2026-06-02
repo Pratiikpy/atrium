@@ -1,6 +1,7 @@
 'use client';
 
 import { useDeferredValue, useState } from 'react';
+import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useScopedWallet } from '@/lib/use-scoped-wallet';
@@ -67,6 +68,7 @@ async function fetchQuote(amount: string, from: string, to: string, token: strin
 }
 
 export function TransferForm() {
+  const { isConnected } = useAccount();
   const [token, setToken] = useState('USDC');
   const [amount, setAmount] = useState('');
   const [from, setFrom] = useState('arb-sepolia');
@@ -79,16 +81,18 @@ export function TransferForm() {
     queryKey: ['balance', from, token, wallet],
     queryFn: () => fetchBalance(from, token, wallet),
     refetchInterval: 30_000,
+    enabled: isConnected,
   });
   const toBalance = useQuery({
     queryKey: ['balance', to, token, wallet],
     queryFn: () => fetchBalance(to, token, wallet),
     refetchInterval: 30_000,
+    enabled: isConnected,
   });
   const quote = useQuery({
     queryKey: ['transfer-quote', deferredAmount, from, to, token],
     queryFn: () => fetchQuote(deferredAmount, from, to, token),
-    enabled: deferredAmount.length > 0,
+    enabled: isConnected && deferredAmount.length > 0,
     refetchInterval: 15_000,
   });
   const { data: deployment } = useDeploymentStatus(1);

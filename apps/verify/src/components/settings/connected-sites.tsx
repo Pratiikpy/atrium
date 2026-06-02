@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface Site { id: string; host: string; lastUsedAgo: string; }
@@ -32,8 +33,9 @@ async function revokeAll(): Promise<{ ok: boolean }> {
 }
 
 export function ConnectedSitesCard() {
+  const { isConnected } = useAccount();
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ['connected-sites'], queryFn: fetchSites, refetchInterval: 60_000 });
+  const { data } = useQuery({ queryKey: ['connected-sites'], queryFn: fetchSites, refetchInterval: 60_000 , enabled: isConnected });
   const [confirmRevoke, setConfirmRevoke] = useState(false);
   const revokeMut = useMutation({
     mutationFn: revokeAll,

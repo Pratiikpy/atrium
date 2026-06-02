@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 
 /**
@@ -53,25 +54,30 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export function PortfolioMobile() {
+  const { isConnected } = useAccount();
   const bp = useQuery({
     queryKey: ['mobile-bp'],
     queryFn: () => fetchJSON<BuyingPower>('/api/portfolio/buying-power?window=7d'),
     refetchInterval: 60_000,
+    enabled: isConnected,
   });
   const summary = useQuery({
     queryKey: ['mobile-summary'],
     queryFn: () => fetchJSON<PortfolioSummary>('/api/portfolio/summary'),
     refetchInterval: 60_000,
+    enabled: isConnected,
   });
   const positions = useQuery({
     queryKey: ['mobile-positions'],
     queryFn: () => fetchJSON<{ positions: Position[]; source: string }>('/api/portfolio/positions'),
     refetchInterval: 60_000,
+    enabled: isConnected,
   });
   const activity = useQuery({
     queryKey: ['mobile-activity'],
     queryFn: () => fetchJSON<{ activities: Activity[]; source: string }>('/api/portfolio/activity'),
     refetchInterval: 60_000,
+    enabled: isConnected,
   });
 
   const currentUsd = bp.data?.currentUsd ?? 'pending';

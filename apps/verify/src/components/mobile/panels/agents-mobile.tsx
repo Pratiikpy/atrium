@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { NewMandateButton } from '@/components/agents/new-mandate-button';
 
@@ -35,10 +36,12 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export function AgentsMobile() {
+  const { isConnected } = useAccount();
   const mandates = useQuery({
     queryKey: ['mobile-mandates'],
     queryFn: () => fetchJSON<{ mandates: Mandate[]; source: string }>('/api/agents/my-mandates'),
     refetchInterval: 60_000,
+    enabled: isConnected, // my-mandates is wallet-scoped; disconnected -> no 401
   });
   const board = useQuery({
     queryKey: ['mobile-rostrum'],

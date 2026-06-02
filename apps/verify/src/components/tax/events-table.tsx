@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import type { TaxJurisdiction, TaxYear } from './tax-types';
 
 interface TaxEvent {
@@ -32,10 +33,12 @@ export function TaxEventsTable({
   jurisdiction: TaxJurisdiction;
   year: TaxYear;
 }) {
+  const { isConnected } = useAccount();
   const { data, isLoading } = useQuery({
     queryKey: ['tax-events', jurisdiction, year],
     queryFn: () => fetchEvents(jurisdiction, year),
     refetchInterval: 60_000,
+    enabled: isConnected,
   });
 
   if (isLoading) {

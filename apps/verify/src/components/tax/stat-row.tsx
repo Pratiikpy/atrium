@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import type { TaxJurisdiction, TaxYear } from './tax-types';
 
 interface TaxSummary {
@@ -39,12 +40,14 @@ export function TaxStatRow({
   jurisdiction: TaxJurisdiction;
   year: TaxYear;
 }) {
+  const { isConnected } = useAccount();
   // queryKey carries jurisdiction + year so changing the bar re-fetches
   // rather than showing stale data from a different jurisdiction.
   const { data } = useQuery({
     queryKey: ['tax-summary', jurisdiction, year],
     queryFn: () => fetchSummary(jurisdiction, year),
     refetchInterval: 5 * 60_000,
+    enabled: isConnected,
   });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
