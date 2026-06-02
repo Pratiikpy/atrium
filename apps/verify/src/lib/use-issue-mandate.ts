@@ -20,13 +20,19 @@ import { instrumentIdsForVenues } from './instruments';
  *   2. Build the EIP-712 envelope (lib/sigil-typed-data.ts)
  *   3. User signs via wallet (useSignTypedData)
  *   4. POST {envelope, signature, intentHash} to /api/agents/issue-mandate
- *     , server stores in Codex so the agent + future sessions can look
- *      up the signed bytes by hash.
+ *      so the server re-derives the EIP-712 hash and verifies the signature
+ *      binds to these exact fields + recovers to the session wallet. The
+ *      signed envelope is the artifact: IntentSigil mandates are off-chain
+ *      in Year-1 (no server-side store), held by the client to hand to its
+ *      agent. The mandate first surfaces on chain when the agent's initial
+ *      action calls Sigil.validate_action (which emits the SigilValidation
+ *      event the My-mandates panel reads).
  *
  * Honest failure modes:
  *   - sigilAddress is null → 'sigil_not_deployed'
  *   - wallet rejects signature → wallet's actual error message
- *   - server can't store → 'storage_pending'
+ *   - server rejects the signature binding → that error surfaces; a network
+ *     error still resolves success since the signed envelope is valid locally
  */
 
 export interface MandateFormInput {

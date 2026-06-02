@@ -82,7 +82,7 @@ export function MyMandatesPanel() {
             ? data.reason === 'no_wallet_configured'
               ? 'Connect a wallet to see mandates issued from it.'
               : 'Scribe is currently unreachable. The mandate list will populate when indexing resumes.'
-            : "You haven't issued any Sigils yet. Click Issue mandate to delegate to an agent."
+            : 'Mandates show up here after an agent first acts under one on chain. A Sigil you just signed stays with you and your agent until then. Use New mandate above to delegate.'
         }
       />
     );
