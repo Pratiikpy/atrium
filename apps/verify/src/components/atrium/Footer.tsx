@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_VERSION, BUILD_PERIOD_SHORT } from "@/lib/app-meta";
 import { BrandWordmark } from "./brand";
 
 export function Footer() {
@@ -13,7 +14,7 @@ export function Footer() {
               Arbitrum Sepolia with Chainlink CCIP, ERC-8004, and ERC-4337 / 7702.
             </p>
             <div className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-              v0.15 · 2026.05 · testnet only
+              {APP_VERSION} · {BUILD_PERIOD_SHORT} · testnet only
             </div>
             <p className="text-[12px] text-[var(--muted)]">
               <a href="mailto:support@atrium.fi" className="hover:text-[var(--ink)]">support@atrium.fi</a>

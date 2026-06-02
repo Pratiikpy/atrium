@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { BUILD_PERIOD } from "@/lib/app-meta";
 
 type Room = {
   id: string;
@@ -223,7 +224,7 @@ export function FloorPlanSection() {
             </div>
             <div className="mono cap" style={{ textAlign: "right" }}>
               <div>Sheet 03 / 08</div>
-              <div className="muted" style={{ marginTop: 4 }}>Atrium · May 2026</div>
+              <div className="muted" style={{ marginTop: 4 }}>Atrium · {BUILD_PERIOD}</div>
             </div>
           </div>
 

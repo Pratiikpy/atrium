@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { APP_VERSION, BUILD_PERIOD_SHORT } from '@/lib/app-meta';
 import { Wordmark } from '@/components/wordmark';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
@@ -153,7 +154,7 @@ export default function BrandPage() {
           <TypeRow specimen="$1,247,820.00 . 0x4f29...81e0 . arb-sepolia . 16:14 UTC"
             meta="Geist Mono 400 . 14 / 22 . Figures + addresses"
             className="font-mono text-[14px] leading-[1.55]" />
-          <TypeRow specimen="ALL-CAPS MONO LABEL . POSITIONS . 7 VENUES"
+          <TypeRow specimen="ALL-CAPS MONO LABEL . POSITIONS . VENUES"
             meta="Geist Mono 500 . 10.5 / 0.14em . Labels"
             className="font-mono text-[11.5px] uppercase tracking-[0.14em]" />
           <TypeRow specimen={<span className="font-display italic">Atrium</span>}
@@ -365,7 +366,7 @@ export default function BrandPage() {
 
       <div className="mt-24 flex items-center justify-between border-t border-line pt-6 text-xs text-muted">
         <span>(c) 2026 Atrium.</span>
-        <span>Brand kit v1.0 . 2026.05</span>
+        <span>Brand kit {APP_VERSION} . {BUILD_PERIOD_SHORT}</span>
         <Pill color="testnet" label="testnet" />
       </div>
     </MarketingShell>

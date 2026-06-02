@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BUILD_PERIOD } from '@/lib/app-meta';
 
 /**
  * Hero, "One wallet. Every venue. One buying-power number."
@@ -113,7 +114,7 @@ export function HeroSection() {
             </div>
             <div className="text-right">
               <p>Sheet 02 / 08</p>
-              <p className="mt-1.5">Atrium · May 2026</p>
+              <p className="mt-1.5">Atrium · {BUILD_PERIOD}</p>
             </div>
           </div>
         </div>
