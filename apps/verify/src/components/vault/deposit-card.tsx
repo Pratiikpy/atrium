@@ -38,7 +38,10 @@ export function VaultDeposit() {
   });
 
   const helper = readinessMessage(deployment, 'Deposit');
-  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !disabledReason;
+  // >= 1 micro-USDC (USDC has 6 decimals): a sub-precision amount like 0.0000001
+  // is > 0 but parseUnits-floors to 0, so the deposit would revert. Floor at
+  // 0.000001 so the button never enables an amount that can only round to zero.
+  const ready = deployment?.ready === true && parseFloat(amount) >= 0.000001 && !disabledReason;
   const busy =
     status.kind === 'checking' || status.kind === 'approving' || status.kind === 'depositing';
 

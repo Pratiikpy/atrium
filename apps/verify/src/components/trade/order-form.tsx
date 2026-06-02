@@ -83,7 +83,13 @@ export function OrderForm({
   const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
   const { status: openStatus, open: openPosition, reset: resetOpen } = useOpenPosition();
   const busy = openStatus.kind === 'resolving' || openStatus.kind === 'submitting';
-  const ready = deployment?.ready === true && size.length > 0 && !busy;
+  // Validate the size as a positive number, not merely non-empty: a bare
+  // `size.length > 0` left the Open button enabled for "0", "-5", and "abc"
+  // (interactive form-edge sweep 2026-06-02). parseFloat rejects all three
+  // (NaN/<=0). The deposit form already gates this way; match it here.
+  const sizeNum = parseFloat(size);
+  const sizeValid = Number.isFinite(sizeNum) && sizeNum > 0;
+  const ready = deployment?.ready === true && sizeValid && !busy;
 
   // First-trade risk preview gate. The flow doc treats this as required
   // before the very first open-position click. Persistence is per-device

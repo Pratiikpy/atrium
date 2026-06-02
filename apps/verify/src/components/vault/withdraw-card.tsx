@@ -26,7 +26,9 @@ export function VaultWithdraw() {
   const { status, withdraw, reset } = useVaultWithdraw(cofferAddress ?? null);
 
   const helper = readinessMessage(deployment, 'Withdraw');
-  const ready = deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0;
+  // >= 1 micro-USDC: a sub-precision amount floors to 0 on-chain and would
+  // revert, so never enable an amount that can only round to zero.
+  const ready = deployment?.ready === true && parseFloat(amount) >= 0.000001;
   const busy = status.kind === 'submitting';
 
   return (
