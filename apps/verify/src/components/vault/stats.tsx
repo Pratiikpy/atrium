@@ -6,6 +6,7 @@ import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 interface VaultStatsResponse {
   vaultTvlUsd: string | null;
   userSharesFormatted: string | null;
+  userValueUsd: string | null;
   sharePriceUsd: string | null;
   source: 'coffer' | 'pending';
 }
@@ -16,7 +17,7 @@ async function fetchStats(wallet: string | null): Promise<VaultStatsResponse> {
     if (!r.ok) throw new Error();
     return await r.json();
   } catch {
-    return { vaultTvlUsd: null, userSharesFormatted: null, sharePriceUsd: null, source: 'pending' };
+    return { vaultTvlUsd: null, userSharesFormatted: null, userValueUsd: null, sharePriceUsd: null, source: 'pending' };
   }
 }
 
@@ -31,8 +32,8 @@ export function VaultStats() {
   return (
     <div className="grid gap-3 md:grid-cols-3">
       <Tile label="Vault TVL" value={data?.vaultTvlUsd ?? '-'} sub="from Coffer.totalAssets()" source={sourceCaption} />
-      <Tile label="Your shares" value={data?.userSharesFormatted ?? '-'} sub="from Coffer.balanceOf(you)" source={sourceCaption} />
-      <Tile label="Share price" value={data?.sharePriceUsd ?? '-'} sub="assets / shares (4626)" source={sourceCaption} />
+      <Tile label="Your value" value={data?.userValueUsd ?? '-'} sub="redeemable · convertToAssets(your shares)" source={sourceCaption} />
+      <Tile label="Your shares" value={data?.userSharesFormatted ?? '-'} sub="ERC-4626 · 1e12 virtual-offset scale" source={sourceCaption} />
     </div>
   );
 }

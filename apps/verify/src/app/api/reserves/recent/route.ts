@@ -37,7 +37,7 @@ export async function GET(req: Request) {
   const limit = WINDOW_TO_LIMIT[windowKey] ?? 24;
   try {
     const data = await gql<{
-      lanternAttestations: Array<{ root: string; blockNumber: string; timestamp: string; leafCount: string }>;
+      lanternAttestations: Array<{ root: string; blockNumber: string; timestamp: string; leafCount: string; ipfsCid: string }>;
     }>(
       `query Recent($limit: Int!) {
         lanternAttestations(first: $limit, orderBy: blockNumber, orderDirection: desc) {
@@ -45,6 +45,7 @@ export async function GET(req: Request) {
           blockNumber
           timestamp
           leafCount
+          ipfsCid
         }
       }`,
       { limit },
@@ -63,21 +64,29 @@ export async function GET(req: Request) {
       leafCount: number;
       pinned: boolean;
       attestationTime: string;
-      status: 'PASS';
+      status: 'PASS' | 'PENDING';
     }> = [];
     for (const a of data.lanternAttestations ?? []) {
       const block = parseIntOrNull(a.blockNumber);
       const leaves = parseIntOrNull(a.leafCount);
       const ts = parseTsOrNull(a.timestamp);
       if (block == null || leaves == null || ts == null) continue;
+      // Launch-review P0 (fake-as-live): this used to hardcode pinned:true +
+      // status:'PASS' on EVERY row, claiming end-to-end-verifiable proof of
+      // reserves even when the Merkle tree was never pinned to IPFS (so a user
+      // CANNOT verify their own inclusion). Derive both from the indexed
+      // ipfsCid, matching /api/lantern/latest's ipfsPinned semantics + its
+      // >=10-char CID heuristic: a row is PASS (inclusion-verifiable) only when
+      // its tree is pinned; an on-chain-only root is honestly PENDING.
+      const pinned = typeof a.ipfsCid === 'string' && a.ipfsCid.length >= 10;
       attestations.push({
         id: a.root,
         blockNumber: block,
         rootHash: a.root,
         leafCount: leaves,
-        pinned: true,
+        pinned,
         attestationTime: new Date(ts * 1000).toLocaleString(),
-        status: 'PASS',
+        status: pinned ? 'PASS' : 'PENDING',
       });
     }
     return NextResponse.json({ attestations, source: 'scribe' as const });

@@ -80,7 +80,11 @@ export function PortfolioMobile() {
     enabled: isConnected,
   });
 
-  const currentUsd = bp.data?.currentUsd ?? 'pending';
+  // Launch-review P0: never render the raw status word "pending" as the giant
+  // hero value. Mirror the desktop buying-power card exactly: a real figure
+  // when Plinth has valued the account, else a quiet "-" placeholder (the value
+  // is genuinely unknown-until-margin-update, not a computed $0.00).
+  const currentUsd = bp.data?.currentUsd ?? '-';
   const series = bp.data?.series ?? [];
   const delta = computeDelta(series);
 
@@ -122,9 +126,9 @@ export function PortfolioMobile() {
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-3 border-t border-mob-hairline pt-3 text-[11px]">
-            <Meta label="Collateral" value={summary.data?.totalAccountValueUsd ?? 'pending'} />
-            <Meta label="Open" value={openCount != null ? String(openCount) : 'pending'} />
-            <Meta label="Utilisation" value={utilisationPct != null ? `${utilisationPct.toFixed(1)}%` : 'pending'} />
+            <Meta label="Collateral" value={summary.data?.totalAccountValueUsd ?? '-'} />
+            <Meta label="Open" value={openCount != null ? String(openCount) : '-'} />
+            <Meta label="Utilisation" value={utilisationPct != null ? `${utilisationPct.toFixed(1)}%` : '-'} />
           </div>
         </div>
       </section>
@@ -230,7 +234,7 @@ function PositionRow({ p }: { p: Position }) {
       </div>
       <div className="text-right">
         <div className="font-mono text-[13px] text-mob-ink">{p.notionalUsd}</div>
-        <div className={`font-mono text-[11px] ${pnlColor}`}>{pnl ?? 'pending'}</div>
+        <div className={`font-mono text-[11px] ${pnlColor}`}>{pnl ?? '-'}</div>
       </div>
     </li>
   );
@@ -276,7 +280,7 @@ function Sparkline({ series, loading }: { series: { ts: number; valueUsd: string
   if (!series || series.length < 2) {
     return (
       <div className="grid h-full place-items-center text-[10.5px] uppercase tracking-wider text-mob-muted">
-        Plinth . live wire pending
+        Chart populates after your first position
       </div>
     );
   }

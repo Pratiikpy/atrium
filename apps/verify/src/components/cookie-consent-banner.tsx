@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'atrium_consent_v1';
 const CONSENT_TIMESTAMP_KEY = 'atrium_consent_ts';
@@ -31,14 +31,41 @@ function writeConsent(c: Categories) {
   window.dispatchEvent(new Event('atrium-consent-change'));
 }
 
+/**
+ * Cookie consent.
+ *
+ * Launch-review fix: this used to be a 380px floating card pinned bottom-right,
+ * which OVERLAPPED load-bearing content on every screen (the kill switch, the
+ * Trade margin panel, the Reserves Merkle diagram, mobile action buttons). It
+ * is now a full-width bar docked to the very bottom edge, and it reserves its
+ * own height as body padding-bottom so the last row of page content scrolls
+ * clear of it instead of hiding behind it. One-time: once a choice is saved it
+ * never renders again (localStorage, 12-month TTL).
+ */
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [analytics, setAnalytics] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!readConsent()) setVisible(true);
   }, []);
+
+  // Reserve space equal to the bar's height so it never sits on top of content.
+  // Re-measures when the customize panel expands/collapses (height changes).
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!visible) {
+      document.body.style.paddingBottom = '';
+      return;
+    }
+    const h = barRef.current?.offsetHeight ?? 0;
+    document.body.style.paddingBottom = h ? `${h}px` : '';
+    return () => {
+      document.body.style.paddingBottom = '';
+    };
+  }, [visible, customize]);
 
   const save = useCallback((c: Categories) => {
     writeConsent(c);
@@ -49,67 +76,75 @@ export function CookieConsentBanner() {
 
   return (
     <div
+      ref={barRef}
       role="dialog"
       aria-label="Privacy choices"
-      className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-lg border border-divider bg-parchment p-5 shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-divider bg-parchment shadow-[0_-6px_24px_rgba(0,0,0,0.08)]"
     >
-      <h2 className="font-display text-lg text-ink">Privacy choices</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Atrium uses essential cookies for the service to work. We also offer optional
-        analytics (SimpleAnalytics, no personal IDs) and crash reporting (Sentry, scrubbed
-        of wallet addresses).
-      </p>
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <h2 className="font-display text-base italic text-ink">Privacy choices</h2>
+          <p className="mt-0.5 text-[13px] leading-snug text-ink-soft">
+            Atrium uses essential cookies to run. Optional analytics (SimpleAnalytics, no personal
+            IDs) and crash reporting (Sentry, wallet addresses scrubbed) stay off until you allow
+            them.
+          </p>
 
-      {customize && (
-        <div className="mt-4 space-y-3 border-t border-divider pt-3">
-          <label className="flex items-center gap-3 text-sm text-ink-soft">
-            <input type="checkbox" checked disabled className="size-4 accent-ink" />
-            <span>Essential <span className="text-muted">(always on)</span></span>
-          </label>
-          <label className="flex items-center gap-3 text-sm text-ink-soft">
-            <input
-              type="checkbox"
-              checked={analytics}
-              onChange={(e) => setAnalytics(e.target.checked)}
-              className="size-4 accent-ink"
-            />
-            Analytics &amp; crash reporting
-          </label>
-          <label className="flex items-center gap-3 text-sm text-ink-soft">
-            <input type="checkbox" checked={false} disabled className="size-4 accent-ink" />
-            <span>Marketing <span className="text-muted">(none today)</span></span>
-          </label>
-          <button
-            onClick={() => save({ essential: true, analytics, marketing: false })}
-            className="mt-2 h-[44px] w-full rounded-md bg-ink text-sm font-medium text-bg"
-          >
-            Save preferences
-          </button>
+          {customize && (
+            <div className="mt-3 flex flex-col gap-2 border-t border-divider pt-3 sm:flex-row sm:gap-6">
+              <label className="flex items-center gap-2 text-[13px] text-ink-soft">
+                <input type="checkbox" checked disabled className="size-4 accent-ink" />
+                <span>Essential <span className="text-muted">(always on)</span></span>
+              </label>
+              <label className="flex items-center gap-2 text-[13px] text-ink-soft">
+                <input
+                  type="checkbox"
+                  checked={analytics}
+                  onChange={(e) => setAnalytics(e.target.checked)}
+                  className="size-4 accent-ink"
+                />
+                Analytics &amp; crash reporting
+              </label>
+              <label className="flex items-center gap-2 text-[13px] text-ink-soft">
+                <input type="checkbox" checked={false} disabled className="size-4 accent-ink" />
+                <span>Marketing <span className="text-muted">(none today)</span></span>
+              </label>
+            </div>
+          )}
         </div>
-      )}
 
-      {!customize && (
-        <div className="mt-4 flex flex-col gap-2">
-          <button
-            onClick={() => save({ essential: true, analytics: true, marketing: false })}
-            className="h-[44px] w-full rounded-md bg-ink text-sm font-medium text-bg"
-          >
-            Accept all
-          </button>
-          <button
-            onClick={() => save({ essential: true, analytics: false, marketing: false })}
-            className="h-[44px] w-full rounded-md border border-divider bg-bg text-sm font-medium text-ink"
-          >
-            Reject non-essential
-          </button>
-          <button
-            onClick={() => setCustomize(true)}
-            className="mt-1 text-sm text-muted underline underline-offset-2 hover:text-ink"
-          >
-            Customize
-          </button>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {customize ? (
+            <button
+              onClick={() => save({ essential: true, analytics, marketing: false })}
+              className="h-[40px] rounded-md bg-ink px-4 text-sm font-medium text-bg"
+            >
+              Save preferences
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setCustomize(true)}
+                className="h-[40px] rounded-md px-3 text-sm text-muted underline underline-offset-2 hover:text-ink"
+              >
+                Customize
+              </button>
+              <button
+                onClick={() => save({ essential: true, analytics: false, marketing: false })}
+                className="h-[40px] rounded-md border border-divider bg-bg px-4 text-sm font-medium text-ink"
+              >
+                Reject non-essential
+              </button>
+              <button
+                onClick={() => save({ essential: true, analytics: true, marketing: false })}
+                className="h-[40px] rounded-md bg-ink px-4 text-sm font-medium text-bg"
+              >
+                Accept all
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

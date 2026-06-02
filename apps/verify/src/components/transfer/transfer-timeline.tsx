@@ -52,21 +52,45 @@ async function fetchLast(wallet: string | null): Promise<LastTransfer> {
 
 export function TransferTimeline() {
   const wallet = useScopedWallet();
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['last-transfer', wallet],
     queryFn: () => fetchLast(wallet),
     refetchInterval: 5_000,
     enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
+  // Launch-review fix: only treat this as a real transfer when Scribe returned
+  // one (status + txHash present). Pre-fix the card always rendered, fabricating
+  // a "0 USDC" all-pending transfer that directly contradicted the "No transfers
+  // yet" empty state right below it.
+  const hasTransfer = data?.status != null && data?.txHash != null;
   return (
     <section className="rounded-md border border-divider bg-parchment p-5">
       <header className="flex items-baseline justify-between">
         <p className="font-display text-xl italic text-ink">Last transfer</p>
-        <span className="rounded-full border border-divider px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-muted">
-          {data?.status ?? 'pending'}
-        </span>
+        {hasTransfer && (
+          <span className="rounded-full border border-divider px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-muted">
+            {data!.status}
+          </span>
+        )}
       </header>
 
+      {!hasTransfer && (
+        <div className="mt-6 rounded-md border border-dashed border-divider bg-parchment-soft/40 px-4 py-10 text-center">
+          {isLoading ? (
+            <span className="skeleton inline-block h-4 w-40 rounded" />
+          ) : (
+            <>
+              <p className="text-sm text-ink-soft">No transfer to show yet</p>
+              <p className="mt-1 text-[11px] uppercase tracking-wider text-muted">
+                Your latest cross-chain transfer appears here
+              </p>
+            </>
+          )}
+        </div>
+      )}
+
+      {hasTransfer && (
+        <>
       <div className="mt-4 rounded-md bg-parchment-soft/60 px-4 py-3">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-muted">
           <span>From</span>
@@ -125,6 +149,8 @@ export function TransferTimeline() {
           </a>
         ) : null;
       })()}
+        </>
+      )}
     </section>
   );
 }

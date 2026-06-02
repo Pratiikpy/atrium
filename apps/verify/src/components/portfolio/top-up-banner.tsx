@@ -47,14 +47,18 @@ export function TopUpBanner() {
   });
   const [open, setOpen] = useState(false);
 
-  // Hide when no live data or buffer is healthy. We do NOT fire on a null
-  // bufferBps even though that "could" mean liquidation, the source is
-  // explicitly pending, so we don't have any signal to warn on.
+  // Gate on margin HEALTH, not the raw buffer. marginHealthBps = 10000 means
+  // full headroom (100% healthy); it drops toward 0 as an account nears
+  // liquidation. A no-position account returns marginHealthBps 10000 AND
+  // liquidationBufferBps 0, so the prior buffer-only gate screamed "Buffer at
+  // 0%, top up to avoid liquidation" at users with ZERO positions and perfect
+  // health (launch-review data-trust bug). Warn only when health is genuinely
+  // low (real liquidation risk), and never when the account is fully healthy.
   if (!health || health.source !== 'plinth') return null;
-  if (health.liquidationBufferBps === null) return null;
-  if (health.liquidationBufferBps >= WARNING_THRESHOLD_BPS) return null;
+  if (health.marginHealthBps === null) return null;
+  if (health.marginHealthBps >= WARNING_THRESHOLD_BPS) return null;
 
-  const bufferPct = (health.liquidationBufferBps / 100).toFixed(0);
+  const bufferPct = ((health.liquidationBufferBps ?? 0) / 100).toFixed(0);
 
   return (
     <>

@@ -47,9 +47,17 @@ export async function GET(req?: Request) {
       ? ((await coffer.read.balanceOf([wallet as `0x${string}`])) as bigint)
       : 0n;
     const oneShareInAssets = (await coffer.read.convertToAssets([10n ** BigInt(USDC_DECIMALS)])) as bigint;
+    // The user's redeemable USD value = convertToAssets(their shares). This is
+    // the number a user actually cares about. The bare "share price" reads as
+    // ~$0.000001 because Coffer mints at a 1e12 virtual-offset scale, so it
+    // renders as a trust-killing "$0.0000" on the vault page (launch review).
+    const userAssets = sharesUser > 0n
+      ? ((await coffer.read.convertToAssets([sharesUser])) as bigint)
+      : 0n;
     return NextResponse.json({
       vaultTvlUsd: formatUsd(totalAssets, USDC_DECIMALS),
       userSharesFormatted: formatShares(sharesUser, USDC_DECIMALS),
+      userValueUsd: wallet ? formatUsd(userAssets, USDC_DECIMALS) : null,
       sharePriceUsd: formatSharePrice(oneShareInAssets, USDC_DECIMALS),
       source: 'coffer' as const,
     });

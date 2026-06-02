@@ -34,6 +34,7 @@ function row(overrides: Partial<{
   blockNumber: string;
   timestamp: string;
   leafCount: string;
+  ipfsCid: string;
 }> = {}) {
   return {
     root: '0x' + 'a'.repeat(64),
@@ -113,14 +114,37 @@ describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
     expect(json.attestations[0].attestationTime.length).toBeGreaterThan(0);
   });
 
-  it('marks every valid row as pinned + status PASS', async () => {
+  // Launch-review P0 (fake-as-live): a proof-of-reserves row may only show a
+  // green PASS when the user can actually verify inclusion end-to-end, which
+  // requires the Merkle tree pinned to IPFS. Derive PASS/PENDING from ipfsCid
+  // instead of hardcoding PASS on every row.
+  it('marks a row PASS + pinned only when its Merkle tree is pinned to IPFS', async () => {
     (gql as any).mockResolvedValue({
-      lanternAttestations: [row({ root: '0xf1' })],
+      lanternAttestations: [row({ root: '0xf1', ipfsCid: 'bafybeigdyrnotarealcidbutlongenough' })],
     });
     const { GET } = await import('./route');
     const json = await (await GET(new Request("http://localhost/api/reserves/recent"))).json();
     expect(json.attestations[0].pinned).toBe(true);
     expect(json.attestations[0].status).toBe('PASS');
+  });
+
+  it('marks a row PENDING + not pinned when the tree is not pinned (no IPFS CID)', async () => {
+    (gql as any).mockResolvedValue({
+      lanternAttestations: [row({ root: '0xf2' })], // no ipfsCid → on-chain-only root
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET(new Request("http://localhost/api/reserves/recent"))).json();
+    expect(json.attestations[0].pinned).toBe(false);
+    expect(json.attestations[0].status).toBe('PENDING');
+  });
+
+  it('treats a too-short / garbage ipfsCid as not pinned (PENDING)', async () => {
+    (gql as any).mockResolvedValue({
+      lanternAttestations: [row({ root: '0xf3', ipfsCid: 'x' })],
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET(new Request("http://localhost/api/reserves/recent"))).json();
+    expect(json.attestations[0].status).toBe('PENDING');
   });
 
   it('returns source:scribe on success', async () => {
