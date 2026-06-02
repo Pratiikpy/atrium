@@ -76,6 +76,9 @@ export function depositReceiptStatus(
 export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<DepositStatus>({ kind: 'idle' });
+  // The amount to deposit once the approve tx mines. Set when we send the
+  // approve, consumed by the auto-proceed effect below.
+  const [pendingDeposit, setPendingDeposit] = useState<bigint | null>(null);
   const { writeContractAsync } = useWriteContract();
 
   // Read current USDC allowance so we can skip the approve tx when the
@@ -112,6 +115,38 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
     if (next) setStatus(next);
   }, [depositingHash, receipt.data, receipt.error]);
 
+  // Auto-proceed approve -> deposit. LAUNCH-CRITICAL FIX (found driving the real
+  // money path with a wallet): the deposit used to set `approving` and wait for
+  // a SECOND click on the Deposit button to send the mint. But the card disables
+  // that button while `approving` (busy), so a first-time depositor was stuck at
+  // "Approve sent" forever and could never deposit. Now, once the approve tx
+  // MINES, we send the deposit automatically (the standard 2-popup DeFi flow):
+  // approving -> depositing on a confirmed approve, or -> error if it reverted.
+  const approvingHash = status.kind === 'approving' ? status.hash : undefined;
+  useEffect(() => {
+    if (!approvingHash || pendingDeposit == null || !account || !cofferAddress) return;
+    if (receipt.data?.status === 'success') {
+      const amount = pendingDeposit;
+      setPendingDeposit(null);
+      void (async () => {
+        try {
+          const depositHash = await writeContractAsync({
+            address: cofferAddress,
+            abi: ERC4626_DEPOSIT_ABI,
+            functionName: 'deposit',
+            args: [amount, account],
+          });
+          setStatus({ kind: 'depositing', hash: depositHash });
+        } catch (e) {
+          setStatus({ kind: 'error', reason: e instanceof Error ? e.message : 'deposit_failed' });
+        }
+      })();
+    } else if (receipt.data?.status === 'reverted') {
+      setPendingDeposit(null);
+      setStatus({ kind: 'error', reason: 'approve_reverted' });
+    }
+  }, [approvingHash, receipt.data, pendingDeposit, account, cofferAddress, writeContractAsync]);
+
   async function deposit(amountUsdc: string) {
     if (!account) {
       setStatus({ kind: 'error', reason: 'wallet_not_connected' });
@@ -143,12 +178,10 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
           functionName: 'approve',
           args: [cofferAddress, parsed],
         });
+        // Remember the amount; the auto-proceed effect sends the deposit once
+        // this approve mines. We surface the approve tx link in the meantime.
+        setPendingDeposit(parsed);
         setStatus({ kind: 'approving', hash: approveHash });
-        // Defer the deposit until the user can read approve confirmation.
-        // The component renders the approve tx link first, then a second
-        // click on Deposit triggers the actual mint, this prevents the
-        // wallet from popping a second signature prompt before the user
-        // realises the first one fired.
         return;
       }
       const depositHash = await writeContractAsync({

@@ -106,7 +106,7 @@ function buttonLabel(
   amount: string,
 ): string {
   if (status.kind === 'checking') return 'Checking allowance…';
-  if (status.kind === 'approving') return 'Approve sent · click again';
+  if (status.kind === 'approving') return 'Approving USDC…';
   if (status.kind === 'depositing') return 'Depositing…';
   if (status.kind === 'success') return 'Deposit again';
   return `Deposit ${amount || '0'} USDC`;
@@ -125,8 +125,7 @@ function DepositStatusLine({
       <p className="text-xs text-ink-soft">
         Approve tx submitted · <ArbiscanLink hash={status.hash} />
         <br />
-        Click <span className="font-medium text-ink">Deposit</span> again once the wallet
-        confirms.
+        The deposit sends automatically once the approve confirms (second wallet prompt).
       </p>
     );
   }
