@@ -33,12 +33,22 @@ export async function GET(req?: Request) {
   }
   try {
     const [collateral, required, notional, paused] = await plinth.read.getAccount([wallet]);
+    // Free margin = collateral above what open positions require, clamped at 0.
+    // Mirrors the buying-power route's definition so the two surfaces agree.
+    const free = collateral > required ? collateral - required : 0n;
     // Audit LL-9 fix: hand-rolled `fmtUsdc` truncated the fractional part
     // (`$1.99` for $1.999999) instead of locale-rounding. Use the
     // CI-tested formatUsd helper for consistent rounding + thousands
     // separator across every route.
     return NextResponse.json({
       totalAccountValueUsd: formatUsd(collateral, USDC_DECIMALS),
+      // The PortfolioStatRow reads totalCollateralUsd + buyingPowerUsd, which
+      // this route never populated, so the "Total collateral" card rendered a
+      // permanent "-" (value ?? '-') even with real Plinth collateral, and
+      // "Buying power" fell back to raw collateral. Populate both: collateral
+      // is the posted margin; buying power is the free (unencumbered) margin.
+      totalCollateralUsd: formatUsd(collateral, USDC_DECIMALS),
+      buyingPowerUsd: formatUsd(free, USDC_DECIMALS),
       totalRequiredMarginUsd: formatUsd(required, USDC_DECIMALS),
       totalNotionalUsd: formatUsd(notional, USDC_DECIMALS),
       // Audit U-23: pre-fix the success path returned `pnl24hUsd: null` with

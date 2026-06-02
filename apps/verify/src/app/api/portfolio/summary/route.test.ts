@@ -53,6 +53,12 @@ describe('GET /api/portfolio/summary, LL-9 formatUsd', () => {
     expect(json.totalAccountValueUsd).toBe('$1.50');
     expect(json.totalRequiredMarginUsd).toBe('$0.50');
     expect(json.totalNotionalUsd).toBe('$2.00');
+    // Regression lock: the stat-row's "Total collateral" + "Buying power"
+    // cards read these fields. The route used to omit them, so the collateral
+    // card rendered a permanent "-" even with real collateral. totalCollateral
+    // = posted collateral; buyingPower = free margin (collateral - required).
+    expect(json.totalCollateralUsd).toBe('$1.50');
+    expect(json.buyingPowerUsd).toBe('$1.00');
   });
 
   it('rounds half-even at the cent boundary (LL-9 fix)', async () => {
