@@ -36,7 +36,11 @@ export function TradeMobile() {
 
   const submit = () => {
     if (!ready) return;
-    void open({ venue: 'trade-xyz', side, sizeUsd: notional });
+    // Default to Hyperliquid (HL-HIP3), matching the displayed instrument
+    // subtitle + the desktop trade default. Pre-fix this submitted to trade-xyz
+    // while the header showed HL-HIP3 / and desktop defaulted to Hyperliquid -
+    // a display/submit-venue mismatch + a desktop/mobile inconsistency.
+    void open({ venue: 'hyperliquid', side, sizeUsd: notional });
   };
 
   return (
@@ -45,7 +49,7 @@ export function TradeMobile() {
       <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-3.5">
         <div className="flex items-baseline justify-between">
           <div>
-            <div className="font-display text-[22px] italic text-mob-ink">rTSLA-PERP</div>
+            <div className="font-display text-[22px] italic text-mob-ink">HSLA-PERP</div>
             <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">HL-HIP3 . tokenized</div>
           </div>
           <div className="text-right">
@@ -142,7 +146,7 @@ export function TradeMobile() {
         disabled={!ready}
         className={`rounded-full py-3.5 text-center font-medium transition disabled:opacity-50 ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
       >
-        {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . rTSLA-PERP`}
+        {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . HSLA-PERP`}
       </button>
       {/* Honest readiness gate (mirrors desktop): explains why the CTA is off. */}
       {!deployment?.ready && (
