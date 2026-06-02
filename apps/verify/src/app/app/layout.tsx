@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { SessionGate } from '@/components/session-sync';
 
 // Wagmi provider is loaded via next/dynamic with ssr: false so the
 // landing page (which doesn't need wagmi) doesn't pull the ~150KB
@@ -17,20 +18,19 @@ const KillSwitchFAB = dynamic(
   { ssr: false },
 );
 
-// Drives the SIWE sign-in so a connected wallet actually gets a session and its
-// wallet-scoped reads stop 401-ing. Inside WagmiProviders so it sees useAccount.
-const SessionSync = dynamic(
-  () => import('@/components/session-sync').then((m) => m.SessionSync),
-  { ssr: false },
-);
-
+// <SessionGate> (imported above) drives the SIWE sign-in so a connected wallet
+// gets a session, AND provides SessionReadyContext so useScopedWallet holds
+// wallet-scoped reads until the session exists (no first-connect 401 flash). It
+// wraps children so the context reaches every /app page; it only renders inside
+// the ssr:false WagmiProviders, so its useAccount/useQueryClient run client-side.
 export default function AppSegmentLayout({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProviders>
-      <SessionSync />
-      <main id="main-content">
-        {children}
-      </main>
+      <SessionGate>
+        <main id="main-content">
+          {children}
+        </main>
+      </SessionGate>
       <KillSwitchFAB />
     </WagmiProviders>
   );

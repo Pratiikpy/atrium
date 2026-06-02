@@ -1,6 +1,7 @@
 'use client';
 
 import { useAccount } from 'wagmi';
+import { useSessionReady } from './session-ready';
 
 /**
  * Phase theta audit follow-up (2026-05-25). Single source of truth for
@@ -27,7 +28,14 @@ import { useAccount } from 'wagmi';
  */
 export function useScopedWallet(): `0x${string}` | null {
   const { address } = useAccount();
-  return address ?? null;
+  const sessionReady = useSessionReady();
+  // Hold wallet-scoped queries until the SIWE session exists: a connected
+  // wallet with no session yet would 401 on every read (the ~3s window between
+  // connect and the handshake). Returning null keeps `enabled: wallet != null`
+  // false until <SessionGate/> flips ready, so the reads fire once and succeed.
+  // Outside the app subtree the context default is true (no gating).
+  if (!address || !sessionReady) return null;
+  return address;
 }
 
 /**
