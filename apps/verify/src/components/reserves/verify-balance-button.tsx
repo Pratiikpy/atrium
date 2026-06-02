@@ -83,6 +83,12 @@ function VerifyModal({
   const [walletInput, setWalletInput] = useState('');
   const [result, setResult] = useState<null | { ok: boolean; reason: string; leaf?: string }>(null);
   const [busy, setBusy] = useState(false);
+  // The on-chain root can exist while its leaf tree is not yet pinned to IPFS
+  // (attestor runs without WEB3_STORAGE). Inclusion needs the tree, so when the
+  // CID is empty we render an honest not-pinned state instead of inviting the
+  // user to type an address that then fails with a misattributed "invalid
+  // address" error (the real blocker is the unpinned tree, not their input).
+  const pinned = Boolean(ipfsCid && ipfsCid.length > 0);
 
   // Audit U-4 fix: clear stale form/result on the close → open transition
   // (the modal now mounts once, so state would otherwise persist).
@@ -95,7 +101,16 @@ function VerifyModal({
   }, [open]);
 
   async function verify() {
-    if (!ipfsCid || !walletInput || !/^0x[0-9a-fA-F]{40}$/.test(walletInput.trim())) {
+    // Defense in depth: the JSX hides the wallet input when !pinned, but keep
+    // the honest reason here too rather than blaming the user's address.
+    if (!ipfsCid) {
+      setResult({
+        ok: false,
+        reason: 'The attested leaf tree is not pinned to IPFS yet, so per-wallet inclusion cannot be checked.',
+      });
+      return;
+    }
+    if (!walletInput || !/^0x[0-9a-fA-F]{40}$/.test(walletInput.trim())) {
       setResult({ ok: false, reason: 'Enter a valid 0x-prefixed wallet address.' });
       return;
     }
@@ -127,40 +142,53 @@ function VerifyModal({
         on-chain attested root, and verifies your wallet&apos;s inclusion proof reproduces it.
       </p>
       <p className="mt-3 break-all font-mono text-[10px] text-muted">root: {root.slice(0, 14)}…</p>
-      <label className="mt-4 block">
-        <span className="text-[10px] uppercase tracking-wider text-muted">Wallet address</span>
-        <input
-          type="text"
-          inputMode="text"
-          placeholder="0x…"
-          value={walletInput}
-          onChange={(e) => setWalletInput(e.target.value)}
-          className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-3 py-2.5 font-mono text-sm text-ink focus:border-ink/40 focus:outline-none"
-        />
-      </label>
-      <button
-        type="button"
-        onClick={verify}
-        disabled={busy || !walletInput}
-        className="mt-4 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
-      >
-        {busy ? 'Verifying…' : 'Verify'}
-      </button>
-      {result && (
-        <div
-          className={
-            'mt-4 rounded-md border p-3 text-sm ' +
-            (result.ok
-              ? 'border-live/40 bg-live-soft text-live'
-              : 'border-neg/40 bg-neg/5 text-neg')
-          }
-        >
-          <p className="font-medium">{result.ok ? 'Verified ✓' : 'Verification failed'}</p>
-          {result.reason && <p className="mt-1 text-xs">{result.reason}</p>}
-          {result.leaf && (
-            <p className="mt-1 font-mono text-[10px]">leaf: {result.leaf}</p>
-          )}
+      {!pinned ? (
+        <div className="mt-4 rounded-md border border-testnet/30 bg-testnet/5 p-3 text-xs text-ink-soft">
+          <p className="font-medium text-ink">Leaf tree not pinned to IPFS yet</p>
+          <p className="mt-1">
+            The attestation root is published on chain and you can verify it directly on Arbiscan.
+            Per-wallet inclusion needs the full leaf tree, which the attestor pins to IPFS once
+            WEB3_STORAGE is configured. This check lights up then.
+          </p>
         </div>
+      ) : (
+        <>
+          <label className="mt-4 block">
+            <span className="text-[10px] uppercase tracking-wider text-muted">Wallet address</span>
+            <input
+              type="text"
+              inputMode="text"
+              placeholder="0x…"
+              value={walletInput}
+              onChange={(e) => setWalletInput(e.target.value)}
+              className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-3 py-2.5 font-mono text-sm text-ink focus:border-ink/40 focus:outline-none"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={verify}
+            disabled={busy || !walletInput}
+            className="mt-4 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
+          >
+            {busy ? 'Verifying…' : 'Verify'}
+          </button>
+          {result && (
+            <div
+              className={
+                'mt-4 rounded-md border p-3 text-sm ' +
+                (result.ok
+                  ? 'border-live/40 bg-live-soft text-live'
+                  : 'border-neg/40 bg-neg/5 text-neg')
+              }
+            >
+              <p className="font-medium">{result.ok ? 'Verified ✓' : 'Verification failed'}</p>
+              {result.reason && <p className="mt-1 text-xs">{result.reason}</p>}
+              {result.leaf && (
+                <p className="mt-1 font-mono text-[10px]">leaf: {result.leaf}</p>
+              )}
+            </div>
+          )}
+        </>
       )}
     </Modal>
   );
