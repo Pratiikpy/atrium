@@ -255,14 +255,14 @@ export default function BrandPage() {
         </p>
 
         <div className="mt-6 rounded-md border border-line bg-paper p-6">
-          <div className="grid grid-cols-[200px_1fr] gap-6 py-1.5">
+          <div className="grid grid-cols-1 gap-1.5 py-1.5 sm:grid-cols-[200px_1fr] sm:gap-6">
             <div className="text-xs uppercase tracking-widest text-muted">We are</div>
             <div className="text-[17px] leading-[1.55] text-ink">
               Precise. Restrained. Architectural. Quietly confident.
             </div>
           </div>
           <div className="my-3.5 border-t border-line" />
-          <div className="grid grid-cols-[200px_1fr] gap-6 py-1.5">
+          <div className="grid grid-cols-1 gap-1.5 py-1.5 sm:grid-cols-[200px_1fr] sm:gap-6">
             <div className="text-xs uppercase tracking-widest text-muted">We are not</div>
             <div className="text-[17px] leading-[1.55] text-ink">
               Hyped. Memed. Decorative. Approximate. &ldquo;Revolutionary.&rdquo;
@@ -302,7 +302,7 @@ export default function BrandPage() {
           What you can and cannot do with the Atrium name and assets.
         </p>
         <div className="mt-6 rounded-md border border-line bg-paper p-6">
-          <div className="grid grid-cols-[180px_1fr] items-start gap-6 py-2.5">
+          <div className="grid grid-cols-1 gap-1.5 py-2.5 sm:grid-cols-[180px_1fr] sm:items-start sm:gap-6">
             <div className="text-xs uppercase tracking-widest text-muted">You may</div>
             <ul className="list-disc space-y-2 pl-5 text-sm leading-[1.8] text-ink-soft">
               <li>Refer to Atrium by name in editorial, journalistic, or research contexts</li>
@@ -312,7 +312,7 @@ export default function BrandPage() {
             </ul>
           </div>
           <div className="my-3.5 border-t border-line" />
-          <div className="grid grid-cols-[180px_1fr] items-start gap-6 py-2.5">
+          <div className="grid grid-cols-1 gap-1.5 py-2.5 sm:grid-cols-[180px_1fr] sm:items-start sm:gap-6">
             <div className="text-xs uppercase tracking-widest text-muted">You may not</div>
             <ul className="list-disc space-y-2 pl-5 text-sm leading-[1.8] text-ink-soft">
               <li>Use the Atrium name or wordmark to imply endorsement of a product</li>
@@ -430,7 +430,7 @@ function TypeRow({
   className?: string;
 }) {
   return (
-    <div className="grid grid-cols-[1fr_220px] items-baseline gap-6 border-b border-line pb-4 last:border-b-0 last:pb-0">
+    <div className="grid grid-cols-1 gap-2 border-b border-line pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[1fr_220px] sm:items-baseline sm:gap-6">
       <div className={`text-ink ${className ?? ''}`}>{specimen}</div>
       <div className="whitespace-pre-line font-mono text-[11.5px] leading-[1.45] text-muted">
         {meta.split(' . ').join('\n')}

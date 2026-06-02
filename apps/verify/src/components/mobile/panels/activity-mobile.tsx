@@ -46,6 +46,11 @@ export function ActivityMobile() {
   });
 
   const filtered = (data?.activities ?? []).filter(a => filter === 'all' || a.kind === filter);
+  // Disconnected: the load-fetch is gated (enabled: wallet!=null) but a manual
+  // refetch() bypasses `enabled` and 401s. Hide the Refresh button + show a
+  // connect-wallet empty state so a disconnected visitor never fires a 401
+  // (interactive-sweep 2026-06-02).
+  const noWallet = wallet == null;
 
   // Error state (distinct from empty, E2E-48)
   if (error) {
@@ -78,10 +83,12 @@ export function ActivityMobile() {
         ))}
       </div>
 
-      {/* Pull to refresh */}
-      <button onClick={() => refetch()} className="min-h-[44px] self-center text-[12px] text-mob-accent">
-        ↻ Refresh
-      </button>
+      {/* Pull to refresh (hidden disconnected: refetch() would 401) */}
+      {!noWallet && (
+        <button onClick={() => refetch()} className="min-h-[44px] self-center text-[12px] text-mob-accent">
+          ↻ Refresh
+        </button>
+      )}
 
       {/* Loading */}
       {isLoading && <div className="space-y-2">{[0,1,2,3,4].map(i => <div key={i} className="skeleton h-[64px] rounded-xl" />)}</div>}
@@ -89,7 +96,9 @@ export function ActivityMobile() {
       {/* Empty state */}
       {!isLoading && !filtered.length && !error && (
         <div className="rounded-xl border border-mob-line bg-mob-bg-card px-4 py-12 text-center">
-          <p className="text-[16px] text-mob-muted">No activity yet</p>
+          <p className="text-[16px] text-mob-muted">
+            {noWallet ? 'Connect a wallet to see your activity' : 'No activity yet'}
+          </p>
         </div>
       )}
 

@@ -65,12 +65,30 @@ export function ReservesMobile() {
   const [proofResult, setProofResult] = useState<'idle' | 'verifying' | 'verified' | 'absent' | 'error'>('idle');
   const [copied, setCopied] = useState(false);
 
-  const copyRoot = useCallback(() => {
-    if (data?.root) {
-      navigator.clipboard.writeText(data.root);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+  const copyRoot = useCallback(async () => {
+    if (!data?.root) return;
+    // clipboard.writeText rejects on denied permission / insecure context /
+    // some mobile browsers; an unhandled rejection was surfacing as a page
+    // error (interactive-sweep 2026-06-02). Guard + fall back to a hidden
+    // textarea + execCommand so the copy still works and never throws.
+    try {
+      await navigator.clipboard.writeText(data.root);
+    } catch {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = data.root;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch {
+        return; // copy genuinely unavailable; don't flash a false "copied"
+      }
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }, [data?.root]);
 
   async function verifyMyBalance() {

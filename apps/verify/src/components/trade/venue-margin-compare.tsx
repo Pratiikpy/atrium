@@ -120,10 +120,15 @@ function Drawer({
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  // No wallet -> do NOT fan out 7 wallet-scoped margin-impact fetches that
+  // each 401 and log a browser-level console error on a public page
+  // (interactive-sweep 2026-06-02). Render the static venue + haircut rows
+  // (those are public risk weights) with margin pending until the user connects.
+  const noWallet = wallet == null;
   const { data, isLoading } = useQuery({
     queryKey: ['venue-margin-compare', scenario, wallet],
     queryFn: () => fetchAll(scenario, wallet),
-    enabled: parseFloat(scenario) > 0,
+    enabled: parseFloat(scenario) > 0 && !noWallet,
   });
 
   const anyLive = data?.some((r) => r.impact.source === 'plinth') ?? false;
@@ -202,6 +207,14 @@ function Drawer({
                       </td>
                     </tr>
                   ))
+                : noWallet
+                ? VENUES.map((v) => (
+                    <tr key={v.id} className="border-b border-divider/60 last:border-0">
+                      <td className="px-3 py-2.5 text-ink">{v.label}</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-muted">{v.haircutBps / 100}%</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-muted">-</td>
+                    </tr>
+                  ))
                 : (data ?? []).map((r) => (
                     <tr
                       key={r.id}
@@ -229,7 +242,9 @@ function Drawer({
         </div>
 
         <p className="mt-4 rounded-md bg-parchment-soft/60 px-4 py-3 text-[11px] leading-snug text-ink-soft">
-          {anyLive
+          {noWallet
+            ? 'Connect a wallet to read live per-venue margin from Plinth. The haircuts shown are the real published risk weights and apply to every account.'
+            : anyLive
             ? 'These are per-venue siloed requirements. Open positions on more than one and Plinth nets the correlated risk, so your real portfolio margin is lower than the sum. See it on the portfolio page.'
             : 'Plinth is not deployed to this environment yet, so per-venue margin reads as pending. The haircuts shown are the real published risk weights. Live numbers appear once contracts deploy.'}
         </p>

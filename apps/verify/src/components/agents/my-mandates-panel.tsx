@@ -32,11 +32,34 @@ export function MyMandatesPanel() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    // No wallet -> render the honest "connect a wallet" state directly; never
+    // fetch a wallet-scoped endpoint that 401s. Interactive-sweep 2026-06-02
+    // caught a hard crash here: the disconnected fetch 401'd, r.json() returned
+    // an error object with NO `mandates` array, and data.mandates.length threw
+    // TypeError on a public app page. Scope the fetch + guard non-ok responses.
+    if (!wallet) {
+      setError(null);
+      setData({ mandates: [], source: 'pending', reason: 'no_wallet_configured' });
+      return;
+    }
     // Phase theta audit follow-up: scope to the connected wallet.
     fetch(walletQuery('/api/agents/my-mandates', wallet))
-      .then((r) => r.json())
-      .then((d: ApiShape) => setData(d))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load mandates'));
+      .then(async (r) => {
+        if (!r.ok) {
+          // 401/5xx body is an error object, not ApiShape: map to honest pending
+          // instead of letting `data.mandates` come back undefined and crash.
+          return {
+            mandates: [],
+            source: 'pending',
+            reason: r.status === 401 ? 'no_wallet_configured' : 'scribe_unavailable',
+          } as ApiShape;
+        }
+        return (await r.json()) as ApiShape;
+      })
+      .then((d) => { if (!cancelled) setData(d); })
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load mandates'); });
+    return () => { cancelled = true; };
   }, [wallet]);
 
   if (error) {
@@ -50,7 +73,7 @@ export function MyMandatesPanel() {
   if (!data) {
     return <EmptyState title="Loading mandates…" sub="from Scribe" />;
   }
-  if (data.mandates.length === 0) {
+  if (!data.mandates || data.mandates.length === 0) {
     return (
       <EmptyState
         title="No active mandates"
