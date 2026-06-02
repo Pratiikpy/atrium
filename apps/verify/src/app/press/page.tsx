@@ -77,7 +77,9 @@ export default function PressPage() {
             Press inquiries: <code className="font-mono text-ink">press@atrium.fi</code>
           </p>
           <p className="mt-2 text-xs text-muted">
-            Note: email routing not yet configured. See runbooks/email-routing.md for setup status.
+            We&rsquo;re testnet-stage, so email replies may take a little longer. For anything
+            time-sensitive, the security contact on{' '}
+            <a href="/security" className="underline hover:text-ink">/security</a> is monitored.
           </p>
         </section>
       </div>
