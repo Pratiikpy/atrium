@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
 import { waitForTransactionReceipt } from 'wagmi/actions';
+import { useContractAddress } from '@/lib/use-coffer-address';
 
 /**
  * Postern Kill Switch, the single button that revokes every Sigil mandate
@@ -33,6 +34,27 @@ const KILL_SWITCH_ABI = [
   },
 ] as const;
 
+// QA 2026-06-02: the live PosternKillSwitch (0xCD89..) revokes mandates via
+// `Sigil.revokeAllOnBehalfOf`, which is gated to the postern_kill_switch pointer
+// Sigil was initialized with. That pointer is the OLD Postern (Sigil has no setter
+// for it, and re-init is blocked), so the redeployed Postern's per-agent revoke
+// reverts UnauthorizedCaller and is swallowed by Postern's try/catch: the Kill
+// Switch's mandate revocation silently no-op'd (proven on-chain: nonce never
+// bumped). The owner can always revoke their OWN delegations via the un-gated
+// `Sigil.revokeAll(agent)` (owner == msg.sender), so the Kill Switch now drives
+// the mandate revocation owner-direct (which DOES bump the nonce) and keeps the
+// Postern call only for session-key cancellation. Re-pointing Sigil to the live
+// Postern needs a Sigil redeploy + setter (tracked for the next cutover).
+const SIGIL_REVOKE_ALL_ABI = [
+  {
+    type: 'function',
+    name: 'revokeAll',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'agent', type: 'address' }],
+    outputs: [],
+  },
+] as const;
+
 export type KillSwitchStatus =
   | { kind: 'idle' }
   | { kind: 'submitting'; agentCount: number }
@@ -44,6 +66,9 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
   const [status, setStatus] = useState<KillSwitchStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
   const config = useConfig();
+  // Owner-direct mandate revocation needs the live Sigil address (see the
+  // SIGIL_REVOKE_ALL_ABI note for why we revoke owner-direct, not via Postern).
+  const { data: sigilAddress } = useContractAddress('sigil');
 
   async function activate() {
     if (!account) {
@@ -94,23 +119,50 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
       setStatus({ kind: 'error', reason: 'nothing_to_revoke' });
       return;
     }
+    if (!sigilAddress) {
+      setStatus({ kind: 'error', reason: 'sigil_not_deployed' });
+      return;
+    }
 
     setStatus({ kind: 'submitting', agentCount: agents.length });
     try {
-      const hash = await writeContractAsync({
-        address: killSwitchAddress,
-        abi: KILL_SWITCH_ABI,
-        functionName: 'activate',
-        args: [agents],
-      });
-      // Emergency revoke must be CONFIRMED before we tell the user they're
-      // safe. Gate success on the mined receipt, never bare submit.
-      const receipt = await waitForTransactionReceipt(config, { hash });
-      if (receipt.status !== 'success') {
-        setStatus({ kind: 'error', reason: 'transaction_reverted' });
-        return;
+      // 1. Revoke every mandate owner-direct via Sigil.revokeAll(agent). This is
+      //    the safety-critical leg and the one that actually bumps the revocation
+      //    nonce (the Postern path is auth-broken against the redeployed Postern).
+      //    Each is gated on its mined receipt: never tell the user they are safe
+      //    on a bare submit.
+      let lastHash: `0x${string}` | undefined;
+      for (const agent of agents) {
+        const hash = await writeContractAsync({
+          address: sigilAddress,
+          abi: SIGIL_REVOKE_ALL_ABI,
+          functionName: 'revokeAll',
+          args: [agent],
+        });
+        const receipt = await waitForTransactionReceipt(config, { hash });
+        if (receipt.status !== 'success') {
+          setStatus({ kind: 'error', reason: 'transaction_reverted' });
+          return;
+        }
+        lastHash = hash;
       }
-      setStatus({ kind: 'success', hash, agentCount: agents.length });
+
+      // 2. Best-effort: cancel Postern session keys via the Kill Switch. The
+      //    mandate revocation above is the safety guarantee, so a session-key
+      //    cancellation failure must not flip the result to error.
+      try {
+        const ph = await writeContractAsync({
+          address: killSwitchAddress,
+          abi: KILL_SWITCH_ABI,
+          functionName: 'activate',
+          args: [agents],
+        });
+        await waitForTransactionReceipt(config, { hash: ph });
+      } catch {
+        // session-key cancellation is best-effort; mandates are already revoked.
+      }
+
+      setStatus({ kind: 'success', hash: lastHash as `0x${string}`, agentCount: agents.length });
     } catch (e) {
       setStatus({
         kind: 'error',
