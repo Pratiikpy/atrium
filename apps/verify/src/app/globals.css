@@ -997,7 +997,10 @@ input[type="range"] { cursor: ew-resize; }
 .atrium-app .side-link.active .pill-mini {
   background: color-mix(in oklch, var(--bg) 18%, transparent); color: var(--bg);
 }
-.atrium-app .side-foot { margin-top: auto; padding: 8px 6px 4px; }
+/* Reserve the cookie-consent bottom-bar height (published as --consent-h by
+   cookie-consent-banner.tsx) so the wallet/Connect card in the FIXED sidebar
+   lifts clear of the bar instead of sitting under it. var falls back to 0. */
+.atrium-app .side-foot { margin-top: auto; padding: 8px 6px calc(4px + var(--consent-h, 0px)); }
 .atrium-app .side-wallet {
   padding: 10px 12px; background: var(--bg); border: 1px solid var(--hairline);
   border-radius: 10px; display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center;

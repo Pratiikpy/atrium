@@ -56,14 +56,22 @@ export function CookieConsentBanner() {
   // Re-measures when the customize panel expands/collapses (height changes).
   useLayoutEffect(() => {
     if (typeof document === 'undefined') return;
+    const root = document.documentElement;
     if (!visible) {
       document.body.style.paddingBottom = '';
+      root.style.removeProperty('--consent-h');
       return;
     }
     const h = barRef.current?.offsetHeight ?? 0;
+    // Body padding reflows normal-flow content above the bar. The --consent-h
+    // var lets OUT-of-flow elements (the fixed app sidebar's wallet card, the
+    // PWA install prompt) also lift clear of the bar instead of overlapping it.
     document.body.style.paddingBottom = h ? `${h}px` : '';
+    if (h) root.style.setProperty('--consent-h', `${h}px`);
+    else root.style.removeProperty('--consent-h');
     return () => {
       document.body.style.paddingBottom = '';
+      root.style.removeProperty('--consent-h');
     };
   }, [visible, customize]);
 

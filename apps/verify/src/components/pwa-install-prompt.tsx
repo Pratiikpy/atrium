@@ -43,7 +43,10 @@ export function PwaInstallPrompt() {
   return (
     <div
       role="alert"
-      className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-md border border-divider bg-parchment px-4 py-3 shadow-lg"
+      // Sit ABOVE the cookie-consent bottom-bar (height published as --consent-h)
+      // so the two bottom-docked prompts don't stack/overlap. Falls back to 1rem.
+      style={{ bottom: 'calc(1rem + var(--consent-h, 0px))' }}
+      className="fixed right-4 z-50 flex items-center gap-3 rounded-md border border-divider bg-parchment px-4 py-3 shadow-lg"
     >
       <p className="text-sm text-ink">Install Atrium for offline access</p>
       <button
