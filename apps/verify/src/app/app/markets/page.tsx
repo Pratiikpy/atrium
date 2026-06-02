@@ -43,7 +43,7 @@ const VENUES = [
   {
     name: 'Curve',
     slug: 'adapter-curve',
-    desc: 'Stable LP positions. Treated as netting cash equivalent if pool composition stable.',
+    desc: 'Stable LP positions, priced as a low-risk cash-equivalent while pool composition holds. Margin nets within the STABLE_LP class, not against other classes (v1 has no cross-class credit).',
     risk: 'LP; haircut 5%; correlation class STABLE_LP.',
     instruments: '3pool, FRAX-USDC, +5 more',
     // Audit fix (#37): venue address is a deployer-EOA placeholder; open reverts.
