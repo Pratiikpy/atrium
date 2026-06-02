@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+// The funded-key E2E build (E2E_KEY_BUILD=1) auto-connects on load, so the
+// disconnected "Connect with Postern" CTA these tests assert on is absent
+// (the page shows the connected address instead). Verified: in that build
+// /verify/1 renders ["Run step 1", ...] + the address, no connect button.
+// These connect-CTA tests are valid for the normal (disconnected) build, so
+// skip them when the auto-connect connector is active.
+const E2E_AUTOCONNECT = process.env.E2E_KEY_BUILD === '1';
+
 /**
  * Journey 1, Postern passkey wallet connect.
  *
@@ -22,6 +30,7 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('Journey 1, Connect wallet', () => {
   test('Connect CTA exists on /verify/1 @critical @mobile', async ({ page }) => {
+    test.skip(E2E_AUTOCONNECT, 'E2E build auto-connects; disconnected CTA absent');
     await page.goto('/verify/1');
 
     const connectButton = page.getByRole('button', { name: /connect with postern/i });
@@ -29,6 +38,7 @@ test.describe('Journey 1, Connect wallet', () => {
   });
 
   test('Connect CTA is keyboard-reachable @critical', async ({ page }) => {
+    test.skip(E2E_AUTOCONNECT, 'E2E build auto-connects; disconnected CTA absent');
     // Per docs/conventions/ui.md accessibility: every interactive element must
     // have a focus ring and be reachable without a mouse. Tab through the
     // page until we land on the Connect button.
@@ -64,6 +74,7 @@ test.describe('Journey 1, Connect wallet', () => {
   });
 
   test('Click on Connect does not crash the page @critical', async ({ page }) => {
+    test.skip(E2E_AUTOCONNECT, 'E2E build auto-connects; disconnected CTA absent');
     // We don't assert that a popup mounts (wagmi connector dependent), only
     // that clicking the disabled-or-enabled button doesn't throw. Catches
     // regressions where a missing connector causes an uncaught exception.
