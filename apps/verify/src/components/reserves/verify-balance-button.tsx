@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
+import { inclusionGuard, isPinned } from '@/lib/lantern-inclusion-ui';
 
 interface Latest {
   exists?: false;
@@ -88,7 +89,8 @@ function VerifyModal({
   // CID is empty we render an honest not-pinned state instead of inviting the
   // user to type an address that then fails with a misattributed "invalid
   // address" error (the real blocker is the unpinned tree, not their input).
-  const pinned = Boolean(ipfsCid && ipfsCid.length > 0);
+  // Pin/guard logic lives in lib/lantern-inclusion-ui.ts (unit-tested).
+  const pinned = isPinned(ipfsCid);
 
   // Audit U-4 fix: clear stale form/result on the close → open transition
   // (the modal now mounts once, so state would otherwise persist).
@@ -101,17 +103,12 @@ function VerifyModal({
   }, [open]);
 
   async function verify() {
-    // Defense in depth: the JSX hides the wallet input when !pinned, but keep
-    // the honest reason here too rather than blaming the user's address.
-    if (!ipfsCid) {
-      setResult({
-        ok: false,
-        reason: 'The attested leaf tree is not pinned to IPFS yet, so per-wallet inclusion cannot be checked.',
-      });
-      return;
-    }
-    if (!walletInput || !/^0x[0-9a-fA-F]{40}$/.test(walletInput.trim())) {
-      setResult({ ok: false, reason: 'Enter a valid 0x-prefixed wallet address.' });
+    // Defense in depth: the JSX hides the wallet input when !pinned, but the
+    // guard still keeps the unpinned-tree reason distinct from a bad address
+    // (regression-locked in lib/lantern-inclusion-ui.test.ts).
+    const guard = inclusionGuard(ipfsCid, walletInput);
+    if (!guard.ok) {
+      setResult({ ok: false, reason: guard.reason });
       return;
     }
     setBusy(true);
