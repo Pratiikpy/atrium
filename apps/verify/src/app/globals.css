@@ -945,7 +945,13 @@ input[type="range"] { cursor: ew-resize; }
 
 .atrium-app {
   min-height: 100vh; display: grid;
-  grid-template-columns: var(--side-w) 1fr;
+  /* Audit fix (visual sweep 2026-06-02): a bare 1fr track resolves to
+     minmax(auto, 1fr); its auto-minimum equals the main column's max-content
+     width, so any wide child (table, long hash) pushed .atrium-app past 100vw
+     and produced a viewport horizontal scrollbar on /app/portfolio/activity,
+     /app/agents, /app/notifications, /app/settings/session-keys. minmax(0,1fr)
+     caps the track minimum at 0 so content scrolls inside the column instead. */
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
   background: var(--bg); color: var(--ink);
   font-family: var(--sans); font-size: 14px; line-height: 1.5;
   letter-spacing: -0.005em;
@@ -1064,7 +1070,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 .atrium-app .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
 
-.atrium-app .view { padding: 28px var(--app-pad) 96px; max-width: 1480px; margin: 0 auto; width: 100%; }
+.atrium-app .view { padding: 28px var(--app-pad) 96px; max-width: 1480px; margin: 0 auto; width: 100%; min-width: 0; }
 .atrium-app .view-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
 .atrium-app .view-title { font-weight: 500; font-size: 28px; letter-spacing: -0.022em; line-height: 1.1; color: var(--ink); margin: 0; }
 .atrium-app .view-sub { margin-top: 6px; color: var(--ink-soft); font-size: 13.5px; }

@@ -45,8 +45,12 @@ export function PwaInstallPrompt() {
       role="alert"
       // Sit ABOVE the cookie-consent bottom-bar (height published as --consent-h)
       // so the two bottom-docked prompts don't stack/overlap. Falls back to 1rem.
-      style={{ bottom: 'calc(1rem + var(--consent-h, 0px))' }}
-      className="fixed right-4 z-50 flex items-center gap-3 rounded-md border border-divider bg-parchment px-4 py-3 shadow-lg"
+      // Audit fix (visual sweep 2026-06-02): on mobile this sat at bottom-right
+      // on top of the bottom nav + the red kill-switch FAB, occluding both.
+      // Anchor it bottom-LEFT above the ~64px mobile nav (mb-[68px]) so it clears
+      // the bottom-right FAB; desktop keeps its original bottom-right placement.
+      style={{ bottom: 'calc(1rem + var(--consent-h, 0px) + env(safe-area-inset-bottom, 0px))' }}
+      className="fixed left-4 right-auto z-50 mb-[68px] flex items-center gap-3 rounded-md border border-divider bg-parchment px-4 py-3 shadow-lg md:left-auto md:right-4 md:mb-0"
     >
       <p className="text-sm text-ink">Install Atrium for offline access</p>
       <button

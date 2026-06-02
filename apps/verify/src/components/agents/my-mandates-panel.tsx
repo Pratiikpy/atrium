@@ -95,7 +95,7 @@ function MandatesTableWithRevoke({ mandates }: { mandates: Mandate[] }) {
   const [confirmFor, setConfirmFor] = useState<Mandate | null>(null);
   const { status, revoke, reset } = useRevokeMandate();
   return (
-    <div className="overflow-hidden rounded-md border border-divider">
+    <div className="overflow-x-auto rounded-md border border-divider">
       <table className="w-full text-sm">
         <thead className="bg-parchment-soft/40 text-[11px] uppercase tracking-wider text-label">
           <tr>

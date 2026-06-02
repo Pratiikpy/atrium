@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * PortfolioMobile  the Home panel for /app/portfolio at < md.
@@ -54,30 +54,38 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export function PortfolioMobile() {
-  const { isConnected } = useAccount();
+  // Audit fix (real-Rabby mobile sweep 2026-06-02): this panel fetched
+  // /api/portfolio/* with NO ?wallet param and only `enabled: isConnected`.
+  // The backend falls back to DEMO_WALLET, which requireWalletMatch rejects
+  // against the connected SIWE session wallet -> 403 -> a connected user never
+  // saw their real portfolio on mobile (stuck-shimmer cards). The desktop cards
+  // and the sibling activity-mobile panel already use the scoped-wallet pattern;
+  // migrate this one to match: useScopedWallet gates on connect + SIWE session,
+  // walletQuery appends ?wallet=<connected> so the reads match the session (200).
+  const wallet = useScopedWallet();
   const bp = useQuery({
-    queryKey: ['mobile-bp'],
-    queryFn: () => fetchJSON<BuyingPower>('/api/portfolio/buying-power?window=7d'),
+    queryKey: ['mobile-bp', wallet],
+    queryFn: () => fetchJSON<BuyingPower>(walletQuery('/api/portfolio/buying-power?window=7d', wallet)),
     refetchInterval: 60_000,
-    enabled: isConnected,
+    enabled: wallet != null,
   });
   const summary = useQuery({
-    queryKey: ['mobile-summary'],
-    queryFn: () => fetchJSON<PortfolioSummary>('/api/portfolio/summary'),
+    queryKey: ['mobile-summary', wallet],
+    queryFn: () => fetchJSON<PortfolioSummary>(walletQuery('/api/portfolio/summary', wallet)),
     refetchInterval: 60_000,
-    enabled: isConnected,
+    enabled: wallet != null,
   });
   const positions = useQuery({
-    queryKey: ['mobile-positions'],
-    queryFn: () => fetchJSON<{ positions: Position[]; source: string }>('/api/portfolio/positions'),
+    queryKey: ['mobile-positions', wallet],
+    queryFn: () => fetchJSON<{ positions: Position[]; source: string }>(walletQuery('/api/portfolio/positions', wallet)),
     refetchInterval: 60_000,
-    enabled: isConnected,
+    enabled: wallet != null,
   });
   const activity = useQuery({
-    queryKey: ['mobile-activity'],
-    queryFn: () => fetchJSON<{ activities: Activity[]; source: string }>('/api/portfolio/activity'),
+    queryKey: ['mobile-activity', wallet],
+    queryFn: () => fetchJSON<{ activities: Activity[]; source: string }>(walletQuery('/api/portfolio/activity', wallet)),
     refetchInterval: 60_000,
-    enabled: isConnected,
+    enabled: wallet != null,
   });
 
   // Launch-review P0: never render the raw status word "pending" as the giant

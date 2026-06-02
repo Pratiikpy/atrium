@@ -141,7 +141,7 @@ export function AppShell({
             testnet
           </span>
         </header>
-        <main style={{ padding: '16px', paddingBottom: '80px' }}>{isMobile ? (mobile ?? children) : null}</main>
+        <main style={{ padding: '16px', paddingBottom: 'calc(112px + env(safe-area-inset-bottom, 0px))' }}>{isMobile ? (mobile ?? children) : null}</main>
         {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
             never rendered one - the built MobileBottomNav was orphaned, leaving
             mobile users with no in-app navigation between screens. Now wired. */}

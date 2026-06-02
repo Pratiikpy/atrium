@@ -168,13 +168,13 @@ export function TaxMobile() {
       <div className="flex flex-col gap-2">
         <a
           href={`/api/tax/export?format=csv&jurisdiction=${jurisdiction}&year=${year}`}
-          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line text-[16px] text-mob-ink"
+          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
         >
           Export CSV
         </a>
         <a
           href={`/api/tax/export?format=pdf&jurisdiction=${jurisdiction}&year=${year}`}
-          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line text-[16px] text-mob-ink"
+          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
         >
           Export PDF
         </a>
