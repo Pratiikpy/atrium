@@ -62,7 +62,7 @@ export function ReservesMobile() {
   });
 
   const [verifyOpen, setVerifyOpen] = useState(false);
-  const [proofResult, setProofResult] = useState<'idle' | 'verifying' | 'verified' | 'absent' | 'error'>('idle');
+  const [proofResult, setProofResult] = useState<'idle' | 'verifying' | 'verified' | 'absent' | 'error' | 'not_pinned'>('idle');
   const [copied, setCopied] = useState(false);
 
   const copyRoot = useCallback(async () => {
@@ -92,7 +92,11 @@ export function ReservesMobile() {
   }, [data?.root]);
 
   async function verifyMyBalance() {
-    if (!address || !data?.ipfsCid) return;
+    if (!address) return;
+    // Honest not-pinned state instead of opening a blank sheet: the on-chain
+    // root can exist while the leaf tree is unpinned (attestor without
+    // WEB3_STORAGE), and inclusion needs the tree. Mirrors the desktop fix.
+    if (!data?.ipfsCid) { setProofResult('not_pinned'); return; }
     setProofResult('verifying');
     try {
       const r = await fetch('/api/lantern/verify-inclusion', {
@@ -148,9 +152,13 @@ export function ReservesMobile() {
             <div><span className="text-mob-muted">Leaves</span><br/><span className="text-mob-ink">{data.leafCount}</span></div>
             <div>
               <span className="text-mob-muted">IPFS</span><br/>
-              <a href={`https://${data.ipfsCid}.ipfs.dweb.link/`} target="_blank" rel="noreferrer" className="text-mob-accent text-[14px]">
-                {data.ipfsCid.slice(0, 8)}… ↗
-              </a>
+              {data.ipfsCid ? (
+                <a href={`https://${data.ipfsCid}.ipfs.dweb.link/`} target="_blank" rel="noreferrer" className="text-mob-accent text-[14px]">
+                  {data.ipfsCid.slice(0, 8)}… ↗
+                </a>
+              ) : (
+                <span className="text-mob-muted text-[14px]">not pinned yet</span>
+              )}
             </div>
           </div>
         </section>
@@ -175,6 +183,7 @@ export function ReservesMobile() {
               {proofResult === 'verifying' && <p className="text-mob-muted">Checking inclusion…</p>}
               {proofResult === 'verified' && <p className="text-live">✓ Your wallet is included in the latest Merkle tree</p>}
               {proofResult === 'absent' && <p className="text-testnet">Your wallet is not in this attestation tree</p>}
+              {proofResult === 'not_pinned' && <p className="text-testnet">The attested leaf tree is not pinned to IPFS yet, so per-wallet inclusion can&apos;t be checked. The root above is on chain and verifiable now.</p>}
               {proofResult === 'error' && <p className="text-neg">Verification failed, IPFS gateway may be unreachable</p>}
             </div>
             <button onClick={() => setVerifyOpen(false)} className="mt-6 min-h-[44px] w-full rounded-xl border border-mob-line text-[16px] text-mob-ink">
