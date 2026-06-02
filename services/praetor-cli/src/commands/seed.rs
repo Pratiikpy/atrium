@@ -105,7 +105,10 @@ async fn preflight_coffer_wired(rpc_url: &str) -> Result<()> {
     // doesn't need validator signatures). If true, the timelock batch
     // executed and the seed script will succeed; if false, bail.
     use serde_json::json;
-    const COFFER: &str = "0xd169554caf920f1fbcffbafcff3068a84892b0d8";
+    // Post-cutover Coffer (deployments/arbitrum_sepolia.json). The pre-cutover
+    // 0xd169554c was retired; the pre-flight must read the live Coffer or it
+    // checks adapter approval on a dead contract and the seed bails wrongly.
+    const COFFER: &str = "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3";
     const CURVE_ADAPTER: &str = "0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682";
     // ABI selector for isAdapterApproved(address) -> 0x96749b21
     let calldata = format!("0x96749b21{:0>64}", &CURVE_ADAPTER[2..].to_lowercase());
