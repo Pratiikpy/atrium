@@ -190,6 +190,7 @@ atrium-site-tokens.json
 # Internal planning / audit / readiness docs (kept local, out of the public repo)
 GOAL.md
 QA_TEST_PLAN.md
+AI_WEB3_TESTING_GUIDE.md
 BUILD_PLAN.md
 DO_NOW_PLAN.md
 FEATURE_COMPLETION.md
@@ -214,3 +215,6 @@ apps/verify/visual-sweep.mjs
 
 # Kiro IDE workspace
 .kiro/
+
+# Local QA evidence (screenshots, sweep reports), kept local
+qa-evidence/

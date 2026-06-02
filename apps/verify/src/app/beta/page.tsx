@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Beta Program',
   description: 'Atrium beta tester onboarding',
+  // Invite-only surface: keep out of search + link previews (defense in depth
+  // beyond the robots.txt disallow, which crawlers may ignore).
+  robots: { index: false, follow: false },
 };
 
 export default function BetaPage() {
