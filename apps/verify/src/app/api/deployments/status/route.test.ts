@@ -60,7 +60,10 @@ describe('GET /api/deployments/status, step clamping', () => {
     for (let i = 1; i <= 7; i++) {
       expect((await call(String(i))).step).toBe(i);
     }
-  });
+    // 7 calls x 9 live on-chain init-state probes each; the 5s default flaked
+    // under slow public-RPC latency. Match the 30s budget the other
+    // live-probe loop tests in this file use.
+  }, 30_000);
 
   it('truncates fractional input to integer', async () => {
     expect((await call('3.7')).step).toBe(3);
