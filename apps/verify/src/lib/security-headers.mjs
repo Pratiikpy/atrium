@@ -12,6 +12,14 @@ function buildCsp() {
     // but the CSP blocked both - so even when NEXT_PUBLIC_NEW_RELIC_* is set the
     // agent silently failed. Allow its script + telemetry origins.
     "script-src 'self' 'unsafe-inline' https://vercel.live https://js-agent.newrelic.com",
+    // Audit fix (real-Rabby sweep 2026-06-02): the Coinbase Wallet SDK (the
+    // `coinbaseWallet` smartWalletOnly connector in lib/wagmi.ts) spawns a
+    // `blob:` Worker on init. Without an explicit worker-src it falls back to
+    // script-src (no blob:), so EVERY page logged "Creating a worker from
+    // 'blob:' violates ... script-src". Allow blob: for workers only - this
+    // keeps script-src tight (no blob: scripts) while clearing the violation.
+    // 'self' also covers the PWA service worker registered from /sw.js.
+    "worker-src 'self' blob:",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self' data:",
     "img-src 'self' data: blob: https://sepolia.arbiscan.io https://*.simpleanalyticscdn.com",
