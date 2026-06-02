@@ -26,6 +26,7 @@ export function ActivityFeedFull() {
     queryKey: ['activity-full', wallet],
     queryFn: () => fetchActivity(wallet),
     refetchInterval: 30_000,
+    enabled: wallet != null, // no wallet -> guided empty state, never a 401
   });
 
   if (isLoading) {

@@ -44,6 +44,7 @@ export function PortfolioStatRow() {
     queryKey: ['portfolio-summary', wallet],
     queryFn: () => fetchSummary(wallet),
     refetchInterval: 30_000,
+    enabled: wallet != null, // no wallet -> guided empty state, never a 401
   });
 
   // Derived sublines, fall back to honest pending state when live data

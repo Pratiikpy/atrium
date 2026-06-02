@@ -24,6 +24,7 @@ export function MarginEngineCard() {
     queryKey: ['margin-health', wallet],
     queryFn: () => fetchHealth(wallet),
     refetchInterval: 30_000,
+    enabled: wallet != null, // no wallet -> guided empty state, never a 401
   });
 
   return (

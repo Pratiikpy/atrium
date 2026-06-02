@@ -43,6 +43,7 @@ export function TopUpBanner() {
     queryKey: ['margin-health-banner', wallet],
     queryFn: () => fetchMarginHealth(wallet),
     refetchInterval: 15_000,
+    enabled: wallet != null, // no wallet -> guided empty state, never a 401
   });
   const [open, setOpen] = useState(false);
 

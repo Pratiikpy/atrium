@@ -25,6 +25,10 @@ export function BuyingPowerCard() {
     queryKey: ['buying-power-30d', wallet],
     queryFn: () => fetchBP(wallet),
     refetchInterval: 60_000,
+    // Don't fetch a wallet-scoped endpoint with no wallet: disconnected it 401s
+    // (the demo fallback is off in prod) and logs a console error on every load.
+    // No wallet -> render the guided empty state, never a 401.
+    enabled: wallet != null,
   });
 
   return (
