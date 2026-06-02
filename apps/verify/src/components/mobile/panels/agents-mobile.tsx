@@ -73,9 +73,12 @@ export function AgentsMobile() {
       ) : (
         <div className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-5 text-center">
           <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">No active mandate</div>
-          <div className="mt-3 flex justify-center">
-            <NewMandateButton />
-          </div>
+          {/* Single CTA: the "+ New mandate" button in the header above. Pre-fix
+              this card rendered a SECOND NewMandateButton, stacking two identical
+              "+ New mandate" affordances. */}
+          <p className="mt-1.5 text-[12.5px] text-mob-muted/70">
+            Use &ldquo;+ New mandate&rdquo; above to delegate to an agent.
+          </p>
         </div>
       )}
 

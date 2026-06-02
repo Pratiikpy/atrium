@@ -36,49 +36,74 @@ export function NotificationsMobile() {
   });
 
   const unreadCount = (data?.notifications ?? []).filter(n => !n.read).length;
+  const hasList = (data?.notifications.length ?? 0) > 0;
 
   async function markAllRead() {
     await fetch(walletQuery('/api/notifications/mark-read', wallet), { method: 'POST' });
     refetch();
   }
 
+  // Always render the "Inbox" page header so the mobile screen has chrome in
+  // every state (loading/error/empty/list). Pre-fix the empty + error states
+  // were a stranded centered line with no title, unlike the desktop header.
+  const Header = (
+    <div className="mb-3 flex items-baseline justify-between" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="flex items-baseline gap-2">
+        <h2 className="font-display text-[22px] italic text-mob-ink">Inbox</h2>
+        {hasList && unreadCount > 0 && (
+          <span className="font-mono text-[11px] uppercase tracking-wider text-mob-muted">{unreadCount} unread</span>
+        )}
+      </div>
+      {hasList && (
+        <button onClick={markAllRead} className="min-h-[44px] px-3 text-[14px] text-mob-accent">
+          Mark all read
+        </button>
+      )}
+    </div>
+  );
+
   // Error state (distinct from empty, E2E-15, E2E-49)
   if (error) {
     return (
-      <div className="flex flex-col items-center gap-4 px-4 py-12">
-        <p className="text-[16px] text-neg">Could not load, retry</p>
-        <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
-          Retry
-        </button>
+      <div className="flex flex-col">
+        {Header}
+        <div className="flex flex-col items-center gap-4 px-4 py-12">
+          <p className="text-[16px] text-neg">Could not load, retry</p>
+          <button onClick={() => refetch()} className="min-h-[44px] min-w-[44px] rounded-xl bg-mob-bg-card border border-mob-line px-6 text-[16px] text-mob-ink">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   if (isLoading) {
-    return <div className="space-y-2">{[0,1,2,3].map(i => <div key={i} className="skeleton h-[80px] rounded-xl" />)}</div>;
+    return (
+      <div className="flex flex-col">
+        {Header}
+        <div className="space-y-2">{[0,1,2,3].map(i => <div key={i} className="skeleton h-[80px] rounded-xl" />)}</div>
+      </div>
+    );
   }
 
   // Empty state (only when not stale)
   if (!data?.notifications.length) {
     return (
-      <div className="flex flex-col items-center gap-2 px-4 py-12">
-        <p className="text-[16px] text-mob-muted">Inbox is empty</p>
-        <p className="text-[14px] text-mob-muted/60">
-          {data?.source === 'pending' ? 'Notifications populate once contracts deploy' : 'Nothing to flag right now'}
-        </p>
+      <div className="flex flex-col">
+        {Header}
+        <div className="flex flex-col items-center gap-2 px-4 py-16">
+          <p className="text-[16px] text-mob-muted">Inbox is empty</p>
+          <p className="text-[14px] text-mob-muted/60 text-center">
+            {data?.source === 'pending' ? 'Notifications populate once contracts deploy' : 'Nothing to flag right now'}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <p className="text-[16px] text-mob-ink">{unreadCount} unread</p>
-        <button onClick={markAllRead} className="min-h-[44px] px-3 text-[14px] text-mob-accent">
-          Mark all read
-        </button>
-      </div>
+    <div className="flex flex-col gap-3">
+      {Header}
 
       {/* List */}
       {data.notifications.map(n => {

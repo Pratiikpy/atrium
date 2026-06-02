@@ -150,6 +150,20 @@ export function TaxMobile() {
         </>
       )}
 
+      {/* Honest empty state: pre-fix, with no stats data + no events (the
+          disconnected/pending case) the panel showed the selectors then a big
+          blank gap. Fill it so the screen reads as "empty by design", not broken. */}
+      {!stats.isLoading && !events.isLoading && !stats.data && (events.data?.events?.length ?? 0) === 0 && (
+        <div className="rounded-xl border border-dashed border-mob-line bg-mob-bg-card/40 px-4 py-12 text-center">
+          <p className="text-[15px] text-mob-muted">
+            {wallet ? `No realised events for ${year} yet` : 'Connect your wallet to view tax'}
+          </p>
+          <p className="mt-1 text-[12px] text-mob-muted/60">
+            Figures populate after your first taxable event.
+          </p>
+        </div>
+      )}
+
       {/* Export buttons */}
       <div className="flex flex-col gap-2">
         <a
