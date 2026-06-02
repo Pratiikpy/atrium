@@ -25,16 +25,32 @@ jobs:
           node-version: '20'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The hardened signer (Audit C-20/F-7) loads an ENCRYPTED keystore from
+      # disk; it does not accept a raw key. Materialize the keystore envelope
+      # from a secret into the runner temp dir (outside the repo tree, so the
+      # signer's path-traversal guard passes) and point LANTERN_KEY_PATH at it.
+      - name: Materialize Lantern keystore
+        run: |
+          printf '%s' "$LANTERN_KEY_ENVELOPE" > "$RUNNER_TEMP/lantern.key"
+          echo "LANTERN_KEY_PATH=$RUNNER_TEMP/lantern.key" >> "$GITHUB_ENV"
+        env:
+          LANTERN_KEY_ENVELOPE: ${{ secrets.LANTERN_KEY_ENVELOPE }}
       - name: Trigger Lantern publish
         run: pnpm --filter @atrium/lantern-attestor publish-now
         env:
           SCRIBE_URL:                 ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC:       ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
-          LANTERN_SIGNER_KEY:         ${{ secrets.LANTERN_SIGNER_KEY }}
-          LANTERN_CONTRACT_ADDR:      ${{ secrets.LANTERN_CONTRACT_ADDR }}
-          WEB3_STORAGE_TOKEN:         ${{ secrets.WEB3_STORAGE_TOKEN }}
-          COFFER_ADDR:                ${{ secrets.COFFER_ADDR }}
+          # Addresses resolve from the canonical registry (self-correcting across
+          # redeploys); the *_ADDRESS env vars are the fallback. The names MUST
+          # match what publish-once.ts reads (were LANTERN_CONTRACT_ADDR /
+          # COFFER_ADDR, which the code never read, so every tick threw and the
+          # on-chain root went stale).
+          DEPLOYMENT_REGISTRY_URL:    https://verify.atrium.fi/deployments/arbitrum_sepolia.json
+          LANTERN_ATTESTOR_ADDRESS:   ${{ secrets.LANTERN_CONTRACT_ADDR }}
+          COFFER_ADDRESS:             ${{ secrets.COFFER_ADDR }}
           USDC_ADDR:                  ${{ secrets.USDC_ADDR }}
+          WEB3_STORAGE_TOKEN:         ${{ secrets.WEB3_STORAGE_TOKEN }}
+          LANTERN_KEY_PASSPHRASE:     ${{ secrets.LANTERN_KEY_PASSPHRASE }}
       - name: Notify ops on failure
         if: failure()
         run: |

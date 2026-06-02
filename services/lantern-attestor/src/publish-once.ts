@@ -58,14 +58,54 @@ const LANTERN_ABI = [
   },
 ] as const;
 
+/**
+ * Resolve contract addresses from the canonical deployment registry when
+ * DEPLOYMENT_REGISTRY_URL is set (the self-correcting pattern vigil-keeper
+ * uses), falling back to explicit env vars. Makes the cron immune to a
+ * redeploy/cutover changing addresses AND to workflow env-var-name drift: the
+ * GHA env had been setting LANTERN_CONTRACT_ADDR/COFFER_ADDR while this code
+ * reads LANTERN_ATTESTOR_ADDRESS/COFFER_ADDRESS, so requireEnv threw on every
+ * 10-min tick and the on-chain root went stale.
+ */
+async function resolveFromRegistry(): Promise<{ lantern?: string; coffer?: string }> {
+  const url = process.env.DEPLOYMENT_REGISTRY_URL;
+  if (!url || !isUrl(url)) return {};
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return {};
+    const j = (await r.json()) as { contracts?: Record<string, { address?: string }> };
+    const c = j.contracts ?? {};
+    return { lantern: c['lantern-attestor']?.address, coffer: c['coffer']?.address };
+  } catch {
+    return {};
+  }
+}
+
 export async function publishOnce(): Promise<void> {
-  const LANTERN_ATTESTOR_ADDRESS = requireEnv('LANTERN_ATTESTOR_ADDRESS', isAddress) as `0x${string}`;
   const SCRIBE_URL = requireEnv('SCRIBE_URL', isUrl);
   const ARBITRUM_SEPOLIA_RPC = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
+
+  // Registry-first resolution; env vars (correctly named) are the fallback.
+  const reg = await resolveFromRegistry();
+  const lanternEnv = process.env.LANTERN_ATTESTOR_ADDRESS;
+  const LANTERN_ATTESTOR_ADDRESS = (
+    reg.lantern && isAddress(reg.lantern)
+      ? reg.lantern
+      : lanternEnv && isAddress(lanternEnv)
+        ? lanternEnv
+        : ''
+  ) as `0x${string}`;
+  if (!LANTERN_ATTESTOR_ADDRESS) {
+    throw new Error(
+      'Lantern requires a LanternAttestor address; set DEPLOYMENT_REGISTRY_URL or LANTERN_ATTESTOR_ADDRESS',
+    );
+  }
   const COFFER_ADDRESS =
-    process.env.COFFER_ADDRESS && isAddress(process.env.COFFER_ADDRESS)
-      ? process.env.COFFER_ADDRESS
-      : '';
+    reg.coffer && isAddress(reg.coffer)
+      ? reg.coffer
+      : process.env.COFFER_ADDRESS && isAddress(process.env.COFFER_ADDRESS)
+        ? process.env.COFFER_ADDRESS
+        : '';
 
   const startTs = Date.now();
   console.log(`[lantern] tick start ${new Date(startTs).toISOString()}`);
