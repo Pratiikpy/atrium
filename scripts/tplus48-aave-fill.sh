@@ -8,10 +8,9 @@
 # timelock op is executed only if its 48h window has opened and it has not
 # already executed; the fill runs only after all wiring is in place.
 #
-# Sequence:
-#   1. execute #337  Coffer.setAdapter(Router,true,cap)          ready 2026-05-31T19:34Z
-#   2. execute       Plinth.set_instrument_risk(venue 2 USDC-LEND) ready ~2026-05-31T22:49Z
-#   3. execute       AaveHorizonAdapterV11.addInstrument(USDC-LEND) ready ~2026-05-31T22:51Z
+# Sequence (post-cutover contracts; #337 already done in the cutover):
+#   1. execute       Plinth.set_instrument_risk(venue 2 USDC-LEND) ready 2026-06-03T13:48:22Z
+#   2. execute       AaveHorizonAdapterV11.addInstrument(USDC-LEND) ready 2026-06-03T13:48:24Z
 #   4. push a fresh USDC/USD price into Pyth (scripts/pyth-push-usdc.sh)
 #   5. build + sign the EIP-712 intent+action sigils (apps/verify build-aave-fill-envelope.mjs)
 #   6. AtriumRouter.open_position_via_adapter(2, USDC-LEND, 1e6, action, intent, 0x) from the test key
@@ -37,26 +36,32 @@ MODE="${1:-check}"
 RPC="${ARBITRUM_SEPOLIA_RPC_URL:?set ARBITRUM_SEPOLIA_RPC_URL}"
 KEY="${DEPLOYER_PRIVATE_KEY:-${PRIVATE_KEY:-${ARBITRUM_DEPLOYER_KEY:-}}}"
 
+# Post-cutover contract set (verified on chain 2026-06-02; the app's
+# /api/deployments + Plinth.sigilAddress() are the source of truth). The
+# pre-cutover addresses this script first shipped with were retired in the
+# cutover, so the fill must run against these or it lands on dead contracts.
 TL="0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4"
-COFFER="0xd169554caf920f1fbcffbafcff3068a84892b0d8"
-ROUTER="0xF134127Cc2762d3Ebc5645abA6c99cD5a8b82717"
-PLINTH="0xef31b4b75badc0faf323e3448248585b57a78ecd"
-AAVE="0x826dc4FE429d0Df6454E11dAeA10f2975b551042"
+COFFER="0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3"
+ROUTER="0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0"
+PLINTH="0xd86f579ec880eaab27dfa698ae056d1893ec7553"
+AAVE="0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1"
 MOCKCL="0x5D5e0996954114b70848587D7A7b49dEeA9c5D44"
 PYTH_FEED="0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
 IID="0x128570b155efd3ba4fae8e482ebd851f483ef0bd8056503fc4e12ffd3e6ceedc"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
-# op: target, scheduledTs, scheduled calldata, expected id
-OP337_TS=1780083268
-OP337_DATA=$(cast calldata "setAdapter(address,bool,uint256)" "$ROUTER" true 10000000000)
-OP337_ID="0x8703d00b6e6575123d675dd2cc45e95a157cab7253cd1332c775289870efe2e1"
-OPSIR_TS=1780094981
+# Post-cutover ops (.forge-cache/aave-instrument-ops.json, scheduled
+# 2026-05-31, 48h delay -> ready 2026-06-03T13:48:22Z). #337 Coffer.setAdapter
+# is NOT here: the new Coffer already has isAdapterApproved(Router)=true
+# (executed during the cutover, verified on chain 2026-06-02). IDs below were
+# recomputed from (target,data,ts) and matched the timelock's executed()=false
+# on chain; execute_op re-checks the id before broadcasting.
+OPSIR_TS=1780321702
 OPSIR_DATA=$(cast calldata "setInstrumentRisk(uint8,bytes32,uint16,uint16,bytes32,address,bool)" 2 "$IID" 100 1 "$PYTH_FEED" "$MOCKCL" true)
-OPSIR_ID="0x0dd4e5c0c95fca123d5341aeea1f53c145e1684976f593d6e6cf3179720e50e4"
-OPADD_TS=1780095079
+OPSIR_ID="0x04b06d5cccba794a713a766d2a49dd0a5bdea2be3f80e83f4203db981aa3f84b"
+OPADD_TS=1780321704
 OPADD_DATA=$(cast calldata "addInstrument(bytes32,uint16,uint16,uint16)" "$IID" 100 500 200)
-OPADD_ID="0x29f99514d54dc4613f5fb65233f95a48abc3e9520dcd47376e8b7562d7b80795"
+OPADD_ID="0xc5bb3f537f8464f5c1a4d3284a05e26740cf0f80511afb268ad24e8e35f42e8e"
 
 now() { date +%s; }
 
@@ -78,7 +83,7 @@ execute_op() {
 }
 
 echo "=== T+48h Aave fill driver ($MODE) ==="
-execute_op "#337 Coffer->Router" "$COFFER" "$OP337_TS" "$OP337_DATA" "$OP337_ID"; R1=$?
+R1=0  # #337 Coffer.setAdapter already executed in the cutover (isAdapterApproved=true)
 execute_op "set_instrument_risk"  "$PLINTH" "$OPSIR_TS" "$OPSIR_DATA" "$OPSIR_ID"; R2=$?
 execute_op "addInstrument"        "$AAVE"   "$OPADD_TS" "$OPADD_DATA" "$OPADD_ID"; R3=$?
 

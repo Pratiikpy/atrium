@@ -43,7 +43,15 @@ import { privateKeyToAccount } from 'viem/accounts';
 
 // ---- canonical constants (match deployments/arbitrum_sepolia.json) ----------
 const CHAIN_ID = 421614n;
-const SIGIL = '0xc9933ebe7dc8c4849a1720b2e5b33e381442c873';
+// The REAL fill envelope must be EIP-712-bound to the Sigil that actually
+// validates it on chain. Post-cutover that is Plinth.sigilAddress() =
+// 0xdba97d39 (verified on chain 2026-06-02). The old 0xc9933ebe Sigil was
+// retired in the cutover; signing against it makes Sigil.validate_action
+// recover the wrong owner and the fill reverts. `build` MUST use the deployed
+// address; `--selfcheck` keeps the FROZEN Rust crosscheck vector so its hash
+// parity with contracts/sigil/src/tests.rs stays green.
+const SIGIL_DEPLOYED = '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9';
+const SIGIL_TESTVEC = '0xc9933ebe7dc8c4849a1720b2e5b33e381442c873';
 const AAVE_VENUE_ID = 2;
 const INSTRUMENT = keccak256(toBytes('USDC-LEND')); // 0x128570b1...
 
@@ -67,14 +75,14 @@ const venueWord = (id) => pad(numberToHex(BigInt(id)), { size: 32 }); // byte at
 const int256Word = (v) => pad(numberToHex(((BigInt(v) % (1n << 256n)) + (1n << 256n)) % (1n << 256n)), { size: 32 });
 
 // ---- EIP-712 (mirrors contracts/sigil/src/eip712.rs exactly) ----------------
-function domainSeparator() {
+function domainSeparator(sigil) {
   return keccak256(
     concat([
       DOMAIN_TYPEHASH,
       keccak256(toBytes('AtriumSigil')),
       keccak256(toBytes('1')),
       word(CHAIN_ID),
-      addrWord(SIGIL),
+      addrWord(sigil),
     ]),
   );
 }
@@ -193,7 +201,7 @@ async function selfcheck() {
   // Identical fixed inputs to the Rust crosscheck test (anvil[0] addr).
   const owner = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
   const { intent, intentStruct, action } = fixedIntentAction(owner, owner);
-  const ds = domainSeparator();
+  const ds = domainSeparator(SIGIL_TESTVEC); // frozen Rust crosscheck vector
   const intentDigest = finalDigest(ds, intentStruct);
   const actionStruct = hashAction(action);
   const actionDigest = finalDigest(ds, actionStruct);
@@ -215,7 +223,7 @@ async function build() {
   const user = account.address;
   const { intent, intentStruct, action } = fixedIntentAction(user, user);
 
-  const ds = domainSeparator();
+  const ds = domainSeparator(SIGIL_DEPLOYED); // bind to the live post-cutover Sigil
   const intentDigest = finalDigest(ds, intentStruct);
   const actionDigest = finalDigest(ds, hashAction(action));
 
