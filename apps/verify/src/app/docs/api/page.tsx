@@ -206,7 +206,10 @@ curl -H "X-PAYMENT: $X402_TOKEN" \\
                 </div>
               </header>
               <p className="mt-3 text-sm text-ink-soft">{ep.summary}</p>
-              <pre className="mt-3 overflow-x-auto rounded-md border border-divider bg-parchment-soft px-4 py-3 font-mono text-[12px] text-ink">
+              {/* whitespace-pre-wrap + break-words so the short example curl wraps
+                  and stays fully readable on narrow viewports instead of needing a
+                  horizontal scroll that reads as clipped in a static view. */}
+              <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-divider bg-parchment-soft px-4 py-3 font-mono text-[12px] text-ink">
                 {ep.exampleCurl}
               </pre>
             </article>

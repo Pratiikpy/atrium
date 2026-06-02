@@ -47,7 +47,11 @@ export default async function DeploymentPage() {
                   return (
                     <tr key={slug} className="border-b border-divider/60 last:border-0">
                       <td className="px-4 py-3 text-ink">{slug}</td>
-                      <td className="px-4 py-3 font-mono text-xs">
+                      {/* break-all so the 42-char address (one unbreakable token)
+                          wraps and stays fully visible instead of overflowing the
+                          cell and getting clipped by the section's rounded mask,
+                          especially on narrow viewports. Judges read these. */}
+                      <td className="px-4 py-3 font-mono text-xs break-all">
                         {url ? (
                           <a href={url} target="_blank" rel="noreferrer" className="text-accent hover:underline">
                             {addr}
