@@ -47,9 +47,11 @@ export function BuyingPowerCard() {
             {isLoading ? <span className="skeleton inline-block h-8 w-40 rounded" /> : data?.currentUsd ?? '-'}
           </p>
         </div>
+        {/* Audit fix (use-everything sweep 2026-06-02): 1d/7d were dead PillTabs
+            (no onClick) and the buying-power API only serves window=30d, so they
+            implied selectable ranges that did nothing. Show only the real 30d
+            window until shorter windows are backed by the API. */}
         <div className="flex gap-1 text-xs">
-          <PillTab label="1d" />
-          <PillTab label="7d" />
           <PillTab label="30d" active />
         </div>
       </header>

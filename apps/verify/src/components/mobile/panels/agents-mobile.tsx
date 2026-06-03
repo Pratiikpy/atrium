@@ -45,12 +45,15 @@ export function AgentsMobile() {
   });
   const board = useQuery({
     queryKey: ['mobile-rostrum'],
-    queryFn: () => fetchJSON<{ rows: LeaderboardRow[]; source: string }>('/api/agents/leaderboard'),
+    queryFn: () => fetchJSON<{ agents: LeaderboardRow[]; source: string }>('/api/agents/leaderboard'),
     refetchInterval: 60_000,
   });
 
   const active = mandates.data?.mandates?.[0];
-  const rows = board.data?.rows ?? [];
+  // Audit fix (use-everything sweep 2026-06-02): /api/agents/leaderboard returns
+  // the key `agents`, not `rows`; reading `rows` left this list permanently empty
+  // even once real Rostrum rows ship. Align to the route contract.
+  const rows = board.data?.agents ?? [];
 
   return (
     <div className="md:hidden flex flex-col gap-4">

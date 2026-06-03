@@ -38,10 +38,12 @@ export function NotificationsMobile() {
   const unreadCount = (data?.notifications ?? []).filter(n => !n.read).length;
   const hasList = (data?.notifications.length ?? 0) > 0;
 
-  async function markAllRead() {
-    await fetch(walletQuery('/api/notifications/mark-read', wallet), { method: 'POST' });
-    refetch();
-  }
+  // Audit fix (use-everything sweep 2026-06-02): the "Mark all read" button
+  // POSTed to /api/notifications/mark-read, which does not exist (404). Read
+  // state is not persisted server-side (notifications are GET-only aggregated
+  // Scribe events), so the action did nothing but error. Removed the button
+  // below rather than ship a control that silently fails; it returns when a
+  // real read-state endpoint exists.
 
   // Always render the "Inbox" page header so the mobile screen has chrome in
   // every state (loading/error/empty/list). Pre-fix the empty + error states
@@ -54,11 +56,6 @@ export function NotificationsMobile() {
           <span className="font-mono text-[11px] uppercase tracking-wider text-mob-muted">{unreadCount} unread</span>
         )}
       </div>
-      {hasList && (
-        <button onClick={markAllRead} className="min-h-[44px] px-3 text-[14px] text-mob-accent">
-          Mark all read
-        </button>
-      )}
     </div>
   );
 

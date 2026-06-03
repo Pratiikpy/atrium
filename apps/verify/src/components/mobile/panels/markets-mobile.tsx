@@ -29,7 +29,18 @@ export function MarketsMobile() {
       const r = await fetch(walletQuery('/api/protocol/subsystems', wallet));
       if (!r.ok) throw new Error(`venues_${r.status}`);
       const j = await r.json();
-      return j.venues ?? VENUES.map(v => ({ id: v.id, status: 'live' as const, tvl: '-' }));
+      // Audit fix (use-everything sweep 2026-06-02): this read `j.venues`, but
+      // GET /api/protocol/subsystems returns `{ live: [...slugs] }` with no
+      // `venues` key, so it ALWAYS fell through to the fallback and showed EVERY
+      // venue as 'live' (wrong data presented as real). Derive each venue's
+      // status from the real `live` slug set: live when its adapter is up, else
+      // paused. TVL has no source in this route, so it stays an honest '-'.
+      const liveSet = new Set<string>(Array.isArray(j.live) ? j.live : []);
+      return VENUES.map((v) => ({
+        id: v.id,
+        status: (liveSet.has(v.adapterSlug) || liveSet.has(v.id)) ? ('live' as const) : ('paused' as const),
+        tvl: '-',
+      }));
     },
     refetchInterval: 60_000,
   });
