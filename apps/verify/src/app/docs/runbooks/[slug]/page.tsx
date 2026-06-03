@@ -38,15 +38,17 @@ export default async function RunbookPage({ params }: { params: Promise<{ slug: 
             text is HTML-escaped and link schemes are validated in the renderer. */}
         <article dangerouslySetInnerHTML={{ __html: html }} />
 
+        {/* Link-integrity fix (use-everything 2026-06-03): the GitHub repo is not
+            public yet, so the per-runbook source link 404'd. The runbook is already
+            rendered above from the committed markdown, so the external source link
+            is redundant; replace it with an in-app return to the runbook index. */}
         <div className="mt-12 border-t border-divider pt-6">
-          <a
-            href={`https://github.com/Pratiikpy/atrium/blob/main/runbooks/${rb.slug}.md`}
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            href="/docs/runbooks"
             className="text-sm text-accent underline-offset-2 hover:underline"
           >
-            View source on GitHub ↗
-          </a>
+            ← All runbooks
+          </Link>
         </div>
       </div>
     </MarketingShell>

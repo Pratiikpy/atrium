@@ -48,9 +48,12 @@ const DOCS = [
     repoOnly: true,
   },
   {
+    // Link-integrity fix (use-everything 2026-06-03): the GitHub repo is not
+    // public yet, so the blob link 404'd. /benchmarks is the live in-app
+    // competitive comparison, so point there instead of a dead external link.
     title: 'COMPETITIVE_POSITIONING.md',
     sub: 'The wedge: cross-venue portfolio margin from a neutral layer, why no single venue can copy it',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/COMPETITIVE_POSITIONING.md',
+    href: '/benchmarks',
     pages: 'one-page positioning',
   },
   {
@@ -60,9 +63,11 @@ const DOCS = [
     repoOnly: true,
   },
   {
+    // Link-integrity fix (use-everything 2026-06-03): repo not public yet, blob
+    // link 404'd. /security is the live in-app threat-model + disclosure page.
     title: 'SECURITY.md',
     sub: 'Threat model, key handling, disclosure policy, bug bounty',
-    href: 'https://github.com/Pratiikpy/atrium/blob/main/SECURITY.md',
+    href: '/security',
     pages: 'STRIDE + PGP',
   },
 ] as const;
