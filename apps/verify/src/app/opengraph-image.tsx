@@ -75,7 +75,11 @@ export default async function OpengraphImage() {
           </span>
           <span
             style={{
-              display: 'inline-flex',
+              // Satori (next/og) supports only display: flex | block | contents
+              // | none | -webkit-box. 'inline-flex' throws at render time, which
+              // ImageResponse turns into a 200 with an empty body. This span is
+              // already a flex item in the row above, so 'flex' is layout-equal.
+              display: 'flex',
               alignSelf: 'flex-start',
               marginTop: 24,
               padding: '6px 14px',
