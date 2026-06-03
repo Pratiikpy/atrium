@@ -8,7 +8,7 @@ import {IPorticoAdapter} from "./IPorticoAdapter.sol";
 ///         whitelist time. Upgrade = re-whitelist with 3-reviewer Curator approval.
 contract PorticoRegistry {
     /// `praetor_multisig` holds the emergency-deregister lever and is shown by
-    /// UI dashboards (verify.atrium.fi) via the auto-generated getter. It is
+    /// UI dashboards (verify.useatrium.me) via the auto-generated getter. It is
     /// transferable via `updatePraetor` (101-OPS3.1) so the post-leak 3-of-5
     /// Safe handoff can move the role off the deployer EOA. Routine parameter
     /// changes still go through `praetor_timelock`.

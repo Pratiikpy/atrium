@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
  * shows a live up/down badge from this. Honest: a network failure or non-2xx
  * returns ok:false with the reason, never a faked "live".
  */
-const CODEX_URL = process.env.CODEX_URL ?? 'https://codex.atrium.fi';
+const CODEX_URL = process.env.CODEX_URL ?? 'https://codex.useatrium.me';
 
 export async function GET() {
   const url = `${CODEX_URL.replace(/\/$/, '')}/health`;

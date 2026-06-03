@@ -5,7 +5,7 @@ Install and configure Caddy as reverse proxy on the Atrium daemons droplet.
 ## Prerequisites
 
 - Droplet provisioned via `scripts/provision-do-droplet.sh`
-- DNS A records for `codex.atrium.fi` and `tablet.atrium.fi` pointing to droplet IP
+- DNS A records for `codex.useatrium.me` and `tablet.useatrium.me` pointing to droplet IP
 - Ports 80 and 443 open (handled by cloud-init UFW rules)
 
 ## Install
@@ -22,11 +22,11 @@ apt install -y caddy
 
 ```bash
 cat > /etc/caddy/Caddyfile << 'EOF'
-codex.atrium.fi {
+codex.useatrium.me {
   reverse_proxy localhost:3000
 }
 
-tablet.atrium.fi {
+tablet.useatrium.me {
   reverse_proxy localhost:3001
 }
 EOF
@@ -49,10 +49,10 @@ systemctl reload caddy
 systemctl status caddy
 
 # Test TLS + proxy (after DNS propagates)
-curl -I https://codex.atrium.fi/healthz
+curl -I https://codex.useatrium.me/healthz
 # Expected: HTTP/2 200, valid Let's Encrypt cert
 
-curl -I https://tablet.atrium.fi/healthz
+curl -I https://tablet.useatrium.me/healthz
 # Expected: HTTP/2 200
 ```
 

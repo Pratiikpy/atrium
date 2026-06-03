@@ -24,7 +24,7 @@ describe('Email channel', () => {
     const { deliverEmail } = await import('./email.js');
     await deliverEmail(
       { id: '0x1-0', kind: 'emergency_pause_invoked', contract: 'PraetorTimelock', blockNumber: 200, timestamp: 1700000000, title: 'Emergency Pause', body: 'Praetor timelock paused', severity: 'critical' } as any,
-      { emailAddress: 'ops@atrium.fi' } as any,
+      { emailAddress: 'ops@useatrium.me' } as any,
     );
 
     expect(sentPayload).toHaveProperty('to');

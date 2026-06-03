@@ -50,7 +50,7 @@ covers demo rehearsals; F1 covers infra; F2 covers comms.
 
 ## Founder contacts
 
-- F1: f1@atrium.fi . Discord: @F1 . Phone: in 1Password
+- F1: f1@useatrium.me . Discord: @F1 . Phone: in 1Password
 - F2: TBD per cohort founder lineup
 - F3: TBD per cohort founder lineup
 

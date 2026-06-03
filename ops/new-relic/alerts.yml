@@ -79,4 +79,4 @@ channels:
   - name: team-email
     type: email
     recipients:
-      - ops@atrium.fi
+      - ops@useatrium.me

@@ -1,6 +1,6 @@
 # Status Page Setup
 
-Upptime-based status page at `status.atrium.fi`.
+Upptime-based status page at `status.useatrium.me`.
 
 ## Prerequisites
 
@@ -34,17 +34,17 @@ In your DNS registrar (Namecheap / Cloudflare / etc.):
 ### 4. Verify
 
 ```bash
-nslookup status.atrium.fi
+nslookup status.useatrium.me
 # Should resolve to GitHub Pages IPs
 
-curl -I https://status.atrium.fi
+curl -I https://status.useatrium.me
 # Should return 200 with valid TLS
 ```
 
 ### 5. Custom domain in GitHub Pages
 
 After DNS propagates:
-1. Settings → Pages → Custom domain → `status.atrium.fi`
+1. Settings → Pages → Custom domain → `status.useatrium.me`
 2. Check "Enforce HTTPS"
 
 ## Troubleshooting

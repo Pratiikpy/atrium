@@ -77,7 +77,7 @@ export default function TeamPage() {
         <section className="mt-16">
           <h2 className="font-display text-2xl text-ink">Contact</h2>
           <p className="mt-3 text-sm text-ink-soft">
-            Security disclosure: <code className="font-mono text-ink">security@atrium.fi</code> (PGP key linked from <Link href="/security" className="underline">/security</Link>).
+            Security disclosure: <code className="font-mono text-ink">security@useatrium.me</code> (PGP key linked from <Link href="/security" className="underline">/security</Link>).
           </p>
           <p className="mt-2 text-sm text-ink-soft">
             Partnerships and integrations are scoped through the Cohort programme, see <Link href="/cohort" className="underline">/cohort</Link>.

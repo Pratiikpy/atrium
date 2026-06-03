@@ -63,7 +63,7 @@ async fn main() -> Result<()> {
     }
     let config = AgentConfig {
         codex_url: std::env::var("CODEX_URL")
-            .unwrap_or_else(|_| "https://codex.atrium.fi".to_string()),
+            .unwrap_or_else(|_| "https://codex.useatrium.me".to_string()),
         instrument_id,
         venue_id: 1,
         interval_seconds: 3600,

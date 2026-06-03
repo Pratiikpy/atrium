@@ -19,7 +19,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://verify.atrium.fi' }}
+      BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://verify.useatrium.me' }}
       FORK_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC || 'https://arbitrum-sepolia.publicnode.com' }}
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7

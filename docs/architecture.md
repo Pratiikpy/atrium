@@ -105,4 +105,4 @@ A typical hedged-position lifecycle:
 
 ## Disclosures
 
-What's a mock, what's a relay, what's a stub on testnet is published at [`/docs/honesty`](https://verify.atrium.fi/docs/honesty) on the live app. Year-1 testnet posture: certain venues (Aave on Sepolia, Pyth equity feeds, Hyperliquid HIP-3) are not natively available, so Atrium uses mocks or Praetor-signed relays disclosed openly. None of the landing-page numbers ever pretend a mock is a real upstream.
+What's a mock, what's a relay, what's a stub on testnet is published at [`/docs/honesty`](https://verify.useatrium.me/docs/honesty) on the live app. Year-1 testnet posture: certain venues (Aave on Sepolia, Pyth equity feeds, Hyperliquid HIP-3) are not natively available, so Atrium uses mocks or Praetor-signed relays disclosed openly. None of the landing-page numbers ever pretend a mock is a real upstream.

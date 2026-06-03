@@ -8,12 +8,12 @@ once they sign on.
 
 | # | Name | URL | Interval | Region | Alert channel |
 |---|---|---|---|---|---|
-| 1 | verify.atrium.fi | https://verify.atrium.fi | 1 min | global | Discord `#alerts` |
-| 2 | codex.atrium.fi | https://codex.atrium.fi/health | 1 min | global | Discord `#alerts` |
-| 3 | atrium.fi | https://atrium.fi | 1 min | global | Discord `#alerts` |
-| 4 | /api/protocol/metrics | https://verify.atrium.fi/api/protocol/metrics | 5 min | global | Discord `#alerts` |
-| 5 | /api/lantern/latest | https://verify.atrium.fi/api/lantern/latest | 5 min | global | Discord `#alerts` |
-| 6 | /api/deployments/status | https://verify.atrium.fi/api/deployments/status | 5 min | global | Discord `#alerts` |
+| 1 | verify.useatrium.me | https://verify.useatrium.me | 1 min | global | Discord `#alerts` |
+| 2 | codex.useatrium.me | https://codex.useatrium.me/health | 1 min | global | Discord `#alerts` |
+| 3 | useatrium.me | https://useatrium.me | 1 min | global | Discord `#alerts` |
+| 4 | /api/protocol/metrics | https://verify.useatrium.me/api/protocol/metrics | 5 min | global | Discord `#alerts` |
+| 5 | /api/lantern/latest | https://verify.useatrium.me/api/lantern/latest | 5 min | global | Discord `#alerts` |
+| 6 | /api/deployments/status | https://verify.useatrium.me/api/deployments/status | 5 min | global | Discord `#alerts` |
 | 7 | Arbitrum Sepolia RPC | https://arbitrum-sepolia.publicnode.com | 5 min | global | Discord `#warning` |
 | 8 | Scribe (subgraph) | (Graph Studio query URL) | 5 min | global | Discord `#warning` |
 

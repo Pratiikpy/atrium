@@ -46,7 +46,7 @@ export default function SecurityPage() {
 
         <Block heading="Disclose a vulnerability">
           <p className="text-ink-soft">
-            Email <a className="text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
+            Email <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>.
             We respond within 48 hours. Critical issues are triaged same-day. PGP key at{' '}
             <code className="font-mono">/.well-known/pgp.asc</code>.
           </p>
@@ -54,7 +54,7 @@ export default function SecurityPage() {
 
         <Block heading="Bug bounty">
           <ul className="space-y-2 text-ink-soft">
-            <li>• Year 1 testnet: bug bounty program standup pending. Interim disclosure via <a className="text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>. Same-day triage.</li>
+            <li>• Year 1 testnet: bug bounty program standup pending. Interim disclosure via <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>. Same-day triage.</li>
             <li>• Year 2 mainnet flip: formal Immunefi-style program live before the flip. Tier target set on board sign-off.</li>
           </ul>
         </Block>

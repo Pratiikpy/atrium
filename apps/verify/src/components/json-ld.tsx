@@ -16,7 +16,7 @@ export const ATRIUM_ORG_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Atrium',
-  url: 'https://verify.atrium.fi',
+  url: 'https://verify.useatrium.me',
   sameAs: [
     'https://github.com/atrium-labs',
     'https://twitter.com/atriumfi',
@@ -31,5 +31,5 @@ export const ATRIUM_APP_SCHEMA = {
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web',
   description: 'Cross-venue portfolio margin for the EVM.',
-  url: 'https://verify.atrium.fi',
+  url: 'https://verify.useatrium.me',
 };

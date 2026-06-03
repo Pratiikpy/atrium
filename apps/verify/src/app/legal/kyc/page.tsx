@@ -69,7 +69,7 @@ export default function KycPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Re-submit via the KYC flow with corrected documents.</li>
             <li>Request manual review by contacting{' '}
-              <a href="mailto:privacy@atrium.fi" className="underline">privacy@atrium.fi</a>.
+              <a href="mailto:privacy@useatrium.me" className="underline">privacy@useatrium.me</a>.
             </li>
             <li>Human escalation available: response within 30 days.</li>
           </ul>

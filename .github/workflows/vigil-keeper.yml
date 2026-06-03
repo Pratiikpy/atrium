@@ -29,7 +29,7 @@ jobs:
         env:
           SCRIBE_URL: ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
-          DEPLOYMENT_REGISTRY_URL: https://verify.atrium.fi/deployments/arbitrum_sepolia.json
+          DEPLOYMENT_REGISTRY_URL: https://verify.useatrium.me/deployments/arbitrum_sepolia.json
           KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
         run: pnpm --filter @atrium/vigil-keeper tick
       - name: Notify ops on failure

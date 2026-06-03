@@ -9,7 +9,7 @@ Phase 12, go-live procedure for Atrium beta.
 - [ ] Honeybadger heartbeats all green
 - [ ] New Relic dashboards showing data
 - [ ] Sentry receiving events (test with manual error)
-- [ ] `status.atrium.fi` shows all services UP
+- [ ] `status.useatrium.me` shows all services UP
 
 ## Launch Steps
 
@@ -17,20 +17,20 @@ Phase 12, go-live procedure for Atrium beta.
 
 Per `runbooks/vercel-deployment-protection.md`:
 - Vercel → Project Settings → Deployment Protection → Disable password
-- Confirm `verify.atrium.fi` loads in incognito browser
+- Confirm `verify.useatrium.me` loads in incognito browser
 
 ### 2. Verify Production
 
-- [ ] `verify.atrium.fi` loads, wallet connect works
+- [ ] `verify.useatrium.me` loads, wallet connect works
 - [ ] `/api/scribe/health` returns `{ blockLag: <number> }`
 - [ ] `/api/portfolio/summary` returns data for test wallet
-- [ ] `status.atrium.fi` shows all green
+- [ ] `status.useatrium.me` shows all green
 
 ### 3. Beta Tester Recruitment
 
 - Post in Discord `#announcements`: "Beta is live. 10 spots. DM for access."
 - Direct-invite 10 testers from the waitlist
-- Share `verify.atrium.fi/beta` link
+- Share `verify.useatrium.me/beta` link
 
 ### 4. Monitor (48h)
 
@@ -44,7 +44,7 @@ Per `runbooks/vercel-deployment-protection.md`:
 ### 5. Soft Launch Announcement
 
 After 48h stable:
-- [ ] Tweet from `@AtriumProtocol`: "Atrium Verifier Mode is live on Arbitrum Sepolia. Try it: verify.atrium.fi"
+- [ ] Tweet from `@AtriumProtocol`: "Atrium Verifier Mode is live on Arbitrum Sepolia. Try it: verify.useatrium.me"
 - [ ] Discord `#announcements` post
 - [ ] GitHub Release with link to CHANGELOG
 

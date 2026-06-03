@@ -17,7 +17,7 @@ export function Footer() {
               {APP_VERSION} · {BUILD_PERIOD_SHORT} · testnet only
             </div>
             <p className="text-[12px] text-[var(--muted)]">
-              <a href="mailto:support@atrium.fi" className="hover:text-[var(--ink)]">support@atrium.fi</a>
+              <a href="mailto:support@useatrium.me" className="hover:text-[var(--ink)]">support@useatrium.me</a>
               {' · '}
               Discord launching with testnet, see{' '}
               <Link href="/security" className="hover:text-[var(--ink)]">/security</Link> for security@ contact

@@ -13,7 +13,7 @@ export default function AccessibilityPage() {
           <h1 className="font-display text-5xl text-ink">Accessibility Statement</h1>
           <p className="mt-2 text-sm italic text-muted">Last reviewed: 2026-05-28</p>
           <p className="mt-1 text-sm text-muted">
-            Contact: <a href="mailto:accessibility@atrium.fi" className="underline">accessibility@atrium.fi</a>
+            Contact: <a href="mailto:accessibility@useatrium.me" className="underline">accessibility@useatrium.me</a>
           </p>
         </header>
 
@@ -74,7 +74,7 @@ export default function AccessibilityPage() {
           <h2 className="font-display text-2xl text-ink">Feedback</h2>
           <p className="mt-3">
             If you encounter an accessibility barrier, please contact{' '}
-            <a href="mailto:accessibility@atrium.fi" className="underline">accessibility@atrium.fi</a>.
+            <a href="mailto:accessibility@useatrium.me" className="underline">accessibility@useatrium.me</a>.
             We aim to respond within 5 business days and resolve issues within 30 days.
           </p>
         </section>

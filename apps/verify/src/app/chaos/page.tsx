@@ -115,7 +115,7 @@ export default function ChaosPage() {
       <p className="mt-4 max-w-prose text-ink-soft">
         Each button injects a real fault into the testnet stack. The system handles it
         gracefully or it fails honestly. Every run is logged here and on{' '}
-        <code className="font-mono text-ink">chaos.atrium.fi</code>.
+        <code className="font-mono text-ink">chaos.useatrium.me</code>.
       </p>
 
       <section className="mt-12 grid gap-4 sm:grid-cols-2">

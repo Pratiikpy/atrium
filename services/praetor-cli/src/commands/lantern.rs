@@ -43,7 +43,7 @@ pub async fn run(network: &str, action: LanternAction) -> Result<()> {
                     anyhow::anyhow!(
                         "LANTERN_CRON_URL not set and --cron-url flag absent. \
                          Expected the Vercel-hosted lantern-attestor /api/cron \
-                         endpoint, e.g. https://lantern.atrium.fi/api/cron."
+                         endpoint, e.g. https://lantern.useatrium.me/api/cron."
                     )
                 })?;
             let secret = cron_secret

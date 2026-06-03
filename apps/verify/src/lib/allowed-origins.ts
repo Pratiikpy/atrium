@@ -6,8 +6,8 @@
  */
 
 const STATIC_ORIGINS = [
-  'https://verify.atrium.fi',
-  'https://atrium.fi',
+  'https://verify.useatrium.me',
+  'https://useatrium.me',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];

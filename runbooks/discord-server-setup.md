@@ -35,7 +35,7 @@ Human-action runbook for creating the Atrium Discord server.
 - If server boost level ≥ 3: set vanity URL `discord.gg/atrium`.
 - Otherwise: create a permanent invite link (never expires, unlimited uses).
 - Update `apps/verify/src/components/landing/footer.tsx` with the real invite link.
-- If using a redirect (`https://atrium.fi/discord`), configure that redirect in DNS/Vercel.
+- If using a redirect (`https://useatrium.me/discord`), configure that redirect in DNS/Vercel.
 
 ### 5. Roles
 

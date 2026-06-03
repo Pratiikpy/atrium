@@ -246,13 +246,13 @@ Each finding shows: source audit reference, file/line evidence, root cause, impa
 ### C-020 · All live URLs in `deployment.md` are unreachable to external visitors
 **Area:** Live verification · **Source:** wave1-live-verify LV-12
 **Evidence:** Every URL tested:
-- `verify.atrium.fi` → HTTP 403 (Vercel auth wall)
-- `tablet-staging.atrium.fi`, `codex-staging.atrium.fi`, `lantern-staging.atrium.fi`, `verify-staging.atrium.fi` → DNS resolution failure
+- `verify.useatrium.me` → HTTP 403 (Vercel auth wall)
+- `tablet-staging.useatrium.me`, `codex-staging.useatrium.me`, `lantern-staging.useatrium.me`, `verify-staging.useatrium.me` → DNS resolution failure
 
-README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A judge visiting gets 403.
+README claims the app is "deployed to Arbitrum Sepolia at verify.useatrium.me". A judge visiting gets 403.
 **Root cause:** Vercel deployment-protection auth wall is enabled on the production project. DNS for staging subdomains never set up.
-**Impact:** No external visitor can access the live demo. The judge runbook gate #9 ("verify.atrium.fi resolves") fails.
-**Fix:** Disable Vercel deployment-protection on the production verify.atrium.fi project. Verify via curl that the URL returns 200.
+**Impact:** No external visitor can access the live demo. The judge runbook gate #9 ("verify.useatrium.me resolves") fails.
+**Fix:** Disable Vercel deployment-protection on the production verify.useatrium.me project. Verify via curl that the URL returns 200.
 **Effort:** S (5 min toggle in Vercel dashboard)
 
 ### C-021 · `subgraph-deploy.sh` reads from non-existent `deploy/arbitrum-sepolia.json`
@@ -296,7 +296,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 **Evidence:** `apps/verify/src/app/api/chaos/inject/route.ts:85`, `if (origin.endsWith('.vercel.app')) return true;`
 **Root cause:** Wildcard match intended for Atrium preview deploys also matches any other Vercel project.
 **Impact:** An attacker deploys a malicious page on their own Vercel project (e.g. `evil-xyz.vercel.app`), and the browser fetch succeeds origin-check. They can pause Plinth on Sepolia. Per-IP rate limit slows but does not prevent.
-**Fix:** Replace wildcard with project-scoped prefix: `^https:\/\/atrium-verify-[a-z0-9]+-[a-z0-9-]+\.vercel\.app$` plus `*.atrium.fi`. Or read an env var `ALLOWED_PREVIEW_PREFIX`.
+**Fix:** Replace wildcard with project-scoped prefix: `^https:\/\/atrium-verify-[a-z0-9]+-[a-z0-9-]+\.vercel\.app$` plus `*.useatrium.me`. Or read an env var `ALLOWED_PREVIEW_PREFIX`.
 **Effort:** S (15 min)
 
 ---
@@ -316,7 +316,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### H-002 · No Strict-Transport-Security header
 **Source:** wave1-websec F2 · **File:** `apps/verify/next.config.mjs:37-44`
 **Impact:** First-visit HTTP downgrade vector. Browsers do not enforce HTTPS for the domain.
-**Fix:** Add `{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }`. Submit `verify.atrium.fi` to hstspreload.org once stable.
+**Fix:** Add `{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }`. Submit `verify.useatrium.me` to hstspreload.org once stable.
 **Effort:** S (5 min)
 
 ### H-003 · No global error boundary
@@ -340,7 +340,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 ### H-006 · `issue-mandate` route has no Origin / CSRF check
 **Source:** wave1-websec F9 · **File:** `apps/verify/src/app/api/agents/issue-mandate/route.ts`
 **Impact:** A malicious page can POST to this route cross-origin if the user's wallet is connected. The signature gate provides indirect protection but the legacy unsigned path still accepts the request.
-**Fix:** Add Origin allow-list (`verify.atrium.fi`, `localhost:3000`). Remove the legacy unsigned path so signature is mandatory.
+**Fix:** Add Origin allow-list (`verify.useatrium.me`, `localhost:3000`). Remove the legacy unsigned path so signature is mandatory.
 **Effort:** S (30 min)
 
 ### H-007 · CI actions pinned by tag, not SHA
@@ -630,7 +630,7 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-051 · No Loom backup recording exists; no QR mirror on judge card
 **Source:** wave2-product P-14 · **Missing:** rehearsals/loom-recording-outline.md exists but no recording committed
-**Impact:** PRD §26 and acceptance-criteria.md gate #4 require "Loom backup uploaded + matches current contract state." If verify.atrium.fi goes down on judge day (and given C-020, it's already down for external visitors), there is no fallback.
+**Impact:** PRD §26 and acceptance-criteria.md gate #4 require "Loom backup uploaded + matches current contract state." If verify.useatrium.me goes down on judge day (and given C-020, it's already down for external visitors), there is no fallback.
 **Fix:** Once the demo is functional (after C-004), record a Loom. Add a QR component to the judge card. Commit the Loom URL.
 **Effort:** M (2h, blocked on C-004 fix)
 
@@ -657,14 +657,14 @@ README claims the app is "deployed to Arbitrum Sepolia at verify.atrium.fi". A j
 
 ### H-055 · No public status page
 **Source:** wave1-launch L-8 · **Missing**
-**Impact:** Users and partners have no way to check service health. The SLA page makes commitments with no public accountability mechanism. ops/monitoring/uptime-config.md exists but there is no `status.atrium.fi`.
-**Fix:** Deploy a status page (Better Stack, Upptime on GitHub Pages, or similar). Link from footer and SLA page. Wire monitor checks: verify.atrium.fi, codex API, lantern cron, vigil-keeper cron, subgraph endpoint.
+**Impact:** Users and partners have no way to check service health. The SLA page makes commitments with no public accountability mechanism. ops/monitoring/uptime-config.md exists but there is no `status.useatrium.me`.
+**Fix:** Deploy a status page (Better Stack, Upptime on GitHub Pages, or similar). Link from footer and SLA page. Wire monitor checks: verify.useatrium.me, codex API, lantern cron, vigil-keeper cron, subgraph endpoint.
 **Effort:** M (3h)
 
 ### H-056 · No support channel for non-security issues
 **Source:** wave1-launch L-9 · **Missing**
-**Impact:** No `support@atrium.fi`, no in-app help button. Discord link is an indirect redirect (`atrium.fi/discord`). Users with non-security issues have no support path.
-**Fix:** Add `support@atrium.fi`. Replace Discord redirect with a direct `discord.gg/` invite. Add an in-app feedback widget (or a "Get help" link in the app footer linking to Discord + email).
+**Impact:** No `support@useatrium.me`, no in-app help button. Discord link is an indirect redirect (`useatrium.me/discord`). Users with non-security issues have no support path.
+**Fix:** Add `support@useatrium.me`. Replace Discord redirect with a direct `discord.gg/` invite. Add an in-app feedback widget (or a "Get help" link in the app footer linking to Discord + email).
 **Effort:** S (1h after Discord vanity URL is created)
 
 ### H-057 · Adapter conformance test suite missing, `tests/adapter-conformance/` is empty

@@ -26,7 +26,7 @@ vercel project add atrium-verify --prod-only-protection
 
 ## Verification
 
-1. Open `https://verify.atrium.fi` in an incognito/private browser window.
+1. Open `https://verify.useatrium.me` in an incognito/private browser window.
 2. Page should load without any Vercel auth challenge.
 3. Check all critical routes:
    - `/` (landing)

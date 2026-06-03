@@ -90,7 +90,7 @@ See `ops/new-relic/alerts.yml`. Create via NerdGraph mutations or manually in th
 ### 8. Verify
 
 1. Deploy verify-app to Vercel.
-2. Visit `verify.atrium.fi`, accept analytics consent.
+2. Visit `verify.useatrium.me`, accept analytics consent.
 3. Check New Relic → Browser → atrium-verify for page views.
 4. Check New Relic → APM → atrium-verify for server transactions.
 5. Confirm dashboards show data within 5 minutes.

@@ -11,11 +11,11 @@ workflowSchedule:
 
 sites:
   - name: Verify (production)
-    url: https://verify.atrium.fi
+    url: https://verify.useatrium.me
   - name: Codex API
-    url: https://codex.atrium.fi/healthz
+    url: https://codex.useatrium.me/healthz
   - name: Tablet (tax service)
-    url: https://tablet.atrium.fi/healthz
+    url: https://tablet.useatrium.me/healthz
   - name: Scribe (subgraph)
     url: $SCRIBE_URL
     method: POST
@@ -23,16 +23,16 @@ sites:
       - "Content-Type: application/json"
     body: '{"query":"{ _meta { block { number } } }"}'
   - name: Atrium docs
-    url: https://atrium.fi
+    url: https://useatrium.me
   - name: Lantern Attestor
-    url: https://lantern-attestor.atrium.fi/api/cron
+    url: https://lantern-attestor.useatrium.me/api/cron
     method: GET
   - name: Subgraph (proxied)
-    url: https://verify.atrium.fi/api/scribe/health
+    url: https://verify.useatrium.me/api/scribe/health
 
 status-website:
-  cname: status.atrium.fi
-  logoUrl: https://atrium.fi/brand/atrium-wordmark.svg
+  cname: status.useatrium.me
+  logoUrl: https://useatrium.me/brand/atrium-wordmark.svg
   name: Atrium status
   introTitle: Atrium status
   introMessage: Live uptime for Atrium services. Updates every 5 minutes.

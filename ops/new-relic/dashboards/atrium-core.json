@@ -1,6 +1,6 @@
 {
   "name": "Atrium Core Flow Latency",
-  "description": "Request latency, error rates, and Web Vitals for verify.atrium.fi",
+  "description": "Request latency, error rates, and Web Vitals for verify.useatrium.me",
   "permissions": "PUBLIC_READ_WRITE",
   "pages": [
     {

@@ -16,7 +16,7 @@ export default function TermsPage() {
             Last updated: 2026-05-28 · Effective immediately
           </p>
           <p className="mt-1 text-sm text-muted">
-            Contact: <a href="mailto:legal@atrium.fi" className="underline">legal@atrium.fi</a>
+            Contact: <a href="mailto:legal@useatrium.me" className="underline">legal@useatrium.me</a>
           </p>
         </header>
 
@@ -149,7 +149,7 @@ export default function TermsPage() {
 
         <Section title="13. Contact">
           <p>
-            Questions or concerns: <a href="mailto:legal@atrium.fi" className="underline">legal@atrium.fi</a>.
+            Questions or concerns: <a href="mailto:legal@useatrium.me" className="underline">legal@useatrium.me</a>.
             Security disclosures: see <Link href="/security" className="underline">/security</Link>.
           </p>
         </Section>

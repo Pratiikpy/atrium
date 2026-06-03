@@ -22,7 +22,7 @@ Examples of unacceptable behaviour:
 
 ## Enforcement
 
-Reports go to **conduct@atrium.fi**. The Praetor council (the three founders plus two external contributors when the cohort lands) reviews every report within 7 days and acts on:
+Reports go to **conduct@useatrium.me**. The Praetor council (the three founders plus two external contributors when the cohort lands) reviews every report within 7 days and acts on:
 
 - Warning
 - Temporary ban from the project Discord and GitHub

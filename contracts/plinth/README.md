@@ -56,7 +56,7 @@ cargo kani --workspace
 
 ## Gas budgets
 
-Targets (to be measured + published on `loadtest.atrium.fi`):
+Targets (to be measured + published on `loadtest.useatrium.me`):
 
 | Operation | Target gas | Status |
 |---|---|---|

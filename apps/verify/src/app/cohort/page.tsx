@@ -28,10 +28,10 @@ export default function CohortPage() {
           governance proposals, and Atrium credits toward future mainnet activity.
         </p>
         <a
-          href="mailto:cohort@atrium.fi"
+          href="mailto:cohort@useatrium.me"
           className="mt-4 inline-flex rounded-md bg-ink px-4 py-2 text-sm font-medium text-parchment hover:bg-ink/90"
         >
-          Email cohort@atrium.fi
+          Email cohort@useatrium.me
         </a>
       </section>
       </div>

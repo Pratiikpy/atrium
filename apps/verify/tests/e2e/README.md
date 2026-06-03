@@ -28,7 +28,7 @@ pnpm test:e2e --grep "deposit"
 pnpm test:e2e --project=mobile-safari
 
 # sepolia mode (against deployed contracts)
-E2E_MODE=sepolia E2E_BASE_URL=https://verify.atrium.fi pnpm test:e2e
+E2E_MODE=sepolia E2E_BASE_URL=https://verify.useatrium.me pnpm test:e2e
 ```
 
 ## Updating tests after deployment

@@ -1,6 +1,6 @@
 # Incident runbook: Codex API down
 
-Codex is the x402-payable read API surface (`codex.atrium.fi`). When
+Codex is the x402-payable read API surface (`codex.useatrium.me`). When
 it is down, third-party agents and dashboards cannot query Atrium
 data even though the contracts are healthy.
 
@@ -19,7 +19,7 @@ wired in `ops/monitoring/uptime-config.md`). Sentry events tagged
 
 ## Triage (15 min target)
 
-1. `curl https://codex.atrium.fi/health` . expect 200 with all
+1. `curl https://codex.useatrium.me/health` . expect 200 with all
    endpoint statuses; if 5xx, escalate.
 2. Check Vercel deployments dashboard (Cloudflare Workers for the
    Codex deploy). Look for a recent deploy that correlates with the

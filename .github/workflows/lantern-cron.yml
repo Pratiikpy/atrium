@@ -45,7 +45,7 @@ jobs:
           # match what publish-once.ts reads (were LANTERN_CONTRACT_ADDR /
           # COFFER_ADDR, which the code never read, so every tick threw and the
           # on-chain root went stale).
-          DEPLOYMENT_REGISTRY_URL:    https://verify.atrium.fi/deployments/arbitrum_sepolia.json
+          DEPLOYMENT_REGISTRY_URL:    https://verify.useatrium.me/deployments/arbitrum_sepolia.json
           LANTERN_ATTESTOR_ADDRESS:   ${{ secrets.LANTERN_CONTRACT_ADDR }}
           COFFER_ADDRESS:             ${{ secrets.COFFER_ADDR }}
           USDC_ADDR:                  ${{ secrets.USDC_ADDR }}

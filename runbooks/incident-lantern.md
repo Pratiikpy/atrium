@@ -20,7 +20,7 @@ balances. When publication stops, `/lantern` dashboard renders honest
 
 ## Triage
 
-1. `curl https://verify.atrium.fi/api/lantern/latest` . inspect
+1. `curl https://verify.useatrium.me/api/lantern/latest` . inspect
    `timestamp` field.
 2. Check the Lantern attestor host (Vercel cron OR `$5 VPS` per
    the internal ops log). Log tail for the most recent tick.

@@ -31,8 +31,8 @@ export default function BetaPage() {
             </li>
             <li>
               Send feedback to{' '}
-              <a href="mailto:feedback@atrium.fi" className="underline hover:text-black">
-                feedback@atrium.fi
+              <a href="mailto:feedback@useatrium.me" className="underline hover:text-black">
+                feedback@useatrium.me
               </a>{' '}
               or use the form below
             </li>

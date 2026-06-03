@@ -1,6 +1,6 @@
 # DNS Provisioning
 
-Records to configure for `atrium.fi` via your registrar (Namecheap, Cloudflare, etc.).
+Records to configure for `useatrium.me` via your registrar (Namecheap, Cloudflare, etc.).
 
 ## Required records
 
@@ -18,7 +18,7 @@ Replace `<DROPLET_IP>` with the IP printed by `scripts/provision-do-droplet.sh`.
 
 ## Step-by-step (Namecheap)
 
-1. Log in → Domain List → `atrium.fi` → Advanced DNS.
+1. Log in → Domain List → `useatrium.me` → Advanced DNS.
 2. Add each record from the table above.
 3. Save all changes.
 
@@ -27,22 +27,22 @@ Replace `<DROPLET_IP>` with the IP printed by `scripts/provision-do-droplet.sh`.
 After DNS records propagate:
 
 1. Vercel dashboard → Project (atrium-verify) → Settings → Domains.
-2. Add `verify.atrium.fi` → assign to Production.
-3. Add `verify-staging.atrium.fi` → assign to Preview (branch: `staging`).
+2. Add `verify.useatrium.me` → assign to Production.
+3. Add `verify-staging.useatrium.me` → assign to Preview (branch: `staging`).
 4. Vercel will verify DNS automatically.
 
 ## Verification
 
 ```bash
 # Each should resolve correctly
-nslookup verify.atrium.fi
-nslookup codex.atrium.fi
-nslookup tablet.atrium.fi
-nslookup status.atrium.fi
+nslookup verify.useatrium.me
+nslookup codex.useatrium.me
+nslookup tablet.useatrium.me
+nslookup status.useatrium.me
 
 # TLS check (after Caddy is running on droplet)
-curl -I https://codex.atrium.fi/healthz
-curl -I https://tablet.atrium.fi/healthz
+curl -I https://codex.useatrium.me/healthz
+curl -I https://tablet.useatrium.me/healthz
 ```
 
 ## Caddyfile reference
@@ -52,11 +52,11 @@ The droplet runs Caddy as reverse proxy. See `services/codex/Caddyfile` and `run
 Combined Caddyfile installed at `/etc/caddy/Caddyfile`:
 
 ```
-codex.atrium.fi {
+codex.useatrium.me {
   reverse_proxy localhost:3000
 }
 
-tablet.atrium.fi {
+tablet.useatrium.me {
   reverse_proxy localhost:3001
 }
 ```

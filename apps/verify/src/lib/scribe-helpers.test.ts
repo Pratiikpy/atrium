@@ -136,7 +136,7 @@ describe('gql(), error paths', () => {
   });
 
   it('propagates fetch network errors (no swallow)', async () => {
-    (global.fetch as any).mockRejectedValue(new Error('ENOTFOUND scribe.atrium.fi'));
+    (global.fetch as any).mockRejectedValue(new Error('ENOTFOUND scribe.useatrium.me'));
     await expect(gql('query { x }')).rejects.toThrow(/ENOTFOUND/);
   });
 

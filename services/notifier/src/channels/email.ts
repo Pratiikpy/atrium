@@ -4,7 +4,7 @@ import type { Alert, ChannelConfig } from '../types.js';
  * Resend transactional email delivery. Free tier ships 3K emails/month
  * which comfortably covers Year-1 testnet alert volume.
  *
- * Founder ops: create Resend account, verify atrium.fi domain, generate
+ * Founder ops: create Resend account, verify useatrium.me domain, generate
  * API key, set RESEND_API_KEY env on the notifier deploy.
  *
  * Templates: per docs/conventions/writing.md, plain prose, no marketing
@@ -26,7 +26,7 @@ export async function deliverEmail(alert: Alert, config: ChannelConfig): Promise
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Atrium Alerts <alerts@atrium.fi>',
+      from: 'Atrium Alerts <alerts@useatrium.me>',
       to: [config.emailAddress],
       subject: `[Atrium ${alert.severity}] ${alert.title}`,
       html,
@@ -56,7 +56,7 @@ function formatEmailHtml(alert: Alert): string {
       <p style="margin:0;font-size:15px;line-height:1.55;color:#4A453F;">${escapeHtml(alert.body)}</p>
       ${linkRow}
       <p style="margin:32px 0 0;border-top:1px solid #DBD8D2;padding-top:16px;font-size:11px;color:#807872;">
-        You are receiving this because you enabled email alerts in /app/settings/notifications. <a href="https://verify.atrium.fi/app/settings/notifications" style="color:#807872;">Unsubscribe / adjust</a>.
+        You are receiving this because you enabled email alerts in /app/settings/notifications. <a href="https://verify.useatrium.me/app/settings/notifications" style="color:#807872;">Unsubscribe / adjust</a>.
       </p>
     </td></tr>
   </table>

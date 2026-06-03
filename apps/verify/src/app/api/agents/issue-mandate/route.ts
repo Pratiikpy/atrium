@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
 
 // --- Origin allowlist (Phase 3 CSRF hardening) ---
 const ALLOWED_ORIGINS = [
-  'https://verify.atrium.fi',
-  'https://atrium.fi',
+  'https://verify.useatrium.me',
+  'https://useatrium.me',
   'http://localhost:3000',
 ];
 

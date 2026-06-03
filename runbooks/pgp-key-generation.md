@@ -1,6 +1,6 @@
 # PGP Key Generation
 
-Generate the `security@atrium.fi` PGP key for vulnerability disclosure encryption.
+Generate the `security@useatrium.me` PGP key for vulnerability disclosure encryption.
 
 ## Prerequisites
 
@@ -21,13 +21,13 @@ Prompts:
 - Keysize: **4096**
 - Expiration: **1y**
 - Real name: **Atrium Security**
-- Email: **security@atrium.fi**
+- Email: **security@useatrium.me**
 - Passphrase: strong passphrase (store in 1Password) OR empty if on air-gapped machine
 
 ### 2. Export public key
 
 ```bash
-gpg --armor --export security@atrium.fi > pgp.asc
+gpg --armor --export security@useatrium.me > pgp.asc
 ```
 
 ### 3. Place in repo
@@ -43,7 +43,7 @@ Remove the `.placeholder` suffix file once the real key is in place.
 
 Ensure `apps/verify/public/.well-known/security.txt` references:
 ```
-Encryption: https://verify.atrium.fi/security/pgp.asc
+Encryption: https://verify.useatrium.me/security/pgp.asc
 ```
 
 ### 5. Test import
@@ -51,20 +51,20 @@ Encryption: https://verify.atrium.fi/security/pgp.asc
 On a clean machine:
 ```bash
 gpg --import pgp.asc
-gpg --list-keys security@atrium.fi
+gpg --list-keys security@useatrium.me
 ```
 
 ### 6. Test encrypt/decrypt
 
 ```bash
-echo "test" | gpg --armor --encrypt -r security@atrium.fi > test.asc
+echo "test" | gpg --armor --encrypt -r security@useatrium.me > test.asc
 gpg --decrypt test.asc  # should output "test"
 rm test.asc
 ```
 
 ### 7. Store private key
 
-1. Export: `gpg --armor --export-secret-keys security@atrium.fi > private.asc`
+1. Export: `gpg --armor --export-secret-keys security@useatrium.me > private.asc`
 2. Store `private.asc` in 1Password Team vault under "Atrium PGP Key".
 3. Two team members must have access.
 4. Delete `private.asc` from disk: `shred -u private.asc`
@@ -72,4 +72,4 @@ rm test.asc
 ### 8. Set renewal reminder
 
 - Calendar reminder: 11 months from generation date.
-- Renewal: `gpg --edit-key security@atrium.fi` → `expire` → set new 1y expiry → re-export.
+- Renewal: `gpg --edit-key security@useatrium.me` → `expire` → set new 1y expiry → re-export.

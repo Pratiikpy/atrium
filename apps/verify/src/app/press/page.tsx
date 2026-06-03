@@ -75,7 +75,7 @@ export default function PressPage() {
         <section className="mt-12">
           <h2 className="font-display text-2xl text-ink">Contact</h2>
           <p className="mt-4 text-sm text-ink-soft">
-            Press inquiries: <code className="font-mono text-ink">press@atrium.fi</code>
+            Press inquiries: <code className="font-mono text-ink">press@useatrium.me</code>
           </p>
           <p className="mt-2 text-xs text-muted">
             We&rsquo;re testnet-stage, so email replies may take a little longer. For anything

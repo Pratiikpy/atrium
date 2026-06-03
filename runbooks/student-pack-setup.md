@@ -104,7 +104,7 @@ Complete in order, later tools depend on earlier ones (Doppler stores all tokens
 
 - **Activation URL:** https://education.github.com/pack → search "Astra" → claim (6 months)
 - **What to grab:** Site key / integration token
-- **Setup:** Point at `verify.atrium.fi` Vercel domain. Enable bot mitigation + malware scan.
+- **Setup:** Point at `verify.useatrium.me` Vercel domain. Enable bot mitigation + malware scan.
 - **Doppler config:** N/A (configured in Astra dashboard, not runtime)
 
 ---

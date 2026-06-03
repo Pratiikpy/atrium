@@ -269,7 +269,7 @@ function Authenticator({ onNext, onBack }: { onNext: () => void; onBack: () => v
       <p className="mt-3 max-w-prose text-[15px] leading-[1.55] text-ink-soft">
         Atrium uses a WebAuthn passkey instead of a seed phrase. Your browser
         or hardware authenticator will produce a key pair scoped to{' '}
-        <code className="font-mono text-ink">atrium.fi</code>.
+        <code className="font-mono text-ink">useatrium.me</code>.
       </p>
 
       <div className="mt-8 rounded-[12px] border border-divider bg-parchment px-6 py-6 text-center">

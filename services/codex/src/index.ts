@@ -49,7 +49,7 @@ app.get('/', (c) =>
     service: 'atrium-codex',
     version: '0.1.0',
     env: c.env.ENV,
-    note: 'x402-payable. See /v1/* endpoints and atrium.fi/docs/codex.',
+    note: 'x402-payable. See /v1/* endpoints and useatrium.me/docs/codex.',
   })
 );
 

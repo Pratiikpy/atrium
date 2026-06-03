@@ -8,7 +8,7 @@ const VALID_CATEGORIES = ['bug', 'ux', 'feature', 'other'] as const;
 /**
  * POST /api/feedback
  *
- * Receives beta tester feedback. Forwards to feedback@atrium.fi via configured
+ * Receives beta tester feedback. Forwards to feedback@useatrium.me via configured
  * email service, or stores for later retrieval.
  *
  * Auth: requires connected wallet (SIWE session) via cookie.

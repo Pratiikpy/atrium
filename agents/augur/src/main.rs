@@ -29,7 +29,7 @@ use strategy::{Bands, Signal};
 #[command(name = "augur", about = "Atrium mean-reversion reference agent")]
 struct Args {
     /// Codex API base URL
-    #[arg(long, env = "CODEX_URL", default_value = "https://codex.atrium.fi")]
+    #[arg(long, env = "CODEX_URL", default_value = "https://codex.useatrium.me")]
     codex_url: String,
 
     /// Instrument id (keccak256 of the symbol)

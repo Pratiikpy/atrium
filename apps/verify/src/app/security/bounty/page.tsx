@@ -27,9 +27,9 @@ export default function BountyPage() {
                 <li>Aqueduct, Postern, Portico, Edict, Praetor</li>
               </ul>
             </li>
-            <li>Verify-app at <code className="font-mono text-ink">verify.atrium.fi</code></li>
-            <li>Codex API at <code className="font-mono text-ink">codex.atrium.fi</code></li>
-            <li>Tablet API at <code className="font-mono text-ink">tablet.atrium.fi</code> (when behind auth)</li>
+            <li>Verify-app at <code className="font-mono text-ink">verify.useatrium.me</code></li>
+            <li>Codex API at <code className="font-mono text-ink">codex.useatrium.me</code></li>
+            <li>Tablet API at <code className="font-mono text-ink">tablet.useatrium.me</code> (when behind auth)</li>
           </ul>
         </section>
 
@@ -96,7 +96,7 @@ export default function BountyPage() {
           <h2 className="font-display text-2xl text-ink">Disclosure process</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li><strong>90-day responsible disclosure window.</strong></li>
-            <li>Report to <a href="mailto:security@atrium.fi" className="underline">security@atrium.fi</a>.</li>
+            <li>Report to <a href="mailto:security@useatrium.me" className="underline">security@useatrium.me</a>.</li>
             <li>PGP encryption optional. See <code className="font-mono text-ink">runbooks/pgp-key-generation.md</code>.</li>
             <li>We acknowledge within 48 hours. Critical issues triaged same-day.</li>
             <li>Do not publicly disclose until the 90-day window expires or we publish a fix.</li>

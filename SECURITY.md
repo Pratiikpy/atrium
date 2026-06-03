@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **security@atrium.fi** with a description and reproduction steps.
+Email **security@useatrium.me** with a description and reproduction steps.
 
 - PGP encryption optional. See `runbooks/pgp-key-generation.md` for the public key (placeholder until Phase 7 publishes).
 - Best-effort 48-hour acknowledgment. Critical issues triaged same-day.
@@ -12,7 +12,7 @@ Email **security@atrium.fi** with a description and reproduction steps.
 
 Full scope, severity matrix, and reward tiers are documented at:
 
-**[/security/bounty](https://verify.atrium.fi/security/bounty)**: the single source of truth.
+**[/security/bounty](https://verify.useatrium.me/security/bounty)**: the single source of truth.
 
 Summary: Critical $5–25K, High $1–5K, Medium $250–1K, Low/Info swag + hall-of-fame.
 
@@ -22,7 +22,7 @@ Funded from Praetor treasury post-mainnet. During testnet: best-effort by foundi
 
 Researchers who responsibly disclose are credited at:
 
-**[/security/hall-of-fame](https://verify.atrium.fi/security/hall-of-fame)**
+**[/security/hall-of-fame](https://verify.useatrium.me/security/hall-of-fame)**
 
 (None yet, repo is pre-launch.)
 
@@ -33,9 +33,9 @@ In scope:
 - All contracts under `contracts/`
 - All services under `services/`
 - The subgraph and indexer
-- The Verifier Mode frontend (verify.atrium.fi)
-- Codex API (codex.atrium.fi)
-- Tablet API (tablet.atrium.fi)
+- The Verifier Mode frontend (verify.useatrium.me)
+- Codex API (codex.useatrium.me)
+- Tablet API (tablet.useatrium.me)
 - The reference agents
 
 Out of scope:

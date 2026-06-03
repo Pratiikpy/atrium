@@ -23,14 +23,14 @@ The `CODEX_PAY_TO_ADDRESS` is the on-chain address that receives x402 USDC payme
      --project atrium --config prod --group codex
    ```
 3. Redeploy the service (Vercel auto-deploys on env change if configured)
-4. Verify: `curl -I https://codex.atrium.fi/health` should return 200
+4. Verify: `curl -I https://codex.useatrium.me/health` should return 200
 5. Old address continues receiving in-flight payments for up to 5 minutes (payment TTL)
 
 ### Verification
 
 ```bash
 # Check the service starts correctly
-curl https://codex.atrium.fi/health
+curl https://codex.useatrium.me/health
 
 # If CODEX_PAY_TO_ADDRESS is unset, the service refuses to start
 # and logs: "[codex] FATAL: CODEX_PAY_TO_ADDRESS is not configured"

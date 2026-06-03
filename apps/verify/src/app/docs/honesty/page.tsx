@@ -208,7 +208,7 @@ export default function HonestyPage() {
           Source of truth for this page is the `tripwires/` directory + `human_left.md`. Every item
           above maps to a dated tripwire file that lives in the repo. If something on the live
           product contradicts a disclosure here, that is a bug. Email
-          <a className="ml-1 text-ink hover:underline" href="mailto:security@atrium.fi">security@atrium.fi</a>.
+          <a className="ml-1 text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>.
         </p>
       </footer>
       </div>

@@ -99,11 +99,11 @@ describe('POST /api/settings/connected-sites, host validation (LL-6)', () => {
 describe('GET / POST / DELETE state machine', () => {
   it('GET returns the registered session with source:postern after POST', async () => {
     const route = await import('./route');
-    await route.POST(makeRequest('POST', '', { host: 'app.atrium.fi' }));
+    await route.POST(makeRequest('POST', '', { host: 'app.useatrium.me' }));
     const json = await (await route.GET(makeRequest('GET', ''))).json();
     expect(json.source).toBe('postern');
     expect(json.sites).toHaveLength(1);
-    expect(json.sites[0].host).toBe('app.atrium.fi');
+    expect(json.sites[0].host).toBe('app.useatrium.me');
     // lastUsedAgo formatting is "now" / "X min ago" / "X hour ago".
     expect(typeof json.sites[0].lastUsedAgo).toBe('string');
   });

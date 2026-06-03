@@ -35,7 +35,7 @@ export interface Alert {
   user?: string;        // wallet address if user-specific
   title: string;        // short headline
   body: string;         // markdown body
-  link?: string;        // arbiscan / verify.atrium.fi URL
+  link?: string;        // arbiscan / verify.useatrium.me URL
   blockNumber?: number;
   timestamp: number;    // unix seconds
   txHash?: string;

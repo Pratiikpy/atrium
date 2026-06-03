@@ -102,7 +102,7 @@ MIT for Atrium code, see [`LICENSE`](./LICENSE). Dependencies under `resources/`
 
 ## Security
 
-See [`SECURITY.md`](./SECURITY.md). Disclose vulnerabilities to `security@atrium.fi` with PGP encryption when handling sensitive payloads.
+See [`SECURITY.md`](./SECURITY.md). Disclose vulnerabilities to `security@useatrium.me` with PGP encryption when handling sensitive payloads.
 
 ## Contributing
 

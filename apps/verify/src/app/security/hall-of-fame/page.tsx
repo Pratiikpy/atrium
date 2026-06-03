@@ -22,7 +22,7 @@ export default function HallOfFamePage() {
           <p className="text-muted">No disclosures published yet.</p>
           <p className="mt-2 text-sm text-muted">
             Found something? Report to{' '}
-            <a href="mailto:security@atrium.fi" className="underline">security@atrium.fi</a>.
+            <a href="mailto:security@useatrium.me" className="underline">security@useatrium.me</a>.
             See <Link href="/security/bounty" className="underline">bounty scope</Link>.
           </p>
         </div>
