@@ -19,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: upptime/uptime-monitor@75b0413ab8fd16c2c9be1048818805d67f53ac2f # v1.38.0
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: upptime/uptime-monitor@87ea79aa239b84db029f957d9cb43646474673ff # v1.42.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       # Discord notification on failure
       - name: Notify Discord on failure
         if: failure()
-        uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9 # v0.3.2
+        uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554 # v0.4.0
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
         with:
