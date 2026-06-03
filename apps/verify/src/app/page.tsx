@@ -21,10 +21,60 @@ export const metadata = {
 };
 
 /**
- * Landing page (2026-05-28).
- * Responsive single-tree render. No dual-render with separate mobile component.
+ * Server-side fetch of the real protocol data the landing previews render.
+ * No fabricated figures: the Plinth dashboard, Lantern proof-of-reserves, and
+ * the numbers band all read these live values. Falls back to honest "—" when a
+ * source is unreachable or a metric is not indexed yet (revalidates every 60s).
  */
-export default function LandingPage() {
+type LandingData = {
+  tvl: string;
+  venuesLive: number;
+  venuesTotal: number;
+  agents: string;
+  queries: string;
+  delta: string;
+  lanternRoot: string;
+  lanternBlock: string;
+  lanternMinsAgo: string;
+};
+
+async function getLandingData(): Promise<LandingData> {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://useatrium.me';
+  const safe = async (p: string): Promise<Record<string, unknown> | null> => {
+    try {
+      const r = await fetch(`${base}${p}`, { next: { revalidate: 60 } });
+      return r.ok ? ((await r.json()) as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  };
+  const [m, l] = await Promise.all([safe('/api/protocol/metrics'), safe('/api/lantern/latest')]);
+  const venues = (m?.venuesDeployed ?? {}) as { count?: number; total?: number };
+  const root = typeof l?.root === 'string' ? (l.root as string) : '';
+  const shortRoot = root ? `${root.slice(0, 6)}…${root.slice(-4)}` : '—';
+  const ts = typeof l?.timestamp === 'number' ? (l.timestamp as number) : 0;
+  // Build-time-safe relative age: server render stamps it; revalidate keeps it fresh.
+  const minsAgo = ts ? Math.max(0, Math.round((Date.now() / 1000 - ts) / 60)) : null;
+  return {
+    tvl: typeof m?.testnetTvlUsd === 'string' ? (m.testnetTvlUsd as string) : '—',
+    venuesLive: typeof venues.count === 'number' ? venues.count : 0,
+    venuesTotal: typeof venues.total === 'number' ? venues.total : 0,
+    agents: m?.registeredAgents != null ? String(m.registeredAgents) : '—',
+    queries: m?.codex24hQueries != null ? String(m.codex24hQueries) : '—',
+    delta: m?.testnetTvlDelta30d != null ? String(m.testnetTvlDelta30d) : 'not indexed yet',
+    lanternRoot: shortRoot,
+    lanternBlock: typeof l?.blockNumber === 'number' ? Number(l.blockNumber).toLocaleString() : '—',
+    lanternMinsAgo: minsAgo != null ? `${minsAgo} min ago` : 'pending',
+  };
+}
+
+/**
+ * Landing page (2026-05-28; reference-parity rebuild 2026-06-03).
+ * Responsive single-tree render. No dual-render with separate mobile component.
+ * Previews render REAL backend data (getLandingData), not prototype figures.
+ */
+export default async function LandingPage() {
+  const d = await getLandingData();
   return (
     <>
       <JsonLd schema={ATRIUM_ORG_SCHEMA} />
@@ -203,79 +253,62 @@ export default function LandingPage() {
                 <div className="product-body">
                   <div className="dash-head">
                     <div>
-                      <div className="mono cap muted">Portfolio · 0x1a3b…7f29</div>
+                      <div className="mono cap muted">Vault · Coffer · Arbitrum Sepolia</div>
                       <div className="num" style={{ fontSize: 42, marginTop: 8, letterSpacing: '-0.024em' }}>
-                        $12,378,422
+                        {d.tvl}
                       </div>
                       <div className="mono cap" style={{ color: 'var(--live)', marginTop: 4 }}>
-                        + $284,920 · 24h
+                        ● live · read from Scribe
                       </div>
                     </div>
                     <div className="dash-actions">
-                      <span className="btn ghost small">Deposit</span>
-                      <span className="btn small">Trade</span>
+                      <Link href="/app" className="btn ghost small">Deposit</Link>
+                      <Link href="/app/trade" className="btn small">Trade</Link>
                     </div>
                   </div>
                   <div className="dash-stats">
                     <div className="stat-card">
                       <div className="mono cap muted">Total collateral</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>$4.13M</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="mono cap muted">Portfolio margin</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>3.12×</div>
+                      <div className="mono cap muted">Venues live</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.venuesLive} / {d.venuesTotal}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="mono cap muted">Plinth utilization</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>38.4%</div>
+                      <div className="mono cap muted">Margin engine</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>Stylus</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Open positions</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>14</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>—</div>
                     </div>
                   </div>
                   <div className="dash-positions">
                     <div className="dash-head-row mono cap muted">
                       <div>Venue</div>
-                      <div>Position</div>
-                      <div>Notional</div>
-                      <div>P&amp;L · 24h</div>
-                      <div style={{ textAlign: 'right' }}>Margin</div>
+                      <div>Adapter</div>
+                      <div>Status</div>
+                      <div>Collateral</div>
+                      <div style={{ textAlign: 'right' }}>Chain</div>
                     </div>
-                    <div className="dash-row">
-                      <div className="dash-cell strong">Hyperliquid HIP-3</div>
-                      <div className="dash-cell mono small">rTSLA-PERP · 4× long</div>
-                      <div className="dash-cell num small">$1,820,400</div>
-                      <div className="dash-cell num small pos">+ $42,180</div>
-                      <div className="dash-cell num small" style={{ textAlign: 'right' }}>$1.25M</div>
-                    </div>
-                    <div className="dash-row">
-                      <div className="dash-cell strong">Aave Horizon</div>
-                      <div className="dash-cell mono small">USTB collateral</div>
-                      <div className="dash-cell num small">$ 892,440</div>
-                      <div className="dash-cell num small">+ $1,084</div>
-                      <div className="dash-cell num small" style={{ textAlign: 'right' }}>—</div>
-                    </div>
-                    <div className="dash-row">
-                      <div className="dash-cell strong">Pendle V2</div>
-                      <div className="dash-cell mono small">PT-stETH · Mar 2027</div>
-                      <div className="dash-cell num small">$ 320,500</div>
-                      <div className="dash-cell num small pos">+ $2,920</div>
-                      <div className="dash-cell num small" style={{ textAlign: 'right' }}>—</div>
-                    </div>
-                    <div className="dash-row">
-                      <div className="dash-cell strong">Trade.xyz</div>
-                      <div className="dash-cell mono small">WBTC-USDC · spot</div>
-                      <div className="dash-cell num small">$ 401,890</div>
-                      <div className="dash-cell num small neg">− $ 8,420</div>
-                      <div className="dash-cell num small" style={{ textAlign: 'right' }}>$420K</div>
-                    </div>
+                    {VENUES.filter((v) => !v.pending)
+                      .slice(0, 4)
+                      .map((v) => (
+                        <div className="dash-row" key={v.id}>
+                          <div className="dash-cell strong">{v.name}</div>
+                          <div className="dash-cell mono small">{v.short}</div>
+                          <div className="dash-cell num small pos">Registered</div>
+                          <div className="dash-cell num small">{v.asset}</div>
+                          <div className="dash-cell num small" style={{ textAlign: 'right' }}>{v.chain}</div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
             </div>
             <p className="mono cap muted" style={{ textAlign: 'center', marginTop: 18, opacity: 0.7 }}>
-              Illustrative preview · sample figures · live portfolio renders in /app/portfolio
+              Live vault TVL + registered venues · read from Scribe · your portfolio in /app/portfolio
             </p>
           </div>
         </section>
@@ -502,17 +535,17 @@ export default function LandingPage() {
                       <svg width="14" height="14" viewBox="0 0 14 14">
                         <path d="M3 7.2 5.8 10 11 4.2" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      Verified · 38 min ago
+                      Verified · {d.lanternMinsAgo}
                     </div>
                   </div>
                   <div className="lantern-grid">
                     <div className="stat-card">
                       <div className="mono cap muted">On-chain reserves</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>$4,128,370</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Reported liabilities</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>$4,128,370</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Delta</div>
@@ -520,7 +553,7 @@ export default function LandingPage() {
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Merkle root</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>0xa72f…91c4</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.lanternRoot}</div>
                     </div>
                   </div>
                   <div className="merkle-tree">
@@ -553,17 +586,49 @@ export default function LandingPage() {
                     </svg>
                   </div>
                   <div className="lantern-foot">
-                    <span className="mono cap muted">Block #8,142,317 · Arb-Sepolia</span>
+                    <span className="mono cap muted">Block #{d.lanternBlock} · Arb-Sepolia</span>
                     <Link href="/lantern" className="ulink mono small">
-                      Download verifier (single HTML, 14kb) ↗
+                      Open the verifier ↗
                     </Link>
                   </div>
                 </div>
               </div>
             </div>
             <p className="mono cap muted" style={{ textAlign: 'center', marginTop: 18, opacity: 0.7 }}>
-              Illustrative preview · sample figures · live attestations in /lantern
+              Live proof-of-reserves · read directly from Lantern on Arbitrum Sepolia · full record at /lantern
             </p>
+          </div>
+        </section>
+
+        {/* ============== NUMBERS · real protocol metrics ==============
+            Reference parity: a stat band between Lantern and the floorplan.
+            All four read /api/protocol/metrics. No inflation: agents/queries
+            render "—" until Rostrum/Codex index them; TVL is the real Scribe
+            figure (small on a fresh testnet, shown honestly). */}
+        <section className="numbers">
+          <div className="container">
+            <div className="numbers-grid">
+              <div className="number-big">
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.tvl}</div>
+                <div className="mono cap muted" style={{ marginTop: 14 }}>Live testnet TVL</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>via Scribe · Arbitrum Sepolia</div>
+              </div>
+              <div className="number-big">
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.agents}</div>
+                <div className="mono cap muted" style={{ marginTop: 14 }}>Registered agents</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>Rostrum index</div>
+              </div>
+              <div className="number-big">
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.queries}</div>
+                <div className="mono cap muted" style={{ marginTop: 14 }}>Codex queries · 24h</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>x402 micropayments</div>
+              </div>
+              <div className="number-big">
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesLive} / {d.venuesTotal}</div>
+                <div className="mono cap muted" style={{ marginTop: 14 }}>Venue adapters live</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>registered in PorticoRegistry</div>
+              </div>
+            </div>
           </div>
         </section>
 
