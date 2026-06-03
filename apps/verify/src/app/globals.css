@@ -1296,3 +1296,42 @@ input[type="range"] { cursor: ew-resize; }
   .dash-head-row, .dash-row { grid-template-columns: 130px 150px 110px 110px 90px; min-width: 590px; }
   .product-body { padding: 18px; }
 }
+
+/* ============================================================
+ * Landing: architecture / cohort / closing — reference parity
+ * (design/Atriumnew.html, 2026-06-03).
+ * ============================================================ */
+.architecture { padding: var(--section-pad) 0; border-top: 1px solid var(--hairline); }
+.arch-stack { margin-top: 64px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-raised); overflow: hidden; }
+.arch-row { display: grid; grid-template-columns: 80px 220px minmax(0,1fr) 180px; align-items: center; gap: 28px; padding: 22px 28px; border-bottom: 1px solid var(--hairline); }
+.arch-row:last-child { border-bottom: none; }
+.arch-num { color: var(--muted); }
+.arch-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.arch-chip { padding: 5px 11px; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-soft); }
+.arch-side { text-align: right; color: var(--muted); }
+
+.cohort { padding: var(--section-pad) 0; border-top: 1px solid var(--hairline); background: var(--bg-sunk); }
+.cohort-head { text-align: center; max-width: 760px; margin: 0 auto; }
+.cohort-title { font-family: var(--sans); font-weight: 400; font-size: clamp(20px,1.8vw,26px); line-height: 1.4; letter-spacing: -0.012em; margin: 14px 0 0; color: var(--ink-soft); }
+.cohort-logos { margin-top: 48px; display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.cohort-logo { padding: 28px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--ink-soft); border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); transition: color 200ms ease, background 200ms ease; text-align: center; }
+.cohort-logo:hover { color: var(--ink); background: var(--bg); }
+.cohort-logo:nth-child(4n) { border-right: none; }
+.cohort-logo:nth-child(n+5) { border-bottom: none; }
+
+.closing { padding: clamp(120px,14vw,180px) 0; background: var(--dark-bg); color: var(--dark-ink); text-align: center; }
+.closing .eyebrow { display: inline-block; }
+.closing-title { font-family: var(--sans); font-weight: 500; font-size: clamp(48px,7vw,88px); line-height: 1.04; letter-spacing: -0.03em; margin: 24px auto 0; max-width: 18ch; color: var(--dark-ink); }
+.closing-sub { font-size: clamp(16px,1.2vw,19px); line-height: 1.55; max-width: 560px; margin: 28px auto 0; color: var(--dark-soft); text-wrap: pretty; }
+.closing-cta { margin-top: 40px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+@media (max-width: 920px) {
+  .arch-row { grid-template-columns: 60px 1fr; gap: 10px 16px; }
+  .arch-row > .arch-items { grid-column: 1 / -1; }
+  .arch-row > .arch-side { grid-column: 1 / -1; text-align: left; }
+  .cohort-logos { grid-template-columns: repeat(2,1fr); }
+  .cohort-logo:nth-child(4n) { border-right: 1px solid var(--hairline); }
+  .cohort-logo:nth-child(2n) { border-right: none; }
+  .cohort-logo:nth-child(n+5) { border-bottom: 1px solid var(--hairline); }
+  .cohort-logo:nth-child(n+7) { border-bottom: none; }
+}

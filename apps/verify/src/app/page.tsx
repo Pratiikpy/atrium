@@ -3,9 +3,9 @@ import { PublicNav } from '@/components/atrium/PublicNav';
 import { Footer } from '@/components/atrium/Footer';
 import { BlueprintGrid, Vignette } from '@/components/atrium/HeroChrome';
 import { Impluvium } from '@/components/atrium/Impluvium';
-import { Card, SectionHead, Tag } from '@/components/atrium/primitives';
+import { SectionHead, Tag } from '@/components/atrium/primitives';
 import { FloorPlanSection } from '@/components/atrium/landing/FloorPlan';
-import { VENUES, SUBSYSTEMS, TECHNOLOGY_STACK } from '@/lib/atrium/static';
+import { VENUES, SUBSYSTEMS } from '@/lib/atrium/static';
 import { JsonLd, ATRIUM_ORG_SCHEMA, ATRIUM_APP_SCHEMA } from '@/components/json-ld';
 
 export const metadata = {
@@ -127,93 +127,6 @@ export default async function LandingPage() {
                 <span><span className="td" />ERC-8004</span>
                 <span><span className="td" />ERC-4337 · 7702</span>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============== ONE PARAGRAPH PITCH ============== */}
-        <section className="section">
-          <div className="container">
-            <SectionHead
-              num="I"
-              title={<>The pitch, in one paragraph.</>}
-              sub="A trader who only uses one venue does not need Atrium. The pitch only makes sense if you trade across two or more."
-            />
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <div className="cap">Without Atrium</div>
-                <p className="mt-3 text-[15px] leading-[1.65] text-[var(--ink-soft)]">
-                  Post collateral on Hyperliquid for your perp. Post collateral on Aave for
-                  your lending. Post collateral on Pendle for your yield. The venues don&apos;t
-                  know about each other. Every one demands full margin. Your money is
-                  split across four sandboxes. If one congests, you withdraw, bridge, and
-                  redeposit by hand.
-                </p>
-              </Card>
-              <Card>
-                <div className="cap">With Atrium</div>
-                <p className="mt-3 text-[15px] leading-[1.65] text-[var(--ink-soft)]">
-                  Deposit USDC once. Open positions across the same venues. Plinth sees
-                  the whole portfolio at once and nets the hedge. Collateral that would
-                  have been double-locked is free to back a third trade. If a venue
-                  fails, your money stays in the vault. One dashboard.
-                </p>
-              </Card>
-            </div>
-            <p className="mt-10 text-center text-[clamp(24px,3vw,40px)] font-medium leading-tight tracking-[-0.018em] text-[var(--ink)]">
-              Less capital locked. Risks made visible.
-            </p>
-          </div>
-        </section>
-
-        {/* ============== VENUES ============== */}
-        <section className="section" id="portfolio">
-          <div className="container">
-            {/* Audit fix (#69): the live count is derived from VENUES so the
-                copy can never drift from the per-card Registered/Pending tags. */}
-            <SectionHead
-              num="II"
-              title={<>Eight venues. One margin engine.</>}
-              sub={`${VENUES.filter((v) => !v.pending).length} adapters registered in PorticoRegistry on Arbitrum Sepolia testnet. RH-Chain ships within 14 days of the Robinhood SDK going public.`}
-            />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {VENUES.map((v) => (
-                <Card key={v.id} dense className="flex flex-col gap-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="text-[14px] font-medium text-[var(--ink)]">
-                        {v.name}
-                      </div>
-                      <div className="mono mt-1 text-[10.5px] uppercase tracking-[0.1em] text-[var(--muted)]">
-                        {v.short}
-                      </div>
-                    </div>
-                    {/* Audit honesty fix (#11/#13): tag was "Live" on every
-                        venue, and the footer rendered a fabricated "Test
-                        collateral" dollar figure from static.ts under it -
-                        contradicting the honesty page's promise to render "-"
-                        for anything not from a live read. The adapters ARE
-                        registered in PorticoRegistry, so "Registered" is the
-                        honest tag; and we show the real collateral-asset types
-                        (a factual venue attribute) instead of a fake TVL. */}
-                    {v.pending ? <Tag variant="amber">Pending</Tag> : <Tag variant="green">Registered</Tag>}
-                  </div>
-                  <div className="text-[13px] text-[var(--ink-soft)]">{v.type}</div>
-                  <div className="hairline" />
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <div className="cap">Collateral asset</div>
-                      <div className="mono mt-1 text-[12px] font-medium text-[var(--ink)]">
-                        {v.asset}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="cap">Chain</div>
-                      <div className="mono mt-1 text-[11px] text-[var(--ink-soft)]">{v.chain}</div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
             </div>
           </div>
         </section>
@@ -666,96 +579,96 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ============== AGENTS ============== */}
-        <section
-          className="section"
-          id="agents"
-          style={{ background: 'var(--dark-bg)', color: 'var(--dark-ink)' }}
-        >
+        {/* ============== ARCHITECTURE (reference parity) ============== */}
+        <section id="architecture" className="architecture">
           <div className="container">
-            {/* Bug-hunt fix (Redmi 360px sweep 2026-06-02): without an explicit
-                grid-cols-1 the mobile fallback column is content-sized (auto), so
-                the large clamp() headline did not shrink and the Sigil section
-                overflowed the viewport by ~46px at 360px. grid-cols-1 uses
-                minmax(0,1fr) so the column shrinks and the headline wraps. */}
-            <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[1fr_360px] md:gap-16">
-              <div>
-                <div className="mono mb-6 text-[11px] uppercase tracking-[0.18em] text-[color:color-mix(in_oklch,var(--dark-ink)_60%,transparent)]">
-                  Sigil · agent credit
-                </div>
-                <h2 className="text-[clamp(32px,4.4vw,56px)] font-medium leading-[1.06] tracking-[-0.025em]">
-                  Hand a fixed budget to an AI agent.
-                  <br />
-                  <span style={{ color: 'color-mix(in oklch, var(--dark-ink) 70%, transparent)' }}>
-                    Pull the plug on every agent <span className="text-accent">in the hand</span>.
-                  </span>
-                </h2>
-                <p className="mt-5 max-w-xl text-[15px] leading-[1.6]" style={{ color: 'color-mix(in oklch, var(--dark-ink) 75%, transparent)' }}>
-                  Sigil writes EIP-712 mandates over ERC-8004: per-action cap, daily-loss
-                  cap, venue allowlist, expiry. The kill switch revokes every mandate and
-                  cancels every active session key for your wallet in one signature.
-                </p>
-                {/* Bug-hunt fix (Redmi 360px sweep 2026-06-02): the two CTAs sat
-                    in a non-wrapping flex row, so "Read the spec" overflowed the
-                    viewport on a 360px phone. flex-wrap lets them stack when they
-                    don't fit. */}
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/app" className="btn light">Open the marketplace</Link>
-                  <Link href="/docs" className="btn ghost-light">Read the spec →</Link>
-                </div>
-              </div>
-              <div className="rounded-[16px] border p-6"
-                style={{
-                  borderColor: 'color-mix(in oklch, var(--dark-ink) 14%, transparent)',
-                  background: 'color-mix(in oklch, var(--dark-ink) 4%, transparent)',
-                }}>
-                <div className="mono text-[10.5px] uppercase tracking-[0.14em]"
-                  style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>
-                  Mandate preview
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-[13px]">
-                  <div style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>Agent</div>
-                  <div className="mono">augur.atrium.eth</div>
-                  <div style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>Per action</div>
-                  <div className="mono">12 USDC</div>
-                  <div style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>Daily loss</div>
-                  <div className="mono">25 USDC</div>
-                  <div style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>Expiry</div>
-                  <div className="mono">7d</div>
-                  <div style={{ color: 'color-mix(in oklch, var(--dark-ink) 55%, transparent)' }}>Intent</div>
-                  <div className="mono">0xeb14…77c1</div>
-                </div>
-              </div>
+            <div className="section-head centered">
+              <div className="eyebrow mono cap">Architecture</div>
+              <h2 className="h2">
+                Stylus for hot math. <span className="accent-grad">Solidity</span> for the venue layer.
+              </h2>
+              <p className="section-sub">
+                Risk math lives in Rust, deployed as Stylus. The venue layer lives in
+                Solidity, on OpenZeppelin patterns. Chainlink CCIP is the messaging bus
+                between chains.
+              </p>
             </div>
-          </div>
-        </section>
-
-        {/* ============== TRUST STRIP ============== */}
-        <section className="border-y border-[var(--hairline)]">
-          <div className="container py-10">
-            <div className="cap mb-5 text-center">Building on</div>
-            <div className="mono flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[12.5px] text-[var(--ink-soft)]">
-              {TECHNOLOGY_STACK.map((t) => (
-                <span key={t}>{t}</span>
+            <div className="arch-stack">
+              {[
+                { num: 'L01', name: 'Postern', sub: 'User entry · wallet abstraction', chips: ['Passkey login', 'Gas sponsorship', 'Session keys', 'Social recovery'], side: 'PWA · Next.js' },
+                { num: 'L02', name: 'Backend services', sub: 'Off-chain orchestration', chips: ['Tablet · tax', 'Codex · x402', 'Aqueduct coordinator', 'Rostrum copy-trade'], side: 'Single region · EU' },
+                { num: 'L03', name: 'Stylus', sub: 'Rust → WASM · hot math', chips: ['Plinth · margin', 'Vigil · liquidations', 'Stoa · options'], side: 'Robinhood · Arbitrum Sepolia' },
+                { num: 'L04', name: 'Solidity', sub: 'Venue + vault layer', chips: ['Portico v1.0.0', '8 P1 adapters', 'Coffer · ERC-4626', 'Sigil · ERC-8004'], side: 'OpenZeppelin' },
+                { num: 'L05', name: 'Oracles + data', sub: 'Free testnet feeds', chips: ['Data Streams', 'Price Feeds', 'CCIP testnet', 'RedStone', 'Scribe'], side: 'Chainlink · The Graph' },
+              ].map((l) => (
+                <div className="arch-row" key={l.num}>
+                  <div className="arch-num mono cap">{l.num}</div>
+                  <div>
+                    <div className="strong" style={{ fontSize: 18, letterSpacing: '-0.005em' }}>{l.name}</div>
+                    <div className="mono cap muted" style={{ marginTop: 4 }}>{l.sub}</div>
+                  </div>
+                  <div className="arch-items">
+                    {l.chips.map((c) => (
+                      <span className="arch-chip mono" key={c}>{c}</span>
+                    ))}
+                  </div>
+                  <div className="mono cap arch-side">{l.side}</div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ============== FINAL CTA ============== */}
-        <section className="section" style={{ background: 'var(--dark-bg)' }}>
-          <div className="container text-center" style={{ color: 'var(--dark-ink)' }}>
-            <h2 className="mx-auto max-w-3xl text-[clamp(36px,5vw,72px)] font-medium leading-[1.04] tracking-[-0.028em]">
-              <span className="text-accent">Less capital locked.</span>
-              <br />
-              Risks made visible.
-            </h2>
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
-              <Link href="/app" className="btn light lg">Open testnet ↗</Link>
-              <Link href="/verify/1" className="btn ghost-light lg">See how it works</Link>
+        {/* ============== COHORT · Built with ==============
+            Honest reframing of the reference's partner wall: these are the real
+            venues + infrastructure Atrium integrates (adapters deployed; built
+            on these rails), not claimed business partnerships. Red-line rule:
+            never invent a partner. */}
+        <section id="network" className="cohort">
+          <div className="container">
+            <div className="cohort-head">
+              <div className="eyebrow mono cap">Built with</div>
+              <h3 className="cohort-title">
+                The venues and infrastructure rails Atrium integrates across Arbitrum
+                Sepolia and Robinhood Chain testnet.
+              </h3>
             </div>
-            <div className="mono mt-8 text-[11px] uppercase tracking-[0.14em]"
-              style={{ color: 'color-mix(in oklch, var(--dark-ink) 50%, transparent)' }}>
+            <div className="cohort-logos">
+              {['Arbitrum', 'Chainlink CCIP', 'Circle USDC', 'The Graph', 'Hyperliquid', 'Aave', 'Pendle', 'GMX'].map(
+                (name) => (
+                  <div className="cohort-logo" key={name}>
+                    <span className="serif-i">{name}</span>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ============== CLOSING (reference parity) ============== */}
+        <section id="open" className="closing">
+          <div className="container">
+            <div className="eyebrow mono cap" style={{ color: 'color-mix(in oklch, white 55%, transparent)' }}>
+              Testnet · now open
+            </div>
+            <h2 className="closing-title">
+              Step inside.
+              <br />
+              <span style={{ color: 'color-mix(in oklch, white 55%, transparent)' }}>The testnet is open.</span>
+            </h2>
+            <p className="closing-sub">
+              The faucet drops 5 test USDC and 0.0005 test ETH. Onboard with a passkey,
+              then post collateral and trade across venues with one margin number.
+            </p>
+            <div className="closing-cta">
+              <Link href="/app" className="btn light">
+                Open testnet <span className="arrow">↗</span>
+              </Link>
+              <Link href="/verify/1" className="btn ghost-light">
+                See how it works
+              </Link>
+            </div>
+            <div className="mono cap" style={{ marginTop: 28, color: 'color-mix(in oklch, white 45%, transparent)' }}>
               Testnet only · not investment advice
             </div>
           </div>
