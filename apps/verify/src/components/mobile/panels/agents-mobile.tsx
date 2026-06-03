@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { NewMandateButton } from '@/components/agents/new-mandate-button';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 /**
  * AgentsMobile  the Agents panel for /app/agents at < md.
@@ -36,12 +36,17 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export function AgentsMobile() {
-  const { isConnected } = useAccount();
+  // Use-everything audit fix (2026-06-03): this fetched '/api/agents/my-mandates'
+  // with NO ?wallet=, so the route fell back to DEMO_WALLET and requireWalletMatch
+  // returned 403 for a real connected (non-demo) wallet -> the user's live mandate
+  // never rendered ('0 active' + 'No active mandate' even when one existed on chain).
+  // Scope the fetch to the SIWE-authed wallet like the desktop My-mandates panel.
+  const wallet = useScopedWallet();
   const mandates = useQuery({
-    queryKey: ['mobile-mandates'],
-    queryFn: () => fetchJSON<{ mandates: Mandate[]; source: string }>('/api/agents/my-mandates'),
+    queryKey: ['mobile-mandates', wallet],
+    queryFn: () => fetchJSON<{ mandates: Mandate[]; source: string }>(walletQuery('/api/agents/my-mandates', wallet)),
     refetchInterval: 60_000,
-    enabled: isConnected, // my-mandates is wallet-scoped; disconnected -> no 401
+    enabled: wallet != null, // wallet-scoped + SIWE-gated; no 401/403
   });
   const board = useQuery({
     queryKey: ['mobile-rostrum'],

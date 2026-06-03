@@ -16,6 +16,12 @@ interface RunState {
   status: 'idle' | 'connecting' | 'pending' | 'success' | 'error';
   txHash?: string;
   errorMessage?: string;
+  // Use-everything audit fix (2026-06-03): some steps succeed WITHOUT a tx hash
+  // (Chaos inject returns a recovery time; Lantern inclusion returns a proof
+  // result). The success UI used to render ONLY an Arbiscan link, so those steps
+  // showed nothing on success and looked like dead buttons. successNote carries
+  // a human result so every success is visible, with the tx link when there is one.
+  successNote?: string;
 }
 
 /**
@@ -92,7 +98,10 @@ export function VerifierStepRunner({ step }: { step: number }) {
       setRun({ status: 'pending' });
     } else if (s.kind === 'success') {
       if (s.result.ok) {
-        setRun({ status: 'success' });
+        setRun({
+          status: 'success',
+          successNote: 'Verified: your wallet is included in the latest Lantern attestation tree, and the published tree hashes to the on-chain attested root.',
+        });
       } else {
         setRun({
           status: 'error',
@@ -111,7 +120,13 @@ export function VerifierStepRunner({ step }: { step: number }) {
     if (s.kind === 'submitting') {
       setRun({ status: 'pending' });
     } else if (s.kind === 'success') {
-      setRun({ status: 'success' });
+      setRun({
+        status: 'success',
+        successNote:
+          s.recoveredInMs != null
+            ? `Fault "${s.fault}" injected; the system detected it and recovered in ${s.recoveredInMs}ms via the graceful-degradation path.`
+            : `Fault "${s.fault}" injected; the graceful-degradation path engaged.`,
+      });
     } else if (s.kind === 'error') {
       setRun({ status: 'error', errorMessage: s.reason });
     }
@@ -248,22 +263,31 @@ export function VerifierStepRunner({ step }: { step: number }) {
       </button>
 
       {/* Audit QQ-1 + SS-1 fix: shared arbiscanTxUrl helper regex-gates the
-          hash + builds the URL. Failed-regex returns null so we fall through
-          to no link displayed, matches "no fake success states". */}
+          hash + builds the URL (failed-regex returns null, no fake link).
+          Use-everything fix (2026-06-03): always render a visible success
+          confirmation (successNote, or a generic line) so steps that succeed
+          WITHOUT a tx hash (Chaos, Lantern inclusion) are no longer silent;
+          the Arbiscan link is shown additionally when a real tx hash exists. */}
       {run.status === 'success' && (() => {
         const url = arbiscanTxUrl(run.txHash);
-        return url ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-live hover:underline"
-          >
-            <Check className="size-4" aria-hidden />
-            View on Arbiscan
-            <ExternalLink className="size-3" aria-hidden />
-          </a>
-        ) : null;
+        return (
+          <div className="rounded-md border border-live/40 bg-live/5 p-4">
+            <p className="flex items-center gap-2 text-sm font-medium text-live">
+              <Check className="size-4" aria-hidden /> {run.successNote ?? 'Step completed.'}
+            </p>
+            {url && (
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex items-center gap-2 text-sm text-live hover:underline"
+              >
+                View on Arbiscan
+                <ExternalLink className="size-3" aria-hidden />
+              </a>
+            )}
+          </div>
+        );
       })()}
 
       {run.status === 'error' && (
