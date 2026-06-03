@@ -518,6 +518,22 @@ body {
   animation: shimmer 1.6s linear infinite;
   border-radius: 6px;
 }
+/* Mobile-dark fix (use-everything sweep 2026-06-03): the skeleton shimmer is
+   built from --ink (the light-theme dark ink) at 5-10% opacity. On the mobile
+   OLED canvas (--color-mob-bg, near-black) that is dark-on-dark and renders
+   INVISIBLE, so every mobile panel's loading state looked like a blank black
+   screen (worst on /app/reserves, which loads 4 endpoints over ~2-3s and so
+   showed an empty page the whole time). Re-derive the shimmer from the light
+   mobile ink token inside the dark shell so the loading state is actually seen. */
+.atrium-mobile-only .skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--color-mob-ink) 6%, transparent) 0%,
+    color-mix(in oklch, var(--color-mob-ink) 16%, transparent) 50%,
+    color-mix(in oklch, var(--color-mob-ink) 6%, transparent) 100%
+  );
+  background-size: 200% 100%;
+}
 @keyframes shimmer {
   from { background-position: 200% 0; }
   to   { background-position: -200% 0; }

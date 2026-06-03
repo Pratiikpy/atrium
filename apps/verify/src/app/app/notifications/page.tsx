@@ -16,7 +16,7 @@ export const metadata = {
 export default function NotificationsPage() {
   return (
     <AppShell
-      active="/app/portfolio"
+      active="/app/notifications"
       breadcrumb={[
         { label: 'Notifications' },
       ]}

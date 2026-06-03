@@ -12,7 +12,7 @@ export default function ManifestoPage() {
         <h1 className="font-display text-5xl text-ink">Manifesto</h1>
 
         <p className="text-lg">
-          A trader who is long $3M of perp and long $500K of T-bills is hedged. <em>(Illustrative scenario. See backtest under <code>services/archive/research/</code>.)</em>
+          A trader who is long $3M of perp and long $500K of T-bills is hedged. <em>(Illustrative scenario. See backtest under <code>services/archive/research/</code>.)</em>{' '}
           The risk has been reduced. Most of the collateral they posted to do this
           is just sitting there, locked, doing nothing for them. That is broken.
         </p>

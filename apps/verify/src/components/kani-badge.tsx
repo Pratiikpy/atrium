@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 /**
@@ -19,10 +20,18 @@ interface KaniStatus {
 }
 
 export function KaniBadge() {
+  const pathname = usePathname();
   const [status, setStatus] = useState<KaniStatus | null>(null);
   const [failed, setFailed] = useState(false);
+  // Use-everything sweep (2026-06-03): this fixed bottom-right judge/trust chip
+  // is mounted globally, but inside the authenticated app it floats over in-app
+  // content - on /app + /app/portfolio it overlapped the Emergency-stop safety
+  // card's copy. It is a public, marketing/judge-facing signal, so suppress it
+  // on /app/* where the user is already in-product (avoids covering controls).
+  const inApp = pathname?.startsWith('/app') ?? false;
 
   useEffect(() => {
+    if (inApp) return;
     let cancelled = false;
     fetch('/api/kani/status')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status_${r.status}`))))
@@ -35,7 +44,10 @@ export function KaniBadge() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [inApp]);
+
+  // Suppressed inside the authenticated app (see inApp note above).
+  if (inApp) return null;
 
   // A11Y-07: persistent wrapper ensures aria-live announces state changes
   return (

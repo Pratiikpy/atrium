@@ -12,14 +12,8 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default function SessionKeysPage() {
-  return (
-    <AppShell
-      active="/app/settings"
-      breadcrumb={[
-        { label: 'Settings' },
-        { label: 'Session keys · Postern' },
-      ]}
-    >
+  const content = (
+    <>
       <header>
         <p className="eyebrow">Session keys · Postern</p>
         <h1 className="mt-1 font-display text-4xl italic tracking-tight text-ink">
@@ -33,6 +27,21 @@ export default function SessionKeysPage() {
       </header>
 
       <SessionKeysView />
-    </AppShell>
+    </>
+  );
+  return (
+    <AppShell
+      active="/app/settings"
+      breadcrumb={[
+        { label: 'Settings' },
+        { label: 'Session keys · Postern' },
+      ]}
+      desktop={content}
+      // Theme-bleed fix (use-everything sweep 2026-06-03): no dedicated dark
+      // mobile panel exists for this Postern surface, so on mobile it fell back
+      // to `children` and rendered light cards on the dark OLED shell. Render the
+      // same content on a light parchment sheet so it reads correctly.
+      mobile={<div className="rounded-2xl bg-parchment p-4 text-ink">{content}</div>}
+    />
   );
 }

@@ -184,7 +184,7 @@ export default function BrandPage() {
       {/* ============ IV. COMPONENTS ============ */}
       <Section roman="IV" title="Components">
         <p className="mt-3 max-w-prose text-sm text-ink-soft">
-          A small set of primitives  buttons, pills, tags, numerals. Keep density high, edges
+          A small set of primitives: buttons, pills, tags, numerals. Keep density high, edges
           sharp, and accent use exceptional.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
