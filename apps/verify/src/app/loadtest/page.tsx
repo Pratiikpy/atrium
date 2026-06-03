@@ -2,7 +2,7 @@ import { LoadtestDashboard } from '@/components/loadtest-dashboard';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · loadtest',
+  title: 'Loadtest',
   description: 'Live latency + gas measurements against testnet contracts. P50, P95, P99.',
   // Internal ops surface: keep out of search + link previews (defense in depth
   // beyond the robots.txt disallow, which crawlers may ignore).

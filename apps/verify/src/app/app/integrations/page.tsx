@@ -2,7 +2,7 @@ import { AppShell } from '@/components/app-shell';
 import { IntegrationsView } from '@/components/integrations/integrations-view';
 
 export const metadata = {
-  title: 'Atrium · Integrations',
+  title: 'Integrations',
   description: 'The programmable surfaces of Atrium: the Codex data API, agent delegation, proof of reserves, venue adapters.',
 };
 

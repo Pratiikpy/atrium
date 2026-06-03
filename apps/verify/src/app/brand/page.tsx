@@ -22,7 +22,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
  * from `globals.css`.
  */
 export const metadata = {
-  title: 'Atrium . brand',
+  title: 'Brand',
   description: 'Atrium brand kit. Tokens, typography, palette, logo. Source of truth.',
 };
 
@@ -190,25 +190,25 @@ export default function BrandPage() {
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {/* Buttons */}
           <ComponentCard title="Buttons" cap="Pill . 38px">
-            {/* Brand-kit samples, not real CTAs. type="button" prevents accidental
-                form submission; aria-label names them as examples. */}
+            {/* Brand-kit samples, not real CTAs. Render them as non-interactive
+                specimens so mobile users and QA do not see dead controls. */}
             <div className="flex flex-wrap gap-2.5">
-              <button type="button" aria-label="Primary button sample"
+              <span aria-label="Primary button sample"
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-5 h-[38px] text-sm font-medium text-paper hover:bg-ink/90">
                 Open testnet
-              </button>
-              <button type="button" aria-label="Ghost button sample"
+              </span>
+              <span aria-label="Ghost button sample"
                 className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-5 h-[38px] text-sm font-medium text-ink hover:border-ink/30">
                 Read documentation
-              </button>
-              <button type="button" aria-label="Live action sample"
+              </span>
+              <span aria-label="Live action sample"
                 className="inline-flex items-center gap-2 rounded-full bg-live px-5 h-[38px] text-sm font-medium text-paper hover:bg-live/90">
                 Open long
-              </button>
-              <button type="button" aria-label="Negative action sample"
+              </span>
+              <span aria-label="Negative action sample"
                 className="inline-flex items-center gap-2 rounded-full bg-neg px-5 h-[38px] text-sm font-medium text-paper hover:bg-neg/90">
                 Revoke
-              </button>
+              </span>
             </div>
           </ComponentCard>
 

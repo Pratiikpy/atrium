@@ -7,7 +7,7 @@ import { VaultMobile } from '@/components/mobile/panels/vault-mobile';
 import { TestnetPill } from '@/components/ui/testnet-pill';
 
 export const metadata = {
-  title: 'Atrium · Vault',
+  title: 'Vault',
   description: 'Coffer ERC-4626 vault. Deposit USDC. Withdraw with circuit-breaker.',
 };
 

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Sub-processors',
+  title: 'Sub-processors',
   description: 'List of third-party sub-processors that handle data on behalf of Atrium.',
 };
 
@@ -31,7 +31,35 @@ export default function SubProcessorsPage() {
           </p>
         </header>
 
-        <div className="overflow-x-auto">
+        <div className="grid gap-3 sm:hidden">
+          {PROCESSORS.map((p) => (
+            <article key={p.name} className="rounded-md border border-divider bg-parchment-soft/40 p-4">
+              <a href={p.url} className="font-medium text-ink underline" target="_blank" rel="noreferrer">{p.name}</a>
+              <dl className="mt-3 space-y-2 text-sm">
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">Purpose</dt>
+                  <dd className="mt-0.5 break-words">{p.purpose}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">Data shared</dt>
+                  <dd className="mt-0.5 break-words text-xs">{p.data}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">Location</dt>
+                  <dd className="mt-0.5 break-words text-xs">{p.location}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-xs">
+                {p.dpa ? (
+                  <a href={p.dpa} className="underline" target="_blank" rel="noreferrer">View DPA</a>
+                ) : (
+                  <span className="text-muted">DPA: N/A</span>
+                )}
+              </p>
+            </article>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-divider text-left text-muted">

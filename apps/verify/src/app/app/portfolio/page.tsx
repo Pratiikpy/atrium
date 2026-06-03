@@ -26,7 +26,7 @@ import { TestnetPill } from '@/components/ui/testnet-pill';
  */
 
 export const metadata = {
-  title: 'Atrium · Portfolio',
+  title: 'Portfolio',
   description: 'Unified margin. One number across every venue you hold positions in.',
 };
 

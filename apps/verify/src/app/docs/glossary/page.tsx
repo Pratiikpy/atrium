@@ -3,7 +3,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { SUBSYSTEMS } from '@/lib/atrium/copy';
 
 export const metadata = {
-  title: 'Atrium · Glossary',
+  title: 'Glossary',
   description: 'Every Atrium subsystem in plain English: what it is, and what it does for you.',
 };
 

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Atrium · App',
+  title: 'App',
 };
 
 /**

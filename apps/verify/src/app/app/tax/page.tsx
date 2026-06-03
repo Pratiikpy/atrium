@@ -3,7 +3,7 @@ import { TaxView } from '@/components/tax/tax-view';
 import { TaxMobile } from '@/components/mobile/panels/tax-mobile';
 
 export const metadata = {
-  title: 'Atrium · Tax',
+  title: 'Tax',
   description: 'Realised gains by jurisdiction. Auditor-grade CSV + PDF + signed Merkle proof.',
 };
 

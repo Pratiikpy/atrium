@@ -12,7 +12,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
  * docs site, so judges + cohort partners + users can read it cold.
  */
 export const metadata = {
-  title: 'Atrium . honest disclosures',
+  title: 'Honest disclosures',
   description:
     'Every place Atrium uses a mock, stub, or relay on Arbitrum Sepolia. Each item names the gap, why it exists, and when it goes away.',
 };

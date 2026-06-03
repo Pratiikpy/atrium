@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Team',
+  title: 'Team',
   description: 'How the team behind Atrium works, and the workstreams shipping in public.',
 };
 

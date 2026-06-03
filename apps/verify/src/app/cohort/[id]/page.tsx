@@ -13,7 +13,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Atrium · Cohort partner',
+  title: 'Cohort partner',
   description: 'Cohort partner detail. Live TVL, positions, audit history from Scribe.',
 };
 

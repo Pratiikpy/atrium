@@ -4,7 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { DISCLOSURES } from '@/app/docs/honesty/page';
 
 export const metadata = {
-  title: 'Atrium · Docs',
+  title: 'Docs',
   description: 'Spec, technical design, runbooks, ADRs. Single source of truth.',
 };
 

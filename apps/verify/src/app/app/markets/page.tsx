@@ -4,7 +4,7 @@ import { StrategyCombos } from '@/components/markets/strategy-combos';
 import { MarketsMobile } from '@/components/mobile/panels/markets-mobile';
 
 export const metadata = {
-  title: 'Atrium · Markets',
+  title: 'Markets',
   description: 'Every Portico-whitelisted instrument. Haircut, correlation class, oracle source.',
 };
 

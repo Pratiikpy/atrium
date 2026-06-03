@@ -3,7 +3,7 @@ import { loadDeploymentRegistry } from '@/lib/deployments-registry';
 import { arbiscanAddressUrl } from '@/lib/arbiscan';
 
 export const metadata = {
-  title: 'Atrium · Deployment',
+  title: 'Deployment',
   description: 'Every Atrium contract on Arbitrum Sepolia: address, Arbiscan link, and who controls it.',
 };
 

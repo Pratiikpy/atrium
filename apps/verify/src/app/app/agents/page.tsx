@@ -14,7 +14,7 @@ const CopyTradeMandate = nextDynamic(
 );
 
 export const metadata = {
-  title: 'Atrium · Agents',
+  title: 'Agents',
   description: 'Delegate to agents with bounded mandates. Sigil + Rostrum.',
 };
 

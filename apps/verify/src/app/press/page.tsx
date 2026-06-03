@@ -3,7 +3,7 @@ import { Card } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Press',
+  title: 'Press',
   description: 'Brand assets, boilerplate, and press contacts for Atrium.',
 };
 

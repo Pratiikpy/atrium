@@ -1,7 +1,7 @@
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Manifesto',
+  title: 'Manifesto',
   description: 'Why Atrium exists. What we will not do. What we will.',
 };
 

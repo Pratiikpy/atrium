@@ -3,7 +3,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { ResetConsentButton } from '@/components/reset-consent-button';
 
 export const metadata = {
-  title: 'Atrium · Privacy Policy',
+  title: 'Privacy Policy',
   description: 'GDPR and CCPA-compliant privacy policy for Atrium Verifier Mode.',
 };
 

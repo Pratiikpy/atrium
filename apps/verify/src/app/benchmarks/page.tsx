@@ -17,7 +17,29 @@ export default function BenchmarksPage() {
         Where Atrium loses, we say so.
       </p>
 
-      <section className="mt-12 overflow-x-auto">
+      <section className="mt-12">
+        <div className="grid gap-3 sm:hidden">
+          {ROWS.map((row) => (
+            <article key={row.dim} className="rounded-md border border-divider bg-parchment-soft/40 p-4">
+              <p className="font-medium text-ink">{row.dim}</p>
+              <dl className="mt-3 space-y-2 text-sm text-ink-soft">
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">Atrium</dt>
+                  <dd className="mt-0.5 break-words">{row.a}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">Cascade</dt>
+                  <dd className="mt-0.5 break-words">{row.c}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-muted">August</dt>
+                  <dd className="mt-0.5 break-words">{row.b}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto sm:block">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-divider text-left text-muted">
@@ -28,15 +50,10 @@ export default function BenchmarksPage() {
             </tr>
           </thead>
           <tbody className="text-ink-soft">
-            <Row dim="Chain" a="Arbitrum + RH-Chain (when SDK)" c="Solana" b="Solana" />
-            <Row dim="Margin compute" a="Stylus (Rust, ~10-100x cheaper compute-heavy ops, per Arbitrum Stylus)" c="Native Solana programs" b="N/A" />
-            <Row dim="Open adapter standard" a="IPorticoAdapter v1.0 (MIT)" c="Closed" b="Closed" />
-            <Row dim="Agent integration" a="Sigil EIP-712 + Postern session keys + ERC-8004" c="Limited" b="None" />
-            <Row dim="Formal verification" a="5 Kani+proptest invariants in CI" c="Audit only" b="Audit only" />
-            <Row dim="UX polish today" a="Foundation: Verifier Mode complete, app surfaces in progress" c="More mature" b="More mature" />
-            <Row dim="Mainnet live" a="No, testnet build phase" c="Yes" b="Yes" />
+            {ROWS.map((row) => <Row key={row.dim} {...row} />)}
           </tbody>
         </table>
+        </div>
       </section>
 
       <section className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
@@ -48,6 +65,16 @@ export default function BenchmarksPage() {
     </MarketingShell>
   );
 }
+
+const ROWS = [
+  { dim: 'Chain', a: 'Arbitrum + RH-Chain (when SDK)', c: 'Solana', b: 'Solana' },
+  { dim: 'Margin compute', a: 'Stylus (Rust, ~10-100x cheaper compute-heavy ops, per Arbitrum Stylus)', c: 'Native Solana programs', b: 'N/A' },
+  { dim: 'Open adapter standard', a: 'IPorticoAdapter v1.0 (MIT)', c: 'Closed', b: 'Closed' },
+  { dim: 'Agent integration', a: 'Sigil EIP-712 + Postern session keys + ERC-8004', c: 'Limited', b: 'None' },
+  { dim: 'Formal verification', a: '5 Kani+proptest invariants in CI', c: 'Audit only', b: 'Audit only' },
+  { dim: 'UX polish today', a: 'Foundation: Verifier Mode complete, app surfaces in progress', c: 'More mature', b: 'More mature' },
+  { dim: 'Mainnet live', a: 'No, testnet build phase', c: 'Yes', b: 'Yes' },
+] as const;
 
 function Row({ dim, a, c, b }: { dim: string; a: string; c: string; b: string }) {
   return (

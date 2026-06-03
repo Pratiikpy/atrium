@@ -6,7 +6,7 @@ import { TransferMobile } from '@/components/mobile/panels/transfer-mobile';
 import { TestnetPill } from '@/components/ui/testnet-pill';
 
 export const metadata = {
-  title: 'Atrium · Transfer',
+  title: 'Transfer',
   description: 'Aqueduct routes through Chainlink CCIP. Cross-chain collateral with one tx.',
 };
 

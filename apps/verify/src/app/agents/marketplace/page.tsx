@@ -3,7 +3,7 @@ import { Card, Tag, RecessedCard, PrimaryButton } from '@/components/ui';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Agents marketplace',
+  title: 'Agents marketplace',
   description: 'Reference agents and Curator-grant submissions. Open-source, signed mandates.',
 };
 

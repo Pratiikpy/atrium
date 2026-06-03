@@ -4,7 +4,7 @@ import { TradeMobile } from '@/components/mobile/panels/trade-mobile';
 import { TestnetPill } from '@/components/ui/testnet-pill';
 
 export const metadata = {
-  title: 'Atrium · Trade',
+  title: 'Trade',
   description: 'Execute across every Atrium-registered Portico adapter.',
 };
 

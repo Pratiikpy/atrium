@@ -3,7 +3,7 @@ import { NotificationsList } from '@/components/notifications/list';
 import { NotificationsMobile } from '@/components/mobile/panels/notifications-mobile';
 
 export const metadata = {
-  title: 'Atrium · Notifications',
+  title: 'Notifications',
   description: 'Mandate revocations, liquidation triggers, attestation publications.',
 };
 

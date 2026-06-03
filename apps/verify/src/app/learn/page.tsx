@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · learn',
+  title: 'Learn',
   description: 'How Atrium nets cross-venue collateral with one margin number.',
   alternates: { canonical: '/learn' },
 };

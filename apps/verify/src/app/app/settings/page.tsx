@@ -7,7 +7,7 @@ import { SessionKeysView } from '@/components/settings/session-keys-view';
 import { SettingsMobile } from '@/components/mobile/panels/settings-mobile';
 
 export const metadata = {
-  title: 'Atrium · Settings',
+  title: 'Settings',
   description: 'Wallet, session keys, recovery, network, notifications, account.',
 };
 

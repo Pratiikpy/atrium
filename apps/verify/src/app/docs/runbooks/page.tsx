@@ -4,7 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { getRunbooks, getRunbooksByCategory } from '@/lib/runbooks';
 
 export const metadata = {
-  title: 'Atrium · Runbooks',
+  title: 'Runbooks',
   description: 'Operational runbooks: incident response, deploy, keys, monitoring, setup.',
 };
 

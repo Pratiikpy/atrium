@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Bug Bounty',
+  title: 'Bug Bounty',
   description: 'Atrium bug bounty program scope, severity matrix, and disclosure process.',
 };
 

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · KYC Disclosure',
+  title: 'KYC Disclosure',
   description: 'How and when Atrium triggers KYC verification via Sumsub.',
 };
 

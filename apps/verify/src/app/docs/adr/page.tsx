@@ -4,7 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { ADRS } from '@/lib/adrs';
 
 export const metadata = {
-  title: 'Atrium · Architecture Decision Records',
+  title: 'Architecture Decision Records',
   description: 'ADR-001 through ADR-012: every consequential design decision, with context and alternatives.',
 };
 

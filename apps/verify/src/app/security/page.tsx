@@ -3,7 +3,7 @@ import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · security',
+  title: 'Security',
   description: 'Atrium security posture, disclosure policy, and audit-findings register.',
 };
 
@@ -92,7 +92,7 @@ function Block({
   id?: string;
 }) {
   return (
-    <div id={id} className="rounded-md border border-divider bg-parchment p-6 scroll-mt-24">
+    <div id={id} className="min-w-0 overflow-hidden rounded-md border border-divider bg-parchment p-6 scroll-mt-24">
       <h2 className="font-display text-2xl text-ink">{heading}</h2>
       <div className="mt-3">{children}</div>
     </div>

@@ -7,7 +7,7 @@ import { VerifyMyBalanceButton } from '@/components/reserves/verify-balance-butt
 import { ReservesMobile } from '@/components/mobile/panels/reserves-mobile';
 
 export const metadata = {
-  title: 'Atrium · Reserves',
+  title: 'Reserves',
   description: 'Proof-of-reserves attestation every ≤10 minutes. Verify your own balance locally.',
 };
 

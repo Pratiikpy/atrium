@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Terms of Service',
+  title: 'Terms of Service',
   description: 'Terms of service for Atrium Verifier Mode on Arbitrum Sepolia testnet.',
 };
 

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Atrium · Security Hall of Fame',
+  title: 'Security Hall of Fame',
   description: 'Researchers who have responsibly disclosed vulnerabilities to Atrium.',
 };
 

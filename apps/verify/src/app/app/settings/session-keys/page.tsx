@@ -2,7 +2,7 @@ import { AppShell } from '@/components/app-shell';
 import { SessionKeysView } from '@/components/settings/session-keys-view';
 
 export const metadata = {
-  title: 'Atrium · Session keys',
+  title: 'Session keys',
   description: 'List, prune, and revoke the ERC-7715 session keys issued by your Postern wallet.',
 };
 

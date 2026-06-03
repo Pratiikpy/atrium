@@ -3,7 +3,7 @@ import { ActivityFeedFull } from '@/components/portfolio/activity-feed-full';
 import { ActivityMobile } from '@/components/mobile/panels/activity-mobile';
 
 export const metadata = {
-  title: 'Atrium · Portfolio activity',
+  title: 'Portfolio activity',
   description: 'Full activity history: margin updates, position events, mandate validations.',
 };
 

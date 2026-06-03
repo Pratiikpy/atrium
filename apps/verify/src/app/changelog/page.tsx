@@ -48,7 +48,7 @@ const RELEASES: Release[] = [
 ];
 
 export const metadata = {
-  title: 'Atrium · Changelog',
+  title: 'Changelog',
   description: 'Published milestones and their dated git tags.',
 };
 
