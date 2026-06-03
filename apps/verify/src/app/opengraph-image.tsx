@@ -26,21 +26,13 @@ const INK = '#1A1714';
 const AMBER = 'rgb(207, 156, 67)';
 
 export default async function OpengraphImage() {
-  // SEO-09 / L-27: Load Instrument Serif for the wordmark.
-  // Phase 11 task: add InstrumentSerif-Italic.woff2 to public/fonts/.
-  // Until then, the edge runtime falls back to generic serif.
-  let fonts: { name: string; data: ArrayBuffer; style: 'italic' }[] = [];
-  try {
-    const fontData = await fetch(
-      new URL('../../public/fonts/InstrumentSerif-Italic.woff2', import.meta.url),
-    ).then((r) => (r.ok ? r.arrayBuffer() : null));
-    if (fontData) {
-      fonts = [{ name: 'Instrument Serif', data: fontData, style: 'italic' }];
-    }
-  } catch {
-    // Font not available, fall through to generic serif
-  }
-
+  // Vercel deploy fix (2026-06-03): the wordmark renders in the system serif
+  // (fontFamily 'serif' below). A custom Instrument Serif woff2 was never added
+  // to public/fonts, and Turbopack treats build-time resolution of a missing
+  // `new URL(import.meta.url)` asset as a HARD error (not a runtime fallback),
+  // which failed the production build. Render in the fallback serif. To restore
+  // the exact wordmark font later, add the woff2 and fetch it from the deployed
+  // origin (not via import.meta.url).
   return new ImageResponse(
     (
       <div
@@ -117,6 +109,6 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size, ...(fonts.length > 0 && { fonts }) },
+    { ...size },
   );
 }
