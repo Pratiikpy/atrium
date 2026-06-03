@@ -268,7 +268,12 @@ export default function LandingPage() {
           style={{ background: 'var(--dark-bg)', color: 'var(--dark-ink)' }}
         >
           <div className="container">
-            <div className="grid items-end gap-10 md:grid-cols-[1fr_360px] md:gap-16">
+            {/* Bug-hunt fix (Redmi 360px sweep 2026-06-02): without an explicit
+                grid-cols-1 the mobile fallback column is content-sized (auto), so
+                the large clamp() headline did not shrink and the Sigil section
+                overflowed the viewport by ~46px at 360px. grid-cols-1 uses
+                minmax(0,1fr) so the column shrinks and the headline wraps. */}
+            <div className="grid grid-cols-1 items-end gap-10 md:grid-cols-[1fr_360px] md:gap-16">
               <div>
                 <div className="mono mb-6 text-[11px] uppercase tracking-[0.18em] text-[color:color-mix(in_oklch,var(--dark-ink)_60%,transparent)]">
                   Sigil · agent credit
@@ -285,7 +290,11 @@ export default function LandingPage() {
                   cap, venue allowlist, expiry. The kill switch revokes every mandate and
                   cancels every active session key for your wallet in one signature.
                 </p>
-                <div className="mt-8 flex gap-3">
+                {/* Bug-hunt fix (Redmi 360px sweep 2026-06-02): the two CTAs sat
+                    in a non-wrapping flex row, so "Read the spec" overflowed the
+                    viewport on a 360px phone. flex-wrap lets them stack when they
+                    don't fit. */}
+                <div className="mt-8 flex flex-wrap gap-3">
                   <Link href="/app" className="btn light">Open the marketplace</Link>
                   <Link href="/docs" className="btn ghost-light">Read the spec →</Link>
                 </div>

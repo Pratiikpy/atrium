@@ -571,6 +571,18 @@ body {
   .nav-links { display: none; }
   .nav-inner { grid-template-columns: auto 1fr auto; }
 }
+/* Bug-hunt fix (Redmi 360px sweep 2026-06-02): on narrow Android/Redmi-class
+   phones the wordmark + the nav-right group (testnet pill + "Open testnet"
+   button + hamburger) plus the 32px grid gaps exceeded the viewport, so EVERY
+   public/marketing/docs page overflowed horizontally by ~34px (content 394px on
+   a 360px screen -> a horizontal scrollbar + cut-off hamburger). Tighten the gap,
+   hide the redundant testnet pill, and shrink the CTA so the header fits 360px. */
+@media (max-width: 480px) {
+  .nav-inner { gap: 12px; }
+  .atrium-nav .nav-right { gap: 8px; }
+  .atrium-nav .nav-right .pill { display: none; }
+  .atrium-nav .btn.sm { padding: 0 10px; font-size: 12px; }
+}
 
 /* Audit fix (#72): mobile menu. On phones the 5 nav links were display:none
    with no hamburger, so Product/Agents/Reserves/Subsystems/Docs were
