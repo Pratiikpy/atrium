@@ -20,7 +20,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const STEP_CONFIG = {
   '1': {
     title: 'Deposit USDC into Coffer',
-    body: 'Postern issues a passkey-bound smart wallet. Coffer locks 1,000 USDC and mints ERC-4626 shares. Plinth opens a fresh margin account.',
+    body: 'Postern issues a passkey-bound smart wallet. Coffer locks a $1 USDC demo deposit and mints ERC-4626 shares. Plinth opens a fresh margin account.',
     contract: 'Coffer.deposit',
     nextStep: 2,
   },

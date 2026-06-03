@@ -12,10 +12,13 @@
 export type VerifierAction =
   | {
       kind: 'coffer-deposit';
-      // Fixed demo amount so the judge flow is reproducible. $10 USDC
-      // (small enough to fit any faucet drop, big enough to compute non-
-      // zero margin).
-      amountUsd: '10';
+      // Fixed demo amount so the judge flow is reproducible. Use-everything
+      // audit fix (2026-06-03): this was '10', but the faucet only drops 5 USDC
+      // per claim (24h cooldown), so a fresh judge who claimed once could NOT
+      // complete the flagship "verify it yourself" step 1 (insufficient balance,
+      // stuck for 24h). $1 fits any single faucet drop with headroom and still
+      // mints non-zero shares / non-zero collateral.
+      amountUsd: '1';
     }
   | { kind: 'plinth-open-position'; pending: true }
   | { kind: 'plinth-recompute-margin'; pending: true }
@@ -48,7 +51,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
   1: {
     step: 1,
     title: 'Deposit USDC to Coffer',
-    action: { kind: 'coffer-deposit', amountUsd: '10' },
+    action: { kind: 'coffer-deposit', amountUsd: '1' },
     pendingReason:
       'Coffer ERC-4626 vault is not in the deployments registry yet. Step 1 deploys in Month 1 W2.',
   },

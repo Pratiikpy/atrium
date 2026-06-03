@@ -26,8 +26,9 @@ describe('STEP_CONFIG', () => {
     const s1 = STEP_CONFIG[1];
     expect(s1.action.kind).toBe('coffer-deposit');
     if (s1.action.kind === 'coffer-deposit') {
-      // Demo amount is fixed so the judge flow is reproducible.
-      expect(s1.action.amountUsd).toBe('10');
+      // Demo amount is fixed + affordable with one faucet drop (5 USDC) so the
+      // judge flow is reproducible (use-everything fix: was '10' > faucet drop).
+      expect(s1.action.amountUsd).toBe('1');
     }
   });
 
