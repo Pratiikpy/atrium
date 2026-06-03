@@ -15,6 +15,17 @@ import { ImageResponse } from 'next/og';
  *
  * Routes can override per-page metadata via their own opengraph-image
  * file under the route segment; this top-level one is the fallback.
+ *
+ * Font handling (Vercel deploy fix, 2026-06-03): Satori (the engine
+ * behind next/og) renders glyphs from font *buffers*, not OS font names.
+ * It has no system "serif" / "system-ui" to fall back to, and passing a
+ * `fonts` array disables next/og's bundled default font. So EVERY text
+ * family used in the card must be supplied here, or that text renders
+ * blank (a 200 image/png with a 0-byte body, exactly the symptom that
+ * shipped before this fix). We ship two real static TTFs committed under
+ * public/fonts: Instrument Serif Italic for the wordmark, Geist Regular
+ * for the body + pill. They load via `new URL(..., import.meta.url)` so
+ * Turbopack traces + bundles them for the edge runtime.
  */
 export const runtime = 'edge';
 export const alt = 'Atrium · cross-venue portfolio margin on Arbitrum Sepolia';
@@ -26,13 +37,15 @@ const INK = '#1A1714';
 const AMBER = 'rgb(207, 156, 67)';
 
 export default async function OpengraphImage() {
-  // Vercel deploy fix (2026-06-03): the wordmark renders in the system serif
-  // (fontFamily 'serif' below). A custom Instrument Serif woff2 was never added
-  // to public/fonts, and Turbopack treats build-time resolution of a missing
-  // `new URL(import.meta.url)` asset as a HARD error (not a runtime fallback),
-  // which failed the production build. Render in the fallback serif. To restore
-  // the exact wordmark font later, add the woff2 and fetch it from the deployed
-  // origin (not via import.meta.url).
+  const [serifItalic, sans] = await Promise.all([
+    fetch(new URL('../../public/fonts/InstrumentSerif-Italic.ttf', import.meta.url)).then((r) =>
+      r.arrayBuffer(),
+    ),
+    fetch(new URL('../../public/fonts/Geist-Regular.ttf', import.meta.url)).then((r) =>
+      r.arrayBuffer(),
+    ),
+  ]);
+
   return new ImageResponse(
     (
       <div
@@ -44,12 +57,13 @@ export default async function OpengraphImage() {
           justifyContent: 'space-between',
           background: PARCHMENT,
           padding: 80,
-          fontFamily: 'serif',
+          fontFamily: 'Geist',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <span
             style={{
+              fontFamily: 'Instrument Serif',
               fontStyle: 'italic',
               fontSize: 160,
               lineHeight: 1,
@@ -69,7 +83,7 @@ export default async function OpengraphImage() {
               background: 'rgba(207, 156, 67, 0.14)',
               border: '1px solid rgba(207, 156, 67, 0.30)',
               color: AMBER,
-              fontFamily: 'system-ui, sans-serif',
+              fontFamily: 'Geist',
               fontStyle: 'normal',
               fontSize: 20,
               letterSpacing: '0.06em',
@@ -83,7 +97,7 @@ export default async function OpengraphImage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p
             style={{
-              fontFamily: 'system-ui, sans-serif',
+              fontFamily: 'Geist',
               fontSize: 44,
               lineHeight: 1.25,
               color: INK,
@@ -95,7 +109,7 @@ export default async function OpengraphImage() {
           </p>
           <p
             style={{
-              fontFamily: 'system-ui, sans-serif',
+              fontFamily: 'Geist',
               fontSize: 26,
               lineHeight: 1.4,
               color: '#5C544B',
@@ -109,6 +123,22 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size },
+    {
+      ...size,
+      fonts: [
+        {
+          name: 'Instrument Serif',
+          data: serifItalic,
+          style: 'italic',
+          weight: 400,
+        },
+        {
+          name: 'Geist',
+          data: sans,
+          style: 'normal',
+          weight: 400,
+        },
+      ],
+    },
   );
 }
