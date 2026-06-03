@@ -636,7 +636,9 @@ body {
 .hero-monument {
   position: relative;
   color: var(--dark-ink);
-  padding: clamp(64px, 8vw, 112px) var(--gutter) clamp(80px, 9vw, 128px);
+  /* Reference-parity (Atriumnew.html): tighter vertical rhythm so the hero
+     reads at ~1.5k px like the reference, not ~2.1k. */
+  padding: clamp(56px, 6.5vw, 92px) var(--gutter) clamp(56px, 6vw, 84px);
   overflow: hidden;
   isolation: isolate;
   background:

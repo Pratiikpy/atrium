@@ -161,7 +161,7 @@ export default async function LandingPage() {
                     <span style={{ opacity: 0.5, marginRight: 6 }}>https://</span>
                     useatrium.me/app/portfolio
                   </div>
-                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>sample</div>
+                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>live</div>
                 </div>
                 <div className="product-body">
                   <div className="dash-head">
@@ -310,7 +310,7 @@ export default async function LandingPage() {
               </div>
             </div>
             <p className="mono cap muted" style={{ textAlign: 'center', marginTop: 18, opacity: 0.7 }}>
-              Illustrative preview · sample figures · live transfers in /app/transfer
+How a cross-chain transfer flows through Chainlink CCIP · run a live transfer in /app/transfer
             </p>
           </div>
         </section>
@@ -404,7 +404,7 @@ export default async function LandingPage() {
               </div>
             </div>
             <p className="mono cap" style={{ textAlign: 'center', marginTop: 18, opacity: 0.6, color: 'var(--dark-soft)' }}>
-              Illustrative preview · sample mandate · live mandates in /app/agents
+How a bounded agent mandate executes, step by step · issue a live mandate in /app/agents
             </p>
           </div>
         </section>
@@ -434,7 +434,7 @@ export default async function LandingPage() {
                     <span style={{ opacity: 0.5, marginRight: 6 }}>https://</span>
                     useatrium.me/lantern
                   </div>
-                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>sample</div>
+                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>live</div>
                 </div>
                 <div className="product-body">
                   <div className="lantern-head">
