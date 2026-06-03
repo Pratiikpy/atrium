@@ -47,13 +47,14 @@ export default function PressPage() {
               <p className="mt-2 text-sm text-ink-soft">
                 ZIP archive of all brand assets (logos, colors, typography samples).
               </p>
-              <a
-                href="/press/atrium-press-kit.zip"
-                className="mt-3 inline-block text-xs text-ink underline-offset-2 hover:underline"
-                download
-              >
-                Download press kit (.zip) →
-              </a>
+              {/* Bug-hunt fix (2026-06-02): the .zip CTA was a live `download`
+                  link to /press/atrium-press-kit.zip, which does not exist (404
+                  on click). The same assets are live on the brand kit, so point
+                  there with an honest "packaging" note instead of a dead download. */}
+              <p className="mt-3 text-xs text-muted">
+                Packaged .zip pending. Browse every asset on the{' '}
+                <a href="/brand" className="text-ink underline-offset-2 hover:underline">brand kit</a>.
+              </p>
             </Card>
           </div>
         </section>

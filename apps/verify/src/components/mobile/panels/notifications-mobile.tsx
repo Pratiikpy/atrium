@@ -35,7 +35,11 @@ export function NotificationsMobile() {
     enabled: wallet != null, // disconnected -> no authed fetch (no 401)
   });
 
-  const unreadCount = (data?.notifications ?? []).filter(n => !n.read).length;
+  // Bug-hunt fix (2026-06-02): /api/notifications never returns a `read` field
+  // (read-state is not persisted server-side), so `!n.read` was true for every
+  // item and the "N unread" badge always equalled the total count. Drop the
+  // unread concept until a real read-state source exists (the desktop list shows
+  // no unread count either).
   const hasList = (data?.notifications.length ?? 0) > 0;
 
   // Audit fix (use-everything sweep 2026-06-02): the "Mark all read" button
@@ -52,9 +56,6 @@ export function NotificationsMobile() {
     <div className="mb-3 flex items-baseline justify-between" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <div className="flex items-baseline gap-2">
         <h2 className="font-display text-[22px] italic text-mob-ink">Inbox</h2>
-        {hasList && unreadCount > 0 && (
-          <span className="font-mono text-[11px] uppercase tracking-wider text-mob-muted">{unreadCount} unread</span>
-        )}
       </div>
     </div>
   );

@@ -21,7 +21,15 @@ interface Attestation {
 
 async function fetchLatest(): Promise<Attestation | null> {
   const r = await fetch('/api/lantern/latest');
-  if (!r.ok) throw new Error(`lantern_${r.status}`);
+  // Bug-hunt fix (2026-06-02): /api/lantern/latest returns 404 + {exists:false}
+  // to mean "no attestation published yet" (the normal pre-launch state). The
+  // prior code threw on ANY non-2xx, so the 404 surfaced a hard "Could not load,
+  // retry" error instead of the honest empty state the desktop dashboard shows.
+  // Treat 404 as null (empty); only real failures (5xx/network) throw.
+  if (!r.ok) {
+    if (r.status === 404) return null;
+    throw new Error(`lantern_${r.status}`);
+  }
   return r.json();
 }
 

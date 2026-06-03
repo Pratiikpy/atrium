@@ -35,10 +35,16 @@ export function MarketsMobile() {
       // venue as 'live' (wrong data presented as real). Derive each venue's
       // status from the real `live` slug set: live when its adapter is up, else
       // paused. TVL has no source in this route, so it stays an honest '-'.
+      // Bug-hunt fix (2026-06-02): /api/protocol/subsystems returns registry keys
+      // PREFIXED with 'adapter-' (e.g. 'adapter-hyperliquid'); matching the bare
+      // adapterSlug never hit, so every venue fell to 'paused'. Check the prefixed
+      // key first. TVL has no source in this route -> honest '-'.
       const liveSet = new Set<string>(Array.isArray(j.live) ? j.live : []);
       return VENUES.map((v) => ({
         id: v.id,
-        status: (liveSet.has(v.adapterSlug) || liveSet.has(v.id)) ? ('live' as const) : ('paused' as const),
+        status: (liveSet.has(`adapter-${v.adapterSlug}`) || liveSet.has(v.adapterSlug) || liveSet.has(v.id))
+          ? ('live' as const)
+          : ('paused' as const),
         tvl: '-',
       }));
     },

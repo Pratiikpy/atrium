@@ -15,7 +15,14 @@ interface Attestation {
 
 async function fetchLatest(): Promise<Attestation | null> {
   const r = await fetch('/api/lantern/latest');
-  if (!r.ok) return null;
+  // Bug-hunt fix (2026-06-02): returning null on EVERY non-2xx made the
+  // "Lantern source unavailable" outage card unreachable - a real Scribe outage
+  // (5xx) looked identical to "no attestation yet" (404). 404 is the honest
+  // empty state (null); any other failure throws so the outage card surfaces.
+  if (!r.ok) {
+    if (r.status === 404) return null;
+    throw new Error(`lantern_${r.status}`);
+  }
   return r.json();
 }
 

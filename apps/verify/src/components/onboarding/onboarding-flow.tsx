@@ -26,11 +26,16 @@ import { VENUES, VENUE_COUNT } from '@/lib/venues';
  *  - Done step routes the three "next" cards to the real /app/* pages.
  */
 
+// Bug-hunt fix (2026-06-02): /api/faucet/status returns usdcDrop/ethDrop numbers
+// and source:'faucet' (not a `drops` array, not source:'live'), so the Step-3
+// "testnet drop" table built from `status.drops` was ALWAYS empty even when the
+// faucet is live + stocked. Align the type to the route; build the rows below.
 type FaucetStatus = {
   available: boolean;
   reason?: string;
-  drops: { token: string; amount: number; chain: 'arb-sepolia' | 'rh-chain' }[];
-  source: 'pending' | 'live';
+  usdcDrop?: number;
+  ethDrop?: number;
+  source: 'pending' | 'faucet';
 };
 
 type BuyingPower = {
@@ -440,7 +445,13 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
       .catch((e) => setError(e instanceof Error ? e.message : 'Faucet status unavailable'));
   }, [wallet]);
 
-  const drops = status?.drops ?? [];
+  // Build the drop rows from the real route fields (usdcDrop/ethDrop).
+  const drops: { token: string; amount: number; chain: 'arb-sepolia' }[] = status
+    ? [
+        { token: 'USDC', amount: status.usdcDrop ?? 0, chain: 'arb-sepolia' },
+        { token: 'ETH', amount: status.ethDrop ?? 0, chain: 'arb-sepolia' },
+      ]
+    : [];
 
   return (
     <>
@@ -468,7 +479,7 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
               <tr key={`${d.token}-${d.chain}`}>
                 <td className="px-3 py-2.5 font-mono font-medium text-ink">{d.token}</td>
                 <td className="px-3 py-2.5 font-mono text-ink">
-                  {d.amount.toLocaleString()}
+                  {d.amount.toLocaleString(undefined, { maximumFractionDigits: 5 })}
                 </td>
                 <td className="px-3 py-2.5 font-mono text-xs text-ink-soft">{d.chain}</td>
                 <td className="px-3 py-2.5 text-right">

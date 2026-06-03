@@ -22,12 +22,16 @@ interface Activity {
   txHash?: string;
 }
 
+// Bug-hunt fix (2026-06-02): /api/portfolio/activity only emits kind 'tx'
+// (margin recompute + position open) and 'mandate'. The 'attestation' (Positions)
+// and 'liquidation' (Liquidations) chips filtered on kinds the route never emits,
+// so they were permanently dead (always-empty list). Keep only the chips that map
+// to real kinds; relabel 'tx' to the accurate "Transactions" (it is not just
+// margin). The 'attestation'/'liquidation' chips return when the route emits them.
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'tx', label: 'Margin' },
-  { key: 'attestation', label: 'Positions' },
+  { key: 'tx', label: 'Transactions' },
   { key: 'mandate', label: 'Mandates' },
-  { key: 'liquidation', label: 'Liquidations' },
 ];
 
 export function ActivityMobile() {

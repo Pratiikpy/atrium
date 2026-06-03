@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useOpenPosition } from '@/lib/use-open-position';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
@@ -32,7 +33,13 @@ export function TradeMobile() {
   const ready = deployment?.ready === true && amountValid && !isSubmitting;
   const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
 
-  const notional = (Number(amount || '0') * leverage).toFixed(2);
+  // Bug-hunt fix (2026-06-02): mobile computed notional = amount * leverage and
+  // submitted THAT as sizeUsd, while desktop submits the raw typed amount
+  // (leverage is UI-only by design). That meant the SAME user intent sent a
+  // different notional_signed on-chain on mobile vs desktop (e.g. 1000 @ 4x ->
+  // 4000 on mobile, 1000 on desktop). Match desktop: the typed amount IS the
+  // notional; leverage stays a UI-only slider. Submit + display now agree.
+  const notional = Number(amount || '0').toFixed(2);
 
   const submit = () => {
     if (!ready) return;
@@ -60,18 +67,11 @@ export function TradeMobile() {
         <div className="mt-3 h-14">
           <ChartPlaceholder />
         </div>
-        <div className="mt-3 flex gap-1.5">
-          {['1H', '4H', '1D', '1W', '1M'].map((tf) => (
-            <span
-              key={tf}
-              className={`rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider ${
-                tf === '1D' ? 'bg-mob-bg-elev text-mob-ink' : 'text-mob-muted'
-              }`}
-            >
-              {tf}
-            </span>
-          ))}
-        </div>
+        {/* Bug-hunt fix (2026-06-02): the 1H/4H/1D/1W/1M pills were dead - plain
+            <span>s with no handler and a hardcoded 1D highlight - while the chart
+            itself is a pending placeholder (no timeframe data source). Removed the
+            fake timeframe selector rather than imply interactivity that does
+            nothing; it returns when a real price/timeframe feed lands. */}
       </section>
 
       {/* Side toggle */}
@@ -134,7 +134,12 @@ export function TradeMobile() {
       {/* Order summary */}
       <div className="rounded-2xl border border-mob-line bg-mob-bg-card">
         <Row l="Notional" v={`$${Number(notional).toLocaleString()}`} />
-        <Row l="Initial margin" v={`$${Number(amount || '0').toLocaleString()}`} />
+        {/* Bug-hunt fix (2026-06-02): this showed the FULL position size as
+            "Initial margin", but initial margin is the venue haircut (e.g. 10% on
+            HL), so a $1,000 size should read ~$100, not $1,000 - a wrong number
+            presented as a real computed figure next to honest 'pending' rows.
+            Show 'pending' until the margin-impact fetch is wired into mobile. */}
+        <Row l="Initial margin" v="pending" />
         <Row l="Liquidation" v="pending" />
         <Row l="Fee" v="pending" />
         <Row l="Gas" v="sponsored" />
@@ -154,7 +159,9 @@ export function TradeMobile() {
       )}
       {status.kind === 'error' && (
         <p className="text-center font-mono text-[11px] text-mob-neg">
-          {status.reason}
+          {/* Bug-hunt fix (2026-06-02): showed the raw machine code (e.g.
+              wallet_not_connected) to the user; humanize it like desktop. */}
+          {humanizeWalletError(status.reason).message}
           <button type="button" onClick={reset} className="ml-2 underline">retry</button>
         </p>
       )}

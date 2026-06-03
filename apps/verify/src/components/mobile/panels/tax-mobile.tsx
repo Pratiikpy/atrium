@@ -11,10 +11,14 @@ import { useQuery } from '@tanstack/react-query';
 import type { TaxJurisdiction, TaxYear } from '@/components/tax/tax-types';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
+// Bug-hunt fix (2026-06-02): these keys (realizedGains/unrealizedGains/
+// allowanceUsed) are NOT what /api/tax/summary returns, so all three tiles were
+// permanently blank. The route returns realisedGainUsd / taxOwedEstUsd /
+// totalProceedsUsd (no unrealized field by design). Align to the real contract.
 interface TaxStats {
-  realizedGains: string;
-  unrealizedGains: string;
-  allowanceUsed: string;
+  realisedGainUsd: string | null;
+  taxOwedEstUsd: string | null;
+  totalProceedsUsd: string | null;
 }
 
 interface TaxEvent {
@@ -112,16 +116,16 @@ export function TaxMobile() {
       ) : stats.data && (
         <section className="grid grid-cols-3 gap-2 rounded-xl border border-mob-line bg-mob-bg-card px-3 py-3">
           <div className="text-center">
-            <p className="text-[10px] uppercase text-mob-muted">Realized</p>
-            <p className="text-[16px] text-mob-ink">{stats.data.realizedGains}</p>
+            <p className="text-[10px] uppercase text-mob-muted">Realised</p>
+            <p className="text-[16px] text-mob-ink">{stats.data.realisedGainUsd ?? '-'}</p>
           </div>
           <div className="text-center">
-            <p className="text-[10px] uppercase text-mob-muted">Unrealized</p>
-            <p className="text-[16px] text-mob-ink">{stats.data.unrealizedGains}</p>
+            <p className="text-[10px] uppercase text-mob-muted">Tax owed</p>
+            <p className="text-[16px] text-mob-ink">{stats.data.taxOwedEstUsd ?? '-'}</p>
           </div>
           <div className="text-center">
-            <p className="text-[10px] uppercase text-mob-muted">Allowance</p>
-            <p className="text-[16px] text-mob-ink">{stats.data.allowanceUsed}</p>
+            <p className="text-[10px] uppercase text-mob-muted">Proceeds</p>
+            <p className="text-[16px] text-mob-ink">{stats.data.totalProceedsUsd ?? '-'}</p>
           </div>
         </section>
       )}
