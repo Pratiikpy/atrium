@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { TaxJurisdiction, TaxYear } from '@/components/tax/tax-types';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { useTaxExportReady } from '@/lib/use-tax-export-ready';
 
 // Bug-hunt fix (2026-06-02): these keys (realizedGains/unrealizedGains/
 // allowanceUsed) are NOT what /api/tax/summary returns, so all three tiles were
@@ -40,6 +41,7 @@ const YEARS: TaxYear[] = ['2026', '2025', '2024'];
 
 export function TaxMobile() {
   const wallet = useScopedWallet();
+  const exportReady = useTaxExportReady();
   const [jurisdiction, setJurisdiction] = useState<TaxJurisdiction>('uk');
   const [year, setYear] = useState<TaxYear>('2026');
   const [limit, setLimit] = useState(50);
@@ -168,21 +170,37 @@ export function TaxMobile() {
         </div>
       )}
 
-      {/* Export buttons */}
-      <div className="flex flex-col gap-2">
-        <a
-          href={`/api/tax/export?format=csv&jurisdiction=${jurisdiction}&year=${year}`}
-          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
-        >
-          Export CSV
-        </a>
-        <a
-          href={`/api/tax/export?format=pdf&jurisdiction=${jurisdiction}&year=${year}`}
-          className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
-        >
-          Export PDF
-        </a>
-      </div>
+      {/* Export buttons. Gated on a HEAD availability probe: while the Tablet
+          service is undeployed the export route 503s, so live links would hand the
+          user an error blob. Render disabled + honest until exports are live. */}
+      {exportReady === true ? (
+        <div className="flex flex-col gap-2">
+          <a
+            href={`/api/tax/export?format=csv&jurisdiction=${jurisdiction}&year=${year}`}
+            className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
+          >
+            Export CSV
+          </a>
+          <a
+            href={`/api/tax/export?format=pdf&jurisdiction=${jurisdiction}&year=${year}`}
+            className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-ink"
+          >
+            Export PDF
+          </a>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <span aria-disabled="true" className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-muted opacity-50">
+            Export CSV
+          </span>
+          <span aria-disabled="true" className="flex min-h-[44px] items-center justify-center rounded-xl border border-mob-line bg-mob-bg-card text-[16px] text-mob-muted opacity-50">
+            Export PDF
+          </span>
+          <p className="px-1 text-[12px] text-mob-muted">
+            {exportReady === null ? 'Checking export availability…' : 'Exports become available once the Tablet service is live.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

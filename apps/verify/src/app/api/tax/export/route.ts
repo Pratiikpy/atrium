@@ -16,6 +16,17 @@ const ALLOWED_JURISDICTIONS = new Set(['uk', 'us', 'de', 'other']);
 const MIN_YEAR = 2020;
 const MAX_YEAR = 2099;
 
+// Cheap availability probe so the UI export buttons can gate themselves instead
+// of rendering live <a download> links that return a 503 error blob when the
+// Tablet service is not deployed (use-everything action-audit 2026-06-03). Mirrors
+// GET's session + TABLET_URL gate WITHOUT proxying the full export.
+export async function HEAD(req: NextRequest) {
+  const session = await getSession(req);
+  if (!session) return new NextResponse(null, { status: 401 });
+  if (!TABLET_URL) return new NextResponse(null, { status: 503 });
+  return new NextResponse(null, { status: 200 });
+}
+
 export async function GET(req: NextRequest) {
   // Audit fix (backend-api #29): this was the only wallet-scoped tax route
   // missing the session guard its sibling tax/summary has - an unauthenticated,

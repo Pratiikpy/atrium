@@ -42,7 +42,12 @@ function safeHref(url: string): string | null {
 function inline(text: string): string {
   let s = escapeHtml(text);
   // inline code `...` (run first; its content is already escaped)
-  s = s.replace(/`([^`]+)`/g, (_m, c) => `<code class="rounded bg-parchment-soft/70 px-1 py-0.5 font-mono text-[0.9em] text-ink">${c}</code>`);
+  // `break-words` + overflow-wrap:anywhere so a long unbroken inline-code string
+  // (a curl URL, a <script src>, an env-var value) wraps instead of pushing the
+  // page wider than the viewport. Runbook pages incident-scribe/student-pack-setup/
+  // vercel-env-scoping overflowed 23-75px on mobile/Redmi before this (use-everything
+  // route-crawl 2026-06-03).
+  s = s.replace(/`([^`]+)`/g, (_m, c) => `<code class="rounded bg-parchment-soft/70 px-1 py-0.5 font-mono text-[0.9em] text-ink break-words [overflow-wrap:anywhere]">${c}</code>`);
   // links [text](url) - href scheme validated; unsafe schemes render as plain
   // text. The url is also attribute-encoded (quotes -> entities) so a `"` in
   // the URL cannot break out of href="..." and inject an event-handler
