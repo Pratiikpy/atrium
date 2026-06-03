@@ -1337,3 +1337,26 @@ input[type="range"] { cursor: ew-resize; }
   .cohort-logo:nth-child(n+5) { border-bottom: 1px solid var(--hairline); }
   .cohort-logo:nth-child(n+7) { border-bottom: none; }
 }
+
+/* ============================================================
+ * Landing: subsystems — Four architectural blocks (reference parity)
+ * ============================================================ */
+.subsystems { padding: var(--section-pad) 0; border-top: 1px solid var(--hairline); }
+.subsys-stack { margin-top: 72px; display: flex; flex-direction: column; border-top: 1px solid var(--ink); }
+.subsys-group { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 56px; padding: 48px 0; border-bottom: 1px solid var(--hairline); align-items: start; }
+.subsys-group:last-child { border-bottom: 1px solid var(--ink); }
+.subsys-group-head { padding-top: 4px; position: sticky; top: 96px; }
+.subsys-group-title { font-family: var(--sans); font-weight: 500; font-size: 28px; letter-spacing: -0.018em; line-height: 1.1; margin: 10px 0 12px; color: var(--ink); }
+.subsys-group-sub { font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); margin: 0; max-width: 260px; }
+.subsys-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 12px; }
+.subsys-card { display: flex; flex-direction: column; padding: 18px 20px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-raised); min-height: 170px; transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease; }
+.subsys-card:hover { transform: translateY(-3px); border-color: var(--ink); box-shadow: 0 12px 24px color-mix(in oklch, var(--ink) 7%, transparent), 0 2px 6px color-mix(in oklch, var(--ink) 5%, transparent); }
+.subsys-card-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+.subsys-card-name { font-size: 26px; line-height: 1; letter-spacing: -0.012em; color: var(--ink); }
+.subsys-card-sub { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--ink-soft); flex: 1; }
+.subsys-card-stack { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hairline); font-size: 10px; }
+@media (max-width: 860px) {
+  .subsys-group { grid-template-columns: 1fr; gap: 22px; padding: 36px 0; }
+  .subsys-group-head { position: static; }
+  .subsys-group-sub { max-width: none; }
+}

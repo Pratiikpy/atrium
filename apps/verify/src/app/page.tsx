@@ -3,9 +3,8 @@ import { PublicNav } from '@/components/atrium/PublicNav';
 import { Footer } from '@/components/atrium/Footer';
 import { BlueprintGrid, Vignette } from '@/components/atrium/HeroChrome';
 import { Impluvium } from '@/components/atrium/Impluvium';
-import { SectionHead, Tag } from '@/components/atrium/primitives';
 import { FloorPlanSection } from '@/components/atrium/landing/FloorPlan';
-import { VENUES, SUBSYSTEMS } from '@/lib/atrium/static';
+import { VENUES } from '@/lib/atrium/static';
 import { JsonLd, ATRIUM_ORG_SCHEMA, ATRIUM_APP_SCHEMA } from '@/components/json-ld';
 
 export const metadata = {
@@ -547,31 +546,86 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
 
         <FloorPlanSection />
 
-        {/* ============== SUBSYSTEMS ============== */}
-        <section className="section" id="system">
+        {/* ============== SUBSYSTEMS · Four architectural blocks (reference parity) ============== */}
+        <section id="subsystems" className="subsystems">
           <div className="container">
-            <SectionHead
-              num="III"
-              title={<>The system, named.</>}
-              sub="Seventeen subsystems and Postern, all trademark-checked, all testnet-buildable in Year 1."
-            />
-            <div className="grid gap-px overflow-hidden rounded-[14px] border border-[var(--hairline)] bg-[var(--hairline)] sm:grid-cols-2 lg:grid-cols-3">
-              {SUBSYSTEMS.map((s) => (
-                <div key={s.num} className="bg-[var(--bg-raised)] p-5">
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <div className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--muted)]">
-                        {s.num}
-                      </div>
-                      <div className="mt-1 text-[20px] font-medium leading-none tracking-[-0.018em] text-[var(--ink)]">
-                        {s.name}
-                      </div>
-                      <div className="mt-1 text-[13px] text-[var(--ink-soft)]">{s.sub}</div>
-                    </div>
-                    <Tag variant={s.phase === 'P1' ? 'green' : 'amber'}>{s.phase}</Tag>
+            <div className="section-head centered">
+              <div className="eyebrow mono cap">Subsystems</div>
+              <h2 className="h2">
+                Eighteen named pieces. <span className="accent-grad">Four architectural blocks.</span>
+              </h2>
+              <p className="section-sub">
+                Each subsystem owns one responsibility. Thirteen are live on testnet
+                today; all eighteen ship at launch, with Stoa conditional on Phase-2
+                funding.
+              </p>
+            </div>
+            <div className="subsys-stack">
+              {[
+                {
+                  block: 'Block 01', title: 'Risk engine', count: '4 subsystems',
+                  sub: 'Cross-product margin, liquidations, options pricing — Rust deployed as Stylus.',
+                  cards: [
+                    { n: '01', p: 'P1', name: 'Plinth', sub: 'Margin engine', stack: 'Stylus · Rust' },
+                    { n: '02', p: 'P1', name: 'Vigil', sub: 'Liquidation engine', stack: 'Stylus · Rust' },
+                    { n: '03', p: 'P2', name: 'Stoa', sub: 'Options pricing', stack: 'Stylus · Rust' },
+                    { n: '12', p: 'P1', name: 'Coffer', sub: 'ERC-4626 vaults', stack: 'Stylus · OZ' },
+                  ],
+                },
+                {
+                  block: 'Block 02', title: 'Venues + cross-chain', count: '3 subsystems',
+                  sub: 'Portico framework, Chainlink CCIP bridge, wallet abstraction layer.',
+                  cards: [
+                    { n: '04', p: 'P1', name: 'Portico', sub: 'Venue framework', stack: 'Solidity · OZ' },
+                    { n: '05', p: 'P1', name: 'Aqueduct', sub: 'Cross-chain bridge', stack: 'Solidity · CCIP' },
+                    { n: '18', p: 'P1', name: 'Postern', sub: 'Wallet abstraction', stack: 'ERC-4337 · 7702' },
+                  ],
+                },
+                {
+                  block: 'Block 03', title: 'Agents + APIs', count: '5 subsystems',
+                  sub: 'ERC-8004 mandates, copy-trading marketplace, paid agent surface, indexing.',
+                  cards: [
+                    { n: '06', p: 'P1', name: 'Sigil', sub: 'Agent credit', stack: 'Solidity · ERC-8004' },
+                    { n: '07', p: 'P1', name: 'Rostrum', sub: 'Agent marketplace', stack: 'Solidity · Indexer' },
+                    { n: '08', p: 'P1', name: 'Codex', sub: 'Paid agent APIs', stack: 'Node · x402' },
+                    { n: '09', p: 'P1', name: 'Scribe', sub: 'Indexer', stack: 'The Graph' },
+                    { n: '10', p: 'P1', name: 'Archive', sub: 'Off-chain risk lab', stack: 'Python' },
+                  ],
+                },
+                {
+                  block: 'Block 04', title: 'Trust + ops', count: '6 subsystems',
+                  sub: 'Proof-of-reserves, compliance, tax exports, CLI, partner programmes.',
+                  cards: [
+                    { n: '11', p: 'P1', name: 'Lantern', sub: 'Proof-of-reserves', stack: 'Vercel · Merkle' },
+                    { n: '13', p: 'P1', name: 'Edict', sub: 'Jurisdiction tiers', stack: 'Solidity · Sumsub' },
+                    { n: '14', p: 'P1', name: 'Tablet', sub: 'Tax reporting', stack: 'Node' },
+                    { n: '15', p: 'P1', name: 'Praetor', sub: 'CLI · ops', stack: 'Rust · Foundry' },
+                    { n: '16', p: 'P1', name: 'Cohort', sub: 'Design partners', stack: 'BD · program' },
+                    { n: '17', p: 'P1', name: 'Curator', sub: 'Adapter grants', stack: 'ARB · grants' },
+                  ],
+                },
+              ].map((g) => (
+                <div className="subsys-group" key={g.block}>
+                  <div className="subsys-group-head">
+                    <div className="mono cap muted">{g.block}</div>
+                    <h3 className="subsys-group-title">{g.title}</h3>
+                    <p className="subsys-group-sub">{g.sub}</p>
+                    <div className="mono cap muted" style={{ marginTop: 18 }}>{g.count}</div>
                   </div>
-                  <div className="mono mt-4 text-[11px] uppercase tracking-[0.08em] text-[var(--muted)]">
-                    {s.stack}
+                  <div className="subsys-cards">
+                    {g.cards.map((c) => (
+                      <div className="subsys-card" key={c.n}>
+                        <div className="subsys-card-top">
+                          <span className="mono cap muted">{c.n}</span>
+                          <span className="mono cap" style={{ color: c.p === 'P1' ? 'var(--ink-soft)' : 'var(--muted)', letterSpacing: '0.1em' }}>
+                            {c.p}
+                          </span>
+                        </div>
+                        <div className="subsys-card-name serif-i">{c.name}</div>
+                        <div className="subsys-card-sub">{c.sub}</div>
+                        <div className="subsys-card-stack mono cap muted">{c.stack}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
