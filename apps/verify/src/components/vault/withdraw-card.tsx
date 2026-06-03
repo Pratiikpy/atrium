@@ -13,7 +13,7 @@ import { USDC_DECIMALS } from '@/lib/testnet-tokens';
 // Read the connected wallet's redeemable USDC: Coffer.balanceOf(user) shares
 // -> convertToAssets. Used to gate an over-balance withdraw client-side (the
 // withdraw form previously had NO balance gate, so a user could submit more
-// than they hold and eat a raw chain revert — caught by the launch audit).
+// than they hold and eat a raw chain revert (caught by the launch audit).
 const COFFER_READ_ABI = [
   { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ name: 'a', type: 'address' }], outputs: [{ type: 'uint256' }] },
   { type: 'function', name: 'convertToAssets', stateMutability: 'view', inputs: [{ name: 'shares', type: 'uint256' }], outputs: [{ type: 'uint256' }] },
@@ -59,7 +59,7 @@ export function VaultWithdraw() {
   const helper = readinessMessage(deployment, 'Withdraw');
   // >= 1 micro-USDC floor (sub-precision floors to 0 on-chain) AND <= redeemable
   // balance (a connected user must not be able to submit more than they hold and
-  // eat a raw chain revert — launch-audit defect).
+  // eat a raw chain revert (launch-audit defect).
   const overBalance = redeemableUsd != null && parseFloat(amount) > redeemableUsd + 1e-9;
   const ready =
     deployment?.ready === true && parseFloat(amount) >= 0.000001 && !overBalance;

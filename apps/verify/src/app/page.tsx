@@ -131,10 +131,9 @@ export default async function LandingPage() {
         </section>
 
         {/* ============== FEATURE · PLINTH (margin engine) ==============
-            Reference-parity product mock (design/Atriumnew.html). The figures
-            are an illustrative sample, labelled as such under the frame — a
-            labelled product screenshot, not a live-stat claim. Live portfolio
-            data renders in /app/portfolio. */}
+            Reference-parity product mock (design/Atriumnew.html). The vault TVL,
+            venue count and Lantern figures read real backend data (getLandingData);
+            the dashboard frame shows what /app/portfolio looks like populated. */}
         <section id="portfolio-feature" className="feature">
           <div className="container">
             <div className="section-head centered">
@@ -564,7 +563,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
               {[
                 {
                   block: 'Block 01', title: 'Risk engine', count: '4 subsystems',
-                  sub: 'Cross-product margin, liquidations, options pricing — Rust deployed as Stylus.',
+                  sub: 'Cross-product margin, liquidations, options pricing. Rust, deployed as Stylus.',
                   cards: [
                     { n: '01', p: 'P1', name: 'Plinth', sub: 'Margin engine', stack: 'Stylus · Rust' },
                     { n: '02', p: 'P1', name: 'Vigil', sub: 'Liquidation engine', stack: 'Stylus · Rust' },
