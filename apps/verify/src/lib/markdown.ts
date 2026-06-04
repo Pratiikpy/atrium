@@ -113,7 +113,7 @@ export function renderMarkdownToHtml(md: string): string {
       }
       i++; // skip closing fence
       out.push(
-        `<pre class="mt-4 overflow-x-auto rounded-md border border-divider bg-parchment-soft/50 p-4 text-[12.5px] leading-relaxed"><code class="font-mono text-ink">${escapeHtml(
+        `<pre class="mt-4 max-w-full overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-divider bg-parchment-soft/50 p-4 text-[12.5px] leading-relaxed"><code class="font-mono whitespace-pre-wrap break-words text-ink">${escapeHtml(
           body.join('\n'),
         )}</code></pre>`,
       );

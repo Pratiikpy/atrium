@@ -75,7 +75,42 @@ export function AuditFindingsTable() {
       )}
 
       {findings.length > 0 && (
-        <div className="overflow-x-auto rounded-md border border-divider">
+        <>
+        <div className="grid min-w-0 max-w-full gap-3 sm:hidden">
+          {findings.slice(0, 40).map((f) => (
+            <article key={f.id} className="min-w-0 max-w-full overflow-hidden rounded-md border border-divider bg-parchment p-4">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <p className="font-mono text-[11px] text-muted">#{f.id}</p>
+                <span
+                  className={
+                    'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wider ' +
+                    (f.status === 'closed'
+                      ? 'bg-live-soft text-live'
+                      : 'bg-testnet/10 text-testnet')
+                  }
+                >
+                  <span
+                    className={
+                      'size-1.5 rounded-full ' +
+                      (f.status === 'closed' ? 'bg-live' : 'bg-testnet')
+                    }
+                  />
+                  {f.status}
+                </span>
+              </div>
+              <p className="mt-2 min-w-0 break-words text-sm text-ink">{f.finding}</p>
+              <p className="mt-3 min-w-0 break-all font-mono text-[11px] text-ink-soft">{f.location}</p>
+              <p className="mt-1 font-mono text-[11px] text-muted">{f.agent}</p>
+            </article>
+          ))}
+          {findings.length > 40 && (
+            <p className="rounded-md border border-divider bg-parchment-soft px-3 py-2 text-center text-[11px] text-muted">
+              showing first 40 of {findings.length} . see{' '}
+              <code className="font-mono">docs/plan-tracker.md</code> for the full register
+            </p>
+          )}
+        </div>
+        <div className="hidden overflow-x-auto rounded-md border border-divider sm:block">
           <table className="min-w-full divide-y divide-divider text-[12.5px]">
             <thead className="bg-parchment-soft text-[10.5px] uppercase tracking-wider text-muted">
               <tr>
@@ -122,6 +157,7 @@ export function AuditFindingsTable() {
             </p>
           )}
         </div>
+        </>
       )}
     </div>
   );

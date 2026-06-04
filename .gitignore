@@ -222,3 +222,5 @@ qa-evidence/
 # Internal secret-management docs, kept local, not for the public repo
 ops/doppler/secrets-inventory.md
 ops/doppler/service-tokens.md
+
+.vercel
