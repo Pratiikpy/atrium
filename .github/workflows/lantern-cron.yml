@@ -54,8 +54,15 @@ jobs:
       - name: Notify ops on failure
         if: failure()
         run: |
+          # Guard the webhook: when DISCORD_OPS_WEBHOOK is unset the bare curl
+          # exits 2 ("no URL specified"), which masks the real failure and adds
+          # noise. Only post when the secret is actually configured.
+          if [ -z "$DISCORD_OPS_WEBHOOK" ]; then
+            echo "DISCORD_OPS_WEBHOOK not set; skipping failure notification."
+            exit 0
+          fi
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
-            $DISCORD_OPS_WEBHOOK
+            "$DISCORD_OPS_WEBHOOK"
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
