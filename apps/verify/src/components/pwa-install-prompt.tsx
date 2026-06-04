@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -10,6 +11,11 @@ interface BeforeInstallPromptEvent extends Event {
 export function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [show, setShow] = useState(false);
+  const pathname = usePathname();
+  // The /app/* dashboard is a dense financial surface; a floating install
+  // banner there occludes portfolio cards (visual sweep 2026-06-04). Keep the
+  // prompt to the roomier marketing pages, never over the app data.
+  const onAppSurface = pathname?.startsWith('/app') ?? false;
 
   useEffect(() => {
     const visits = Number(localStorage.getItem('atrium-visits') || '0') + 1;
@@ -27,7 +33,7 @@ export function PwaInstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  if (!show) return null;
+  if (!show || onAppSurface) return null;
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
