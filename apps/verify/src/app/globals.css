@@ -527,6 +527,17 @@ body {
     color: var(--color-mob-ink);
   }
 
+  /* Gap H (dark-mobile): the flip is scoped to .marketing-shell, but the
+     <body>/<html> keep the LIGHT parchment background. Anything outside the
+     shell box shows that white: the consent banner's reserved padding-bottom
+     strip at page bottom, and iOS rubber-band overscroll above/below. Paint
+     the document dark too, scoped to pages that actually carry the shell so
+     the landing (.atrium-m-root) and /app (.atrium-mobile-only) are untouched. */
+  html:has(.marketing-shell),
+  body:has(.marketing-shell) {
+    background-color: var(--color-mob-bg);
+  }
+
   .marketing-shell .container {
     padding-left: 20px;
     padding-right: 20px;
