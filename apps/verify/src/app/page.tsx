@@ -78,7 +78,7 @@ export default async function LandingPage() {
     <>
       <JsonLd schema={ATRIUM_ORG_SCHEMA} />
       <JsonLd schema={ATRIUM_APP_SCHEMA} />
-      <div className="min-h-screen">
+      <div className="atrium-desktop-only min-h-screen">
         <PublicNav heroId="hero" />
         {/* a11y: primary-content landmark. The nav above and footer below are
             siblings, so "Skip to content" (-> #main-content) jumps past the nav
@@ -730,6 +730,179 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
 
         <Footer />
       </div>
+      <div className="atrium-mobile-only">
+        <MobileLanding data={d} />
+      </div>
     </>
+  );
+}
+
+function MobileLanding({ data }: { data: LandingData }) {
+  return (
+    <div className="atrium-m-root">
+      <div className="iphone-screen">
+        <div className="page landing-page">
+          <nav className="topnav" aria-label="Mobile landing navigation">
+            <Link href="/" className="mark">Atrium</Link>
+            <Link href="/app" className="cta">Open testnet ↗</Link>
+          </nav>
+
+          <div className="scroll">
+            <section className="hero">
+              <div className="hero-grid" />
+              <div className="hero-glow" />
+              <div className="hero-eyebrow">
+                <span className="rule" />
+                <span>Unified margin · EVM · testnet</span>
+              </div>
+              <h1>
+                One wallet. Every venue.
+                <br />
+                One <em>buying-power</em>
+                <br />
+                number.
+              </h1>
+              <p className="sub">
+                Atrium is unified margin prime brokerage for the EVM. Post collateral once.
+                Trade across onchain venues against one figure, computed onchain by Plinth.
+              </p>
+              <div className="hero-cta">
+                <Link href="/app" className="primary">Open testnet ↗</Link>
+                <Link href="#product" className="ghost">See how it works</Link>
+              </div>
+              <div className="hero-trust">
+                <span><span className="td" /> Arbitrum Sepolia</span>
+                <span><span className="td" /> Chainlink CCIP</span>
+                <span><span className="td" /> ERC-8004</span>
+              </div>
+            </section>
+
+            <div className="impluvium">
+              <div className="label-row">
+                <div className="left">
+                  <div><strong>Fig. 01</strong> · Capital convergence</div>
+                  <div style={{ marginTop: 3 }}>Plan view · live testnet</div>
+                </div>
+                <div className="right">
+                  <div><strong>Sheet 02 / 08</strong></div>
+                  <div style={{ marginTop: 3 }}>Atrium Labs · 2026</div>
+                </div>
+              </div>
+
+              <div className="pool">
+                <div className="l">Pool · unified margin</div>
+                <div className="v">{data.tvl}</div>
+                <div className="s">Buying power · live</div>
+              </div>
+
+              <div className="venues">
+                {[
+                  ['HL-HIP3', 'Tokenized perps', '$1.25M', '100%'],
+                  ['AAVE-V3', 'RWA · USTB', '$892K', '71%'],
+                  ['TRADE', 'RFQ · dark pool', '$401K', '32%'],
+                  ['PENDLE', 'PT · stETH', '$320K', '26%'],
+                  ['HL-HIP4', 'Permissioned', '$483K', '39%'],
+                  ['CURVE', '3pool LP', '$186K', '15%'],
+                ].map(([name, sub, amount, width], index) => (
+                  <div className="venue" key={name}>
+                    <div className="name">{name}</div>
+                    <div className="sub">{sub}</div>
+                    <div className="amt">{amount}</div>
+                    <div className="bar">
+                      <span style={{ width, background: index === 0 ? 'var(--accent)' : undefined }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="scale">
+                <span>0×</span><span>2×</span><span>4×</span><span>6×</span><span>10×</span>
+              </div>
+            </div>
+
+            <section className="section" id="product">
+              <div className="section-num"><span className="accent">01</span> · The product</div>
+              <h2>Capital efficiency, <em>mathematically.</em></h2>
+              <p className="lede">
+                Plinth reads collateral across every venue and returns one cross-product
+                margin number per block.
+              </p>
+              <div className="feat">
+                <div className="feat-eyebrow">Plinth · Stylus</div>
+                <div className="t">SPAN-style portfolio margin, <em>onchain.</em></div>
+                <div className="d">
+                  The hot risk loop lives in Rust via Stylus, while the venue layer stays
+                  Solidity and standards-friendly.
+                </div>
+                <div className="mock">
+                  <div className="mock-head"><span className="l">Buying power</span><span className="pill">live</span></div>
+                  <div className="big">{data.tvl}</div>
+                  <div className="mock-row"><span className="l">Venues live</span><span className="v">{data.venuesLive} / {data.venuesTotal}</span></div>
+                  <div className="mock-row"><span className="l">Margin</span><span className="v">SPAN</span></div>
+                  <div className="mock-row"><span className="l">Engine</span><span className="v">Stylus</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section className="section">
+              <div className="section-num"><span className="accent">02</span> · Cross-chain</div>
+              <h2>Move collateral in <em>one transaction.</em></h2>
+              <p className="lede">
+                Aqueduct routes through Chainlink CCIP so collateral posted on one chain
+                becomes Plinth credit on another.
+              </p>
+              <div className="move-mock">
+                <div className="ends">
+                  <div className="end"><div className="l">From</div><div className="n">arb-sepolia</div></div>
+                  <div className="arrow">→</div>
+                  <div className="end" style={{ textAlign: 'right' }}><div className="l">To</div><div className="n">rh-chain</div></div>
+                </div>
+                <div className="amt">50,000<span className="u">USDC</span></div>
+                <div className="meta">CCIP fee · testnet · estimated 8.4s</div>
+              </div>
+            </section>
+
+            <section className="section">
+              <div className="section-num"><span className="accent">03</span> · Agents</div>
+              <h2>Agents trade with <em>bounded mandates.</em></h2>
+              <p className="lede">
+                Sigil turns one typed signature into a finite mandate: one agent, one
+                strategy, one cap, one expiry.
+              </p>
+              <div className="sigil-mock">
+                <div className="step"><span className="m">✓</span><span className="desc">Intent Sigil signed<span className="v">agent · cap · ttl</span></span></div>
+                <div className="step"><span className="m">✓</span><span className="desc">Session key issued<span className="v">Postern · scoped key</span></span></div>
+                <div className="step"><span className="x">→</span><span className="desc">Action Sigil checked<span className="v">Vigil · mandate ok</span></span></div>
+              </div>
+            </section>
+
+            <div className="stats-band">
+              <div className="head">Live testnet surface</div>
+              <div className="stats-grid">
+                <div className="stat"><div className="l">TVL</div><div className="v">{data.tvl}</div><div className="s">from Scribe</div></div>
+                <div className="stat"><div className="l">Venues</div><div className="v">{data.venuesLive}/{data.venuesTotal}</div><div className="s">registered</div></div>
+                <div className="stat"><div className="l">Lantern</div><div className="v">{data.lanternRoot}</div><div className="s">{data.lanternMinsAgo}</div></div>
+                <div className="stat"><div className="l">Agents</div><div className="v">{data.agents}</div><div className="s">Rostrum</div></div>
+              </div>
+            </div>
+
+            <div className="cta-band">
+              <h3>Step inside. <em>The testnet is open.</em></h3>
+              <p>Onboard with a passkey, claim faucet funds, then post collateral against one margin number.</p>
+              <div className="actions">
+                <Link href="/app" className="primary">Open testnet ↗</Link>
+                <Link href="/verify/1" className="ghost">Verifier walk</Link>
+              </div>
+            </div>
+
+            <footer>
+              <div className="foot-mark">Atrium</div>
+              <div className="foot-sub">Unified margin prime brokerage<br />for the EVM.</div>
+              <div className="foot-base"><span className="dot" /> Testnet only · not investment advice</div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

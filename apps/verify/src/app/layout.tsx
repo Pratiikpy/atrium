@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Instrument_Serif } from 'next/font/google';
 import './globals.css';
+import './mobile-landing-dark.css';
 import { Providers } from '@/components/providers';
 import { KaniBadge } from '@/components/kani-badge';
 import { CookieConsentBanner } from '@/components/cookie-consent-banner';
