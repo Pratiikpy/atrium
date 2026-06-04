@@ -1,0 +1,48 @@
+{
+  "_comment": "Sigil-selector-fix cutover (commit b4701dc). New core stack DEPLOYED + STAGED on Arbitrum Sepolia 2026-06-04, NOT yet flipped live. The app keeps using the contracts in arbitrum_sepolia.json until the 48h timelock matures (2026-06-06T09:10Z) and `scripts/cutover-tplus48-execute.sh run` lands the fill, after which the app's contract addresses are flipped to these.",
+  "chainId": 421614,
+  "deployedAt": "2026-06-04T09:10:00Z",
+  "reason": "Sigil.validate_action exported Vec<u8> as Solidity uint8[] (selector 0x0e9c8ea4) instead of bytes (0x20aa2205), so every agent-mandate validateAction call fell through the Stylus fallback (Plinth code 6). Fix = stylus_sdk::abi::Bytes. The fixed Sigil requires a fresh Plinth (no sigil setter) + Router (immutable plinth) cascade.",
+  "newStack": {
+    "sigil": {
+      "address": "0x3b58b39579dbbf4fcab5e2a3331812dc86b1f193",
+      "deployTx": "0x87f00bd9c9d2da63a1b366525a2e20146d0b573e3320dbf51dc047254f44448a",
+      "activationTx": "0x3978ef33bcb360ee748a767bf6cb67c20506d7a5bc61de2df66ff963d1a334c6",
+      "initTx": "0x2ecea08738edf9d67f9c00ebe3d72d3a42f51cacb71bdb9ad8d5a59fe9cffbab",
+      "kind": "stylus",
+      "note": "validateAction(bytes,bytes)=0x20aa2205 fixed; initialized praetor=deployer, timelock=0x0dad24d7, plinth=new Plinth"
+    },
+    "plinth": {
+      "address": "0x2751021c9cb98f6d5fb07053e3e0e18bacfe0693",
+      "deployTx": "0x917cbf56f7480cf622b3fd7f2ed3f59bbceb89c2c03e8e72114384e49440fd42",
+      "kind": "stylus",
+      "note": "multi-fragment (2 fragments) via atrium-stylus docker cargo-stylus 0.10.7; constructor wired -> new Sigil + existing coffer/vigil/registry/chainlink/pyth/real-timelock/plinth-math/plinth-oracle"
+    },
+    "atrium-router": {
+      "address": "0x237113cd7FEBa065795d9b38DB42075E91601718",
+      "deployTx": "0xdc9e18e210ea7c5d20d58d8300c4b9f5c9be5cc33a1c85fad47fe7250df3cd06",
+      "kind": "solidity",
+      "note": "forge create; constructor(new Plinth, coffer, registry, deployer-praetor, real-timelock)"
+    }
+  },
+  "reusedExisting": {
+    "coffer": "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3",
+    "vigil": "0x5ccd3422f430f6d034ff46715b41509de9d0deed",
+    "portico-registry": "0x9a9af6e50491cd4694699d48564bbff18f9b40bc",
+    "plinth-math": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
+    "plinth-oracle": "0x66064d18722f50e055d74daf51a13fd8e331f0b7",
+    "praetor-timelock": "0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4",
+    "adapter-aave-horizon": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1",
+    "mock-aave-pool": "0x2e1360faE80c7937e684067450202D921F72555B"
+  },
+  "verifiedLive": "staticcall new Plinth.openPosition with an envelope bound to the new Sigil reverts code 9 (UNKNOWN_VENUE), NOT code 6 (INVALID_ACTION_SIGIL) -> the Sigil selector fix passes validation on chain. #430 is resolved in the deployed V11 adapter (032-SC11 supplies min(notional,funded)) so the fill will land.",
+  "scheduledTimelockOps": {
+    "readyAt": "2026-06-06T09:10:42Z",
+    "ops": [
+      { "label": "plinth_set_instrument_risk", "target": "0x2751021c9cb98f6d5fb07053e3e0e18bacfe0693", "sig": "setInstrumentRisk(uint8,bytes32,uint16,uint16,bytes32,address,bool)", "args": "2, USDC-LEND, 100, 1, pythFeed, mockCL, true", "scheduledTs": 1780564242 },
+      { "label": "coffer_set_adapter", "target": "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3", "sig": "setAdapter(address,bool,uint256)", "args": "newRouter, true, 1e12", "scheduledTs": 1780564250 },
+      { "label": "adapter_set_authorized_caller", "target": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1", "sig": "setAuthorizedCaller(address,bool)", "args": "newRouter, true", "scheduledTs": 1780564256 }
+    ]
+  },
+  "complete": "After 2026-06-06T09:10Z: `bash scripts/cutover-tplus48-execute.sh run` (executes the 3 ops, pushes Pyth, drives the real agent-mandate fill via the new Router, verifies). Then flip the app: replace sigil/plinth/atrium-router addresses in arbitrum_sepolia.json + apps/verify NEXT_PUBLIC envs with the newStack values, commit, push (Vercel auto-deploys)."
+}
