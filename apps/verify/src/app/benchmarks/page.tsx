@@ -10,7 +10,7 @@ export const metadata = buildMetadata({
 export default function BenchmarksPage() {
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-4xl">
       <h1 className="font-display text-5xl text-ink">Benchmarks</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Side-by-side against the closest comparables. Numbers come from competitor docs and on-chain reads.
@@ -40,13 +40,19 @@ export default function BenchmarksPage() {
           ))}
         </div>
         <div className="hidden overflow-x-auto sm:block">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
+          <colgroup>
+            <col className="w-[28%]" />
+            <col className="w-[24%]" />
+            <col className="w-[24%]" />
+            <col className="w-[24%]" />
+          </colgroup>
           <thead>
             <tr className="border-b border-divider text-left text-muted">
-              <th className="py-3 pr-6 font-normal">Dimension</th>
-              <th className="py-3 pr-6 font-normal">Atrium</th>
-              <th className="py-3 pr-6 font-normal">Cascade (Solana)</th>
-              <th className="py-3 pr-6 font-normal">August (Solana)</th>
+              <th className="py-2.5 pr-6 font-normal">Dimension</th>
+              <th className="py-2.5 pr-6 font-normal">Atrium</th>
+              <th className="py-2.5 pr-6 font-normal">Cascade (Solana)</th>
+              <th className="py-2.5 pr-6 font-normal">August (Solana)</th>
             </tr>
           </thead>
           <tbody className="text-ink-soft">

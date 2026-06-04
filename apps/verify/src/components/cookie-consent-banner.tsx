@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
 
 const STORAGE_KEY = 'atrium_consent_v1';
 const CONSENT_TIMESTAMP_KEY = 'atrium_consent_ts';
@@ -44,12 +43,10 @@ function writeConsent(c: Categories) {
  * never renders again (localStorage, 12-month TTL).
  */
 export function CookieConsentBanner() {
-  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
-  const appMobile = pathname?.startsWith('/app') ?? false;
 
   useEffect(() => {
     if (!readConsent()) setVisible(true);
@@ -64,6 +61,15 @@ export function CookieConsentBanner() {
       document.body.style.paddingBottom = '';
       root.style.removeProperty('--consent-h');
       return;
+    }
+    // Reserve a provisional height SYNCHRONOUSLY before measuring. Without it
+    // the banner paints over the footer / "become a partner" CTA for one frame
+    // (on /cohort, desktop + mobile) until offsetHeight is read and applied.
+    // Setting a sensible default first lifts content immediately, then we
+    // refine to the measured height below.
+    if (!root.style.getPropertyValue('--consent-h')) {
+      document.body.style.paddingBottom = '96px';
+      root.style.setProperty('--consent-h', '96px');
     }
     const h = barRef.current?.offsetHeight ?? 0;
     // Body padding reflows normal-flow content above the bar. The --consent-h
@@ -90,27 +96,24 @@ export function CookieConsentBanner() {
       ref={barRef}
       role="dialog"
       aria-label="Privacy choices"
-      className={
-        'fixed inset-x-0 bottom-0 z-50 border-t border-divider bg-parchment shadow-[0_-6px_24px_rgba(0,0,0,0.08)] ' +
-        (appMobile ? 'max-sm:border-mob-line max-sm:bg-mob-bg-card' : '')
-      }
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-divider bg-parchment shadow-[0_-6px_24px_rgba(0,0,0,0.08)] max-sm:border-mob-line max-sm:bg-mob-bg-card max-sm:shadow-[0_-10px_30px_rgba(0,0,0,0.34)]"
     >
       <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3">
         <div className="min-w-0">
-          <h2 className={'font-display text-[14px] italic leading-tight text-ink sm:text-base ' + (appMobile ? 'max-sm:text-mob-ink' : '')}>Privacy choices</h2>
-          <p className={'mt-0.5 max-w-3xl text-[11px] leading-snug text-ink-soft sm:text-[13px] ' + (appMobile ? 'max-sm:text-mob-muted' : '')}>
+          <h2 className="font-display text-[14px] italic leading-tight text-ink sm:text-base max-sm:text-mob-ink">Privacy choices</h2>
+          <p className="mt-0.5 max-w-3xl text-[11px] leading-snug text-ink-soft sm:text-[13px] max-sm:text-mob-muted">
             Atrium uses essential cookies to run. Optional analytics (SimpleAnalytics, no personal
             IDs) and crash reporting (Sentry, wallet addresses scrubbed) stay off until you allow
             them.
           </p>
 
           {customize && (
-            <div className={'mt-2 flex flex-col gap-1.5 border-t border-divider pt-2 sm:mt-3 sm:flex-row sm:gap-6 sm:pt-3 ' + (appMobile ? 'max-sm:border-mob-line' : '')}>
-              <label className={'flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] ' + (appMobile ? 'max-sm:text-mob-muted' : '')}>
+            <div className="mt-2 flex flex-col gap-1.5 border-t border-divider pt-2 sm:mt-3 sm:flex-row sm:gap-6 sm:pt-3 max-sm:border-mob-line">
+              <label className="flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] max-sm:text-mob-muted">
                 <input type="checkbox" checked disabled className="size-4 accent-ink" />
                 <span>Essential <span className="text-muted">(always on)</span></span>
               </label>
-              <label className={'flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] ' + (appMobile ? 'max-sm:text-mob-muted' : '')}>
+              <label className="flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] max-sm:text-mob-muted">
                 <input
                   type="checkbox"
                   checked={analytics}
@@ -119,7 +122,7 @@ export function CookieConsentBanner() {
                 />
                 Analytics &amp; crash reporting
               </label>
-              <label className={'flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] ' + (appMobile ? 'max-sm:text-mob-muted' : '')}>
+              <label className="flex items-center gap-2 text-[12px] text-ink-soft sm:text-[13px] max-sm:text-mob-muted">
                 <input type="checkbox" checked={false} disabled className="size-4 accent-ink" />
                 <span>Marketing <span className="text-muted">(none today)</span></span>
               </label>
@@ -131,7 +134,7 @@ export function CookieConsentBanner() {
           {customize ? (
             <button
               onClick={() => save({ essential: true, analytics, marketing: false })}
-              className={'h-8 rounded-md bg-ink px-3 text-xs font-medium text-bg sm:h-[40px] sm:px-4 sm:text-sm ' + (appMobile ? 'max-sm:bg-mob-accent max-sm:text-mob-bg' : '')}
+              className="h-8 rounded-md bg-ink px-3 text-xs font-medium text-bg sm:h-[40px] sm:px-4 sm:text-sm max-sm:bg-mob-accent max-sm:text-mob-bg"
             >
               Save preferences
             </button>
@@ -139,19 +142,19 @@ export function CookieConsentBanner() {
             <>
               <button
                 onClick={() => setCustomize(true)}
-                className={'h-8 rounded-md px-2 text-xs text-muted underline underline-offset-2 hover:text-ink sm:h-[40px] sm:px-3 sm:text-sm ' + (appMobile ? 'max-sm:text-mob-muted max-sm:hover:text-mob-ink' : '')}
+                className="h-8 rounded-md px-2 text-xs text-muted underline underline-offset-2 hover:text-ink sm:h-[40px] sm:px-3 sm:text-sm max-sm:text-mob-muted max-sm:hover:text-mob-ink"
               >
                 Customize
               </button>
               <button
                 onClick={() => save({ essential: true, analytics: false, marketing: false })}
-                className={'h-8 rounded-md border border-divider bg-bg px-3 text-xs font-medium text-ink sm:h-[40px] sm:px-4 sm:text-sm ' + (appMobile ? 'max-sm:border-mob-line max-sm:bg-mob-bg-elev max-sm:text-mob-ink' : '')}
+                className="h-8 rounded-md border border-divider bg-bg px-3 text-xs font-medium text-ink sm:h-[40px] sm:px-4 sm:text-sm max-sm:border-mob-line max-sm:bg-mob-bg-elev max-sm:text-mob-ink"
               >
                 Reject non-essential
               </button>
               <button
                 onClick={() => save({ essential: true, analytics: true, marketing: false })}
-                className={'h-8 rounded-md bg-ink px-3 text-xs font-medium text-bg sm:h-[40px] sm:px-4 sm:text-sm ' + (appMobile ? 'max-sm:bg-mob-accent max-sm:text-mob-bg' : '')}
+                className="h-8 rounded-md bg-ink px-3 text-xs font-medium text-bg sm:h-[40px] sm:px-4 sm:text-sm max-sm:bg-mob-accent max-sm:text-mob-bg"
               >
                 Accept all
               </button>

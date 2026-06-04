@@ -31,10 +31,10 @@ export function MarketingShell({
   nakedContent?: boolean;
 }) {
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <div className="marketing-shell min-h-screen" style={{ background: "var(--bg)" }}>
       <PublicNav />
       <main className="pt-[68px]">
-        {nakedContent ? children : <div className="container py-16">{children}</div>}
+        {nakedContent ? children : <div className="container pt-20 pb-16">{children}</div>}
       </main>
       <Footer />
     </div>

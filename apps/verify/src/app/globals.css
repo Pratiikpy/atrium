@@ -575,6 +575,32 @@ body {
     box-shadow: none;
   }
 
+  /* Gap B (dark-mobile spec): native form controls keep the OS LIGHT widget
+     chrome on the OLED canvas, so any input/select/textarea on a marketing
+     page (the /docs/api try-it, faucet, etc.) renders a bright white field on
+     near-black. Force the dark scheme + dark field surface scoped to the
+     shell so they match the inverted palette. */
+  .marketing-shell input,
+  .marketing-shell select,
+  .marketing-shell textarea {
+    color-scheme: dark;
+    background: var(--color-mob-bg-card);
+    color: var(--color-mob-ink);
+    border-color: var(--color-mob-line);
+  }
+
+  /* Gap F (dark-mobile spec): Tailwind's alpha-modified parchment surfaces
+     (e.g. bg-parchment-soft/40) compile to a color-mix against the parchment
+     token. After the flip that token is dark, so a 40% dark-on-dark card is
+     nearly invisible (benchmark cards, the cohort "become a partner" panel,
+     security panels, honest-read callouts read as empty rectangles). Promote
+     those alpha surfaces to a visible card elevation. Solid bg-parchment
+     already maps to mob-bg-card via the var and is left alone. */
+  .marketing-shell [class*="bg-parchment-soft/"],
+  .marketing-shell [class*="bg-parchment/"] {
+    background-color: var(--color-mob-bg-card) !important;
+  }
+
   .atrium-onboarding-flow,
   .dark-mobile-sheet {
     --bg: var(--color-mob-bg);

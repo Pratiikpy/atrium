@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="border-t border-[var(--hairline)] bg-[var(--bg-sunk)]">
       <div className="container py-16">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           <div className="col-span-2 flex flex-col gap-4">
             <BrandWordmark size={28} />
             <p className="max-w-xs text-[13.5px] text-[var(--ink-soft)]">

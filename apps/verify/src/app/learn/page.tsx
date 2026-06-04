@@ -54,6 +54,7 @@ export default function LearnPage() {
         />
       </section>
 
+      <div className="hairline mt-20" />
       <section className="mt-12">
         <h2 className="font-display text-2xl text-ink">Open standards</h2>
         <p className="mt-3 text-ink-soft">
