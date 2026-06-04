@@ -75,7 +75,7 @@ export function OnboardingFlow() {
   });
 
   return (
-    <div className="atrium-onboarding-flow min-h-screen bg-parchment">
+    <div className="atrium-onboarding-flow mobile-dark-doc min-h-screen bg-parchment">
       {/* Top bar */}
       <div className="flex items-center justify-between px-8 py-5">
         <Link href="/" className="font-display text-xl italic text-ink">
