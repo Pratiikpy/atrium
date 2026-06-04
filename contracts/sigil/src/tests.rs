@@ -437,7 +437,7 @@ fn validate_action_happy_path_returns_true() {
     let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
 
     vm.set_sender(PLINTH); // Plinth drives validate_action
-    assert_ok_true(sigil.validate_action(intent_bytes, action_bytes));
+    assert_ok_true(sigil.validate_action(intent_bytes.into(), action_bytes.into()));
 
     // The credit-line counter advanced by the action's notional.
     assert_eq!(
@@ -455,10 +455,10 @@ fn validate_action_rejects_replayed_action_031sc10() {
     let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
     vm.set_sender(PLINTH);
     // First use of the signed action succeeds.
-    assert_ok_true(sigil.validate_action(intent_bytes.clone(), action_bytes.clone()));
+    assert_ok_true(sigil.validate_action(intent_bytes.clone().into(), action_bytes.clone().into()));
     // Replaying the EXACT same captured pair must revert (pre-fix it succeeded
     // indefinitely, re-opening positions the user already closed).
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     assert!(
         matches!(res, Err(SigilError::ActionReplayed(_))),
         "replayed signed action must revert ActionReplayed, got {}",
@@ -473,7 +473,7 @@ fn validate_action_rejects_non_plinth_caller_031sc10() {
     let intent = happy_intent();
     let (intent_bytes, action_bytes, _h) = valid_envelopes(&vm, &intent, 1_000_000, 1);
     vm.set_sender(address!("000000000000000000000000000000000000dEaD"));
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     assert!(
         matches!(res, Err(SigilError::Unauthorized(_))),
         "validate_action must reject non-Plinth callers, got {}",
@@ -515,7 +515,7 @@ fn validate_action_rejects_forged_owner_signature() {
     let action_bytes = encode_action(&action, &agent_sig);
 
     vm.set_sender(PLINTH);
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     assert!(
         matches!(res, Err(SigilError::InvalidSignature(_))),
         "forged owner sig must revert InvalidSignature, got {}",
@@ -558,7 +558,7 @@ fn validate_action_rejects_forged_agent_signature() {
     let action_bytes = encode_action(&action, &forged);
 
     vm.set_sender(PLINTH);
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     assert!(
         matches!(res, Err(SigilError::InvalidSignature(_))),
         "forged agent sig must revert InvalidSignature, got {}",
@@ -603,7 +603,7 @@ fn validate_action_rejects_unauthorized_venue() {
     let action_bytes = encode_action(&action, &agent_sig);
 
     vm.set_sender(PLINTH);
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     match res {
         Err(SigilError::VenueNotAllowed(e)) => assert_eq!(e.venue_id, 99),
         Err(e) => panic!("expected VenueNotAllowed(99), got Err({})", err_name(&e)),
@@ -644,7 +644,7 @@ fn validate_action_rejects_oversize_notional() {
     let action_bytes = encode_action(&action, &agent_sig);
 
     vm.set_sender(PLINTH);
-    let res = sigil.validate_action(intent_bytes, action_bytes);
+    let res = sigil.validate_action(intent_bytes.into(), action_bytes.into());
     match res {
         Err(SigilError::NotionalExceeded(e)) => {
             assert_eq!(e.attempted, U256::from(over as u64));
@@ -671,12 +671,12 @@ fn validate_action_enforces_per_day_rate_limit() {
     // First two actions (distinct action nonces, sub-cap notional) succeed.
     for nonce in 1u64..=2 {
         let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, nonce);
-        assert_ok_true(sigil.validate_action(ib, ab));
+        assert_ok_true(sigil.validate_action(ib.into(), ab.into()));
     }
 
     // Third action in the same day hits the rate limit.
     let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, 3);
-    match sigil.validate_action(ib, ab) {
+    match sigil.validate_action(ib.into(), ab.into()) {
         Err(SigilError::RateLimitExceeded(e)) => {
             assert_eq!(e.cap, 2, "effective cap is the tighter intent cap");
             assert_eq!(e.attempted, 3);
@@ -703,7 +703,7 @@ fn credit_line_is_cumulative_and_caps() {
     let chunk = 10_000i64 * 1_000_000i64;
     for nonce in 1u64..=4 {
         let (ib, ab, _) = valid_envelopes(&vm, &intent, chunk, nonce);
-        assert_ok_true(sigil.validate_action(ib, ab));
+        assert_ok_true(sigil.validate_action(ib.into(), ab.into()));
     }
     assert_eq!(
         sigil.get_open_notional(agent),
@@ -713,7 +713,7 @@ fn credit_line_is_cumulative_and_caps() {
 
     // Fifth $10k open would push cumulative to $50k > $40k credit cap -> reject.
     let (ib, ab, _) = valid_envelopes(&vm, &intent, chunk, 5);
-    match sigil.validate_action(ib, ab) {
+    match sigil.validate_action(ib.into(), ab.into()) {
         Err(SigilError::CreditCapExceeded(e)) => {
             assert_eq!(e.max_credit, intent.max_total_open_notional_wei);
             assert_eq!(
@@ -741,7 +741,7 @@ fn record_close_decrements_open_notional_plinth_only() {
     vm.set_sender(PLINTH);
     let chunk = 10_000i64 * 1_000_000i64;
     let (ib, ab, _) = valid_envelopes(&vm, &intent, chunk, 1);
-    assert_ok_true(sigil.validate_action(ib, ab));
+    assert_ok_true(sigil.validate_action(ib.into(), ab.into()));
     let opened = U256::from(10_000u64) * U256::from(1_000_000u64);
     assert_eq!(sigil.get_open_notional(agent), opened);
 
@@ -787,7 +787,7 @@ fn revoke_marks_intent_and_blocks_validation() {
     let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, 1);
     vm.set_sender(PLINTH);
     assert!(
-        matches!(sigil.validate_action(ib, ab), Err(SigilError::MandateRevoked(_))),
+        matches!(sigil.validate_action(ib.into(), ab.into()), Err(SigilError::MandateRevoked(_))),
         "revoked intent must not validate"
     );
 }
@@ -813,7 +813,7 @@ fn revoke_all_bumps_per_owner_per_agent_nonce() {
     let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, 1);
     vm.set_sender(PLINTH);
     assert!(
-        matches!(sigil.validate_action(ib, ab), Err(SigilError::MandateRevoked(_))),
+        matches!(sigil.validate_action(ib.into(), ab.into()), Err(SigilError::MandateRevoked(_))),
         "stale revocation nonce must reject"
     );
 }
@@ -865,7 +865,7 @@ fn pause_blocks_validation_and_resume_restores() {
     let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, 1);
     vm.set_sender(PLINTH);
     assert!(matches!(
-        sigil.validate_action(ib, ab),
+        sigil.validate_action(ib.into(), ab.into()),
         Err(SigilError::Paused(_))
     ));
 
@@ -881,7 +881,7 @@ fn pause_blocks_validation_and_resume_restores() {
     assert!(sigil.resume().is_ok());
     let (ib, ab, _) = valid_envelopes(&vm, &intent, 100_000, 1);
     vm.set_sender(PLINTH);
-    assert_ok_true(sigil.validate_action(ib, ab));
+    assert_ok_true(sigil.validate_action(ib.into(), ab.into()));
 }
 
 // ---------------------------------------------------------------------------

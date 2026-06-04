@@ -17,6 +17,7 @@ use alloc::vec::Vec;
 use alloy_primitives::{Address, FixedBytes, Uint, U256, B256};
 use alloy_sol_types::sol;
 use stylus_sdk::prelude::*;
+use stylus_sdk::abi::Bytes;
 use stylus_sdk::call::static_call;
 
 // Wire the EIP-712 module per Agent A audit (MUST-FIX #1).
@@ -216,8 +217,8 @@ impl Sigil {
     /// Returns true if the action is authorized.
     pub fn validate_action(
         &mut self,
-        intent_bytes: alloc::vec::Vec<u8>,
-        action_bytes: alloc::vec::Vec<u8>,
+        intent_bytes: Bytes,
+        action_bytes: Bytes,
     ) -> Result<bool, SigilError> {
         // Audit 2026-05-24 (Auditor A C-5 + Auditor E reentrancy gap):
         // global pause check first, reentrancy guard second. Same shape as
@@ -238,8 +239,8 @@ impl Sigil {
 
     fn validate_action_inner(
         &mut self,
-        intent_bytes: alloc::vec::Vec<u8>,
-        action_bytes: alloc::vec::Vec<u8>,
+        intent_bytes: Bytes,
+        action_bytes: Bytes,
     ) -> Result<bool, SigilError> {
         // 031-SC10: validate_action is the agent-authorization gate, only
         // Plinth may invoke it (same trust boundary as record_close). Pre-fix
