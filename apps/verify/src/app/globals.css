@@ -550,7 +550,9 @@ body {
   html:has(.marketing-shell),
   body:has(.marketing-shell),
   html:has(.atrium-mobile-only),
-  body:has(.atrium-mobile-only) {
+  body:has(.atrium-mobile-only),
+  html:has(.mobile-dark-doc),
+  body:has(.mobile-dark-doc) {
     background-color: var(--color-mob-bg) !important;
   }
   /* The landing mobile shell (.atrium-m-root) uses its own slightly different
