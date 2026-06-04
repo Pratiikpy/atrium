@@ -136,16 +136,18 @@ export default async function LandingPage() {
             the dashboard frame shows what /app/portfolio looks like populated. */}
         <section id="portfolio-feature" className="feature">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Plinth · margin engine</div>
+            <div className="section-head product-feature-head">
+              <div className="product-feature-copy">
+                <div className="eyebrow mono cap">Plinth · margin engine</div>
+                <p className="section-sub">
+                  Plinth computes a SPAN-style cross-product margin number in Rust,
+                  deployed as Stylus. The same math costs 10–100× more gas in equivalent
+                  Solidity, which is why it has not shipped onchain elsewhere.
+                </p>
+              </div>
               <h2 className="h2">
                 Capital efficiency, <span className="accent-grad">mathematically.</span>
               </h2>
-              <p className="section-sub">
-                Plinth computes a SPAN-style cross-product margin number in Rust,
-                deployed as Stylus. The same math costs 10–100× more gas in equivalent
-                Solidity, which is why it has not shipped onchain elsewhere.
-              </p>
             </div>
             <div className="feature-stage">
               <div className="product-frame">

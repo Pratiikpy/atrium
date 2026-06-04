@@ -481,6 +481,156 @@ body {
   padding-right: var(--gutter);
   position: relative;
 }
+
+/* Mobile public-page brand pass:
+   Marketing/docs/legal pages keep the parchment Brand Kit desktop treatment,
+   but on phone-sized screens they adopt the Mobile Landing OLED palette so the
+   public site does not feel like a different product from the mobile landing/app. */
+@media (max-width: 768px) {
+  .marketing-shell {
+    --bg: var(--color-mob-bg);
+    --bg-sunk: var(--color-mob-bg-2);
+    --bg-raised: var(--color-mob-bg-card);
+    --ink: var(--color-mob-ink);
+    --ink-soft: var(--color-mob-ink-soft);
+    --muted: var(--color-mob-muted);
+    --faint: var(--color-mob-faint);
+    --line: var(--color-mob-line);
+    --hairline: var(--color-mob-hairline);
+    --accent: var(--color-mob-accent);
+    --accent-soft: oklch(0.78 0.12 28);
+    --testnet: var(--color-mob-testnet);
+    --live: var(--color-mob-live);
+    --neg: var(--color-mob-neg);
+
+    --color-ink: var(--color-mob-ink);
+    --color-ink-dark: var(--color-mob-ink);
+    --color-ink-soft: var(--color-mob-ink-soft);
+    --color-ink-muted: var(--color-mob-ink-soft);
+    --color-muted: var(--color-mob-muted);
+    --color-label: var(--color-mob-faint);
+    --color-divider: var(--color-mob-line);
+    --color-divider-soft: var(--color-mob-hairline);
+    --color-line: var(--color-mob-line);
+    --color-paper: var(--color-mob-bg);
+    --color-parchment: var(--color-mob-bg-card);
+    --color-parchment-warm: var(--color-mob-bg);
+    --color-parchment-soft: var(--color-mob-bg-2);
+    --color-parchment-light: var(--color-mob-bg-elev);
+    --color-bg: var(--color-mob-bg);
+    --color-bg-sunk: var(--color-mob-bg-2);
+    --color-bg-raised: var(--color-mob-bg-card);
+
+    background:
+      radial-gradient(ellipse 90% 42% at 50% -12%, color-mix(in oklch, var(--color-mob-accent) 16%, transparent), transparent 68%),
+      var(--color-mob-bg) !important;
+    color: var(--color-mob-ink);
+  }
+
+  .marketing-shell .container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .marketing-shell main {
+    background: transparent;
+  }
+
+  .marketing-shell .atrium-nav {
+    background: color-mix(in oklch, var(--color-mob-bg) 84%, transparent);
+    border-bottom-color: var(--color-mob-hairline);
+    color: var(--color-mob-ink);
+  }
+
+  .marketing-shell .atrium-nav .atrium-mark,
+  .marketing-shell .atrium-nav .nav-link,
+  .marketing-shell .nav-mobile-sheet .nav-link {
+    color: var(--color-mob-ink);
+  }
+
+  .marketing-shell .atrium-nav .btn.sm {
+    background: var(--color-mob-ink);
+    color: var(--color-mob-bg);
+    border-color: var(--color-mob-ink);
+  }
+
+  .marketing-shell .atrium-nav .pill,
+  .marketing-shell .nav-menu-btn {
+    border-color: var(--color-mob-line);
+    background: var(--color-mob-bg-card);
+    color: var(--color-mob-ink-soft);
+  }
+
+  .marketing-shell .nav-mobile-sheet.open {
+    background: color-mix(in oklch, var(--color-mob-bg) 94%, transparent);
+    border-bottom-color: var(--color-mob-line);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  }
+
+  .marketing-shell .atrium-card,
+  .marketing-shell .card,
+  .marketing-shell article,
+  .marketing-shell section.rounded-md,
+  .marketing-shell aside.rounded-md {
+    box-shadow: none;
+  }
+
+  .atrium-onboarding-flow,
+  .dark-mobile-sheet {
+    --bg: var(--color-mob-bg);
+    --bg-sunk: var(--color-mob-bg-2);
+    --bg-raised: var(--color-mob-bg-card);
+    --ink: var(--color-mob-ink);
+    --ink-soft: var(--color-mob-ink-soft);
+    --muted: var(--color-mob-muted);
+    --faint: var(--color-mob-muted);
+    --line: var(--color-mob-line);
+    --hairline: var(--color-mob-hairline);
+    --accent: var(--color-mob-accent);
+    --color-ink: var(--color-mob-ink);
+    --color-ink-dark: var(--color-mob-ink);
+    --color-ink-soft: var(--color-mob-ink-soft);
+    --color-ink-muted: var(--color-mob-muted);
+    --color-muted: var(--color-mob-muted);
+    --color-label: var(--color-mob-muted);
+    --color-divider: var(--color-mob-line);
+    --color-border: var(--color-mob-line);
+    --color-line: var(--color-mob-line);
+    --color-paper: var(--color-mob-bg);
+    --color-parchment: var(--color-mob-bg);
+    --color-parchment-warm: var(--color-mob-bg);
+    --color-parchment-soft: var(--color-mob-bg-2);
+    --color-parchment-light: var(--color-mob-bg-card);
+    --color-bg: var(--color-mob-bg);
+    --color-bg-sunk: var(--color-mob-bg-2);
+    --color-bg-raised: var(--color-mob-bg-card);
+  }
+
+  .atrium-onboarding-flow {
+    background:
+      radial-gradient(ellipse 90% 42% at 50% -12%, color-mix(in oklch, var(--color-mob-accent) 15%, transparent), transparent 68%),
+      var(--color-mob-bg) !important;
+    color: var(--color-mob-ink);
+  }
+
+  .atrium-onboarding-flow section,
+  .atrium-onboarding-flow table,
+  .atrium-onboarding-flow a,
+  .dark-mobile-sheet section,
+  .dark-mobile-sheet article,
+  .dark-mobile-sheet a {
+    box-shadow: none;
+  }
+
+  .atrium-onboarding-flow input,
+  .atrium-onboarding-flow select,
+  .atrium-onboarding-flow textarea,
+  .dark-mobile-sheet input,
+  .dark-mobile-sheet select,
+  .dark-mobile-sheet textarea {
+    color-scheme: dark;
+  }
+}
 .hairline { height: 1px; background: var(--hairline); width: 100%; }
 .ulink {
   color: inherit; text-decoration: none; position: relative; padding-bottom: 1px;
