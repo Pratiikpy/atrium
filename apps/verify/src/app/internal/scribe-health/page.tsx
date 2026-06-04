@@ -46,9 +46,9 @@ export default function ScribeHealthPage() {
   // Admin gate: check wallet against allowlist
   if (ADMIN_WALLETS.length > 0 && (!wallet || !ADMIN_WALLETS.includes(wallet.toLowerCase()))) {
     return (
-      <main className="p-8">
+      <main className="min-h-screen bg-parchment p-8 text-ink max-sm:bg-mob-bg max-sm:text-mob-ink">
         <h1 className="text-xl font-semibold">Access Denied</h1>
-        <p className="mt-2 text-sm text-neutral-500">
+        <p className="mt-2 text-sm text-neutral-500 max-sm:text-mob-muted">
           This page is restricted to admin wallets. Connect an authorized wallet.
         </p>
       </main>
@@ -56,11 +56,11 @@ export default function ScribeHealthPage() {
   }
 
   return (
-    <main className="p-8 max-w-3xl mx-auto">
+    <main className="min-h-screen bg-parchment p-8 text-ink max-sm:bg-mob-bg max-sm:text-mob-ink md:max-w-3xl md:mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Scribe Indexer Health</h1>
 
       {errorMsg && (
-        <div className="bg-red-50 border border-red-200 rounded p-3 mb-4 text-sm text-red-700">
+        <div className="bg-red-50 border border-red-200 rounded p-3 mb-4 text-sm text-red-700 max-sm:border-neg/40 max-sm:bg-neg/10 max-sm:text-mob-ink">
           Error: {errorMsg}
         </div>
       )}
@@ -75,7 +75,7 @@ export default function ScribeHealthPage() {
       )}
 
       <h2 className="text-lg font-medium mb-3">Lag History (last hour)</h2>
-      <div className="flex items-end gap-px h-32 bg-neutral-100 rounded p-2">
+      <div className="flex items-end gap-px h-32 bg-neutral-100 rounded p-2 max-sm:bg-mob-bg-card">
         {history.map((point, i) => {
           const maxLag = Math.max(...history.map((h) => h.lag), 1);
           const height = Math.max((point.lag / maxLag) * 100, 2);
@@ -90,7 +90,7 @@ export default function ScribeHealthPage() {
         })}
       </div>
 
-      <p className="mt-4 text-xs text-neutral-500">
+      <p className="mt-4 text-xs text-neutral-500 max-sm:text-mob-muted">
         Polls /api/scribe/health every 60s. Per-handler tick latency available in New Relic custom metrics.
       </p>
     </main>
@@ -99,9 +99,9 @@ export default function ScribeHealthPage() {
 
 function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <div className="bg-white border rounded p-3">
-      <div className="text-xs text-neutral-500">{label}</div>
-      <div className={`text-lg font-mono ${warn ? 'text-red-600' : ''}`}>{value}</div>
+    <div className="bg-white border rounded p-3 max-sm:border-mob-line max-sm:bg-mob-bg-card">
+      <div className="text-xs text-neutral-500 max-sm:text-mob-muted">{label}</div>
+      <div className={`text-lg font-mono ${warn ? 'text-red-600 max-sm:text-neg' : 'max-sm:text-mob-ink'}`}>{value}</div>
     </div>
   );
 }

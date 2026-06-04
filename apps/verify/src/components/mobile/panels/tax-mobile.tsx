@@ -41,7 +41,7 @@ const YEARS: TaxYear[] = ['2026', '2025', '2024'];
 
 export function TaxMobile() {
   const wallet = useScopedWallet();
-  const exportReady = useTaxExportReady();
+  const exportReady = useTaxExportReady(wallet != null);
   const [jurisdiction, setJurisdiction] = useState<TaxJurisdiction>('uk');
   const [year, setYear] = useState<TaxYear>('2026');
   const [limit, setLimit] = useState(50);
@@ -197,7 +197,7 @@ export function TaxMobile() {
             Export PDF
           </span>
           <p className="px-1 text-[12px] text-mob-muted">
-            {exportReady === null ? 'Checking export availability…' : 'Exports become available once the Tablet service is live.'}
+            {exportReady === null ? 'Checking export availability…' : wallet ? 'Exports become available once the Tablet service is live.' : 'Connect your wallet to enable tax exports.'}
           </p>
         </div>
       )}

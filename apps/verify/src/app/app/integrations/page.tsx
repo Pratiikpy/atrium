@@ -28,13 +28,11 @@ export default function IntegrationsPage() {
       active="/app/integrations"
       breadcrumb={[{ label: 'Integrations' }]}
       desktop={content}
-      // Theme-bleed fix (use-everything sweep 2026-06-03): this surface has no
-      // dedicated dark mobile panel (it is not in design/Mobile App.html), so on
-      // mobile it previously fell back to `children` and rendered light parchment
-      // cards directly on the dark OLED shell. Render the same (desktop-proven)
-      // content on a light parchment sheet so it reads correctly until a native
-      // dark panel is designed for it.
-      mobile={<div className="rounded-2xl bg-parchment p-4 text-ink">{content}</div>}
+      mobile={
+        <div className="dark-mobile-sheet rounded-2xl border border-mob-line bg-mob-bg-card p-4 text-mob-ink">
+          {content}
+        </div>
+      }
     />
   );
 }

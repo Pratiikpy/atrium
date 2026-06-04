@@ -13,9 +13,13 @@ import { useEffect, useState } from 'react';
  *
  * Returns: null while probing, true if exports are live, false if pending/blocked.
  */
-export function useTaxExportReady(): boolean | null {
+export function useTaxExportReady(enabled = true): boolean | null {
   const [ready, setReady] = useState<boolean | null>(null);
   useEffect(() => {
+    if (!enabled) {
+      setReady(false);
+      return;
+    }
     let cancelled = false;
     fetch('/api/tax/export?format=csv', { method: 'HEAD' })
       .then((r) => {
@@ -27,6 +31,6 @@ export function useTaxExportReady(): boolean | null {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [enabled]);
   return ready;
 }

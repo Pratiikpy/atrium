@@ -7,6 +7,7 @@ import { TaxAllowanceProgress } from './allowance-progress';
 import { TaxEventsTable } from './events-table';
 import { TaxExportButtons } from './export-buttons';
 import type { TaxJurisdiction, TaxYear } from './tax-types';
+import { useScopedWallet } from '@/lib/use-scoped-wallet';
 
 /**
  * Parent client view for /app/tax. Owns the (jurisdiction, year) filter
@@ -21,6 +22,7 @@ import type { TaxJurisdiction, TaxYear } from './tax-types';
  * state source drive every downstream fetch + download URL.
  */
 export function TaxView() {
+  const wallet = useScopedWallet();
   const [jurisdiction, setJurisdiction] = useState<TaxJurisdiction>('uk');
   const [year, setYear] = useState<TaxYear>('2026');
 
@@ -37,7 +39,7 @@ export function TaxView() {
             accounting method. Export signed by a Lantern Merkle root for auditor verification.
           </p>
         </div>
-        <TaxExportButtons jurisdiction={jurisdiction} year={year} />
+        <TaxExportButtons jurisdiction={jurisdiction} year={year} enabled={wallet != null} />
       </header>
 
       <section className="mt-6">

@@ -133,11 +133,18 @@ export function ReservesMobile() {
   }
 
   if (isLoading) {
-    return <div className="space-y-3">{[0,1,2].map(i => <div key={i} className="skeleton h-20 rounded-2xl" />)}</div>;
+    return (
+      <div className="flex flex-col gap-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <MobileReservesHeader />
+        <div className="space-y-3">{[0,1,2].map(i => <div key={i} className="skeleton h-20 rounded-2xl" />)}</div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <MobileReservesHeader />
+
       {/* Latest attestation card */}
       {data && (
         <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-4">
@@ -178,7 +185,7 @@ export function ReservesMobile() {
         disabled={!address || !data}
         className="min-h-[44px] w-full rounded-xl bg-mob-accent text-[16px] font-medium text-mob-bg disabled:opacity-40"
       >
-        Verify my balance
+        {address ? 'Verify my balance' : 'Connect wallet to verify'}
       </button>
 
       {/* Verify sheet */}
@@ -233,5 +240,17 @@ export function ReservesMobile() {
         )}
       </section>
     </div>
+  );
+}
+
+function MobileReservesHeader() {
+  return (
+    <header>
+      <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-mob-muted">Proof of reserves</p>
+      <h1 className="mt-1 text-[26px] font-semibold tracking-tight text-mob-ink">Lantern reserves</h1>
+      <p className="mt-2 text-[14px] leading-relaxed text-mob-muted">
+        Latest attestation, Merkle root, and per-wallet proof status.
+      </p>
+    </header>
   );
 }

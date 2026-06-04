@@ -17,12 +17,14 @@ import { useTaxExportReady } from '@/lib/use-tax-export-ready';
 export function TaxExportButtons({
   jurisdiction,
   year,
+  enabled,
 }: {
   jurisdiction: TaxJurisdiction;
   year: TaxYear;
+  enabled: boolean;
 }) {
   const base = `/api/tax/export?jurisdiction=${jurisdiction}&year=${year}`;
-  const ready = useTaxExportReady();
+  const ready = useTaxExportReady(enabled);
 
   // Gate the export links until the endpoint can actually produce a file. While
   // the Tablet service is undeployed the route 503s, so a live <a download> would
@@ -44,7 +46,7 @@ export function TaxExportButtons({
           ))}
         </div>
         <p className="text-xs text-muted">
-          {ready === null ? 'Checking export availability…' : 'Exports become available once the Tablet service is live (no realised events to export yet).'}
+          {ready === null ? 'Checking export availability…' : enabled ? 'Exports become available once the Tablet service is live (no realised events to export yet).' : 'Connect your wallet to enable tax exports.'}
         </p>
       </div>
     );

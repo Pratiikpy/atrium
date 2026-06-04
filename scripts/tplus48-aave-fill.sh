@@ -103,8 +103,10 @@ echo; echo "=== step 4: push fresh Pyth ==="
 bash "$REPO/scripts/pyth-push-usdc.sh"
 
 echo; echo "=== step 5: build + sign sigil envelopes ==="
-TKEY=$(python3 -c "import json; print(json.load(open('$REPO/.e2e-test-key.json'))[0]['private_key'])")
-TADDR=$(python3 -c "import json; print(json.load(open('$REPO/.e2e-test-key.json'))[0]['address'])")
+# Windows python3 needs a Windows path (C:/...), not the MSYS/git-bash /c/... form.
+REPO_WIN=$(echo "$REPO" | sed 's|^/\([a-zA-Z]\)/|\1:/|')
+TKEY=$(python3 -c "import json; print(json.load(open(r'$REPO_WIN/.e2e-test-key.json'))[0]['private_key'])")
+TADDR=$(python3 -c "import json; print(json.load(open(r'$REPO_WIN/.e2e-test-key.json'))[0]['address'])")
 ENV_JSON=$(cd "$REPO/apps/verify" && E2E_PRIVATE_KEY="$TKEY" node scripts/build-aave-fill-envelope.mjs build)
 INTENT=$(echo "$ENV_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['intent_sigil'])")
 ACTION=$(echo "$ENV_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['action_sigil'])")

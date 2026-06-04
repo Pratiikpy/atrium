@@ -156,8 +156,19 @@ export function renderMarkdownToHtml(md: string): string {
               .join('')}</tr>`,
         )
         .join('')}</tbody>`;
+      const mobileCards = rows
+        .map(
+          (r) =>
+            `<article class="rounded-md border border-divider bg-parchment-soft/40 p-3">${r
+              .map((c, idx) => {
+                const label = header[idx] ?? `Column ${idx + 1}`;
+                return `<div class="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-3 border-b border-divider/50 py-2 first:pt-0 last:border-0 last:pb-0"><dt class="font-mono text-[10px] uppercase tracking-wider text-muted">${inline(label)}</dt><dd class="min-w-0 break-words text-sm text-ink-soft [overflow-wrap:anywhere]">${inline(c)}</dd></div>`;
+              })
+              .join('')}</article>`,
+        )
+        .join('');
       out.push(
-        `<div class="mt-4 overflow-x-auto rounded-md border border-divider"><table class="w-full text-sm">${thead}${tbody}</table></div>`,
+        `<div class="mt-4 space-y-3 sm:hidden">${mobileCards}</div><div class="mt-4 hidden max-w-full overflow-x-auto rounded-md border border-divider sm:block"><table class="w-max min-w-full max-w-none text-sm">${thead}${tbody}</table></div>`,
       );
       continue;
     }
