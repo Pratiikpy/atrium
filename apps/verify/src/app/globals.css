@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "../styles/atrium-mobile.css";
 @import "../styles/atrium-landing.css";
 
 /* =====================================================================
@@ -527,15 +526,39 @@ body {
     color: var(--color-mob-ink);
   }
 
-  /* Gap H (dark-mobile): the flip is scoped to .marketing-shell, but the
+  /* Gap H (dark-mobile): the dark flip is scoped to a shell box, but the
      <body>/<html> keep the LIGHT parchment background. Anything outside the
      shell box shows that white: the consent banner's reserved padding-bottom
-     strip at page bottom, and iOS rubber-band overscroll above/below. Paint
-     the document dark too, scoped to pages that actually carry the shell so
-     the landing (.atrium-m-root) and /app (.atrium-mobile-only) are untouched. */
+     strip at page bottom, and iOS/Android rubber-band overscroll above/below.
+     Paint the document dark too, scoped to pages that actually carry a dark
+     mobile shell. Live-QA recheck 2026-06-04 found the original rule only
+     covered .marketing-shell, so the /app/* pages (.atrium-mobile-only) and the
+     landing (.atrium-m-root) still leaked parchment on overscroll / safe-area
+     insets / the cookie strip: their shells paint a dark <div>, not the
+     document, so the body stayed (251,250,247). Cover all three dark shells.
+     This whole block is inside @media (max-width:768px); .atrium-mobile-only is
+     display:none on desktop but still in the DOM, so the media query is what
+     keeps the desktop /app body parchment.
+
+     !important is deliberate here: the base `body { background: var(--bg) }`
+     (parchment) and this document-fill resolve into Tailwind v4 cascade layers
+     where, on the /app and landing routes, the base body fill was winning the
+     cascade against the unflagged :has() rule (verified live: body stayed
+     (251,250,247) even though the selector matched). The document fill behind a
+     dark mobile shell must ALWAYS be dark, so we force it; it is the one and
+     only intentional override of the base body background on mobile. */
   html:has(.marketing-shell),
-  body:has(.marketing-shell) {
-    background-color: var(--color-mob-bg);
+  body:has(.marketing-shell),
+  html:has(.atrium-mobile-only),
+  body:has(.atrium-mobile-only) {
+    background-color: var(--color-mob-bg) !important;
+  }
+  /* The landing mobile shell (.atrium-m-root) uses its own slightly different
+     OLED bg token (oklch 8% vs --color-mob-bg's oklch 0.08); paint the document
+     with the matching value so the seam is invisible on overscroll. */
+  html:has(.atrium-m-root),
+  body:has(.atrium-m-root) {
+    background-color: oklch(8% 0.006 60) !important;
   }
 
   .marketing-shell .container {

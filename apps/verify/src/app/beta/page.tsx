@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function BetaPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-parchment p-8 text-ink max-sm:bg-mob-bg max-sm:text-mob-ink">
+    <main className="min-h-screen flex items-center justify-center bg-parchment p-8 text-ink max-sm:items-start max-sm:pb-40 max-sm:bg-mob-bg max-sm:text-mob-ink">
       <div className="max-w-lg text-center space-y-6">
         <h1 className="text-3xl font-semibold">You&apos;ve been invited as a beta tester. Welcome.</h1>
         <p className="text-neutral-600 max-sm:text-mob-muted">
