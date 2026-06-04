@@ -141,7 +141,7 @@ export default async function LandingPage() {
                 <div className="eyebrow mono cap">Plinth · margin engine</div>
                 <p className="section-sub">
                   Plinth computes a SPAN-style cross-product margin number in Rust,
-                  deployed as Stylus. The same math costs 10–100× more gas in equivalent
+                  deployed as Stylus. The same math costs 10x to 100x more gas in equivalent
                   Solidity, which is why it has not shipped onchain elsewhere.
                 </p>
               </div>
