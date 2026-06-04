@@ -1,0 +1,833 @@
+/* =====================================================================
+ * /pitch scoped styles. The investor brief, rendered as a premium
+ * vertical-scrolling deck. Uses ONLY the app's themed tokens (--bg,
+ * --ink, --accent, --line, --hairline, ...) so the .marketing-shell
+ * mobile token flip renders this parchment on desktop and dark on
+ * mobile, in lockstep with /architecture and the rest of the product.
+ * Every class is scoped under .pitch-root (and the fixed .pitch-rail).
+ * ===================================================================== */
+
+.pitch-root {
+  --pitch-serif: "Instrument Serif", "Times New Roman", serif;
+  --pitch-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --pitch-mono: "Geist Mono", ui-monospace, monospace;
+  --pitch-pos: oklch(0.58 0.13 145);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
+  color: var(--ink);
+}
+.pitch-root em {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: -0.005em;
+}
+.pitch-root strong { font-weight: 560; color: var(--ink); }
+.pitch-pos { color: var(--pitch-pos); }
+.pitch-neg { color: var(--accent); }
+.pitch-faint { color: var(--faint) !important; }
+.pitch-muted { color: var(--muted); }
+
+/* ---- slide scaffolding --------------------------------------------- */
+.pitch-slide {
+  min-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 0;
+  border-top: 1px solid var(--hairline);
+}
+.pitch-slide:first-child { border-top: none; }
+
+.pitch-eyebrow-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.pitch-numeral {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--accent);
+}
+.pitch-section-label {
+  font-family: var(--pitch-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pitch-h2 {
+  font-family: var(--pitch-sans);
+  font-weight: 540;
+  font-size: clamp(30px, 4.4vw, 48px);
+  line-height: 1.06;
+  letter-spacing: -0.028em;
+  margin: 0;
+  color: var(--ink);
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.pitch-body {
+  font-family: var(--pitch-sans);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 56ch;
+}
+.pitch-body + .pitch-body { margin-top: 16px; }
+.pitch-lede-wide { margin-top: 24px; max-width: 64ch; font-size: 18px; }
+.pitch-aside { margin-top: 32px; font-size: 15px; max-width: 72ch; }
+.pitch-aside-link { display: inline-block; margin-top: 14px; }
+.pitch-inline-link {
+  font-family: var(--pitch-sans);
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
+  transition: border-color 140ms;
+}
+.pitch-inline-link:hover { border-bottom-color: var(--accent); }
+
+.pitch-two-col {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: start;
+}
+.pitch-col-prose { display: flex; flex-direction: column; }
+.pitch-col-data { display: flex; flex-direction: column; gap: 12px; }
+
+/* ---- tags / pills -------------------------------------------------- */
+.pitch-tag {
+  font-family: var(--pitch-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pitch-tag-neg {
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 12%, transparent);
+}
+.pitch-tag-pos {
+  color: var(--pitch-pos);
+  background: color-mix(in oklch, var(--pitch-pos) 13%, transparent);
+}
+.pitch-tag-stylus {
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 12%, transparent);
+}
+.pitch-tag-solidity {
+  color: var(--ink-soft);
+  background: color-mix(in oklch, var(--ink) 8%, transparent);
+}
+
+/* =====================================================================
+ * 00 · TITLE + CLOSING (full-bleed slabs)
+ * ===================================================================== */
+.pitch-title,
+.pitch-closing {
+  min-height: calc(100vh - 68px);
+  justify-content: space-between;
+  padding: 56px 0 48px;
+}
+.pitch-title-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pitch-eyebrow {
+  font-family: var(--pitch-mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pitch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pitch-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: var(--bg-raised);
+}
+.pitch-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-soft, oklch(0.7 0.13 70));
+}
+.pitch-title-body { padding: 40px 0; }
+.pitch-wordmark {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(72px, 13vw, 148px);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.pitch-wordmark-rule {
+  display: block;
+  width: 160px;
+  height: 4px;
+  border-radius: 999px;
+  margin: 20px 0 36px;
+  background: var(--accent-soft, oklch(0.7 0.13 70));
+}
+.pitch-title-h1 {
+  font-family: var(--pitch-sans);
+  font-weight: 540;
+  font-size: clamp(30px, 4.6vw, 50px);
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  margin: 0;
+  color: var(--ink);
+}
+.pitch-title-lede {
+  margin-top: 20px;
+  font-family: var(--pitch-sans);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 48ch;
+}
+.pitch-title-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 40px;
+  align-items: baseline;
+}
+.pitch-title-chain {
+  font-family: var(--pitch-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+.pitch-title-chain strong { color: var(--ink); font-weight: 560; }
+
+.pitch-closing-h2 {
+  font-family: var(--pitch-sans);
+  font-weight: 540;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  margin: 0;
+  color: var(--ink);
+  max-width: 20ch;
+}
+.pitch-closing-cta {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pitch-btn-primary,
+.pitch-btn-ghost {
+  font-family: var(--pitch-sans);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  transition: transform 140ms, border-color 140ms;
+}
+.pitch-btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pitch-btn-ghost { background: transparent; color: var(--ink); }
+.pitch-btn-primary:hover,
+.pitch-btn-ghost:hover { transform: translateY(-1px); }
+
+/* =====================================================================
+ * I · THE PROBLEM (locked-balance cards)
+ * ===================================================================== */
+.pitch-locked-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 14px;
+}
+.pitch-locked-label {
+  grid-column: 1;
+  grid-row: 1;
+  font-family: var(--pitch-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pitch-locked-value {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 8px;
+  font-family: var(--pitch-mono);
+  font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 36px);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--ink);
+}
+.pitch-locked-card .pitch-tag { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
+.pitch-locked-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 8px 4px 0;
+}
+.pitch-locked-foot-note {
+  font-family: var(--pitch-mono);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* =====================================================================
+ * II · THE INSIGHT (one deposit → three backed positions)
+ * ===================================================================== */
+.pitch-insight-flow {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 22px;
+}
+.pitch-deposit-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 190px;
+}
+.pitch-insight-arrow {
+  font-family: var(--pitch-sans);
+  font-size: 26px;
+  color: var(--faint);
+  text-align: center;
+}
+.pitch-backed-grid { display: flex; flex-direction: column; gap: 10px; }
+.pitch-backed-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.pitch-backed-name {
+  font-family: var(--pitch-sans);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+/* =====================================================================
+ * III · WORKED EXAMPLE (without / with comparison)
+ * ===================================================================== */
+.pitch-compare {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.pitch-compare-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+}
+.pitch-compare-card-pos {
+  background: color-mix(in oklch, var(--pitch-pos) 5%, var(--bg-raised));
+  border-color: color-mix(in oklch, var(--pitch-pos) 28%, var(--line));
+}
+.pitch-compare-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pitch-compare-card .pitch-body { font-size: 16px; max-width: none; }
+.pitch-compare-foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pitch-compare-stat {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: clamp(30px, 3.6vw, 40px);
+  line-height: 1;
+}
+.pitch-caveat {
+  margin-top: 26px;
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 76ch;
+}
+.pitch-caveat .pitch-inline-link { font-family: var(--pitch-serif); font-style: italic; }
+
+/* =====================================================================
+ * IV · THE MOAT (named-component list)
+ * ===================================================================== */
+.pitch-moat-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.pitch-moat-item {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.pitch-moat-name {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--accent);
+}
+.pitch-moat-blurb {
+  font-family: var(--pitch-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* =====================================================================
+ * V · THE ARCHITECTURE (8-component grid)
+ * ===================================================================== */
+.pitch-arch-grid {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.pitch-arch-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pitch-arch-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pitch-arch-name {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1;
+  color: var(--ink);
+}
+.pitch-arch-blurb {
+  font-family: var(--pitch-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* =====================================================================
+ * VI · WHY NOW (headline stat)
+ * ===================================================================== */
+.pitch-headline-stat {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 32px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pitch-headline-stat-v {
+  font-family: var(--pitch-mono);
+  font-weight: 500;
+  font-size: clamp(44px, 6vw, 64px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--accent);
+}
+.pitch-headline-stat-l {
+  font-family: var(--pitch-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 24ch;
+}
+
+/* =====================================================================
+ * VII · PROOF IT'S REAL (stat row + tx-hash blocks)
+ * ===================================================================== */
+.pitch-proof-stats {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.pitch-proof-stat {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pitch-proof-stat-v {
+  font-family: var(--pitch-mono);
+  font-weight: 500;
+  font-size: clamp(30px, 3.6vw, 40px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+.pitch-proof-stat-l {
+  font-family: var(--pitch-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.pitch-proof-hashes {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.pitch-hash-block {
+  background: var(--bg-sunk);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pitch-hash-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.pitch-hash-name { font-family: var(--pitch-sans); font-size: 14px; color: var(--ink-soft); }
+.pitch-hash {
+  font-family: var(--pitch-mono);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* =====================================================================
+ * VIII · WHO WE WIN FOR (3 persona cards)
+ * ===================================================================== */
+.pitch-persona-grid {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.pitch-persona-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.pitch-persona-who {
+  font-family: var(--pitch-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.pitch-persona-block { display: flex; flex-direction: column; gap: 8px; }
+.pitch-persona-sub {
+  font-family: var(--pitch-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pitch-persona-text {
+  font-family: var(--pitch-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* =====================================================================
+ * IX · THE CATEGORY (comparison table)
+ * ===================================================================== */
+.pitch-cat-table {
+  margin-top: 36px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.pitch-cat-head,
+.pitch-cat-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 24px;
+}
+.pitch-cat-head {
+  background: var(--bg-sunk);
+  font-family: var(--pitch-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pitch-cat-head > span { text-align: center; }
+.pitch-cat-head > span:first-child { text-align: left; }
+.pitch-cat-row { border-top: 1px solid var(--hairline); background: var(--bg); }
+.pitch-cat-name { font-family: var(--pitch-sans); font-weight: 500; font-size: 15px; color: var(--ink); }
+.pitch-cat-cell {
+  font-family: var(--pitch-sans);
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.pitch-cat-row-self { background: var(--bg-sunk); }
+.pitch-cat-self-name { font-family: var(--pitch-serif); font-style: italic; font-size: 21px; color: var(--ink); }
+
+/* =====================================================================
+ * X · HONEST LIMITS (4 numbered cards)
+ * ===================================================================== */
+.pitch-limits-grid {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.pitch-limit-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 26px;
+}
+.pitch-limit-num {
+  font-family: var(--pitch-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.pitch-limit-title {
+  margin: 12px 0 0;
+  font-family: var(--pitch-sans);
+  font-weight: 540;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.pitch-limit-body {
+  margin: 10px 0 0;
+  font-family: var(--pitch-sans);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* =====================================================================
+ * XI · WHAT'S NEXT (3 numbered cards, last is dark)
+ * ===================================================================== */
+.pitch-next-grid {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.pitch-next-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 26px 30px;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.pitch-next-card-dark { background: var(--ink); border-color: var(--ink); }
+.pitch-next-card-dark .pitch-next-body { color: color-mix(in oklch, var(--bg) 88%, transparent); }
+.pitch-next-card-dark .pitch-next-body strong { color: var(--bg); }
+.pitch-next-num {
+  font-family: var(--pitch-mono);
+  font-weight: 400;
+  font-size: 42px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--faint);
+}
+.pitch-next-num-accent { color: var(--accent-soft, oklch(0.7 0.13 70)); }
+.pitch-next-body {
+  font-family: var(--pitch-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* =====================================================================
+ * XII · THE FOUNDER
+ * ===================================================================== */
+.pitch-founder-name {
+  font-family: var(--pitch-serif);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(44px, 6vw, 64px);
+  letter-spacing: -0.01em;
+}
+.pitch-founder-meta {
+  margin-top: 14px;
+  font-family: var(--pitch-sans);
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.pitch-founder-meta em { font-family: var(--pitch-serif); }
+.pitch-founder-list {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 56ch;
+}
+.pitch-founder-item {
+  position: relative;
+  padding-left: 22px;
+  font-family: var(--pitch-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.pitch-founder-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* =====================================================================
+ * SIDE PROGRESS RAIL (fixed, desktop only)
+ * ===================================================================== */
+.pitch-rail {
+  position: fixed;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+}
+.pitch-rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.pitch-rail-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 140ms;
+}
+.pitch-rail-link:hover { background: color-mix(in oklch, var(--ink) 5%, transparent); }
+.pitch-rail-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--hairline);
+  flex-shrink: 0;
+  transition: background 160ms, transform 160ms;
+}
+.pitch-rail-n {
+  font-family: var(--pitch-serif);
+  font-style: italic;
+  font-size: 12px;
+  width: 26px;
+  color: var(--faint);
+  transition: color 160ms;
+}
+.pitch-rail-label {
+  font-family: var(--pitch-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 160ms, transform 160ms, color 160ms;
+  white-space: nowrap;
+}
+.pitch-rail-link:hover .pitch-rail-label,
+.pitch-rail-link.is-active .pitch-rail-label { opacity: 1; transform: translateX(0); }
+.pitch-rail-link.is-active .pitch-rail-dot { background: var(--accent); transform: scale(1.3); }
+.pitch-rail-link.is-active .pitch-rail-n { color: var(--accent); }
+
+/* hide the rail when it would overlap content (no room beside the deck) */
+@media (max-width: 1340px) {
+  .pitch-rail { display: none; }
+}
+
+/* =====================================================================
+ * RESPONSIVE
+ * ===================================================================== */
+@media (max-width: 980px) {
+  .pitch-arch-grid { grid-template-columns: repeat(2, 1fr); }
+  .pitch-proof-stats { grid-template-columns: repeat(2, 1fr); }
+  .pitch-persona-grid { grid-template-columns: 1fr; }
+  .pitch-next-grid { grid-template-columns: 1fr; }
+  .pitch-next-card { min-height: 0; }
+  .pitch-two-col { grid-template-columns: 1fr; gap: 28px; }
+  .pitch-compare { grid-template-columns: 1fr; }
+  .pitch-limits-grid { grid-template-columns: 1fr; }
+  .pitch-proof-hashes { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .pitch-root { padding: 0 16px 56px; }
+  .pitch-slide { min-height: 0; padding: 56px 0; }
+  .pitch-title,
+  .pitch-closing { min-height: auto; padding: 40px 0; gap: 40px; }
+  .pitch-insight-flow { grid-template-columns: 1fr; gap: 14px; }
+  .pitch-insight-arrow { transform: rotate(90deg); }
+  /* table → stacked rows on phones */
+  .pitch-cat-head { display: none; }
+  .pitch-cat-row,
+  .pitch-cat-row-self { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
+  .pitch-cat-cell { text-align: left; }
+}

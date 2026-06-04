@@ -13,8 +13,8 @@ import { Pill } from "./primitives";
 const NAV_LINKS = [
   { href: "/#portfolio", label: "Product" },
   { href: "/#agents", label: "Agents" },
+  { href: "/architecture", label: "Architecture" },
   { href: "/lantern", label: "Reserves" },
-  { href: "/#system", label: "Subsystems" },
   { href: "/docs", label: "Docs" },
 ] as const;
 

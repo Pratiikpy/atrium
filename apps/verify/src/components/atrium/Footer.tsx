@@ -24,6 +24,8 @@ export function Footer() {
             </p>
           </div>
           <FootCol title="Product" links={[
+            ["Get started", "/getting-started"],
+            ["Architecture", "/architecture"],
             ["App", "/app"],
             ["Verifier walk", "/verify"],
             ["Reserves", "/lantern"],
@@ -31,6 +33,7 @@ export function Footer() {
           ]} />
           <FootCol title="Company" links={[
             ["Manifesto", "/manifesto"],
+            ["Investor brief", "/pitch"],
             ["Team", "/team"],
             ["Cohort", "/cohort"],
             ["Security", "/security"],

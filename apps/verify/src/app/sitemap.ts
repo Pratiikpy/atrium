@@ -18,6 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const publicRoutes = [
     '',
+    '/architecture',
+    '/getting-started',
+    '/pitch',
     '/docs',
     '/docs/honesty',
     '/docs/api',

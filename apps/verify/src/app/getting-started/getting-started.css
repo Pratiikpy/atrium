@@ -1,0 +1,242 @@
+/* =====================================================================
+ * /getting-started scoped styles. Uses the app's themed tokens (--bg,
+ * --ink, --accent, --line, ...) so the .marketing-shell mobile token
+ * flip renders this parchment on desktop and dark on mobile, matching
+ * /architecture and the rest of the product. Faithful to the
+ * getting-started reference (eight expandable steps + honest notes).
+ * ===================================================================== */
+
+.gs-root {
+  --gs-serif: "Instrument Serif", "Times New Roman", serif;
+  --gs-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --gs-mono: "Geist Mono", ui-monospace, monospace;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+  color: var(--ink);
+}
+.gs-root em { font-style: italic; color: var(--accent); }
+
+/* hero */
+.gs-hero { padding: 56px 0 44px; text-align: center; max-width: 720px; margin: 0 auto; }
+.gs-eyebrow {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--gs-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 26px;
+}
+.gs-eyebrow-rule { display: inline-block; width: 28px; height: 1px; background: var(--accent); }
+.gs-h1 {
+  font-family: var(--gs-sans); font-weight: 540; font-size: clamp(38px, 6vw, 62px);
+  line-height: 1.04; letter-spacing: -0.03em; margin: 0; color: var(--ink); text-wrap: balance;
+}
+.gs-h1 em { font-family: var(--gs-serif); font-weight: 400; letter-spacing: -0.01em; }
+.gs-lede {
+  margin: 22px auto 0; font-family: var(--gs-sans); font-size: 17px; line-height: 1.6;
+  color: var(--ink-soft); max-width: 56ch;
+}
+.gs-hero-cta { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+/* shared buttons */
+.gs-btn-primary, .gs-btn-ghost {
+  font-family: var(--gs-sans); font-size: 14px; font-weight: 500; text-decoration: none;
+  padding: 12px 20px; border-radius: 12px; border: 1px solid var(--line);
+  transition: transform 140ms cubic-bezier(0.2, 0.7, 0.2, 1), border-color 140ms, background 140ms;
+}
+.gs-btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.gs-btn-ghost { background: transparent; color: var(--ink); }
+.gs-btn-primary:hover, .gs-btn-ghost:hover { transform: translateY(-1px); }
+
+/* section scaffolding */
+.gs-section { padding: 8px 0; }
+.gs-section-num {
+  font-family: var(--gs-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 16px;
+}
+.gs-h2 {
+  font-family: var(--gs-sans); font-weight: 540; font-size: clamp(26px, 3.6vw, 38px);
+  line-height: 1.08; letter-spacing: -0.025em; margin: 0; color: var(--ink); max-width: 22ch;
+}
+.gs-h2 em { font-family: var(--gs-serif); font-weight: 400; }
+.gs-section-lede {
+  margin-top: 16px; font-family: var(--gs-sans); font-size: 16px; line-height: 1.6;
+  color: var(--ink-soft); max-width: 60ch;
+}
+
+/* ---------------------------------------------------------------- */
+/* walkthrough: progress rail + expandable step cards                */
+/* ---------------------------------------------------------------- */
+.gs-walk { margin-top: 8px; }
+
+.gs-rail {
+  position: sticky; top: 76px; z-index: 2;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 12px; margin-bottom: 18px;
+  background: color-mix(in oklch, var(--bg) 86%, transparent);
+  backdrop-filter: saturate(1.2) blur(8px);
+  border: 1px solid var(--hairline); border-radius: 14px;
+}
+.gs-rail-steps { display: flex; flex-wrap: wrap; gap: 6px; }
+.gs-rail-chip {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  font-family: var(--gs-mono); font-size: 11px; letter-spacing: 0.04em;
+  padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink-soft);
+  transition: border-color 140ms, color 140ms, background 140ms;
+}
+.gs-rail-chip:hover { color: var(--ink); }
+.gs-rail-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 999px;
+  font-size: 9px; font-weight: 500;
+  background: color-mix(in oklch, var(--ink) 7%, transparent); color: var(--muted);
+}
+.gs-rail-chip.is-seen .gs-rail-num {
+  background: color-mix(in oklch, var(--accent) 14%, transparent); color: var(--accent);
+}
+.gs-rail-chip.is-open {
+  border-color: color-mix(in oklch, var(--accent) 50%, transparent); color: var(--ink);
+  background: color-mix(in oklch, var(--accent) 7%, var(--bg));
+}
+.gs-progress {
+  margin-left: auto;
+  font-family: var(--gs-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.gs-progress-count { color: var(--accent); font-weight: 500; }
+
+.gs-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.gs-step {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+.gs-step.is-open {
+  border-color: color-mix(in oklch, var(--accent) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 16%, transparent),
+    0 10px 30px color-mix(in oklch, var(--ink) 8%, transparent);
+}
+
+.gs-step-head {
+  width: 100%; text-align: left; appearance: none; cursor: pointer;
+  display: flex; align-items: center; gap: 16px;
+  background: transparent; border: none; padding: 18px 20px;
+}
+.gs-step-badge {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 999px;
+  font-family: var(--gs-mono); font-size: 14px; font-weight: 500;
+  background: var(--bg-sunk); border: 1px solid var(--hairline); color: var(--muted);
+  transition: background 160ms, color 160ms, border-color 160ms;
+}
+.gs-step.is-seen .gs-step-badge {
+  background: color-mix(in oklch, var(--accent) 12%, transparent);
+  border-color: color-mix(in oklch, var(--accent) 40%, transparent);
+  color: var(--accent);
+}
+.gs-step-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gs-step-eyebrow {
+  font-family: var(--gs-mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+.gs-step-title {
+  font-family: var(--gs-sans); font-weight: 540; font-size: clamp(18px, 2.4vw, 22px);
+  letter-spacing: -0.015em; color: var(--ink); line-height: 1.15;
+}
+.gs-step-title em { font-family: var(--gs-serif); font-weight: 400; }
+.gs-step-chevron {
+  margin-left: auto; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 999px;
+  font-family: var(--gs-sans); font-size: 18px; line-height: 1;
+  color: var(--muted); border: 1px solid var(--hairline); background: var(--bg);
+}
+
+.gs-step-panel { padding: 0 20px 22px 70px; }
+.gs-step-body {
+  margin: 0; font-family: var(--gs-sans); font-size: 15px; line-height: 1.62;
+  color: var(--ink-soft); max-width: 62ch;
+}
+.gs-step-spec {
+  margin-top: 16px; padding: 11px 14px; border-radius: 10px;
+  background: var(--bg-sunk); border: 1px solid var(--hairline);
+  font-family: var(--gs-mono); font-size: 11px; line-height: 1.5;
+  letter-spacing: 0.02em; color: var(--muted); word-break: break-word;
+}
+
+.gs-tilegrid {
+  margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--hairline); border: 1px solid var(--hairline); border-radius: 12px; overflow: hidden;
+}
+.gs-tile { background: var(--bg-raised); padding: 16px 14px; }
+.gs-tile-v {
+  font-family: var(--gs-mono); font-weight: 500; font-size: 16px;
+  letter-spacing: -0.01em; line-height: 1.1; color: var(--ink);
+}
+.gs-tile-l {
+  margin-top: 7px; font-family: var(--gs-mono); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.gs-step-foot {
+  margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px;
+}
+.gs-step-link {
+  font-family: var(--gs-sans); font-size: 13px; font-weight: 500; text-decoration: none;
+  padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg-raised); color: var(--ink);
+  transition: transform 140ms cubic-bezier(0.2, 0.7, 0.2, 1), border-color 140ms;
+  white-space: nowrap;
+}
+.gs-step-link:hover { transform: translateY(-1px); border-color: color-mix(in oklch, var(--accent) 45%, var(--line)); }
+.gs-step-note {
+  flex: 1; min-width: 220px; margin: 0;
+  font-family: var(--gs-sans); font-size: 12.5px; line-height: 1.55; color: var(--muted);
+}
+.gs-note-arrow { color: var(--accent); font-family: var(--gs-mono); }
+
+/* ---------------------------------------------------------------- */
+/* honest notes                                                      */
+/* ---------------------------------------------------------------- */
+.gs-honest { padding-top: 72px; margin-top: 44px; border-top: 1px solid var(--hairline); }
+.gs-honest-grid {
+  margin-top: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+}
+.gs-honest-card { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+.gs-honest-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gs-honest-title {
+  margin: 0; font-family: var(--gs-sans); font-weight: 540; font-size: 17px;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.gs-honest-tag {
+  font-family: var(--gs-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); background: color-mix(in oklch, var(--accent) 12%, transparent);
+  padding: 3px 8px; border-radius: 999px; flex-shrink: 0;
+}
+.gs-honest-body {
+  margin: 12px 0 0; font-family: var(--gs-sans); font-size: 13.5px; line-height: 1.58; color: var(--ink-soft);
+}
+
+/* ---------------------------------------------------------------- */
+/* closing                                                           */
+/* ---------------------------------------------------------------- */
+.gs-closing { padding: 72px 0 0; margin-top: 44px; border-top: 1px solid var(--hairline); text-align: center; }
+.gs-closing .gs-section-num,
+.gs-closing .gs-h2,
+.gs-closing .gs-section-lede { margin-left: auto; margin-right: auto; }
+.gs-closing-cta { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+/* ---------------------------------------------------------------- */
+/* responsive                                                        */
+/* ---------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .gs-honest-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .gs-root { padding: 0 16px 72px; }
+  .gs-rail { position: static; }
+  .gs-progress { margin-left: 0; width: 100%; }
+  .gs-step-head { padding: 16px; gap: 12px; }
+  .gs-step-badge { width: 30px; height: 30px; font-size: 13px; }
+  .gs-step-panel { padding: 0 16px 20px 16px; }
+  .gs-tilegrid { grid-template-columns: 1fr; }
+}
