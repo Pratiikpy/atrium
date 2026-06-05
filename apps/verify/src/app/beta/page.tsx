@@ -9,10 +9,23 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function BetaPage() {
+export default async function BetaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ submitted?: string }>;
+}) {
+  const submitted = (await searchParams).submitted === '1';
   return (
     <main className="mobile-dark-doc min-h-screen flex items-center justify-center bg-parchment p-8 text-ink max-sm:items-start max-sm:pb-40 max-sm:bg-mob-bg max-sm:text-mob-ink">
       <div className="max-w-lg text-center space-y-6">
+        {submitted && (
+          <div
+            role="status"
+            className="rounded-md border border-live/40 bg-live/10 px-4 py-3 text-sm text-ink max-sm:text-mob-ink"
+          >
+            Thanks, your feedback was received.
+          </div>
+        )}
         <div className="flex justify-center">
           <Wordmark size="md" />
         </div>

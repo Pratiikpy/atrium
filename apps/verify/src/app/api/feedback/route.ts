@@ -15,15 +15,13 @@ const VALID_CATEGORIES = ['bug', 'ux', 'feature', 'other'] as const;
  * Rate-limited via Phase 3 middleware (10 req/min per IP).
  */
 export async function POST(req: NextRequest) {
-  // Broken-auth fix: the prior check looked for a cookie named
-  // `atrium_session` (underscore) and only tested EXISTENCE, but the real
-  // session cookie is `atrium-session` (hyphen) and must be HMAC-verified.
-  // So the old check both looked at the wrong cookie AND accepted any
-  // non-empty value. getSession() reads + verifies the signed cookie.
+  // Beta feedback is intentionally low-friction: the /beta page offers it with
+  // the wallet OPTIONAL ("associated with your wallet, if connected") and the
+  // form posts anonymously. Gating on a session returned a raw 401 JSON page to
+  // unconnected testers, breaking the documented flow, and the session was
+  // never used downstream anyway. Abuse is bounded by the per-IP rate limit. If
+  // a verified session IS present we attach the wallet for follow-up.
   const session = await getSession(req);
-  if (!session) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  }
 
   let body: { category?: string; message?: string; email?: string };
   try {
@@ -62,7 +60,13 @@ export async function POST(req: NextRequest) {
     await fetch(feedbackUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, message, email, ts: new Date().toISOString() }),
+      body: JSON.stringify({
+        category,
+        message,
+        email,
+        wallet: session?.walletAddress ?? null,
+        ts: new Date().toISOString(),
+      }),
       signal: AbortSignal.timeout(5000),
     }).catch(() => {});
   }
