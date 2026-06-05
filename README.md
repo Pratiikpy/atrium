@@ -20,9 +20,9 @@
 
 <br/>
 
-[![Atrium architecture, the live deployed system with verified contract addresses](apps/verify/public/brand/assets/readme-architecture.png)](https://www.useatrium.me/architecture)
+[![Atrium capital-convergence schematic: eight venues netting into one unified-margin pool](apps/verify/public/brand/assets/readme-convergence.png)](https://www.useatrium.me/architecture)
 
-<sub>The live system map and verified addresses at [**useatrium.me/architecture**](https://www.useatrium.me/architecture)</sub>
+<sub>Illustrative schematic of the unified-margin concept. The live testnet figures are read straight from the contracts; verify the real numbers in 60 seconds below.</sub>
 
 </div>
 
