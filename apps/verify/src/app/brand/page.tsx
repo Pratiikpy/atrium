@@ -406,8 +406,11 @@ function Swatch({
         className="h-20 w-full"
         // Paint the literal hex, NOT var(tokenVar): the theme tokens flip under
         // the dark-mobile theme, which inverted the Paper/Ink specimen swatches
-        // (the page's own point is to SHOW these exact colors).
-        style={{ background: hex }}
+        // (the page's own point is to SHOW these exact colors). The inset ring
+        // is a neutral 40%-gray that stays visible on both a near-white swatch
+        // (Paper) and a near-black one (Ink), so a dark swatch never blends into
+        // the dark-mobile card.
+        style={{ background: hex, boxShadow: 'inset 0 0 0 1px rgba(140,140,140,0.4)' }}
         title={tokenVar}
         aria-label={`${name} swatch`}
       />
