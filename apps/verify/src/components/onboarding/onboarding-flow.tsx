@@ -152,11 +152,11 @@ function Welcome({ onNext }: { onNext: () => void }) {
         faucet, your first cross-margin position.
       </p>
 
-      {/* Benefit callout - lead onboarding with the wedge, not jargon. */}
+      {/* Benefit callout: lead onboarding with the wedge, not jargon. */}
       <div className="mt-5 rounded-[12px] border border-divider bg-parchment-soft/40 px-5 py-4">
         <p className="text-[11px] uppercase tracking-wider text-muted">Why Atrium</p>
         <p className="mt-1.5 text-[14px] leading-[1.5] text-ink">
-          Without unified margin you post $100K at each venue - $300K tied up. Here, one
+          Without unified margin you post $100K at each venue, so $300K is tied up. Here, one
           $100K deposit backs Hyperliquid, Aave and Pendle together.
         </p>
       </div>
@@ -630,7 +630,7 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
       </div>
 
       {/* Item 7: the benefit LANDS here. The welcome step pitched the wedge;
-          this step is the confirmation - the user's one balance now spans
+          this step is the confirmation: the user's one balance now spans
           every whitelisted venue, not split between them. Buying power is
           the live Plinth read (or honest pending); the venue chips + count
           are the real VENUES source of truth. No fabricated numbers. */}
@@ -640,12 +640,12 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
           {isLive ? (
             <>
               Your <strong className="font-medium">{buyingPower}</strong> of buying power works on
-              any of these {VENUE_COUNT} venues - the same balance, not split between them.
+              any of these {VENUE_COUNT} venues: the same balance, not split between them.
             </>
           ) : (
             <>
               Once Plinth deploys, one deposit gives you buying power across all {VENUE_COUNT}{' '}
-              venues at once - you never re-post collateral per venue.
+              venues at once, and you never re-post collateral per venue.
             </>
           )}
         </p>
