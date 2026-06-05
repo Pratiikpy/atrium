@@ -65,10 +65,26 @@ function category(slug) {
   return 'Setup & accounts';
 }
 
+/**
+ * Fail-closed publish allowlist. /docs/runbooks is a PUBLIC route, so only
+ * runbooks that are safe for a public audience are bundled. Operational
+ * runbooks (infra topology, secret-key names, on-call handles, incident
+ * playbooks) are internal-only: they are gitignored + removed from the repo,
+ * and even if one reappears under runbooks/ it will NOT be published unless its
+ * filename is added here on purpose. Public-repo audit 2026-06-05.
+ */
+const PUBLIC_ALLOWLIST = new Set([
+  'deploy.md',
+  'incident-response.md',
+  'browserstack-setup.md',
+]);
+
 async function main() {
   let files = [];
   try {
-    files = (await readdir(RUNBOOKS_DIR)).filter((f) => f.endsWith('.md')).sort();
+    files = (await readdir(RUNBOOKS_DIR))
+      .filter((f) => f.endsWith('.md') && PUBLIC_ALLOWLIST.has(f))
+      .sort();
   } catch (err) {
     console.warn(`[runbooks] could not read ${RUNBOOKS_DIR}: ${err.message}`);
   }

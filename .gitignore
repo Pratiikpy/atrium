@@ -227,3 +227,17 @@ ops/doppler/service-tokens.md
 
 # Founder audit-prompt scratch (untracked, keep out of public repo)
 goal*.txt
+
+# Public-repo audit 2026-06-05: internal ops docs stay local, never public.
+# Operational runbooks (infra topology, secret-key names, on-call, incident
+# playbooks) and internal audit/incident reports are NOT for the public repo.
+ops/
+incidents/
+audits/2026-05-28-*.md
+scripts/safe-ceremony.md
+subgraph/INDEXING-LOG.md
+*.fix-note
+runbooks/*.md
+!runbooks/deploy.md
+!runbooks/incident-response.md
+!runbooks/browserstack-setup.md
