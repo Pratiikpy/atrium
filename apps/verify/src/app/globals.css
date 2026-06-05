@@ -135,11 +135,14 @@
   --color-status-green: var(--live);
   --color-status-red:   var(--neg);
 
-  /* Typography aliases (legacy code uses --font-display / --font-body) */
+  /* Typography aliases (legacy code uses --font-display / --font-body).
+     NOTE: do NOT alias --font-serif here. It is next/font's output variable
+     (Instrument_Serif, set on <html> in layout.tsx); re-aliasing it to
+     var(--serif) created a cycle that collapsed the wordmark to Geist on
+     routes where the cyclic value won (the /team, /sla, /learn class). */
   --font-display: var(--sans);
   --font-body:    var(--sans);
   --font-mono:    var(--mono);
-  --font-serif:   var(--serif);
 
   /* Spacing scale */
   --gap-2xs: 0.25rem;
@@ -275,7 +278,7 @@
 
   --font-sans: var(--sans);
   --font-mono: var(--mono);
-  --font-serif: var(--serif);
+  /* --font-serif intentionally not re-aliased here (next/font owns it; see note above). */
   --font-display: var(--sans);
   --font-body: var(--sans);
 

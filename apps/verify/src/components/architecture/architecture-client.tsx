@@ -345,7 +345,7 @@ export function PositionFlow() {
         <div className="arch-flow-margin">
           <span className="arch-flow-margin-label">Required margin</span>
           <span className="arch-flow-margin-value">
-            {margin === null ? '—' : `$${margin.toLocaleString()}`}
+            {margin === null ? '·' : `$${margin.toLocaleString()}`}
           </span>
         </div>
         <p className="arch-flow-note">

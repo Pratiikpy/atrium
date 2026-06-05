@@ -191,7 +191,7 @@ export default async function LandingPage() {
                       <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="mono cap muted">Venues live</div>
+                      <div className="mono cap muted">Venue adapters</div>
                       <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.venuesLive} / {d.venuesTotal}</div>
                     </div>
                     <div className="stat-card">
@@ -846,7 +846,7 @@ function MobileLanding({ data }: { data: LandingData }) {
                 <div className="mock">
                   <div className="mock-head"><span className="l">Buying power</span><span className="pill">live</span></div>
                   <div className="big">{data.tvl}</div>
-                  <div className="mock-row"><span className="l">Venues live</span><span className="v">{data.venuesLive} / {data.venuesTotal}</span></div>
+                  <div className="mock-row"><span className="l">Venue adapters</span><span className="v">{data.venuesLive} / {data.venuesTotal}</span></div>
                   <div className="mock-row"><span className="l">Margin</span><span className="v">SPAN</span></div>
                   <div className="mock-row"><span className="l">Engine</span><span className="v">Stylus</span></div>
                 </div>
