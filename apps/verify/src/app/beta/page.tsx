@@ -25,11 +25,6 @@ export default function BetaPage() {
               <a href="/" className="underline hover:text-black max-sm:text-mob-ink">Open Verifier Mode</a>, explore the full app
             </li>
             <li>
-              <a href="https://discord.gg/atrium" className="underline hover:text-black max-sm:text-mob-ink" target="_blank" rel="noopener noreferrer">
-                Join Discord
-              </a>, find us in <code>#beta-feedback</code>
-            </li>
-            <li>
               Send feedback to{' '}
               <a href="mailto:feedback@useatrium.me" className="underline hover:text-black max-sm:text-mob-ink">
                 feedback@useatrium.me

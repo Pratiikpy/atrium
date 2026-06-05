@@ -48,11 +48,9 @@ covers demo rehearsals; F1 covers infra; F2 covers comms.
   emergency-pause (instant, multisig-only). Resume after the rotation
   recovers.
 
-## Founder contacts
+## Contact
 
-- F1: f1@useatrium.me . Discord: @F1 . Phone: in 1Password
-- F2: TBD per cohort founder lineup
-- F3: TBD per cohort founder lineup
+Security + incident reports: security@useatrium.me
 
-Phone numbers + emergency contacts live in the founder 1Password
-vault, NOT in this repo.
+Internal on-call contacts, phone numbers, and escalation details are kept
+in the founder 1Password vault, NOT in this repo or on any public page.
