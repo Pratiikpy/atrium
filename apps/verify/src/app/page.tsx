@@ -418,7 +418,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                 Every dollar, <span className="accent-grad">on the public record.</span>
               </h2>
               <p className="section-sub">
-                Lantern publishes a signed Merkle attestation every sixty minutes. Anyone
+                Lantern publishes a signed Merkle attestation every 10 minutes. Anyone
                 can verify a balance against it locally, without trusting Atrium.
               </p>
             </div>
@@ -441,7 +441,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                     <div>
                       <div className="mono cap muted">Proof-of-reserves · Atrium</div>
                       <div className="strong" style={{ fontSize: 17, marginTop: 6 }}>
-                        Hourly Merkle attestation
+                        Merkle attestation · every 10 min
                       </div>
                     </div>
                     <div className="check-badge">
@@ -538,8 +538,8 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
               </div>
               <div className="number-big">
                 <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesLive} / {d.venuesTotal}</div>
-                <div className="mono cap muted" style={{ marginTop: 14 }}>Venue adapters live</div>
-                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>registered in PorticoRegistry</div>
+                <div className="mono cap muted" style={{ marginTop: 14 }}>Venue adapters deployed</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>Aave Horizon registered; rest ship Month 1 W2</div>
               </div>
             </div>
           </div>

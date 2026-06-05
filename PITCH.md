@@ -130,7 +130,7 @@ testnets, and the core flows produce real on-chain transactions.
   steps against the live contracts: deposit, open, see the margin saving, trigger a
   chaos fault, run a liquidation drill, verify proof of reserves, revoke with the
   kill switch.
-- **The suite is green.** 770 frontend and library tests pass; the Stylus core
+- **The suite is green.** 768 frontend and library tests pass; the Stylus core
   carries Kani formal-verification proofs on solvency and mandate-expiry invariants.
 
 ---

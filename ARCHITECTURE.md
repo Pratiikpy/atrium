@@ -211,7 +211,7 @@ so any user can prove their balance is included without trusting Atrium.
   `span::hedge_frees_a_pinned_share_of_the_isolated_margin` frees about 51% of the
   isolated margin on a canonical equal-size hedge, with a 40 to 70 percent guardrail
   band (`cargo test -p atrium-plinth span::`).
-- 770 frontend and library tests pass. The Stylus core carries Kani formal-
+- 768 frontend and library tests pass. The Stylus core carries Kani formal-
   verification proofs on solvency and mandate-expiry invariants (`make kani`).
 
 ## Honest limits, what is mocked or interim on testnet

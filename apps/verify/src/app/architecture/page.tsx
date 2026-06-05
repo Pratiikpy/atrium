@@ -7,7 +7,7 @@ import './architecture.css';
 export const metadata: Metadata = {
   title: 'Architecture',
   description:
-    'One margin account, many venues. Twenty-four contracts across Arbitrum Sepolia and Robinhood Chain — Stylus for the math, Solidity for the integrations. Real verified addresses, an interactive system map, and a position traced through the whole system.',
+    'One margin account, many venues. Twenty-four contracts across Arbitrum Sepolia and Robinhood Chain - Stylus for the math, Solidity for the integrations. Real verified addresses, an interactive system map, and a position traced through the whole system.',
   alternates: { canonical: '/architecture' },
   openGraph: { title: 'Atrium · Architecture', images: ['/opengraph-image'] },
   twitter: { card: 'summary_large_image' },
@@ -23,7 +23,7 @@ const STATS = [
 const SECURITY = [
   {
     t: 'Timelock + multisig',
-    b: 'Every parameter setter is timelock-gated (48h). Emergency pause is multisig-only with no delay — it can pause but cannot upgrade.',
+    b: 'Every parameter setter is timelock-gated (48h). Emergency pause is multisig-only with no delay - it can pause but cannot upgrade.',
   },
   {
     t: 'Dual-oracle reads',
@@ -35,7 +35,7 @@ const SECURITY = [
   },
   {
     t: 'Per-block notional cap',
-    b: 'Coffer caps how much a single adapter can pull per block — a compromised adapter drains at most ~1% of TVL per block.',
+    b: 'Coffer caps how much a single adapter can pull per block - a compromised adapter drains at most ~1% of TVL per block.',
   },
   {
     t: 'AA emergency lever',
@@ -43,7 +43,7 @@ const SECURITY = [
   },
   {
     t: 'No silent fallbacks',
-    b: 'Coffer and Plinth refuse to operate — revert loudly — when USDC state is unreadable, rather than assuming a safe default.',
+    b: 'Coffer and Plinth refuse to operate - revert loudly - when USDC state is unreadable, rather than assuming a safe default.',
   },
 ];
 
@@ -99,7 +99,7 @@ export default function ArchitecturePage() {
           </h2>
           <p className="arch-section-lede">
             Press play. Follow a deposit become collateral, two offsetting positions net their risk,
-            and the margin requirement fall live — the entire reason Atrium exists, animated through
+            and the margin requirement fall live - the entire reason Atrium exists, animated through
             the real contract path.
           </p>
           <PositionFlow />
@@ -112,7 +112,7 @@ export default function ArchitecturePage() {
             Real addresses, <em>verified on-chain.</em>
           </h2>
           <p className="arch-section-lede">
-            Every contract below is a live, verified deployment — Solidity on Sourcify, Stylus via
+            Every contract below is a live, verified deployment - Solidity on Sourcify, Stylus via
             cargo stylus verify. Click any address to copy it.
           </p>
           <DeploymentsTable />

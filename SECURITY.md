@@ -12,7 +12,7 @@ Email **security@useatrium.me** with a description and reproduction steps.
 
 Full scope, severity matrix, and reward tiers are documented at:
 
-**[/security/bounty](https://verify.useatrium.me/security/bounty)**: the single source of truth.
+**[/security/bounty](https://www.useatrium.me/security/bounty)**: the single source of truth.
 
 Summary: Critical $5–25K, High $1–5K, Medium $250–1K, Low/Info swag + hall-of-fame.
 
@@ -22,7 +22,7 @@ Funded from Praetor treasury post-mainnet. During testnet: best-effort by foundi
 
 Researchers who responsibly disclose are credited at:
 
-**[/security/hall-of-fame](https://verify.useatrium.me/security/hall-of-fame)**
+**[/security/hall-of-fame](https://www.useatrium.me/security/hall-of-fame)**
 
 (None yet, repo is pre-launch.)
 
@@ -33,7 +33,7 @@ In scope:
 - All contracts under `contracts/`
 - All services under `services/`
 - The subgraph and indexer
-- The Verifier Mode frontend (verify.useatrium.me)
+- The Verifier Mode frontend (www.useatrium.me)
 - Codex API (codex.useatrium.me)
 - Tablet API (tablet.useatrium.me)
 - The reference agents

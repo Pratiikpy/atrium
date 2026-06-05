@@ -40,6 +40,16 @@ const ALLOWLIST: { file: string; allowed: RegExp[]; reason: string }[] = [
       'genuine post-user-action UI timer, NOT fake-latency simulation of network/data. ' +
       'There is no fetch/refetchInterval equivalent for "reset a transient UI flag".',
   },
+  {
+    file: 'components/architecture/architecture-client.tsx',
+    allowed: [/\bsetTimeout\s*\(/],
+    reason:
+      'Three genuine UI/animation timers, none faking network/data latency: two ' +
+      'copy-to-clipboard confirmation auto-dismiss timers (setCopied(false/null) after ' +
+      'a real navigator.clipboard.writeText), and one user-triggered "play" timer that ' +
+      'auto-advances the FLOW_STEPS margin-flow explainer animation by one step every ' +
+      '1.5s and stops at the end. All have clearTimeout cleanup.',
+  },
 ];
 
 function walkTs(dir: string, out: string[] = []): string[] {

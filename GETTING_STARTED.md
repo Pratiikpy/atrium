@@ -5,7 +5,7 @@ on Arbitrum Sepolia (chain 421614) today. No real funds are at risk.
 
 > The app reads the live Arbitrum Sepolia contracts directly. Run it locally with
 > `make demo-frontend` (works on Windows; the full `make demo` needs Linux, macOS,
-> or WSL for the Stylus linker). A hosted public URL is pending DNS and deploy.
+> or WSL for the Stylus linker). Live at https://www.useatrium.me .
 
 ---
 

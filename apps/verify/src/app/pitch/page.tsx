@@ -342,8 +342,8 @@ export default function PitchPage() {
               <span className="pitch-proof-stat-l">contract core replicated across both chains.</span>
             </div>
             <div className="pitch-proof-stat">
-              <span className="pitch-proof-stat-v pitch-pos">770</span>
-              <span className="pitch-proof-stat-l">frontend + library tests passing, suite green.</span>
+              <span className="pitch-proof-stat-v pitch-pos">768</span>
+              <span className="pitch-proof-stat-l">frontend + library tests passing.</span>
             </div>
             <div className="pitch-proof-stat">
               <span className="pitch-proof-stat-v">~51%</span>
@@ -357,18 +357,18 @@ export default function PitchPage() {
               <span className="pitch-section-label">MONEY PATH · VERIFIED ON ARBISCAN</span>
               <div className="pitch-hash-row">
                 <span className="pitch-hash-name">Withdraw</span>
-                <code className="pitch-hash">0x976e…ddbf</code>
+                <a href="https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf" target="_blank" rel="noreferrer noopener" className="pitch-inline-link"><code className="pitch-hash">0x976e…ddbf</code></a>
               </div>
               <div className="pitch-hash-row">
                 <span className="pitch-hash-name">Mobile deposit</span>
-                <code className="pitch-hash">0x8c8d…0347</code>
+                <a href="https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347" target="_blank" rel="noreferrer noopener" className="pitch-inline-link"><code className="pitch-hash">0x8c8d…0347</code></a>
               </div>
             </div>
             <div className="pitch-hash-block">
               <span className="pitch-section-label">PROOF OF RESERVES · LIVE ON /LANTERN</span>
               <div className="pitch-hash-row">
                 <span className="pitch-hash-name">Attested root</span>
-                <code className="pitch-hash">0x4b9e…ef1f0</code>
+                <Link href="/lantern" className="pitch-inline-link"><code className="pitch-hash">0x4b9e…ef1f0</code></Link>
               </div>
               <div className="pitch-hash-row">
                 <span className="pitch-hash-name">Block</span>

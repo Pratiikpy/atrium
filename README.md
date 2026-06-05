@@ -4,7 +4,7 @@ Cross-venue portfolio margin for the EVM. One wallet posts collateral once and t
 
 Deployed on **Arbitrum Sepolia** and **Robinhood Chain** testnets. The Stylus (Rust) contracts compile and activate natively on both; addresses in [`docs/deployment.md`](./docs/deployment.md) (Sepolia) and [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json) (Robinhood Chain).
 
-**Run Verifier Mode locally with `make demo-frontend`.** It reads the live Arbitrum Sepolia contracts directly. A hosted public URL is pending DNS + deploy.
+**Run Verifier Mode locally with `make demo-frontend`.** It reads the live Arbitrum Sepolia contracts directly. Live at https://www.useatrium.me .
 
 ## Why it matters
 
@@ -22,6 +22,12 @@ cd atrium
 make demo            # full stack on Linux/macOS/WSL
 # OR
 make demo-frontend   # frontend only, works on Windows MSVC
+```
+
+No `make` on your machine (e.g. stock Windows)? Run Verifier Mode directly:
+
+```bash
+cd apps/verify && pnpm install && pnpm dev   # then open http://localhost:3000
 ```
 
 `make demo` deploys the contracts to a local Arbitrum Sepolia fork, seeds test data, and opens Verifier Mode in your browser.
@@ -80,7 +86,7 @@ atrium/
 
 ## Status
 
-Contracts and core services build green on `master`. Verifier Mode (the Next.js app) reads the live Arbitrum Sepolia contracts directly; run it locally with `make demo-frontend`. A hosted public URL is pending DNS + deploy. Live contract addresses are in [`docs/deployment.md`](./docs/deployment.md). Audit history lives under [`audits/`](./audits/); incident post-mortems under [`incidents/`](./incidents/).
+Contracts and core services build green on `master`. Verifier Mode (the Next.js app) reads the live Arbitrum Sepolia contracts directly; run it locally with `make demo-frontend`. Live at https://www.useatrium.me . Live contract addresses are in [`docs/deployment.md`](./docs/deployment.md). Audit history lives under [`audits/`](./audits/); incident post-mortems under [`incidents/`](./incidents/).
 
 ## Build commands
 

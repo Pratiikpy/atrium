@@ -77,7 +77,7 @@ const ROWS = [
   { dim: 'Margin compute', a: 'Stylus (Rust, ~10-100x cheaper compute-heavy ops, per Arbitrum Stylus)', c: 'Native Solana programs', b: 'N/A' },
   { dim: 'Open adapter standard', a: 'IPorticoAdapter v1.0 (MIT)', c: 'Closed', b: 'Closed' },
   { dim: 'Agent integration', a: 'Sigil EIP-712 + Postern session keys + ERC-8004', c: 'Limited', b: 'None' },
-  { dim: 'Formal verification', a: '5 Kani+proptest invariants in CI', c: 'Audit only', b: 'Audit only' },
+  { dim: 'Formal verification', a: '9 Kani proofs authored; CI lane Month 3', c: 'Audit only', b: 'Audit only' },
   { dim: 'UX polish today', a: 'Foundation: Verifier Mode complete, app surfaces in progress', c: 'More mature', b: 'More mature' },
   { dim: 'Mainnet live', a: 'No, testnet build phase', c: 'Yes', b: 'Yes' },
 ] as const;

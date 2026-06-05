@@ -54,7 +54,7 @@ Off-chain, three services pace the system:
 | `PorticoRegistry` | Solidity | Whitelist of approved adapters, keyed by `venue_id`. Multisig + 48h timelock for changes. |
 | `PraetorTimelock` | Solidity | 3-of-5 multisig with 48h delay for every parameter change. Instant `emergencyPause` lever, no timelock. |
 | `PosternKillSwitch` | Solidity | One-tx revoke of every active Sigil mandate + Postern session key for the calling wallet. |
-| `LanternAttestor` | Solidity | Hourly Merkle root of share balances; off-chain attestor signs, on-chain stores. |
+| `LanternAttestor` | Solidity | Merkle root of share balances every 10 minutes; off-chain attestor signs, on-chain stores. |
 | `Edict` | Solidity | Jurisdiction tier registry. Plinth + Coffer gate sensitive actions behind a minimum tier. |
 | `Adapters` (`adapters/<venue>/`) | Solidity | Per-venue integration. All implement `IPorticoAdapter` v1.0 or v1.1. |
 
