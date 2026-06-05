@@ -12,7 +12,7 @@
 [![Live](https://img.shields.io/badge/live-useatrium.me-1A1714?style=flat-square)](https://www.useatrium.me)
 [![Tests](https://img.shields.io/badge/tests-768%20passing-2E7D32?style=flat-square)](#verification-everything-is-checkable)
 [![Kani proofs](https://img.shields.io/badge/Kani%20proofs-9%20authored-FB8C00?style=flat-square)](#verification-everything-is-checkable)
-[![Stylus](https://img.shields.io/badge/Arbitrum-Stylus%20(Rust)-3D5AFE?style=flat-square)](#how-it-works)
+[![Stylus](<https://img.shields.io/badge/Arbitrum-Stylus%20(Rust)-3D5AFE?style=flat-square>)](#how-it-works)
 [![Network](https://img.shields.io/badge/Arbitrum%20Sepolia-deployed-FB8C00?style=flat-square)](https://sepolia.arbiscan.io/address/0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE)
 
@@ -68,26 +68,26 @@ The compute-heavy core (Plinth, Vigil, Coffer, Sigil) is written in **Arbitrum S
 
 Every core contract is deployed and verified on Arbitrum Sepolia. Click and read the source.
 
-| Contract | Role | Address |
-|---|---|---|
-| **Coffer** | ERC-4626 collateral vault | [`0xc7bf…aaf3`](https://sepolia.arbiscan.io/address/0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3) |
-| **Plinth** | SPAN margin engine | [`0xd86f…7553`](https://sepolia.arbiscan.io/address/0xd86f579ec880eaab27dfa698ae056d1893ec7553) |
-| **Sigil** | Agent mandate registry | [`0xdba9…d6d9`](https://sepolia.arbiscan.io/address/0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9) |
-| **Vigil** | Liquidation engine | [`0x5ccd…deed`](https://sepolia.arbiscan.io/address/0x5ccd3422f430f6d034ff46715b41509de9d0deed) |
-| **AtriumRouter** | Single-tx orchestrator | [`0xF593…35e0`](https://sepolia.arbiscan.io/address/0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0) |
-| **Lantern** | Proof-of-reserves attestor | [`0xF0B9…5888`](https://sepolia.arbiscan.io/address/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888) |
-| **Portico Registry** | Adapter whitelist | [`0x9a9a…40bc`](https://sepolia.arbiscan.io/address/0x9a9af6e50491cd4694699d48564bbff18f9b40bc) |
-| **Praetor Timelock** | 48h timelock + multisig | [`0x0dad…22d4`](https://sepolia.arbiscan.io/address/0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4) |
+| Contract             | Role                       | Address                                                                                         |
+| -------------------- | -------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Coffer**           | ERC-4626 collateral vault  | [`0xc7bf…aaf3`](https://sepolia.arbiscan.io/address/0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3) |
+| **Plinth**           | SPAN margin engine         | [`0xd86f…7553`](https://sepolia.arbiscan.io/address/0xd86f579ec880eaab27dfa698ae056d1893ec7553) |
+| **Sigil**            | Agent mandate registry     | [`0xdba9…d6d9`](https://sepolia.arbiscan.io/address/0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9) |
+| **Vigil**            | Liquidation engine         | [`0x5ccd…deed`](https://sepolia.arbiscan.io/address/0x5ccd3422f430f6d034ff46715b41509de9d0deed) |
+| **AtriumRouter**     | Single-tx orchestrator     | [`0xF593…35e0`](https://sepolia.arbiscan.io/address/0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0) |
+| **Lantern**          | Proof-of-reserves attestor | [`0xF0B9…5888`](https://sepolia.arbiscan.io/address/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888) |
+| **Portico Registry** | Adapter whitelist          | [`0x9a9a…40bc`](https://sepolia.arbiscan.io/address/0x9a9af6e50491cd4694699d48564bbff18f9b40bc) |
+| **Praetor Timelock** | 48h timelock + multisig    | [`0x0dad…22d4`](https://sepolia.arbiscan.io/address/0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4) |
 
 Full address list: [Arbitrum Sepolia](./docs/deployment.md), Robinhood Chain mirror in [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json).
 
 And the money path is on-chain, not a mockup:
 
-| Action | Transaction |
-|---|---|
-| Withdraw from vault | [`0x976e…ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
-| Deposit (mobile) | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
-| Proof-of-reserves root | `0x4b9e…ef1f0` (block 272828085, readable on [`/lantern`](https://www.useatrium.me/lantern)) |
+| Action                 | Transaction                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Withdraw from vault    | [`0x976e…ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
+| Deposit (mobile)       | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
+| Proof-of-reserves root | `0x4b9e…ef1f0` (block 272828085, readable on [`/lantern`](https://www.useatrium.me/lantern))                       |
 
 ## Verify it yourself in 60 seconds
 
@@ -135,12 +135,12 @@ cd apps/verify && pnpm install && pnpm dev   # then open http://localhost:3000
 
 ## Verification: everything is checkable
 
-| Suite | What it covers | Status |
-|---|---|---|
-| **Vitest** | 768 frontend + library tests | green |
-| **Foundry** | 660+ Solidity contract + integration tests | green |
-| **cargo** | Rust/Stylus unit + property tests (Coffer, Plinth, Sigil, Vigil) | green |
-| **Kani** | 9 formal-verification proofs authored (CI lane lands Month 3) | in development |
+| Suite       | What it covers                                                   | Status         |
+| ----------- | ---------------------------------------------------------------- | -------------- |
+| **Vitest**  | 768 frontend + library tests                                     | green          |
+| **Foundry** | 660+ Solidity contract + integration tests                       | green          |
+| **cargo**   | Rust/Stylus unit + property tests (Coffer, Plinth, Sigil, Vigil) | green          |
+| **Kani**    | 9 formal-verification proofs authored (CI lane lands Month 3)    | in development |
 
 ```bash
 make test     # run every suite
@@ -181,13 +181,13 @@ atrium/
 
 ## Docs
 
-| Doc | What it answers |
-|---|---|
-| [`docs/architecture.md`](./docs/architecture.md) | System architecture and security model |
-| [`docs/deployment.md`](./docs/deployment.md) | Live URLs and every deployed address |
-| [`docs/development.md`](./docs/development.md) | Local setup + cloned reference repos |
-| [`docs/conventions/`](./docs/conventions/) | Security, testing, UI, writing, and git conventions |
-| [`audits/`](./audits/) · [`incidents/`](./incidents/) · [`runbooks/`](./runbooks/) | Audits, post-mortems, ops procedures |
+| Doc                                                                                | What it answers                                     |
+| ---------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`docs/architecture.md`](./docs/architecture.md)                                   | System architecture and security model              |
+| [`docs/deployment.md`](./docs/deployment.md)                                       | Live URLs and every deployed address                |
+| [`docs/development.md`](./docs/development.md)                                     | Local setup + cloned reference repos                |
+| [`docs/conventions/`](./docs/conventions/)                                         | Security, testing, UI, writing, and git conventions |
+| [`audits/`](./audits/) · [`incidents/`](./incidents/) · [`runbooks/`](./runbooks/) | Audits, post-mortems, ops procedures                |
 
 ## Security
 
