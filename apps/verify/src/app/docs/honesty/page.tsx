@@ -203,7 +203,7 @@ export default function HonestyPage() {
       </section>
 
       <footer className="mt-16 border-t border-divider pt-6 text-xs text-muted">
-        <p>Last verified: 2026-05-29 (full-codebase build audit).</p>
+        <p>Last verified: 2026-06-05 (hostile-judge UI + repo audit).</p>
         <p className="mt-2">
           Source of truth for this page is the `tripwires/` directory + `human_left.md`. Every item
           above maps to a dated tripwire file that lives in the repo. If something on the live
