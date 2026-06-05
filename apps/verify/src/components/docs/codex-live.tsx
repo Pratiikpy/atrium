@@ -73,7 +73,21 @@ export function CodexTryIt() {
     setBusy(true);
     try {
       const r = await fetch(endpoint.mirror(wallet));
-      const json = await r.json();
+      const json = await r.json().catch(() => null);
+      if (!r.ok) {
+        // Hostile-judge audit: do not dump the raw 401 body. The per-user
+        // mirror routes are SIWE-gated; explain that instead of {"error":"…"}.
+        if (r.status === 401 || r.status === 403) {
+          setError(
+            endpoint.needsWallet
+              ? 'This endpoint reads a specific account, so it needs a connected, signed-in wallet. Sign in on /app, or try GET /venues or GET /attestation, which are public and need no session.'
+              : 'This read needs a signed-in session.',
+          );
+        } else {
+          setError(`Request failed (HTTP ${r.status}).`);
+        }
+        return;
+      }
       setResult(JSON.stringify(json, null, 2));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'request failed');
@@ -122,8 +136,10 @@ export function CodexTryIt() {
 
       <p className="mt-2 text-[11px] leading-snug text-muted">
         Calls the local testnet read route that backs this endpoint, so it needs no x402 payment.
-        Production Codex requires the <code className="font-mono">X-PAYMENT</code> header shown in the
-        curl example for each endpoint.
+        The per-user endpoints (margin, positions) read your account, so they need a connected,
+        signed-in wallet; <code className="font-mono">GET /venues</code> and{' '}
+        <code className="font-mono">GET /attestation</code> are public. Production Codex requires the{' '}
+        <code className="font-mono">X-PAYMENT</code> header shown in the curl example for each endpoint.
       </p>
 
       {error && <p className="mt-3 text-[12px] text-neg">{error}</p>}

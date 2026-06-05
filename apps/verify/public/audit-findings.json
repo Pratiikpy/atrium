@@ -90,7 +90,7 @@
       "owner": "F1",
       "target": "This session",
       "status": "closed",
-      "statusDetail": "(IPorticoAdapter v1.1 + AaveHorizonAdapterV11 reference impl; remaining 5 adapters migrate to v1.1 mechanically — same originator parameter swap)"
+      "statusDetail": "(IPorticoAdapter v1.1 + AaveHorizonAdapterV11 reference impl; remaining 5 adapters migrate to v1.1 mechanically - same originator parameter swap)"
     },
     {
       "id": 11,
@@ -167,7 +167,7 @@
       "owner": "F2",
       "target": "This session",
       "status": "closed",
-      "statusDetail": "(idempotency now D1-backed; rate-limit still in-isolate — acceptable for Workers free tier)"
+      "statusDetail": "(idempotency now D1-backed; rate-limit still in-isolate - acceptable for Workers free tier)"
     },
     {
       "id": 19,
@@ -291,7 +291,7 @@
     },
     {
       "id": 32,
-      "finding": "PraetorTimelock decorative — never wired into downstream contracts",
+      "finding": "PraetorTimelock decorative - never wired into downstream contracts",
       "agent": "F",
       "location": "every contract admin function",
       "owner": "F1",

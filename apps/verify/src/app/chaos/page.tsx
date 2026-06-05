@@ -78,13 +78,17 @@ export default function ChaosPage() {
       return;
     }
     if (!r.ok) {
-      let detail: string | undefined;
-      try {
-        const body = (await r.json()) as { error?: string; detail?: string };
-        detail = body.detail ?? body.error;
-      } catch {
-        detail = `HTTP ${r.status}`;
-      }
+      // Hostile-judge audit: never surface the raw server body to anonymous
+      // visitors. The chaos route's 5xx body names the CHAOS_PRIVATE_KEY env
+      // var and key-handling guidance; mapping to a public-safe message keeps
+      // operator detail in the server logs only.
+      void r.json().catch(() => undefined); // drain the body, do not render it
+      const detail =
+        r.status >= 500
+          ? 'Chaos injector is offline right now. Operator detail is in the server logs.'
+          : r.status === 401 || r.status === 403
+            ? 'Chaos injection is operator-gated and requires a keeper session.'
+            : `Request rejected (HTTP ${r.status}).`;
       setLog((prev) => [
         { fault, injectedAt, error: `chaos_inject_${r.status}`, detail },
         ...prev,
@@ -113,9 +117,10 @@ export default function ChaosPage() {
       <div className="mx-auto max-w-4xl">
       <h1 className="font-display text-5xl text-ink">Chaos Mode</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
-        Each button injects a real fault into the testnet stack. The system handles it
-        gracefully or it fails honestly. Every run is logged here and on{' '}
-        <code className="font-mono text-ink">chaos.useatrium.me</code>.
+        Each button asks the operator keeper to inject a real fault into the testnet stack;
+        the system either absorbs it or fails honestly. Every run is logged here. Injection is
+        operator-gated, so when the keeper is offline the buttons report the injector as offline
+        rather than executing.
       </p>
 
       <section className="mt-12 grid gap-4 sm:grid-cols-2">

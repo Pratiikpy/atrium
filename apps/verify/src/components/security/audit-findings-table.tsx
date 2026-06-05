@@ -111,7 +111,14 @@ export function AuditFindingsTable() {
           )}
         </div>
         <div className="hidden overflow-x-auto rounded-md border border-divider sm:block">
-          <table className="min-w-full divide-y divide-divider text-[12.5px]">
+          <table className="w-full table-fixed divide-y divide-divider text-[12.5px]">
+            <colgroup>
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '44%' }} />
+              <col style={{ width: '13%' }} />
+              <col style={{ width: '22%' }} />
+              <col style={{ width: '14%' }} />
+            </colgroup>
             <thead className="bg-parchment-soft text-[10.5px] uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-3 py-2 text-left font-medium">#</th>
@@ -125,10 +132,10 @@ export function AuditFindingsTable() {
               {findings.slice(0, 40).map((f) => (
                 <tr key={f.id} className="align-top">
                   <td className="px-3 py-2.5 font-mono text-muted">{f.id}</td>
-                  <td className="px-3 py-2.5 text-ink">{f.finding}</td>
-                  <td className="px-3 py-2.5 font-mono text-muted">{f.agent}</td>
-                  <td className="px-3 py-2.5 font-mono text-[11px] text-ink-soft">{f.location}</td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-3 py-2.5 text-ink break-words">{f.finding}</td>
+                  <td className="px-3 py-2.5 font-mono text-muted break-words">{f.agent}</td>
+                  <td className="px-3 py-2.5 font-mono text-[11px] text-ink-soft break-words">{f.location}</td>
+                  <td className="px-3 py-2.5 whitespace-nowrap">
                     <span
                       className={
                         'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wider ' +

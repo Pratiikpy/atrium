@@ -128,11 +128,11 @@ X402_TOKEN=$(./gen-x402.sh 0.001 0x...codex-address)
 curl -H "X-PAYMENT: $X402_TOKEN" \\
      https://codex.useatrium.me/margin/0xYourWallet
 
-# Response:
+# Response (illustrative shape; values are an example, not a live read):
 # {
-#   "marginUsd": "12378422.00",
-#   "requiredMarginUsd": "4759843.21",
-#   "buyingPowerUsd": "7618578.79",
+#   "marginUsd": "125000.00",
+#   "requiredMarginUsd": "48000.00",
+#   "buyingPowerUsd": "77000.00",
 #   "paused": false,
 #   "source": "plinth",
 #   "asOfBlock": 270918668
