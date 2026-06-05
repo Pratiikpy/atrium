@@ -89,6 +89,24 @@ And the money path is on-chain, not a mockup:
 | Deposit (mobile) | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
 | Proof-of-reserves root | `0x4b9e…ef1f0` (block 272828085, readable on [`/lantern`](https://www.useatrium.me/lantern)) |
 
+## Verify it yourself in 60 seconds
+
+Take none of this on faith. From a terminal:
+
+```bash
+# 1. The vault's real reserves, read straight from the contract (no Atrium server in the loop)
+cast call 0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3 "totalAssets()(uint256)" \
+  --rpc-url https://sepolia-rollup.arbitrum.io/rpc
+
+# 2. The same figure the app shows, from the public API
+curl -s https://www.useatrium.me/api/vault/stats
+
+# 3. The ~51% margin-saving headline, as a test you can run
+cargo test -p atrium-plinth span::hedge_frees_a_pinned_share_of_the_isolated_margin
+```
+
+The contract read (6-decimal USDC) and the API's `vaultTvlUsd` are the same number. The test passes. That is the whole product in three commands, and not one of them touches a slide.
+
 ## What is live vs what is mocked
 
 Atrium runs on a testnet, so this is stated plainly, the same way the live [`/docs/honesty`](https://www.useatrium.me/docs/honesty) page states it.
