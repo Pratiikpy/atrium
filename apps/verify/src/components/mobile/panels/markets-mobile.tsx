@@ -13,7 +13,7 @@ import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 
 interface VenueStatus {
   id: string;
-  status: 'live' | 'paused' | 'region-locked';
+  status: 'live' | 'pending' | 'paused' | 'region-locked';
   tvl: string;
 }
 
@@ -40,13 +40,16 @@ export function MarketsMobile() {
       // adapterSlug never hit, so every venue fell to 'paused'. Check the prefixed
       // key first. TVL has no source in this route -> honest '-'.
       const liveSet = new Set<string>(Array.isArray(j.live) ? j.live : []);
-      return VENUES.map((v) => ({
-        id: v.id,
-        status: (liveSet.has(`adapter-${v.adapterSlug}`) || liveSet.has(v.adapterSlug) || liveSet.has(v.id))
-          ? ('live' as const)
-          : ('paused' as const),
-        tvl: '-',
-      }));
+      return VENUES.map((v) => {
+        const deployed =
+          liveSet.has(`adapter-${v.adapterSlug}`) || liveSet.has(v.adapterSlug) || liveSet.has(v.id);
+        // Being in the live set only means the adapter CONTRACT is deployed.
+        // Only Aave Horizon is openable today (operational); the rest are
+        // deployed-but-scaffolded (open reverts), so they badge 'pending', not
+        // 'live'. Otherwise every venue read as tradeable when 6 of 7 revert.
+        const status: VenueStatus['status'] = !deployed ? 'paused' : v.operational ? 'live' : 'pending';
+        return { id: v.id, status, tvl: '-' };
+      });
     },
     refetchInterval: 60_000,
   });
@@ -102,7 +105,7 @@ export function MarketsMobile() {
               <p className="truncate text-[16px] text-mob-ink">{venue.label}</p>
               <p className="text-[14px] text-mob-muted">TVL: {vs?.tvl ?? '-'}</p>
             </div>
-            <StatusPill status={vs?.status ?? 'live'} />
+            <StatusPill status={vs?.status ?? 'pending'} />
             <span className="text-mob-muted text-[18px]">›</span>
           </button>
         );
@@ -151,15 +154,19 @@ export function MarketsMobile() {
   );
 }
 
-function StatusPill({ status }: { status: 'live' | 'paused' | 'region-locked' }) {
+function StatusPill({ status }: { status: 'live' | 'pending' | 'paused' | 'region-locked' }) {
   const styles = {
     live: 'border-live/30 text-live',
+    pending: 'border-testnet/30 text-testnet',
     paused: 'border-testnet/30 text-testnet',
     'region-locked': 'border-neg/30 text-neg',
   };
+  // 'pending' = adapter deployed but not yet openable (scaffold); show "SOON"
+  // in the testnet/amber color so it never reads as a green tradeable "LIVE".
+  const label = status === 'pending' ? 'soon' : status;
   return (
     <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] uppercase tracking-wider ${styles[status]}`}>
-      {status}
+      {label}
     </span>
   );
 }

@@ -24,16 +24,23 @@ export interface Venue {
   haircutBps: number;
   /** Adapter contract slug (matches contracts/adapters/<slug>/). */
   adapterSlug: string;
+  /**
+   * Trading works against this venue TODAY. Only Aave Horizon is mock-backed
+   * (MockAavePool) and openable; the rest are deployed-but-scaffolded (their
+   * open_position reverts), so the UI must not badge them "live". Mirrors the
+   * pendingVenue/scaffold truth in app/markets/page.tsx + /docs/honesty.
+   */
+  operational: boolean;
 }
 
 export const VENUES: Venue[] = [
-  { id: 'hyperliquid', label: 'Hyperliquid HIP-3', shortLabel: 'HL-HIP3', venueId: 1, kind: 'perp', haircutBps: 1000, adapterSlug: 'hyperliquid' },
-  { id: 'aave-horizon', label: 'Aave Horizon', shortLabel: 'AAVE-V3', venueId: 2, kind: 'cash-equiv', haircutBps: 100, adapterSlug: 'aave-horizon' },
-  { id: 'pendle-v2', label: 'Pendle V2', shortLabel: 'PENDLE', venueId: 3, kind: 'yield-bearing', haircutBps: 500, adapterSlug: 'pendle' },
-  { id: 'curve', label: 'Curve', shortLabel: 'CURVE', venueId: 4, kind: 'LP', haircutBps: 500, adapterSlug: 'curve' },
-  { id: 'trade-xyz', label: 'Trade.xyz', shortLabel: 'TRADE', venueId: 5, kind: 'equity-perp', haircutBps: 1500, adapterSlug: 'trade-xyz' },
-  { id: 'polymarket', label: 'Polymarket', shortLabel: 'PMK', venueId: 6, kind: 'binary', haircutBps: 5000, adapterSlug: 'polymarket' },
-  { id: 'hl-hip4', label: 'Hyperliquid HIP-4', shortLabel: 'HL-HIP4', venueId: 7, kind: 'perp', haircutBps: 1000, adapterSlug: 'hyperliquid' },
+  { id: 'hyperliquid', label: 'Hyperliquid HIP-3', shortLabel: 'HL-HIP3', venueId: 1, kind: 'perp', haircutBps: 1000, adapterSlug: 'hyperliquid', operational: false },
+  { id: 'aave-horizon', label: 'Aave Horizon', shortLabel: 'AAVE-V3', venueId: 2, kind: 'cash-equiv', haircutBps: 100, adapterSlug: 'aave-horizon', operational: true },
+  { id: 'pendle-v2', label: 'Pendle V2', shortLabel: 'PENDLE', venueId: 3, kind: 'yield-bearing', haircutBps: 500, adapterSlug: 'pendle', operational: false },
+  { id: 'curve', label: 'Curve', shortLabel: 'CURVE', venueId: 4, kind: 'LP', haircutBps: 500, adapterSlug: 'curve', operational: false },
+  { id: 'trade-xyz', label: 'Trade.xyz', shortLabel: 'TRADE', venueId: 5, kind: 'equity-perp', haircutBps: 1500, adapterSlug: 'trade-xyz', operational: false },
+  { id: 'polymarket', label: 'Polymarket', shortLabel: 'PMK', venueId: 6, kind: 'binary', haircutBps: 5000, adapterSlug: 'polymarket', operational: false },
+  { id: 'hl-hip4', label: 'Hyperliquid HIP-4', shortLabel: 'HL-HIP4', venueId: 7, kind: 'perp', haircutBps: 1000, adapterSlug: 'hyperliquid', operational: false },
 ];
 
 export const VENUE_COUNT = VENUES.length;
