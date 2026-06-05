@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const STATS = [
   { v: '24', l: 'CONTRACTS LIVE' },
-  { v: '9', l: 'VENUE ADAPTERS' },
+  { v: '7', l: 'VENUE ADAPTERS' },
   { v: '2', l: 'TESTNETS' },
   { v: '10‑100×', l: 'STYLUS HEADROOM' },
 ];
