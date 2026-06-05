@@ -825,6 +825,11 @@
   .pitch-closing { min-height: auto; padding: 40px 0; gap: 40px; }
   .pitch-insight-flow { grid-template-columns: 1fr; gap: 14px; }
   .pitch-insight-arrow { transform: rotate(90deg); }
+  /* Mobile overflow fix: the architecture cards stayed 2-wide (~428px) on
+     phones, 38px past a 390px viewport. Stack to 1 column like the other
+     grids so the deck never scrolls sideways on mobile. */
+  .pitch-arch-grid { grid-template-columns: 1fr; }
+  .pitch-proof-stats { grid-template-columns: 1fr 1fr; }
   /* table → stacked rows on phones */
   .pitch-cat-head { display: none; }
   .pitch-cat-row,
