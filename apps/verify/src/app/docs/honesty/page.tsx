@@ -126,11 +126,11 @@ export const DISCLOSURES: Disclosure[] = [
   },
   {
     id: 'scaffold-adapters',
-    surface: 'Synthetix V3 + Morpho Blue adapters',
+    surface: 'GMX, Synthetix V3 + Morpho Blue adapters',
     what:
-      'Both adapters are listed on /app/markets for design completeness, but `open_position` reverts with `ScaffoldNotImplemented`. The /app/trade venue list never offered them; the markets tile renders a "scaffold · open blocked" pill explicitly.',
+      'All three adapters are deployed and listed on /app/markets for design completeness, but `open_position` reverts with `ScaffoldNotImplemented`. The /app/trade venue list never offered them; the markets tile renders a "scaffold · open blocked" pill explicitly.',
     why:
-      'Year-1 scope shipped the 7 production venues (Hyperliquid, Aave Horizon, Pendle, Curve, Trade.xyz, Polymarket, GMX). Synthetix V3 + Morpho Blue scaffolds existed as forward-compatible contracts; before the Phase theta-followup lockdown, an open call would have pulled USDC via Coffer.adapterPull but never deployed into the upstream protocol, a funds-strand risk.',
+      'Year-1 launch scope is the 7 production venues (Hyperliquid HIP-3, Aave Horizon, Pendle, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4). GMX, Synthetix V3, and Morpho Blue scaffolds exist as forward-compatible deployed contracts; before the Phase theta-followup lockdown, an open call would have pulled USDC via Coffer.adapterPull but never deployed into the upstream protocol, a funds-strand risk.',
     whenReal:
       'Year 2. Real Synthetix V3 `commitOrder` + sUSD-vs-USDC bridging, and real Morpho `supplyCollateral` + `borrow` + LLTV math. The contract scaffolds + tests are in place to make those follow-ups mechanical.',
     severity: 'interim',

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Lantern attestor publishes hourly Merkle roots attesting to each user's redeemable asset balance in the Coffer vault.
+The Lantern attestor publishes Merkle roots every 10 minutes attesting to each user's redeemable asset balance in the Coffer vault.
 
 ## Trust Model
 
@@ -42,4 +42,4 @@ Scribe ──[user list]──► Lantern ──[RPC multicall]──► Coffer 
 - Arbitrum Sepolia public RPC: ~100 req/s
 - Per tick (1000 users): ~20 multicall requests = 0.2s at 100 req/s
 - Per tick (10000 users): ~200 multicall requests = 2s at 100 req/s
-- Tick interval: 1 hour → well within budget
+- Tick interval: 10 minutes → well within budget

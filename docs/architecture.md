@@ -71,7 +71,7 @@ Full audit history under [`audits/`](../audits/). Incident post-mortems under [`
 ## Off-chain services
 
 - **`services/codex/`**, Hono-based API on Cloudflare Workers (primary) + Vercel (mirror). x402 USDC payment per call. HMAC-signed responses keyed by `X-Codex-Key-Id`. Idempotency-Key honored for 24h.
-- **`services/lantern-attestor/`**, Vercel cron. Pulls Coffer balances from Scribe each hour, builds a Merkle tree, pins to IPFS, signs the root, publishes to `LanternAttestor.publish`.
+- **`services/lantern-attestor/`**, Vercel cron. Pulls Coffer balances via RPC every 10 minutes, builds a Merkle tree, pins to IPFS, signs the root, publishes to `LanternAttestor.publish`.
 - **`services/vigil-keeper/`**, GitHub Actions cron. Watches the subgraph for accounts crossing the liquidation threshold; calls `queueLiquidation` + `executeLiquidation` against `Vigil`.
 - **`services/notifier/`**, Subgraph-driven alert delivery (Telegram / Discord / email / webhook). Per-user preferences via Bearer-gated REST API.
 - **`services/praetor-cli/`**, Rust CLI for deploys, multisig schedule/execute, lantern publish-now, seed pre-flight, parameter changes.
@@ -105,4 +105,4 @@ A typical hedged-position lifecycle:
 
 ## Disclosures
 
-What's a mock, what's a relay, what's a stub on testnet is published at [`/docs/honesty`](https://verify.useatrium.me/docs/honesty) on the live app. Year-1 testnet posture: certain venues (Aave on Sepolia, Pyth equity feeds, Hyperliquid HIP-3) are not natively available, so Atrium uses mocks or Praetor-signed relays disclosed openly. None of the landing-page numbers ever pretend a mock is a real upstream.
+What's a mock, what's a relay, what's a stub on testnet is published at [`/docs/honesty`](https://www.useatrium.me/docs/honesty) on the live app. Year-1 testnet posture: certain venues (Aave on Sepolia, Pyth equity feeds, Hyperliquid HIP-3) are not natively available, so Atrium uses mocks or Praetor-signed relays disclosed openly. None of the landing-page numbers ever pretend a mock is a real upstream.

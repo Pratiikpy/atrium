@@ -48,7 +48,7 @@ flowchart TD
     R -->|"pull collateral, per-block cap"| C
     R --> A["Portico adapters"]
     A --> V1["Aave Horizon (live)"]
-    A --> V2["Hyperliquid · Pendle · Curve<br/>Trade.xyz · Polymarket (deployed)"]
+    A --> V2["Hyperliquid HIP-3 + HIP-4 · Pendle<br/>Curve · Trade.xyz · Polymarket (deployed)"]
     P -.->|"monitors health"| VG["Vigil<br/>liquidation (Stylus)"]
     C -.->|"signed Merkle root every 10 min"| L["Lantern<br/>proof-of-reserves"]
     U -.->|"EIP-712 mandate + session key"| S["Sigil + Postern"]
@@ -79,7 +79,7 @@ Every core contract is deployed and verified on Arbitrum Sepolia. Click and read
 | **Portico Registry** | Adapter whitelist | [`0x9a9a…40bc`](https://sepolia.arbiscan.io/address/0x9a9af6e50491cd4694699d48564bbff18f9b40bc) |
 | **Praetor Timelock** | 48h timelock + multisig | [`0x0dad…22d4`](https://sepolia.arbiscan.io/address/0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4) |
 
-Full address list (both chains): [`docs/deployment.md`](./docs/deployment.md).
+Full address list: [Arbitrum Sepolia](./docs/deployment.md), Robinhood Chain mirror in [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json).
 
 And the money path is on-chain, not a mockup:
 
@@ -113,7 +113,7 @@ Atrium runs on a testnet, so this is stated plainly, the same way the live [`/do
 
 **Real on-chain today:** the vault (deposit/withdraw real USDC), the SPAN margin engine, the liquidation engine, agent mandates + kill switch, the Chainlink-keeper plumbing, and proof-of-reserves.
 
-**Mocked or pending (testnet limits, not shortcuts):** of 7 deployed venue adapters, **1 (Aave Horizon) is operational** today, through an Atrium-deployed `MockAavePool` because Aave V3 has no usable Arbitrum Sepolia deployment. The other 6 adapters are deployed but scaffolded (their `open_position` reverts rather than strand funds) because the real venues have no testnet to integrate against. Cross-chain transfer (CCIP) and the tax service are pending external dependencies. Each gap is named, with a reason and an unlock date, on the honesty page.
+**Mocked or pending (testnet limits, not shortcuts):** of the 7 launch-scope venues, **1 (Aave Horizon) is operational** today, through an Atrium-deployed `MockAavePool` because Aave V3 has no usable Arbitrum Sepolia deployment. The other 6 are deployed but scaffolded (their `open_position` reverts rather than strand funds) because the real venues have no testnet to integrate against. Nine venue-adapter contracts are deployed on-chain in total; GMX, Morpho, and Synthetix sit outside the launch seven. Cross-chain transfer (CCIP) and the tax service are pending external dependencies. Each gap is named, with a reason and a target date, on the honesty page.
 
 ## Quick start
 

@@ -32,7 +32,7 @@ export function VaultStats() {
   // Only show wallet-scoped values when a wallet is actually connected. When
   // disconnected, useScopedWallet() returns null and /api/vault/stats falls back
   // to DEMO_WALLET_ADDRESS (kept so smoke tests + the explicit demo path still
-  // work) — but we must NOT label that demo balance as "your" value/shares
+  // work), but we must NOT label that demo balance as "your" value/shares
   // (CLAUDE.md red line: no mock data shown as real). Vault TVL is global/public
   // so it always shows; the per-user tiles show "-" until a wallet connects.
   const connected = wallet != null;

@@ -17,7 +17,7 @@
 | sigil | [`0xdba97d39…`](https://sepolia.arbiscan.io/address/0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9) | [`0x1f7e8e32…`](https://sepolia.arbiscan.io/tx/0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371) | 270801710 | stylus | - | 🟢 live | ⚠️ Stylus | 2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed a… |
 | vigil | [`0x5ccd3422…`](https://sepolia.arbiscan.io/address/0x5ccd3422f430f6d034ff46715b41509de9d0deed) | [`0xd573e52e…`](https://sepolia.arbiscan.io/tx/0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e) | 270802353 | stylus | - | 🟢 live | ⚠️ Stylus | 2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed a… |
 | plinth-math | [`0xc53dbfc0…`](https://sepolia.arbiscan.io/address/0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab) | [`0x27a07432…`](https://sepolia.arbiscan.io/tx/0x27a07432f7834f3e83bd7452137572a46a10833e73a80692dd42ad31ae4e7e3b) | 270678961 | stylus | - | 🟢 live | ⚠️ Stylus | SPAN compute extracted from Plinth (Phase A.7) to fit EIP-170 24 KB cap |
-| plinth-oracle | [`0x66064d18…`](https://sepolia.arbiscan.io/address/0x66064d18722f50e055d74daf51a13fd8e331f0b7) | [`0xad2928f7…`](https://sepolia.arbiscan.io/tx/0xad2928f777e608c1108032a0148025e781a759c6655d5c0e0bc9e8d06560d4ea) | 270688421 | stylus | - | 🟢 live | ⚠️ Stylus | Dual-oracle price reader extracted from Plinth (Phase A.7) â€” Chainlink + Pyth … |
+| plinth-oracle | [`0x66064d18…`](https://sepolia.arbiscan.io/address/0x66064d18722f50e055d74daf51a13fd8e331f0b7) | [`0xad2928f7…`](https://sepolia.arbiscan.io/tx/0xad2928f777e608c1108032a0148025e781a759c6655d5c0e0bc9e8d06560d4ea) | 270688421 | stylus | - | 🟢 live | ⚠️ Stylus | Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + m… |
 | plinth | [`0xd86f579e…`](https://sepolia.arbiscan.io/address/0xd86f579ec880eaab27dfa698ae056d1893ec7553) | [`0x1fe8101f…`](https://sepolia.arbiscan.io/tx/0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0) | 270803107 | stylus | - | 🟢 live | ⚠️ Stylus | 2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed a… |
 
 ## Solidity core
@@ -88,4 +88,4 @@ Solidity contracts are verified on [Sourcify](https://sourcify.dev) (full match)
 
 ---
 
-Generated at 2026-06-02T15:58:32Z from `deployments/arbitrum_sepolia.json`.
+Generated at 2026-06-05T11:18:50Z from `deployments/arbitrum_sepolia.json`.

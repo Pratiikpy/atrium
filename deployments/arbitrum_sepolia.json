@@ -88,7 +88,7 @@
       "activationTx": "0x69bff2c17e520de5a7ebe2081d01821eadf42922508c4a49d946c898b6cb7248",
       "block": 270688421,
       "kind": "stylus",
-      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) \u00e2\u20ac\u201d Chainlink + Pyth + median + 50bps tolerance"
+      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
       "address": "0xd86f579ec880eaab27dfa698ae056d1893ec7553",

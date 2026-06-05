@@ -21,7 +21,7 @@ For a list of every cloned dependency and what it's for, see [`./resources.md`](
 
 ## Local Resource Repositories
 
-See `RESOURCES.md` for the full list of cloned repos and their checkout commits.
+See `docs/resources.md` for the full list of cloned repos and their checkout commits.
 
 Key local paths:
 
@@ -65,7 +65,7 @@ Arbitrum One mainnet:
 
 ## Useful Tools for Builders
 
-The cloned upstreams below are mirrored locally under `resources/`; see `RESOURCES.md` for paths and pinned commits.
+The cloned upstreams below are mirrored locally under `resources/`; see `docs/resources.md` for paths and pinned commits.
 
 - Arbitrum Docs, https://docs.arbitrum.io/
 - Arbitrum SDK, https://github.com/OffchainLabs/arbitrum-sdk

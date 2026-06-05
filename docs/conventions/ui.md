@@ -4,7 +4,7 @@
 
 The visual language lives in `design/`. Two HTML files:
 
-- `design/Atrium.html`
+- `design/Atriumnew.html`
 - `design/Atrium App.standalone.html`
 
 Before any UI work:
@@ -38,7 +38,7 @@ If a token is missing from the HTML files, raise it. Do not pick a number out of
 - TanStack Query for caching reads
 - next-pwa for the mobile path (Lighthouse ≥ 90)
 
-Stack decisions are recorded in `TECH_DESIGN.md` §12. Do not swap without an ADR.
+Stack decisions are recorded in `docs/architecture.md` (stack section). Do not swap without an ADR.
 
 ## Required states for every feature
 

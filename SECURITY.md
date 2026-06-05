@@ -51,9 +51,9 @@ Out of scope:
 
 Atrium targets Arbitrum Sepolia testnet for Year 1. No user funds will be at real economic risk. The audit-findings register tracks the gap between the security model and what is wired today; see `audits/2026-05-25-contract-quality-audit.md`.
 
-Design intent (live by Month 3 per `docs/MASTER_PLAN.md`):
+Design intent (formal-verification CI lane lands Month 3):
 
-- Kani + proptest formal-method invariants in CI. 3 of 5 invariants wired at scaffold time; the remaining 2 land Month 2-6.
+- Kani plus proptest formal-method invariants: 9 Kani proofs authored; 5 of 9 proptest invariants pass locally today. The formal-verification CI lane lands Month 3.
 - Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.
 - 3-keeper redundancy with economic slashing.
 - Praetor 3-of-5 multisig with a 48-hour PraetorTimelock on every parameter change.

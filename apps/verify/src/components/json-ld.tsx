@@ -19,7 +19,7 @@ export const ATRIUM_ORG_SCHEMA = {
   url: 'https://verify.useatrium.me',
   // Honesty audit (2026-06-05): removed the `sameAs` social profiles. They
   // pointed at github.com/atrium-labs + twitter.com/atriumfi, which are not
-  // accounts we own — asserting them in structured data tells search engines
+  // accounts we own; asserting them in structured data tells search engines
   // we control profiles we don't. Re-add only verified, owned accounts.
 };
 

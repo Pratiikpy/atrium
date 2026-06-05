@@ -87,7 +87,7 @@ const NODES: MapNode[] = [
     role: 'PER-VENUE · PORTICO',
     lang: 'SOLIDITY',
     blurb:
-      'One adapter per venue, each speaking the IPorticoAdapter interface. Seven adapters are deployed on Arbitrum Sepolia (Aave Horizon is operational today; the rest register in PorticoRegistry in Month 1 W2): Hyperliquid HIP-3, Aave Horizon, Pendle V2, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4.',
+      'One adapter per venue, each speaking the IPorticoAdapter interface. Nine adapter contracts are deployed and verified on Arbitrum Sepolia; seven venues are in the launch margin scope (Aave Horizon is operational today; the rest register in PorticoRegistry in Month 1 W2): Hyperliquid HIP-3, Aave Horizon, Pendle V2, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4. GMX, Morpho, and Synthetix adapters are deployed but outside the initial seven.',
     tags: ['Solidity', 'Portico', '7 venues'],
     address: '0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1',
     chain: 'ARBITRUM SEPOLIA',
@@ -123,8 +123,8 @@ const NODES: MapNode[] = [
     role: 'PROOF OF RESERVES',
     lang: 'SOLIDITY',
     blurb:
-      'Every hour Lantern publishes a Merkle root of every Coffer balance on-chain and pins the tree to IPFS. Verify your own balance with a one-click inclusion proof.',
-    tags: ['Solidity', 'Merkle', 'hourly'],
+      'Every 10 minutes Lantern publishes a Merkle root of every Coffer balance on-chain and pins the tree to IPFS. Verify your own balance with a one-click inclusion proof.',
+    tags: ['Solidity', 'Merkle', '10-min'],
     address: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
@@ -264,7 +264,7 @@ function CopyAddress({ address, chain, chainId }: { address: string; chain?: str
 const FLOW_STEPS = [
   { node: 'coffer', label: 'Deposit 10,000 USDC into Coffer', margin: 0, note: 'Collateral posted. One vault, one balance.' },
   { node: 'router', label: 'Open long: WETH perp, 4× on Hyperliquid', margin: 2500, note: 'Isolated margin on this leg alone: $2,500.' },
-  { node: 'adapter', label: 'Open short: ETH-correlated hedge on GMX', margin: 4900, note: 'Naively both legs cost $4,900 isolated margin.' },
+  { node: 'adapter', label: 'Open short: ETH-correlated hedge on a second venue', margin: 4900, note: 'Naively both legs cost $4,900 isolated margin.' },
   { node: 'plinth', label: 'Plinth runs the SPAN scenario matrix', margin: 4900, note: 'The two legs are correlated. Scenarios cancel.' },
   { node: 'plinth', label: 'Correlated risk nets out', margin: 1180, note: 'Net required margin: $1,180 - not $4,900.' },
   { node: 'vigil', label: 'Vigil holds the line on the netted account', margin: 1180, note: 'You freed ~$3,720 of buying power. That is the point.' },
@@ -363,7 +363,7 @@ export function PositionFlow() {
 /* ------------------------------------------------------------------ */
 const TABS: { key: string; label: string; rows: Row[]; copyable: boolean }[] = [
   { key: 'core', label: 'Arbitrum · Core 15', rows: CORE_15, copyable: true },
-  { key: 'venues', label: 'Arbitrum · Venues 9', rows: VENUES_9, copyable: true },
+  { key: 'venues', label: 'Arbitrum · Adapters 9', rows: VENUES_9, copyable: true },
   { key: 'rh', label: 'Robinhood Chain 8', rows: ROBINHOOD_8, copyable: true },
 ];
 
@@ -429,7 +429,9 @@ export function DeploymentsTable() {
       <p className="arch-deploy-foot">
         {tab === 'rh'
           ? 'Robinhood Chain testnet (chainId 46630) · the full Atrium stack mirrored from Arbitrum. Click any address to copy it.'
-          : 'Solidity verified on Arbiscan + Sourcify · Stylus verified via cargo stylus verify. Click any address to copy it.'}
+          : tab === 'venues'
+            ? '9 venue-adapter contracts deployed + verified. Seven venues are in the launch margin scope (Aave Horizon operational today); GMX, Morpho, and Synthetix are deployed but outside the initial seven. Click any address to copy it.'
+            : 'Solidity verified on Arbiscan + Sourcify · Stylus verified via cargo stylus verify. Click any address to copy it.'}
       </p>
     </div>
   );
