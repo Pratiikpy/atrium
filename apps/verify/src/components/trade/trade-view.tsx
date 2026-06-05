@@ -22,7 +22,12 @@ import { VenueMarginCompare } from './venue-margin-compare';
  * was reading the chip.
  */
 export function TradeView() {
-  const [venue, setVenue] = useState<string>(VENUES[0]?.id ?? 'hyperliquid');
+  // Default to the venue that is actually openable today (Aave Horizon).
+  // VENUES[0] is Hyperliquid, a scaffold whose open_position reverts, so
+  // defaulting there dropped a judge onto a venue they cannot trade.
+  const [venue, setVenue] = useState<string>(
+    VENUES.find((v) => v.operational)?.id ?? VENUES[0]?.id ?? 'aave-horizon',
+  );
   const [size, setSize] = useState<string>('');
 
   return (

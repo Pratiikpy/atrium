@@ -7,6 +7,7 @@ import { useAccount } from 'wagmi';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useOpenPosition } from '@/lib/use-open-position';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { VENUES } from '@/lib/venues';
 import { SlippageSelect } from '@/components/trade/slippage-select';
 import { HelpTip } from '@/components/ui/help-tip';
 
@@ -80,7 +81,13 @@ export function OrderForm({
     refetchInterval: 10_000,
   });
   const { data: deployment } = useDeploymentStatus(2);
-  const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
+  // Only Aave Horizon is openable today; the other venues are deployed-but-
+  // scaffolded (open_position reverts on-chain). Gate the Open button on this
+  // so a user never signs a transaction that is guaranteed to revert.
+  const venueOperational = VENUES.find((v) => v.id === venue)?.operational ?? false;
+  const helper = !venueOperational
+    ? `${venueShortLabel(venue)} is deployed but not openable on testnet yet. Open positions are live on Aave Horizon today.`
+    : readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
   const { status: openStatus, open: openPosition, reset: resetOpen } = useOpenPosition();
   const busy = openStatus.kind === 'resolving' || openStatus.kind === 'submitting';
   // Validate the size as a positive number, not merely non-empty: a bare
@@ -89,7 +96,7 @@ export function OrderForm({
   // (NaN/<=0). The deposit form already gates this way; match it here.
   const sizeNum = parseFloat(size);
   const sizeValid = Number.isFinite(sizeNum) && sizeNum > 0;
-  const ready = deployment?.ready === true && sizeValid && !busy;
+  const ready = deployment?.ready === true && sizeValid && !busy && venueOperational;
 
   // First-trade risk preview gate. The flow doc treats this as required
   // before the very first open-position click. Persistence is per-device
