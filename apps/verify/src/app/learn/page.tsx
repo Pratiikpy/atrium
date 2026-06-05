@@ -59,7 +59,7 @@ export default function LearnPage() {
         <h2 className="font-display text-2xl text-ink">Open standards</h2>
         <p className="mt-3 text-ink-soft">
           IPorticoAdapter v1.0 is MIT-licensed from Day 30. Sigil's EIP-712 schema is published.
-          Curator grants pay $5K ARB per accepted adapter and per accepted reference agent.
+          Curator grants will pay $5K ARB per accepted adapter and reference agent, after testnet launch.
         </p>
       </section>
 

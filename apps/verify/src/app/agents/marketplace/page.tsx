@@ -43,7 +43,7 @@ export default function AgentsMarketplacePage() {
         <p className="mt-4 max-w-prose text-ink-soft">
           Open-source agents that trade for you under bounded Sigil mandates. The three
           reference agents below ship in <code className="font-mono text-ink">agents/</code> in the
-          Atrium repo. Curator grants of $5K ARB go to community-built agents that pass review.
+          Atrium repo. Curator grants will pay $5K ARB to community-built agents that pass review, after testnet launch.
         </p>
       </section>
 

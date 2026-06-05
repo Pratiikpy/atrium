@@ -660,7 +660,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                 { num: 'L01', name: 'Postern', sub: 'User entry · wallet abstraction', chips: ['Passkey login', 'Gas sponsorship', 'Session keys', 'Social recovery'], side: 'PWA · Next.js' },
                 { num: 'L02', name: 'Backend services', sub: 'Off-chain orchestration', chips: ['Tablet · tax', 'Codex · x402', 'Aqueduct coordinator', 'Rostrum copy-trade'], side: 'Single region · EU' },
                 { num: 'L03', name: 'Stylus', sub: 'Rust → WASM · hot math', chips: ['Plinth · margin', 'Vigil · liquidations', 'Stoa · options'], side: 'Robinhood · Arbitrum Sepolia' },
-                { num: 'L04', name: 'Solidity', sub: 'Venue + vault layer', chips: ['Portico v1.0.0', '8 P1 adapters', 'Coffer · ERC-4626', 'Sigil · ERC-8004'], side: 'OpenZeppelin' },
+                { num: 'L04', name: 'Solidity', sub: 'Venue + vault layer', chips: ['Portico v1.0.0', '9 adapter contracts', 'Coffer · ERC-4626', 'Sigil · ERC-8004'], side: 'OpenZeppelin' },
                 { num: 'L05', name: 'Oracles + data', sub: 'Free testnet feeds', chips: ['Data Streams', 'Price Feeds', 'CCIP testnet', 'RedStone', 'Scribe'], side: 'Chainlink · The Graph' },
               ].map((l) => (
                 <div className="arch-row" key={l.num}>

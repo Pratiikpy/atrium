@@ -266,7 +266,7 @@ const FLOW_STEPS = [
   { node: 'router', label: 'Open long: WETH perp, 4× on Hyperliquid', margin: 2500, note: 'Isolated margin on this leg alone: $2,500.' },
   { node: 'adapter', label: 'Open short: ETH-correlated hedge on a second venue', margin: 4900, note: 'Naively both legs cost $4,900 isolated margin.' },
   { node: 'plinth', label: 'Plinth runs the SPAN scenario matrix', margin: 4900, note: 'The two legs are correlated. Scenarios cancel.' },
-  { node: 'plinth', label: 'Correlated risk nets out', margin: 1180, note: 'Net required margin: $1,180 - not $4,900.' },
+  { node: 'plinth', label: 'Correlated risk nets out', margin: 1180, note: 'Net required margin: $1,180, not $4,900.' },
   { node: 'vigil', label: 'Vigil holds the line on the netted account', margin: 1180, note: 'You freed ~$3,720 of buying power. That is the point.' },
 ];
 
@@ -351,7 +351,7 @@ export function PositionFlow() {
         <p className="arch-flow-note">
           {active
             ? active.note
-            : "Press Play the flow to trace a position from wallet to venue and back - with the margin saving computed live by Plinth's SPAN engine."}
+            : "Press Play the flow to trace a position from wallet to venue and back, with the margin saving computed live by Plinth's SPAN engine."}
         </p>
       </div>
     </div>

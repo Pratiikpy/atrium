@@ -116,7 +116,7 @@ export function IntegrationsView() {
       <IntegrationCard
         eyebrow="Venue adapters · Portico"
         title="Add a venue to the cross-margin set"
-        body="Adapters implement the open IPorticoAdapter standard (MIT-licensed). Whitelisted by 3-reviewer Curator approval behind a 48h timelock. A Curator grant of 5K ARB ships per accepted adapter."
+        body="Adapters implement the open IPorticoAdapter standard (MIT-licensed). Whitelisted by 3-reviewer Curator approval behind a 48h timelock. A Curator grant of $5K ARB will ship per accepted adapter after testnet launch."
         ctas={[
           { label: 'Adapter spec', href: '/learn#adapters' },
           { label: 'Decisions (ADR-008)', href: '/docs/adr/008' },

@@ -87,7 +87,7 @@ Being defensible means saying what is not done:
 - **Testnet, Year 1.** Arbitrum Sepolia. Nothing here has economic value yet.
 - **Upgradeable contracts.** UUPS behind a 48-hour timelock, today controlled by a founder deployer key; the production model is a 3-of-5 multisig behind the same timelock. We say so on `/docs/honesty` and `/docs/deployment` rather than claiming false immutability.
 - **Some venues are mocked or relayed** where the real upstream is not on Sepolia (for example Aave V3, equity feeds, certain perp venues). Each one is named with its mechanism and path to real on `/docs/honesty`.
-- **Two adapters are scaffolds** (open is disabled, shown as such on `/app/markets`).
+- **Six of the seven launch venues are deployed but scaffolded** (open is disabled, shown as such on `/app/markets`); only Aave Horizon opens today. This matches the count in `README.md` and `/docs/honesty`.
 
 None of these change the wedge. They are the honest state of a Year-1 testnet build, and disclosing them is part of the trust argument, not a footnote to it.
 

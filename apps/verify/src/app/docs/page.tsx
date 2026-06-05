@@ -196,7 +196,7 @@ export default function DocsPage() {
           <p className="font-display text-xl text-ink">Adapter spec</p>
           <p className="mt-2 text-sm text-ink-soft">
             <code className="font-mono text-ink">IPorticoAdapter v1.0</code> + v1.1 with explicit
-            originator. MIT-licensed. Curator grant $5K ARB per accepted adapter.
+            originator. MIT-licensed. Curator grants will pay $5K ARB per accepted adapter, after testnet launch.
           </p>
           <Link href="/learn#adapters" className="mt-3 inline-block text-xs text-ink underline-offset-2 hover:underline">
             Read
