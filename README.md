@@ -18,6 +18,12 @@
 
 [**Live demo**](https://www.useatrium.me) · [**Pitch**](https://www.useatrium.me/pitch) · [**Architecture**](https://www.useatrium.me/architecture) · [**Honest disclosures**](https://www.useatrium.me/docs/honesty)
 
+<br/>
+
+[![Atrium investor brief, a ten-slide deck live at useatrium.me/pitch](apps/verify/public/brand/assets/readme-deck.png)](https://www.useatrium.me/pitch)
+
+<sub>The ten-slide investor brief, live at [**useatrium.me/pitch**](https://www.useatrium.me/pitch)</sub>
+
 </div>
 
 ---
