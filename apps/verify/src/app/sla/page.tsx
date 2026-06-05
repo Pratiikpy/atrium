@@ -1,11 +1,16 @@
-import { Wordmark } from '@/components/wordmark';
-import Link from 'next/link';
+import { MarketingShell } from '@/components/atrium/MarketingShell';
+
+export const metadata = {
+  title: 'Withdrawal SLA',
+  description:
+    'How fast you can withdraw from Atrium, and the five on-chain circuit-breakers that can pause redemptions.',
+};
 
 export default function SlaPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <Wordmark size="sm" />
-      <h1 className="mt-12 font-display text-5xl text-ink">Withdrawal SLA</h1>
+    <MarketingShell>
+      <article className="mx-auto max-w-3xl px-6 py-16">
+        <h1 className="font-display text-5xl text-ink">Withdrawal SLA</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         Atrium is non-custodial. Your USDC sits in Coffer (ERC-4626 vault) as shares. The contracts
         let you redeem at any time, subject to the five circuit-breakers below.
@@ -23,14 +28,14 @@ export default function SlaPage() {
       <section className="mt-12 space-y-4">
         <h2 className="font-display text-2xl text-ink">Five circuit-breakers</h2>
         <p className="text-ink-soft">
-          Each is automatic. When tripped, withdrawals pause for the listed duration. Praetor (3-of-5 multisig + 48h timelock) unpauses after the trigger is resolved.
+          Each is automatic. When tripped, withdrawals pause for the listed duration. Praetor governance (48h timelock; admin today is a single founder deployer key, with the 3-of-5 Safe queued) unpauses after the trigger is resolved.
         </p>
         <ol className="mt-4 space-y-4">
           <BreakerRow
             number={1}
             name="Oracle disagreement"
             trigger="Chainlink and Pyth disagree by more than 50 bps on any active instrument"
-            duration="Until oracles align; typical 5–15 minutes"
+            duration="Until oracles align; typical 5-15 minutes"
           />
           <BreakerRow
             number={2}
@@ -66,10 +71,8 @@ export default function SlaPage() {
         </p>
       </section>
 
-      <Link href="/" className="mt-16 inline-block text-sm text-ink underline-offset-2 hover:underline">
-        Back to Atrium
-      </Link>
-    </main>
+      </article>
+    </MarketingShell>
   );
 }
 
