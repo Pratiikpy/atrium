@@ -1456,7 +1456,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 
 /* ============================================================
- * Landing feature sections — reference parity with
+ * Landing feature sections - reference parity with
  * design/Atriumnew.html (2026-06-03). All tokens already defined
  * above. The four feature sections (Plinth/Aqueduct/Sigil/Lantern)
  * render a faux-browser product mock instead of an empty stub.
@@ -1541,7 +1541,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 
 /* ============================================================
- * Landing: architecture / cohort / closing — reference parity
+ * Landing: architecture / cohort / closing - reference parity
  * (design/Atriumnew.html, 2026-06-03).
  * ============================================================ */
 .architecture { padding: var(--section-pad) 0; border-top: 1px solid var(--hairline); }
@@ -1580,7 +1580,7 @@ input[type="range"] { cursor: ew-resize; }
 }
 
 /* ============================================================
- * Landing: subsystems — Four architectural blocks (reference parity)
+ * Landing: subsystems - Four architectural blocks (reference parity)
  * ============================================================ */
 .subsystems { padding: var(--section-pad) 0; border-top: 1px solid var(--hairline); }
 .subsys-stack { margin-top: 72px; display: flex; flex-direction: column; border-top: 1px solid var(--ink); }
