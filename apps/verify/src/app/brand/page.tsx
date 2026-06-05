@@ -75,9 +75,16 @@ export default function BrandPage() {
             <Wordmark size="lg" />
             <p className="mt-3 text-xs uppercase tracking-widest text-muted">Light context</p>
           </div>
-          <div className="rounded-md border border-ink bg-dark-bg px-6 py-10 text-center text-parchment">
-            <span className="font-display text-4xl italic">Atrium</span>
-            <p className="mt-3 text-xs uppercase tracking-widest text-dark-white-55">Inverse, same letterforms</p>
+          {/* Pin literal colors (like the Swatch specimens): the dark-bg/parchment
+              tokens both flip under the dark-mobile marketing-shell theme, which
+              made this inverse specimen near-black on near-black. */}
+          <div className="rounded-md border border-ink px-6 py-10 text-center" style={{ background: '#1A1714' }}>
+            <span className="font-display text-4xl italic" style={{ color: '#FBFAF7' }}>
+              Atrium
+            </span>
+            <p className="mt-3 text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Inverse, same letterforms
+            </p>
           </div>
         </div>
 

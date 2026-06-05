@@ -10,7 +10,7 @@ export const metadata = {
 export default function LearnPage() {
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
       <h1 className="font-display text-5xl text-ink">How Atrium works</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
         A trader hedged across two venues today posts margin twice. Atrium nets the hedge with one

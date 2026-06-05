@@ -32,7 +32,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Plinth margin number for a wallet. Returns collateral, required margin, buying power, paused state.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/margin/0xYourWallet`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -40,7 +40,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Open positions across every Portico-whitelisted venue. Includes notional, entry, mark (when oracle live), unrealised PnL.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/positions/0xYourWallet`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -48,7 +48,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Per-venue risk decomposition. Maps each venue to its share of total required margin + haircut applied.',
     pricing: '$0.002 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/risk/0xYourWallet`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -56,7 +56,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Live venue health table. Per-venue: deployed address, paused state, last oracle ts, notional cap remaining this block.',
     pricing: '$0.0005 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/venues`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -64,7 +64,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Agent performance snapshot. 7/30/90 day PnL, total actions, failure rate, deboost tier, mandate count.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/agents/augur/perf`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -80,7 +80,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Lantern proof-of-reserves Merkle proof for a wallet. Returns latest root + the inclusion path.',
     pricing: '$0.0005 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/attestation/0xYourWallet`,
-    status: 'live',
+    status: 'pending',
   },
   {
     method: 'GET',
@@ -102,7 +102,7 @@ export default function CodexDocsPage() {
           <p className="eyebrow">Codex API</p>
           <CodexLiveStatus />
         </div>
-        <h1 className="mt-2 font-display text-5xl italic text-ink">x402-payable . onchain queries</h1>
+        <h1 className="mt-2 font-display text-5xl italic text-ink">x402-payable · onchain queries</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Codex is the read-side API surface for Atrium. Eight endpoints expose margin, positions,
           risk decomposition, venue health, agent performance, research backtests, proof-of-reserves
@@ -120,7 +120,7 @@ export default function CodexDocsPage() {
           <code className="font-mono text-ink">X-PAYMENT</code> header. Codex verifies on-chain
           settlement before serving the response.
         </p>
-        <pre className="mt-4 overflow-x-auto rounded-md border border-line bg-mob-bg-card p-5 font-mono text-[12.5px] leading-[1.6] text-parchment">
+        <pre className="mt-4 overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-line bg-mob-bg-card p-5 font-mono text-[12.5px] leading-[1.6] text-parchment">
 {`# 1. Generate an x402 token via your wallet's x402 SDK
 X402_TOKEN=$(./gen-x402.sh 0.001 0x...codex-address)
 
@@ -220,7 +220,7 @@ curl -H "X-PAYMENT: $X402_TOKEN" \\
       {/* SDK */}
       <Section title="SDK snippets">
         <h3 className="text-sm font-medium text-ink">TypeScript (viem + x402)</h3>
-        <pre className="mt-3 overflow-x-auto rounded-md border border-line bg-mob-bg-card p-4 font-mono text-[12.5px] leading-[1.6] text-parchment">
+        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-line bg-mob-bg-card p-4 font-mono text-[12.5px] leading-[1.6] text-parchment">
 {`import { x402Sign } from '@x402/core';
 import { createWalletClient, http } from 'viem';
 import { arbitrumSepolia } from 'viem/chains';
@@ -234,7 +234,7 @@ const data = await res.json();`}
         </pre>
 
         <h3 className="mt-6 text-sm font-medium text-ink">Python (httpx + web3)</h3>
-        <pre className="mt-3 overflow-x-auto rounded-md border border-line bg-mob-bg-card p-4 font-mono text-[12.5px] leading-[1.6] text-parchment">
+        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-line bg-mob-bg-card p-4 font-mono text-[12.5px] leading-[1.6] text-parchment">
 {`from x402 import sign as x402_sign
 import httpx
 
@@ -258,10 +258,10 @@ data = r.json()`}
       </Section>
 
       <footer className="mt-16 border-t border-divider pt-6 text-xs text-muted">
-        <p>Pricing set by Praetor governance. See <code className="font-mono text-ink">docs/MASTER_PLAN.md</code> Phase 6.</p>
+        <p>Pricing set by Praetor governance.</p>
         <p className="mt-2">
           Codex source: <code className="font-mono text-ink">services/codex/</code> .
-          Phase eta.8 docs page; live status pulled from{' '}
+          Live status is pulled from{' '}
           <code className="font-mono">/api/codex/health</code> once that endpoint lands.
         </p>
       </footer>

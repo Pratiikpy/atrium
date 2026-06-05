@@ -60,7 +60,7 @@ export function RostrumLeaderboard() {
       <div className="mt-12 rounded-md border border-divider bg-parchment p-8 text-center">
         <p className="text-ink-soft">No agents with ≥ 10 actions yet.</p>
         <p className="mt-2 text-sm text-muted">
-          Reference agents (Augur, Haruspex, Auspex) ramp up per <code>docs/MASTER_PLAN.md</code> Phase 6.
+          Reference agents (Augur, Haruspex, Auspex) ramp up as they cross 10 verified actions.
         </p>
       </div>
     );

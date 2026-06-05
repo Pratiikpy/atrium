@@ -275,7 +275,7 @@ export function StepWalkthrough() {
                   <span className="gs-step-title">{s.title}</span>
                 </span>
                 <span className="gs-step-chevron" aria-hidden="true">
-                  {isOpen ? '–' : '+'}
+                  {isOpen ? '-' : '+'}
                 </span>
               </button>
 

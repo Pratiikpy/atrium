@@ -130,7 +130,7 @@ export default function DocsPage() {
               </p>
               {/* Audit fix (#39): count is derived from the DISCLOSURES array so
                   it can never drift from the honesty page again. */}
-              <p className="mt-3 text-xs text-muted">{DISCLOSURES.length} disclosures . sourced</p>
+              <p className="mt-3 text-xs text-muted">{DISCLOSURES.length} disclosures · sourced</p>
             </Card>
           </Link>
           <Link href="/docs/api" className="block">
@@ -140,7 +140,7 @@ export default function DocsPage() {
                 x402-payable HTTP API. 8 endpoints, quickstart, auth, rate limits, TypeScript +
                 Python SDK snippets.
               </p>
-              <p className="mt-3 text-xs text-muted">8 endpoints . x402</p>
+              <p className="mt-3 text-xs text-muted">8 endpoints · x402</p>
             </Card>
           </Link>
           <Link href="/docs/glossary" className="block">
@@ -150,7 +150,7 @@ export default function DocsPage() {
                 Every subsystem name (Plinth, Sigil, Lantern...) in plain English: what it is and
                 what it does for you. The key to the product&apos;s vocabulary.
               </p>
-              <p className="mt-3 text-xs text-muted">18 subsystems . plain language</p>
+              <p className="mt-3 text-xs text-muted">18 subsystems · plain language</p>
             </Card>
           </Link>
           <Link href="/docs/deployment" className="block">
@@ -160,7 +160,7 @@ export default function DocsPage() {
                 Every contract on Arbitrum Sepolia with its address + Arbiscan link, and who controls
                 it. Read the bytecode and state yourself.
               </p>
-              <p className="mt-3 text-xs text-muted">live registry . on-chain</p>
+              <p className="mt-3 text-xs text-muted">live registry · on-chain</p>
             </Card>
           </Link>
           <Link href="/docs/runbooks" className="block">
@@ -170,7 +170,7 @@ export default function DocsPage() {
                 The operational playbooks Atrium runs on: incident response, deploy, key rotation,
                 monitoring, on-call. Rendered from the runbooks/ markdown in the repo.
               </p>
-              <p className="mt-3 text-xs text-muted">34 runbooks . ops-ready</p>
+              <p className="mt-3 text-xs text-muted">operational runbooks · ops-ready</p>
             </Card>
           </Link>
         </div>

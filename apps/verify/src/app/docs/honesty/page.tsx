@@ -150,7 +150,7 @@ export default function HonestyPage() {
       <div className="mx-auto max-w-4xl">
       <section>
         <p className="eyebrow">Honesty</p>
-        <h1 className="mt-2 font-display text-5xl italic text-ink">What is mock . what is relay</h1>
+        <h1 className="mt-2 font-display text-5xl italic text-ink">What is mock · what is relay</h1>
         <p className="mt-6 max-w-prose text-ink-soft">
           Atrium ships on Arbitrum Sepolia testnet in Year 1. Three of the venues we integrate
           (Aave V3, Pyth equity feeds, Hyperliquid) do not exist on Sepolia in a form we can use

@@ -19,7 +19,7 @@ const ARB_ADDR = 'https://sepolia.arbiscan.io/address/';
 const ARB_TX = 'https://sepolia.arbiscan.io/tx/';
 
 const NAV: { n: string; label: string }[] = [
-  { n: 'Title', label: 'Atrium' },
+  { n: '·', label: 'Atrium' },
   { n: 'I', label: 'The problem' },
   { n: 'II', label: 'The insight' },
   { n: 'III', label: 'Worked example' },
@@ -66,7 +66,7 @@ export function PitchDeck() {
         ))}
       </nav>
 
-      <main className="deck-stage">
+      <main id="main-content" className="deck-stage">
         <header className="deck-top">
           <span className="deck-kicker">ATRIUM LABS · INVESTOR BRIEF</span>
           <span className="deck-livepill">

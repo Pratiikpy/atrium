@@ -33,7 +33,7 @@ export function MarketingShell({
   return (
     <div className="marketing-shell min-h-screen" style={{ background: "var(--bg)" }}>
       <PublicNav />
-      <main className="pt-[68px]">
+      <main id="main-content" className="pt-[68px]">
         {nakedContent ? children : <div className="container pt-20 pb-16">{children}</div>}
       </main>
       <Footer />

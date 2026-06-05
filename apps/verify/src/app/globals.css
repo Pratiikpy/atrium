@@ -595,7 +595,7 @@ body {
   }
 
   .marketing-shell .atrium-nav {
-    background: color-mix(in oklch, var(--color-mob-bg) 84%, transparent);
+    background: var(--color-mob-bg);
     border-bottom-color: var(--color-mob-hairline);
     color: var(--color-mob-ink);
   }
@@ -778,7 +778,7 @@ body {
  * ===================================================================== */
 .atrium-nav {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in oklch, var(--bg) 82%, transparent);
+  background: var(--bg);
   backdrop-filter: saturate(140%) blur(18px);
   -webkit-backdrop-filter: saturate(140%) blur(18px);
   border-bottom: 1px solid transparent;
@@ -786,7 +786,7 @@ body {
 }
 .atrium-nav.scrolled { border-bottom-color: var(--hairline); }
 .atrium-nav.over-dark {
-  background: color-mix(in oklch, var(--dark-bg) 78%, transparent);
+  background: var(--dark-bg);
   color: var(--dark-ink);
 }
 .atrium-nav.over-dark .nav-link { color: color-mix(in oklch, var(--dark-ink) 86%, transparent); }
@@ -1216,7 +1216,7 @@ input[type="range"] { cursor: ew-resize; }
      /app/agents, /app/notifications, /app/settings/session-keys. minmax(0,1fr)
      caps the track minimum at 0 so content scrolls inside the column instead. */
   grid-template-columns: var(--side-w) minmax(0, 1fr);
-  background: var(--bg); color: var(--ink);
+  background: linear-gradient(to right, var(--side-bg) 0 var(--side-w), var(--bg) var(--side-w)); color: var(--ink);
   font-family: var(--sans); font-size: 14px; line-height: 1.5;
   letter-spacing: -0.005em;
 }
@@ -1449,7 +1449,7 @@ input[type="range"] { cursor: ew-resize; }
 .atrium-app .kv .num { color: var(--ink); }
 
 @media (max-width: 880px) {
-  .atrium-app { grid-template-columns: 1fr; }
+  .atrium-app { grid-template-columns: 1fr; background: var(--bg); }
   .atrium-app .side { display: none; }
   .atrium-app .stat-grid { grid-template-columns: 1fr 1fr; }
   .atrium-app .grid-2, .atrium-app .grid-3 { grid-template-columns: 1fr; }

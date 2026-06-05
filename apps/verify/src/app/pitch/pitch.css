@@ -146,7 +146,7 @@
   font-family: var(--mono, monospace);
   font-size: 10.5px;
   letter-spacing: 0.18em;
-  color: var(--d-faint);
+  color: var(--d-muted);
 }
 .deck-foot-controls {
   display: inline-flex;
@@ -282,7 +282,7 @@
 }
 .dk-title-meta-r {
   margin-left: auto;
-  color: var(--d-faint);
+  color: var(--d-muted);
 }
 
 /* ── problem locks / insight deposit ────────────────────────── */
