@@ -20,9 +20,9 @@
 
 <br/>
 
-[![Atrium capital-convergence schematic: eight venues netting into one unified-margin pool](apps/verify/public/brand/assets/readme-convergence.png)](https://www.useatrium.me/architecture)
+[![Atrium capital-convergence schematic: a venue book netting into one unified-margin pool](apps/verify/public/brand/assets/readme-convergence.png)](https://www.useatrium.me/architecture)
 
-<sub>Illustrative schematic of the unified-margin concept. The live testnet figures are read straight from the contracts; verify the real numbers in 60 seconds below.</sub>
+<sub>Illustrative schematic of the unified-margin concept. The live testnet figures are read straight from the contracts; [verify the real numbers in 60 seconds](#verify-it-yourself-in-60-seconds).</sub>
 
 </div>
 
