@@ -10,7 +10,7 @@ export const metadata = {
 const ENTRIES = Object.values(SUBSYSTEMS);
 
 /**
- * /docs/glossary - the plain-English key to the subsystem names.
+ * /docs/glossary: the plain-English key to the subsystem names.
  *
  * Atrium keeps its branded names (Plinth, Sigil, Lantern...) as identity per
  * the prototype contract; this page is where any of those names resolves to
@@ -24,7 +24,7 @@ export default function GlossaryPage() {
         <section>
           <h1 className="font-display text-5xl text-ink">Glossary</h1>
           <p className="mt-4 max-w-prose text-ink-soft">
-            Atrium&apos;s subsystems carry short names - Plinth, Sigil, Lantern, and so on. Here is
+            Atrium&apos;s subsystems carry short names: Plinth, Sigil, Lantern, and so on. Here is
             what each one is, in plain English, and what it does for you. The branded name is the
             identity; the plain label is what you see across the app.
           </p>
