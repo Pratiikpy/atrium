@@ -30,6 +30,24 @@ export function KaniBadge() {
   // on /app/* where the user is already in-product (avoids covering controls).
   const inApp = pathname?.startsWith('/app') ?? false;
 
+  // Hostile-judge audit: this fixed bottom-right chip overlapped footer links
+  // (e.g. /rostrum "Accessibility") and bottom cards. Hide it once the viewport
+  // reaches the foot of the page so it never occludes the footer or last card.
+  const [nearBottom, setNearBottom] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      setNearBottom(window.innerHeight + window.scrollY >= doc.scrollHeight - 180);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
   useEffect(() => {
     if (inApp) return;
     let cancelled = false;
@@ -46,8 +64,8 @@ export function KaniBadge() {
     };
   }, [inApp]);
 
-  // Suppressed inside the authenticated app (see inApp note above).
-  if (inApp) return null;
+  // Suppressed inside the authenticated app, and once the footer is in view.
+  if (inApp || nearBottom) return null;
 
   // A11Y-07: persistent wrapper ensures aria-live announces state changes
   return (

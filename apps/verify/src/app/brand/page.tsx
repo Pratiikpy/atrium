@@ -404,7 +404,11 @@ function Swatch({
     <div className="overflow-hidden rounded-md border border-line">
       <div
         className="h-20 w-full"
-        style={{ background: `var(${tokenVar})` }}
+        // Paint the literal hex, NOT var(tokenVar): the theme tokens flip under
+        // the dark-mobile theme, which inverted the Paper/Ink specimen swatches
+        // (the page's own point is to SHOW these exact colors).
+        style={{ background: hex }}
+        title={tokenVar}
         aria-label={`${name} swatch`}
       />
       <div className="bg-paper p-3.5">

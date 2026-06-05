@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Wordmark } from '@/components/wordmark';
 
 export const metadata: Metadata = {
   title: 'Beta Program',
@@ -12,10 +13,14 @@ export default function BetaPage() {
   return (
     <main className="mobile-dark-doc min-h-screen flex items-center justify-center bg-parchment p-8 text-ink max-sm:items-start max-sm:pb-40 max-sm:bg-mob-bg max-sm:text-mob-ink">
       <div className="max-w-lg text-center space-y-6">
-        <h1 className="text-3xl font-semibold">You&apos;ve been invited as a beta tester. Welcome.</h1>
+        <div className="flex justify-center">
+          <Wordmark size="md" />
+        </div>
+        <h1 className="serif-i text-4xl text-ink max-sm:text-mob-ink">You&apos;ve been invited as a beta tester.</h1>
         <p className="text-neutral-600 max-sm:text-mob-muted">
-          Your activity helps us harden Atrium before public launch. Every trade, every edge case
-          you find makes the protocol stronger.
+          Your activity helps us harden Atrium before public launch. The most useful reports are
+          broken flows, wrong or stale numbers, and anything that reads as not-yet-real. Send them
+          below or to feedback@useatrium.me.
         </p>
 
         <div className="space-y-3 text-left bg-neutral-50 rounded-lg p-6 max-sm:border max-sm:border-mob-line max-sm:bg-mob-bg-card">
@@ -37,7 +42,7 @@ export default function BetaPage() {
         <BetaFeedbackForm />
 
         <p className="text-xs text-neutral-400 max-sm:text-mob-muted">
-          Feedback is stored securely and associated with your connected wallet for follow-up.
+          Feedback is stored securely and associated with your wallet, if connected, for follow-up.
         </p>
       </div>
     </main>
