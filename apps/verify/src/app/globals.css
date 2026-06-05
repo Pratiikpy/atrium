@@ -369,6 +369,14 @@ body {
   .mobile-dark-doc .wordmark { color: var(--color-mob-ink); }
   .mobile-dark-doc .wordmark::after { background: var(--color-mob-ink); }
 }
+
+/* Founder decision 2026-06-05: display headings on the marketing/docs surface
+   (MarketingShell) render in Instrument Serif per CLAUDE.md, while the dense
+   /app dashboards keep Geist. The Tailwind v4 `font-display` utility bakes Geist
+   at build, so override it with a higher-specificity scoped selector here. */
+.marketing-shell .font-display {
+  font-family: var(--serif);
+}
 .text-accent { font-weight: 500; letter-spacing: -0.012em; color: var(--ink); }
 .num, .mono {
   font-family: var(--mono);
