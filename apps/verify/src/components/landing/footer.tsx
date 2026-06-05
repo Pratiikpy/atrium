@@ -144,7 +144,7 @@ export function LandingFooter() {
           <span>© 2026 Atrium · testnet on Arbitrum Sepolia · no real funds at risk</span>
           <div className="flex items-center gap-3">
             {/* Honesty audit (2026-06-05): removed GitHub, Twitter, and Farcaster
-                social links — those accounts are not registered/owned yet, so a
+                social links, those accounts are not registered/owned yet, so a
                 link would point at a 404 or a stranger's handle. Discord stays
                 as an honest "launching with testnet" pointer to /security. Add
                 each social back only when the real account exists. */}

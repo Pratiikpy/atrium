@@ -10,7 +10,7 @@ const TERMS: Record<string, string> = {
   'total collateral':
     'The value of everything in your Atrium vault that backs your positions, summed across every live venue.',
   'open notional':
-    'The combined face value of all your open positions, including leverage. Not the cash at risk - that is your margin.',
+    'The combined face value of all your open positions, including leverage. Not the cash at risk; that is your margin.',
   'p&l 24h':
     'Your profit or loss over the last 24 hours, shown as a dollar amount and as a percent of your collateral.',
   notional: 'The total face value of a position, including leverage.',

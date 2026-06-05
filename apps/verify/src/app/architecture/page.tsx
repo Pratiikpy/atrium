@@ -7,7 +7,7 @@ import './architecture.css';
 export const metadata: Metadata = {
   title: 'Architecture',
   description:
-    'One margin account, many venues. Twenty-four contracts across Arbitrum Sepolia and Robinhood Chain - Stylus for the math, Solidity for the integrations. Real verified addresses, an interactive system map, and a position traced through the whole system.',
+    'One margin account, many venues. Twenty-four contracts across Arbitrum Sepolia and Robinhood Chain. Stylus for the math, Solidity for the integrations. Real verified addresses, an interactive system map, and a position traced through the whole system.',
   alternates: { canonical: '/architecture' },
   openGraph: { title: 'Atrium · Architecture', images: ['/opengraph-image'] },
   twitter: { card: 'summary_large_image' },
