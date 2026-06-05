@@ -16,7 +16,7 @@ import { requireChaosBearer } from '@/lib/chaos-auth';
  * Verifier flow without provisioning. The real security boundary is
  * CHAOS_PRIVATE_KEY (without it the route can't sign). To prevent
  * drive-by DDoS we add a per-IP rate limit (1 chaos action / 30s) and
- * an Origin allowlist so only requests from verify.useatrium.me or
+ * an Origin allowlist so only requests from the Atrium app (www) or
  * localhost during dev can fire. Mainnet posture will swap the
  * allowlist for an authenticated demo bridge.
  *
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
   // file comment for the full reasoning).
   if (!isOriginAllowed(req)) {
     return NextResponse.json(
-      { error: 'origin_not_allowed', detail: 'Chaos drill is callable from verify.useatrium.me only.' },
+      { error: 'origin_not_allowed', detail: 'Chaos drill is callable from the Atrium app only.' },
       { status: 403 },
     );
   }

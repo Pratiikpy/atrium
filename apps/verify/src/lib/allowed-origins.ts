@@ -6,8 +6,12 @@
  */
 
 const STATIC_ORIGINS = [
-  'https://verify.useatrium.me',
+  // www is the canonical live origin the app actually serves from; it MUST be
+  // here or strict-gated routes (Chaos inject/restore) reject the real app with
+  // origin_not_allowed. apex + legacy verify. kept for redirects/back-compat.
+  'https://www.useatrium.me',
   'https://useatrium.me',
+  'https://verify.useatrium.me',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];

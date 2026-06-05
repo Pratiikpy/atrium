@@ -27,8 +27,8 @@ export default function BountyPage() {
                 <li>Aqueduct, Postern, Portico, Edict, Praetor</li>
               </ul>
             </li>
-            <li>Verify-app at <code className="font-mono text-ink">verify.useatrium.me</code></li>
-            <li>Codex API at <code className="font-mono text-ink">codex.useatrium.me</code></li>
+            <li>Atrium app at <code className="font-mono text-ink">www.useatrium.me</code></li>
+            <li>Codex API at <code className="font-mono text-ink">codex.useatrium.me</code> (live on worker deploy)</li>
             <li>Tablet API at <code className="font-mono text-ink">tablet.useatrium.me</code> (when behind auth)</li>
           </ul>
         </section>

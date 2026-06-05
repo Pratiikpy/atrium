@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         <header>
           <h1 className="font-display text-5xl text-ink">Privacy Policy</h1>
           <p className="mt-2 text-sm italic text-muted">
-            Last updated: 2026-05-28 · Scope: all Atrium services (verify.useatrium.me, codex.useatrium.me, tablet.useatrium.me)
+            Last updated: 2026-05-28 · Scope: the Atrium app at www.useatrium.me and its supporting APIs (Codex, Tablet)
           </p>
           <p className="mt-1 text-sm text-muted">
             Contact: <a href="mailto:privacy@useatrium.me" className="underline">privacy@useatrium.me</a>
