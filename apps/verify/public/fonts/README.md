@@ -1,6 +1,6 @@
 # Self-hosted fonts
 
-This directory contains WOFF2 font files fetched at build time by `scripts/download-fonts.mjs`.
+This directory holds the TTF font files used for server-side OG image rendering (next/og and Satori need raw TTF/OTF, not WOFF2). The two specimens used by the OG image are committed so it renders without a network fetch.
 
 ## Fonts
 
@@ -15,6 +15,6 @@ Both fonts are licensed under the **SIL Open Font License 1.1**, which permits r
 
 ## How it works
 
-The `prebuild` script in `apps/verify/package.json` runs `node ../../scripts/download-fonts.mjs` which fetches the WOFF2 files from Google Fonts CDN and writes them here. Files are `.gitignore`d to avoid large binaries in the repo.
+`scripts/download-fonts.mjs` (run via the `prebuild` hook) fetches the TTF files from the Google Fonts CDN. The two specimens the OG image needs (`Geist-Regular.ttf`, `InstrumentSerif-Italic.ttf`) are small and committed so the image renders deterministically at build time.
 
 If you need to regenerate manually: `node scripts/download-fonts.mjs` from the repo root.

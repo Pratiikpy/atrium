@@ -9,7 +9,7 @@ From the floor up. Every layer must be green before a feature ships.
 3. **Formal**, Kani `#[kani::proof]` on pure margin math and Sigil validation. See TDD §14.2.
 4. **Integration**, Foundry on Sepolia fork. Stylus contracts via `stylus_sdk::testing::TestVM`.
 5. **End to end**, Playwright against deployed Sepolia. Five user journeys from TDD §9.
-6. **Demo rehearsal**, Ten dress runs with random fault injection by F3 before judge day.
+6. **Demo rehearsal**, Ten dress runs with random fault injection before judge day.
 
 A feature is not done until every relevant layer passes.
 
@@ -69,7 +69,7 @@ If `TestVM` API changes, raise an ADR before working around it.
 
 ## End to end on Sepolia
 
-Playwright nightly job runs five journeys from TDD §9. Failures alert F2 on Discord webhook.
+Playwright nightly job runs five journeys from TDD §9. Failures alert the on-call engineer.
 
 Each E2E test:
 
@@ -82,7 +82,7 @@ Tests must work on a clean clone. `make demo` script wires this up in ≤ 90 sec
 
 ## Demo rehearsal log
 
-Per PRD §26.2. F3 runs ten dry runs of the 5-minute judge pitch with random fault injection (oracle drift, keeper offline, wifi drop, etc.). Each rehearsal records:
+Per PRD §26.2. The team runs ten dry runs of the 5-minute judge pitch with random fault injection (oracle drift, keeper offline, wifi drop, etc.). Each rehearsal records:
 
 - Date, run number
 - Fault injected
