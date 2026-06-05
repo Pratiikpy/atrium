@@ -624,6 +624,35 @@
   max-width: 40ch;
 }
 
+/* ── founder photo ──────────────────────────────────────────── */
+.dk-founder-photo {
+  margin: 0;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--d-line);
+  aspect-ratio: 3 / 2;
+}
+.dk-founder-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% center;
+  display: block;
+}
+.dk-founder-photo figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 16px;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: #f4efe7;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72), transparent);
+}
+
 /* ── responsive: phones get a horizontal rail + stacked slides ─ */
 @media (max-width: 860px) {
   .deck {

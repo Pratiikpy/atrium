@@ -29,9 +29,9 @@ const NAV: { n: string; label: string }[] = [
   { n: 'VII', label: 'The proof' },
   { n: 'VIII', label: 'Who it is for' },
   { n: 'IX', label: 'The wedge' },
+  { n: 'X', label: 'The founder' },
 ];
 
-const SLIDE_THEME = ['dark', 'dark', 'light', 'light', 'dark', 'light', 'light', 'dark', 'light', 'light'] as const;
 const TOTAL = NAV.length;
 
 export function PitchDeck() {
@@ -50,7 +50,7 @@ export function PitchDeck() {
   }, [i, go]);
 
   return (
-    <div className={`deck deck-${SLIDE_THEME[i]}`}>
+    <div className="deck deck-dark">
       <nav className="deck-rail" aria-label="Slides">
         {NAV.map((s, idx) => (
           <button
@@ -122,9 +122,33 @@ function Slide({ index }: { index: number }) {
       return <Personas />;
     case 9:
       return <Wedge />;
+    case 10:
+      return <Founder />;
     default:
       return null;
   }
+}
+
+/* ── Slide 10 · The founder ──────────────────────────────────── */
+function Founder() {
+  return (
+    <div className="dk-grid2 dk-founder">
+      <div>
+        <SectionMark roman="X" label="The founder" />
+        <h2 className="dk-h2 serif-i">Pratik</h2>
+        <p className="dk-body">Hosted offline Web3 events at two universities. Contributed to multiple Web3 products.</p>
+        <p className="dk-body dk-muted">
+          The wedge is durable because it is structural, not a feature. The proof is that it already runs, end to end, on
+          testnet today.
+        </p>
+      </div>
+      <figure className="dk-founder-photo">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/assets/founder.jpg" alt="Pratik presenting Atrium" loading="eager" />
+        <figcaption>Presenting Atrium at a college event</figcaption>
+      </figure>
+    </div>
+  );
 }
 
 /* ── Slide 0 · Title ─────────────────────────────────────────── */
@@ -369,8 +393,8 @@ const HASHES = [
 function Proof() {
   return (
     <div>
-      <SectionMark roman="VII" label="The proof" tone="light" />
-      <h2 className="dk-h2 dk-h2-light">Not a mockup. Deployed, wired, and verified on two testnets.</h2>
+      <SectionMark roman="VII" label="The proof" />
+      <h2 className="dk-h2">Not a mockup. Deployed, wired, and verified on two testnets.</h2>
       <div className="dk-proof-stats">
         {STATS.map((s) => (
           <div className="dk-proof-stat" key={s.l}>
@@ -395,7 +419,7 @@ function Proof() {
             <span className="dk-proof-hhash">0x4b9e…ef1f0 ↗</span>
           </Link>
         </div>
-        <p className="dk-aside dk-aside-light">
+        <p className="dk-aside">
           Don&rsquo;t take it on faith. Read any contract on Arbiscan, replay any transaction, or verify your own balance
           against the on-chain Merkle root on{' '}
           <Link href="/lantern" className="dk-link">
