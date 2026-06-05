@@ -1,858 +1,694 @@
-/* =====================================================================
- * /pitch scoped styles. The investor brief, rendered as a premium
- * vertical-scrolling deck. Uses ONLY the app's themed tokens (--bg,
- * --ink, --accent, --line, --hairline, ...) so the .marketing-shell
- * mobile token flip renders this parchment on desktop and dark on
- * mobile, in lockstep with /architecture and the rest of the product.
- * Every class is scoped under .pitch-root (and the fixed .pitch-rail).
- * ===================================================================== */
+/* Atrium investor-brief slide deck (/pitch). Rebuilt 2026-06-05 from the
+   founder's standalone HTML deck, with real data + zero em-dashes. */
 
-.pitch-root {
-  --pitch-serif: "Instrument Serif", "Times New Roman", serif;
-  --pitch-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --pitch-mono: "Geist Mono", ui-monospace, monospace;
-  --pitch-pos: oklch(0.58 0.13 145);
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 24px 64px;
-  color: var(--ink);
+.deck {
+  --d-accent: #e0913f;
+  --serif-stack: var(--serif, "Instrument Serif", "Times New Roman", serif);
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  height: 100dvh;
+  min-height: 600px;
+  overflow: hidden;
+  font-family: var(--sans, "Geist", ui-sans-serif, system-ui, sans-serif);
 }
-.pitch-root em {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--accent);
-  letter-spacing: -0.005em;
-}
-.pitch-root strong { font-weight: 560; color: var(--ink); }
-.pitch-pos { color: var(--pitch-pos); }
-.pitch-neg { color: var(--accent); }
-.pitch-faint { color: var(--faint) !important; }
-.pitch-muted { color: var(--muted); }
 
-/* ---- slide scaffolding --------------------------------------------- */
-.pitch-slide {
-  min-height: 78vh;
+/* theme tokens driven by the active slide */
+.deck-dark {
+  --d-bg: #101010;
+  --d-panel: #161513;
+  --d-ink: #f4efe7;
+  --d-soft: #cabfb0;
+  --d-muted: #8a8076;
+  --d-faint: #5f574e;
+  --d-line: rgba(255, 255, 255, 0.1);
+  --d-card: #1b1916;
+}
+.deck-light {
+  --d-bg: #fbfaf7;
+  --d-panel: #f3f0ea;
+  --d-ink: #1a1714;
+  --d-soft: #4a443c;
+  --d-muted: #7a7065;
+  --d-faint: #a89c8d;
+  --d-line: rgba(26, 23, 20, 0.12);
+  --d-card: #ffffff;
+}
+
+/* ── left navigator ─────────────────────────────────────────── */
+.deck-rail {
+  background: var(--d-panel);
+  border-right: 1px solid var(--d-line);
+  padding: 22px 12px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 80px 0;
-  border-top: 1px solid var(--hairline);
+  gap: 2px;
+  transition: background 240ms ease, border-color 240ms ease;
 }
-.pitch-slide:first-child { border-top: none; }
+.deck-rail-item {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--d-muted);
+  transition: background 140ms ease, color 140ms ease;
+}
+.deck-rail-item:hover {
+  background: color-mix(in oklab, var(--d-ink) 6%, transparent);
+  color: var(--d-soft);
+}
+.deck-rail-item.is-active {
+  background: color-mix(in oklab, var(--d-accent) 16%, transparent);
+  color: var(--d-ink);
+}
+.deck-rail-n {
+  font-family: var(--serif-stack);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--d-accent);
+  text-align: right;
+}
+.deck-rail-l {
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+}
 
-.pitch-eyebrow-line {
+/* ── stage ──────────────────────────────────────────────────── */
+.deck-stage {
+  background: var(--d-bg);
+  color: var(--d-ink);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 30px clamp(28px, 5vw, 80px);
+  transition: background 240ms ease, color 240ms ease;
+  overflow: hidden;
+}
+.deck-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.deck-kicker {
+  font-family: var(--mono, "Geist Mono", ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--d-muted);
+}
+.deck-livepill {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 22px;
+  gap: 7px;
+  border: 1px solid var(--d-line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--d-soft);
 }
-.pitch-numeral {
-  font-family: var(--pitch-serif);
+.deck-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--d-accent);
+}
+
+.deck-slide {
+  align-self: center;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 8px 0;
+}
+
+.deck-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--d-line);
+  padding-top: 16px;
+}
+.deck-foot-mark {
+  font-family: var(--serif-stack);
   font-style: italic;
-  font-size: 19px;
-  line-height: 1;
-  color: var(--accent);
-}
-.pitch-section-label {
-  font-family: var(--pitch-mono);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.pitch-h2 {
-  font-family: var(--pitch-sans);
-  font-weight: 540;
-  font-size: clamp(30px, 4.4vw, 48px);
-  line-height: 1.06;
-  letter-spacing: -0.028em;
-  margin: 0;
-  color: var(--ink);
-  max-width: 18ch;
-  text-wrap: balance;
-}
-
-.pitch-body {
-  font-family: var(--pitch-sans);
   font-size: 17px;
+  color: var(--d-soft);
+}
+.deck-foot-sec {
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--d-faint);
+}
+.deck-foot-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.deck-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--d-line);
+  background: transparent;
+  color: var(--d-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.deck-arrow:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--d-ink) 8%, transparent);
+  color: var(--d-ink);
+}
+.deck-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+.deck-count {
+  font-family: var(--mono, monospace);
+  font-size: 11.5px;
+  color: var(--d-muted);
+}
+
+/* ── shared slide pieces ────────────────────────────────────── */
+.dk-mark {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.dk-mark-roman {
+  font-family: var(--serif-stack);
+  font-style: italic;
+  font-size: 30px;
+  color: var(--d-accent);
+  line-height: 1;
+}
+.dk-mark-label {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--d-muted);
+}
+.dk-h1 {
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+.dk-h2 {
+  font-size: clamp(24px, 3.1vw, 40px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+.dk-body {
+  margin-top: 18px;
+  font-size: clamp(14.5px, 1.25vw, 17px);
   line-height: 1.62;
-  color: var(--ink-soft);
-  margin: 0;
+  color: var(--d-soft);
   max-width: 56ch;
 }
-.pitch-body + .pitch-body { margin-top: 16px; }
-.pitch-lede-wide { margin-top: 24px; max-width: 64ch; font-size: 18px; }
-.pitch-aside { margin-top: 32px; font-size: 15px; max-width: 72ch; }
-.pitch-aside-link { display: inline-block; margin-top: 14px; }
-.pitch-inline-link {
-  font-family: var(--pitch-sans);
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
-  transition: border-color 140ms;
+.dk-muted {
+  color: var(--d-muted);
 }
-.pitch-inline-link:hover { border-bottom-color: var(--accent); }
-
-.pitch-two-col {
-  margin-top: 38px;
+.dk-sub {
+  margin-top: 20px;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.5;
+  color: var(--d-soft);
+  max-width: 52ch;
+}
+.dk-aside {
+  margin-top: 26px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--d-muted);
+  max-width: 76ch;
+}
+.dk-link {
+  color: var(--d-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dk-pos {
+  color: #5aa86f;
+}
+.deck-dark .dk-pos {
+  color: #7dc894;
+}
+.dk-grid2 {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 48px;
-  align-items: start;
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
 }
-.pitch-col-prose { display: flex; flex-direction: column; }
-.pitch-col-data { display: flex; flex-direction: column; gap: 12px; }
 
-/* ---- tags / pills -------------------------------------------------- */
-.pitch-tag {
-  font-family: var(--pitch-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 9px;
+/* ── title ──────────────────────────────────────────────────── */
+.dk-title-mark {
+  font-size: clamp(72px, 12vw, 150px);
+  line-height: 0.86;
+  color: var(--d-ink);
+}
+.dk-rule {
+  width: 150px;
+  height: 4px;
   border-radius: 999px;
-  white-space: nowrap;
+  background: var(--d-accent);
+  margin: 22px 0 30px;
 }
-.pitch-tag-neg {
-  color: var(--accent);
-  background: color-mix(in oklch, var(--accent) 12%, transparent);
+.dk-title-meta {
+  margin-top: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  font-family: var(--mono, monospace);
+  font-size: 12px;
+  color: var(--d-muted);
 }
-.pitch-tag-pos {
-  color: var(--pitch-pos);
-  background: color-mix(in oklch, var(--pitch-pos) 13%, transparent);
+.dk-title-meta b {
+  color: var(--d-soft);
+  font-weight: 500;
 }
-.pitch-tag-stylus {
-  color: var(--accent);
-  background: color-mix(in oklch, var(--accent) 12%, transparent);
-}
-.pitch-tag-solidity {
-  color: var(--ink-soft);
-  background: color-mix(in oklch, var(--ink) 8%, transparent);
+.dk-title-meta-r {
+  margin-left: auto;
+  color: var(--d-faint);
 }
 
-/* =====================================================================
- * 00 · TITLE + CLOSING (full-bleed slabs)
- * ===================================================================== */
-.pitch-title,
-.pitch-closing {
-  min-height: calc(100vh - 68px);
-  justify-content: space-between;
-  padding: 56px 0 48px;
+/* ── problem locks / insight deposit ────────────────────────── */
+.dk-locks,
+.dk-deposit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.pitch-title-top {
+.dk-lock {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dk-lock-net {
+  border-style: dashed;
+  background: transparent;
+}
+.dk-lock-k {
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--d-muted);
+}
+.dk-lock-v {
+  font-family: var(--mono, monospace);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--d-ink);
+}
+.dk-lock-tag {
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--d-faint);
+}
+.dk-deposit {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 22px;
+  gap: 0;
+}
+.dk-deposit-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--d-line);
+  margin-bottom: 12px;
+}
+.dk-deposit-v {
+  font-family: var(--mono, monospace);
+  font-size: 30px;
+  color: var(--d-ink);
+}
+.dk-deposit-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
-}
-.pitch-eyebrow {
-  font-family: var(--pitch-mono);
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pitch-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--pitch-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: var(--bg-raised);
-}
-.pitch-pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--accent-soft, oklch(0.7 0.13 70));
-}
-.pitch-title-body { padding: 40px 0; }
-.pitch-wordmark {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-weight: 400;
-  font-size: clamp(72px, 13vw, 148px);
-  line-height: 0.9;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-.pitch-wordmark-rule {
-  display: block;
-  width: 160px;
-  height: 4px;
-  border-radius: 999px;
-  margin: 20px 0 36px;
-  background: var(--accent-soft, oklch(0.7 0.13 70));
-}
-.pitch-title-h1 {
-  font-family: var(--pitch-sans);
-  font-weight: 540;
-  font-size: clamp(30px, 4.6vw, 50px);
-  line-height: 1.05;
-  letter-spacing: -0.028em;
-  margin: 0;
-  color: var(--ink);
-}
-.pitch-title-lede {
-  margin-top: 20px;
-  font-family: var(--pitch-sans);
-  font-size: 18px;
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 48ch;
-}
-.pitch-title-foot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 40px;
-  align-items: baseline;
-}
-.pitch-title-chain {
-  font-family: var(--pitch-mono);
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-}
-.pitch-title-chain strong { color: var(--ink); font-weight: 560; }
-
-.pitch-closing-h2 {
-  font-family: var(--pitch-sans);
-  font-weight: 540;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.08;
-  letter-spacing: -0.026em;
-  margin: 0;
-  color: var(--ink);
-  max-width: 20ch;
-}
-.pitch-closing-cta {
-  margin-top: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.pitch-btn-primary,
-.pitch-btn-ghost {
-  font-family: var(--pitch-sans);
+  padding: 11px 0;
   font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  transition: transform 140ms, border-color 140ms;
+  color: var(--d-soft);
 }
-.pitch-btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.pitch-btn-ghost { background: transparent; color: var(--ink); }
-.pitch-btn-primary:hover,
-.pitch-btn-ghost:hover { transform: translateY(-1px); }
-
-/* =====================================================================
- * I · THE PROBLEM (locked-balance cards)
- * ===================================================================== */
-.pitch-locked-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 20px 22px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 14px;
-}
-.pitch-locked-label {
-  grid-column: 1;
-  grid-row: 1;
-  font-family: var(--pitch-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pitch-locked-value {
-  grid-column: 1;
-  grid-row: 2;
-  margin-top: 8px;
-  font-family: var(--pitch-mono);
-  font-weight: 500;
-  font-size: clamp(28px, 3.4vw, 36px);
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: var(--ink);
-}
-.pitch-locked-card .pitch-tag { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
-.pitch-locked-foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 8px 4px 0;
-}
-.pitch-locked-foot-note {
-  font-family: var(--pitch-mono);
-  font-size: 13px;
-  color: var(--ink-soft);
+.dk-deposit-row .dk-pos {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.1em;
 }
 
-/* =====================================================================
- * II · THE INSIGHT (one deposit → three backed positions)
- * ===================================================================== */
-.pitch-insight-flow {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: center;
-  gap: 22px;
-}
-.pitch-deposit-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 22px 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 190px;
-}
-.pitch-insight-arrow {
-  font-family: var(--pitch-sans);
-  font-size: 26px;
-  color: var(--faint);
-  text-align: center;
-}
-.pitch-backed-grid { display: flex; flex-direction: column; gap: 10px; }
-.pitch-backed-card {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-.pitch-backed-name {
-  font-family: var(--pitch-sans);
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--ink);
-}
-
-/* =====================================================================
- * III · WORKED EXAMPLE (without / with comparison)
- * ===================================================================== */
-.pitch-compare {
-  margin-top: 40px;
+/* ── worked example ─────────────────────────────────────────── */
+.dk-cmp2 {
+  margin-top: 26px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
 }
-.pitch-compare-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
+.dk-cmp-card {
+  border: 1px solid var(--d-line);
   border-radius: 16px;
-  padding: 24px 26px;
+  background: var(--d-card);
+  padding: 24px;
+}
+.dk-cmp-card-self {
+  border-color: color-mix(in oklab, var(--d-accent) 45%, var(--d-line));
+}
+.dk-cmp-tag {
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--d-muted);
+}
+.dk-cmp-card .dk-body {
+  margin-top: 14px;
+  font-size: 14px;
+}
+.dk-cmp-stat {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--d-line);
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
-.pitch-compare-card-pos {
-  background: color-mix(in oklch, var(--pitch-pos) 5%, var(--bg-raised));
-  border-color: color-mix(in oklch, var(--pitch-pos) 28%, var(--line));
+.dk-cmp-stat-l {
+  font-size: 12.5px;
+  color: var(--d-muted);
 }
-.pitch-compare-head {
+.dk-cmp-stat-v {
+  font-family: var(--mono, monospace);
+  font-size: 34px;
+  letter-spacing: -0.02em;
+  color: var(--d-ink);
+}
+
+/* ── moat pillars / personas ────────────────────────────────── */
+.dk-pillars,
+.dk-personas {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dk-personas {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.dk-pillar,
+.dk-persona {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dk-pillar {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 14px;
+}
+.dk-pillar-n,
+.dk-persona-who {
+  font-family: var(--serif-stack);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--d-ink);
+  flex: 0 0 auto;
+}
+.dk-pillar-b,
+.dk-persona-what {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--d-soft);
+}
+
+/* ── architecture / proof ───────────────────────────────────── */
+.dk-arch {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.dk-arch-card {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+.dk-arch-card:hover {
+  border-color: color-mix(in oklab, var(--d-accent) 45%, var(--d-line));
+  transform: translateY(-2px);
+}
+.dk-arch-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
 }
-.pitch-compare-card .pitch-body { font-size: 16px; max-width: none; }
-.pitch-compare-foot {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--hairline);
+.dk-arch-name {
+  font-family: var(--serif-stack);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--d-ink);
+}
+.dk-arch-lang {
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--d-line);
+  color: var(--d-muted);
+}
+.lang-stylus {
+  color: #c98b4e;
+}
+.dk-arch-blurb {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--d-soft);
+}
+.dk-arch-addr {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  color: var(--d-muted);
+}
+
+.dk-proof-stats {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.dk-proof-stat {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dk-proof-v {
+  font-family: var(--mono, monospace);
+  font-size: clamp(28px, 3.4vw, 38px);
+  letter-spacing: -0.02em;
+  color: var(--d-ink);
+}
+.dk-proof-l {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--d-soft);
+}
+.dk-proof-hashes {
+  margin-top: 16px;
+}
+.dk-proof-hblock {
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-card);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dk-proof-hrow {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-}
-.pitch-compare-stat {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-size: clamp(30px, 3.6vw, 40px);
-  line-height: 1;
-}
-.pitch-caveat {
-  margin-top: 26px;
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 76ch;
-}
-.pitch-caveat .pitch-inline-link { font-family: var(--pitch-serif); font-style: italic; }
-
-/* =====================================================================
- * IV · THE MOAT (named-component list)
- * ===================================================================== */
-.pitch-moat-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-.pitch-moat-item {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.pitch-moat-name {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-size: 22px;
-  line-height: 1;
-  color: var(--accent);
-}
-.pitch-moat-blurb {
-  font-family: var(--pitch-sans);
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-/* =====================================================================
- * V · THE ARCHITECTURE (8-component grid)
- * ===================================================================== */
-.pitch-arch-grid {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-.pitch-arch-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.pitch-arch-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.pitch-arch-name {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-size: 21px;
-  line-height: 1;
-  color: var(--ink);
-}
-.pitch-arch-blurb {
-  font-family: var(--pitch-sans);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-  margin: 0;
-}
-
-/* =====================================================================
- * VI · WHY NOW (headline stat)
- * ===================================================================== */
-.pitch-headline-stat {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 32px 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.pitch-headline-stat-v {
-  font-family: var(--pitch-mono);
-  font-weight: 500;
-  font-size: clamp(44px, 6vw, 64px);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--accent);
-}
-.pitch-headline-stat-l {
-  font-family: var(--pitch-sans);
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-  max-width: 24ch;
-}
-
-/* =====================================================================
- * VII · PROOF IT'S REAL (stat row + tx-hash blocks)
- * ===================================================================== */
-.pitch-proof-stats {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-.pitch-proof-stat {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.pitch-proof-stat-v {
-  font-family: var(--pitch-mono);
-  font-weight: 500;
-  font-size: clamp(30px, 3.6vw, 40px);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--ink);
-}
-.pitch-proof-stat-l {
-  font-family: var(--pitch-sans);
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-.pitch-proof-hashes {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-.pitch-hash-block {
-  background: var(--bg-sunk);
-  border: 1px solid var(--hairline);
-  border-radius: 14px;
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.pitch-hash-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-.pitch-hash-name { font-family: var(--pitch-sans); font-size: 14px; color: var(--ink-soft); }
-.pitch-hash {
-  font-family: var(--pitch-mono);
-  font-size: 13px;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-}
-
-/* =====================================================================
- * VIII · WHO WE WIN FOR (3 persona cards)
- * ===================================================================== */
-.pitch-persona-grid {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  text-decoration: none;
 }
-.pitch-persona-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 24px 24px 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+.dk-proof-hname {
+  font-size: 14px;
+  color: var(--d-soft);
 }
-.pitch-persona-who {
-  font-family: var(--pitch-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
+.dk-proof-hhash {
+  font-family: var(--mono, monospace);
+  font-size: 12px;
+  color: var(--d-accent);
 }
-.pitch-persona-block { display: flex; flex-direction: column; gap: 8px; }
-.pitch-persona-sub {
-  font-family: var(--pitch-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pitch-persona-text {
-  font-family: var(--pitch-sans);
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  margin: 0;
+.dk-aside-light {
+  margin-top: 16px;
 }
 
-/* =====================================================================
- * IX · THE CATEGORY (comparison table)
- * ===================================================================== */
-.pitch-cat-table {
-  margin-top: 36px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
+/* ── comparison table ───────────────────────────────────────── */
+.dk-cmp-table {
+  margin-top: 26px;
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
   overflow: hidden;
 }
-.pitch-cat-head,
-.pitch-cat-row {
+.dk-cmp-head,
+.dk-cmp-row {
   display: grid;
-  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 8px;
+  padding: 13px 18px;
   align-items: center;
-  padding: 16px 24px;
 }
-.pitch-cat-head {
-  background: var(--bg-sunk);
-  font-family: var(--pitch-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pitch-cat-head > span { text-align: center; }
-.pitch-cat-head > span:first-child { text-align: left; }
-.pitch-cat-row { border-top: 1px solid var(--hairline); background: var(--bg); }
-.pitch-cat-name { font-family: var(--pitch-sans); font-weight: 500; font-size: 15px; color: var(--ink); }
-.pitch-cat-cell {
-  font-family: var(--pitch-sans);
-  font-size: 14px;
-  color: var(--ink-soft);
-  text-align: center;
-}
-.pitch-cat-row-self { background: var(--bg-sunk); }
-.pitch-cat-self-name { font-family: var(--pitch-serif); font-style: italic; font-size: 21px; color: var(--ink); }
-
-/* =====================================================================
- * X · HONEST LIMITS (4 numbered cards)
- * ===================================================================== */
-.pitch-limits-grid {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-.pitch-limit-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 24px 26px;
-}
-.pitch-limit-num {
-  font-family: var(--pitch-mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-.pitch-limit-title {
-  margin: 12px 0 0;
-  font-family: var(--pitch-sans);
-  font-weight: 540;
-  font-size: 18px;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-.pitch-limit-body {
-  margin: 10px 0 0;
-  font-family: var(--pitch-sans);
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-/* =====================================================================
- * XI · WHAT'S NEXT (3 numbered cards, last is dark)
- * ===================================================================== */
-.pitch-next-grid {
-  margin-top: 38px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.pitch-next-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 28px 26px 30px;
-  min-height: 168px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.pitch-next-card-dark { background: var(--ink); border-color: var(--ink); }
-.pitch-next-card-dark .pitch-next-body { color: color-mix(in oklch, var(--bg) 88%, transparent); }
-.pitch-next-card-dark .pitch-next-body strong { color: var(--bg); }
-.pitch-next-num {
-  font-family: var(--pitch-mono);
-  font-weight: 400;
-  font-size: 42px;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--faint);
-}
-.pitch-next-num-accent { color: var(--accent-soft, oklch(0.7 0.13 70)); }
-.pitch-next-body {
-  font-family: var(--pitch-sans);
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  margin: 0;
-}
-
-/* =====================================================================
- * XII · THE FOUNDER
- * ===================================================================== */
-.pitch-founder-name {
-  font-family: var(--pitch-serif);
-  font-style: normal;
-  font-weight: 400;
-  font-size: clamp(44px, 6vw, 64px);
-  letter-spacing: -0.01em;
-}
-.pitch-founder-meta {
-  margin-top: 14px;
-  font-family: var(--pitch-sans);
-  font-size: 17px;
-  color: var(--ink-soft);
-}
-.pitch-founder-meta em { font-family: var(--pitch-serif); }
-.pitch-founder-list {
-  margin: 30px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 56ch;
-}
-.pitch-founder-item {
-  position: relative;
-  padding-left: 22px;
-  font-family: var(--pitch-sans);
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-.pitch-founder-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 8px;
-  height: 1px;
-  background: var(--accent);
-}
-
-/* =====================================================================
- * SIDE PROGRESS RAIL (fixed, desktop only)
- * ===================================================================== */
-.pitch-rail {
-  position: fixed;
-  left: 22px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 30;
-}
-.pitch-rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.pitch-rail-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 8px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 140ms;
-}
-.pitch-rail-link:hover { background: color-mix(in oklch, var(--ink) 5%, transparent); }
-.pitch-rail-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--hairline);
-  flex-shrink: 0;
-  transition: background 160ms, transform 160ms;
-}
-.pitch-rail-n {
-  font-family: var(--pitch-serif);
-  font-style: italic;
-  font-size: 12px;
-  width: 26px;
-  color: var(--faint);
-  transition: color 160ms;
-}
-.pitch-rail-label {
-  font-family: var(--pitch-mono);
+.dk-cmp-head {
+  background: var(--d-panel);
+  font-family: var(--mono, monospace);
   font-size: 10px;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--faint);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 160ms, transform 160ms, color 160ms;
-  white-space: nowrap;
+  color: var(--d-muted);
 }
-.pitch-rail-link:hover .pitch-rail-label,
-.pitch-rail-link.is-active .pitch-rail-label { opacity: 1; transform: translateX(0); }
-.pitch-rail-link.is-active .pitch-rail-dot { background: var(--accent); transform: scale(1.3); }
-.pitch-rail-link.is-active .pitch-rail-n { color: var(--accent); }
+.dk-cmp-head > span:not(:first-child),
+.dk-cmp-cell {
+  text-align: center;
+}
+.dk-cmp-row {
+  border-top: 1px solid var(--d-line);
+  font-size: 13px;
+  color: var(--d-soft);
+}
+.dk-cmp-name {
+  text-align: left;
+  font-weight: 500;
+  color: var(--d-ink);
+}
+.dk-cmp-row-self {
+  background: color-mix(in oklab, var(--d-accent) 8%, transparent);
+}
+.dk-cmp-self-name {
+  font-family: var(--serif-stack);
+  font-style: italic;
+  font-size: 18px;
+}
 
-/* hide the rail when it would overlap content (no room beside the deck) */
-@media (max-width: 1340px) {
-  .pitch-rail { display: none; }
+/* ── big number (Stylus) ────────────────────────────────────── */
+.dk-bignum {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.dk-bignum-v {
+  font-family: var(--mono, monospace);
+  font-size: clamp(56px, 8vw, 104px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--d-accent);
+}
+.dk-bignum-l {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--d-soft);
+  max-width: 40ch;
 }
 
-/* =====================================================================
- * RESPONSIVE
- * ===================================================================== */
-@media (max-width: 980px) {
-  .pitch-arch-grid { grid-template-columns: repeat(2, 1fr); }
-  .pitch-proof-stats { grid-template-columns: repeat(2, 1fr); }
-  .pitch-persona-grid { grid-template-columns: 1fr; }
-  .pitch-next-grid { grid-template-columns: 1fr; }
-  .pitch-next-card { min-height: 0; }
-  .pitch-two-col { grid-template-columns: 1fr; gap: 28px; }
-  .pitch-compare { grid-template-columns: 1fr; }
-  .pitch-limits-grid { grid-template-columns: 1fr; }
-  .pitch-proof-hashes { grid-template-columns: 1fr; }
-}
-@media (max-width: 760px) {
-  .pitch-root { padding: 0 16px 56px; }
-  .pitch-slide { min-height: 0; padding: 56px 0; }
-  .pitch-title,
-  .pitch-closing { min-height: auto; padding: 40px 0; gap: 40px; }
-  .pitch-insight-flow { grid-template-columns: 1fr; gap: 14px; }
-  .pitch-insight-arrow { transform: rotate(90deg); }
-  /* Mobile overflow fix: the architecture cards stayed 2-wide (~428px) on
-     phones, 38px past a 390px viewport. Stack to 1 column like the other
-     grids so the deck never scrolls sideways on mobile. */
-  .pitch-arch-grid { grid-template-columns: 1fr; }
-  .pitch-proof-stats { grid-template-columns: 1fr 1fr; }
-  /* table → stacked rows on phones */
-  .pitch-cat-head { display: none; }
-  .pitch-cat-row,
-  .pitch-cat-row-self { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
-  .pitch-cat-name { font-weight: 600; }
-  /* On phones the header row is hidden + cells stack, so each value lost its
-     column label. Show the label inline (data-label) so the matrix stays
-     readable: "LABEL ............ value". */
-  .pitch-cat-cell {
+/* ── responsive: phones get a horizontal rail + stacked slides ─ */
+@media (max-width: 860px) {
+  .deck {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: 100dvh;
+  }
+  .deck-rail {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid var(--d-line);
+    padding: 12px;
+    gap: 6px;
+  }
+  .deck-rail-item {
+    grid-template-columns: auto;
+    gap: 0;
+    flex: 0 0 auto;
+    padding: 7px 11px;
+  }
+  .deck-rail-l {
+    display: none;
+  }
+  .deck-rail-item.is-active .deck-rail-l {
+    display: inline;
+    margin-left: 6px;
+  }
+  .deck-stage {
+    padding: 22px 18px 28px;
+    grid-template-rows: auto 1fr auto;
+    min-height: calc(100dvh - 56px);
+  }
+  .dk-grid2,
+  .dk-cmp2,
+  .dk-arch,
+  .dk-proof-stats,
+  .dk-personas {
+    grid-template-columns: 1fr;
+  }
+  .dk-title-meta-r {
+    margin-left: 0;
+  }
+  /* comparison table: stack with inline labels */
+  .dk-cmp-head {
+    display: none;
+  }
+  .dk-cmp-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .dk-cmp-cell {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: 12px;
     text-align: right;
   }
-  .pitch-cat-cell::before {
+  .dk-cmp-cell::before {
     content: attr(data-label);
-    flex: 0 0 auto;
+    font-family: var(--mono, monospace);
     font-size: 9.5px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--faint);
+    letter-spacing: 0.06em;
+    color: var(--d-faint);
     text-align: left;
   }
 }
