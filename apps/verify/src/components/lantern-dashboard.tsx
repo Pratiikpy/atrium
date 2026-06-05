@@ -117,19 +117,46 @@ export function LanternDashboard() {
     );
   }
 
+  // Freshness: the attestor targets a 10-minute cadence but the free GHA cron
+  // can lag, so show the real age and flag stale rather than implying liveness.
+  const minsAgo = Math.max(0, Math.floor((Date.now() / 1000 - data.timestamp) / 60));
+  const fresh = minsAgo <= 30;
+  const publishedUtc =
+    new Date(data.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
+
   return (
     <section className="mt-12 grid gap-8">
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-6">
-        <p className="text-xs uppercase tracking-wider text-muted">Latest attestation</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs uppercase tracking-wider text-muted">Latest attestation</p>
+          <span
+            className={
+              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wider ' +
+              (fresh ? 'bg-live-soft text-live' : 'bg-testnet/10 text-testnet')
+            }
+          >
+            <span className={'size-1.5 rounded-full ' + (fresh ? 'bg-live' : 'bg-testnet')} />
+            {fresh ? 'fresh' : 'stale'} · {minsAgo} min ago
+          </span>
+        </div>
         <p className="mt-2 font-mono text-sm text-ink break-all">{data.root}</p>
         <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt className="text-muted">Block</dt>
-            <dd className="text-ink">{data.blockNumber}</dd>
+            <dd className="text-ink">
+              <a
+                href={`https://sepolia.arbiscan.io/block/${data.blockNumber}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline underline-offset-2 hover:opacity-80"
+              >
+                {data.blockNumber.toLocaleString()}
+              </a>
+            </dd>
           </div>
           <div>
             <dt className="text-muted">Published</dt>
-            <dd className="text-ink">{new Date(data.timestamp * 1000).toLocaleString()}</dd>
+            <dd className="text-ink">{publishedUtc}</dd>
           </div>
           <div>
             <dt className="text-muted">Users in tree</dt>

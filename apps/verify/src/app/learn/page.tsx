@@ -50,7 +50,7 @@ export default function LearnPage() {
         <Step
           n={6}
           title="Lantern proves reserves"
-          body="Every hour Lantern publishes a Merkle root of every Coffer balance on chain. The tree is pinned to IPFS. You can verify your own balance with a one-click inclusion proof."
+          body="Every 10 minutes Lantern publishes a Merkle root of every Coffer balance on chain. The tree is pinned to IPFS. You can verify your own balance with a one-click inclusion proof."
         />
       </section>
 
