@@ -241,3 +241,12 @@ runbooks/*.md
 !runbooks/deploy.md
 !runbooks/incident-response.md
 !runbooks/browserstack-setup.md
+
+# Audit-agent scratch (never commit): probe scripts + temp captures
+apps/verify/.tmp_audit/
+apps/verify/_vf_*.mjs
+apps/verify/_re_*.mjs
+apps/verify/_check_*.mjs
+apps/verify/.tmp_*
+apps/verify/_audit_shot.mjs
+PUBLIC_RELEASE_ACTION_PLAN.md
