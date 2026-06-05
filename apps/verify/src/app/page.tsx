@@ -464,12 +464,12 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                       <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="mono cap muted">Reported liabilities</div>
+                      <div className="mono cap muted">Redeemable claims</div>
                       <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="mono cap muted">Delta</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>0.00 bps</div>
+                      <div className="mono cap muted">Backing</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>100%</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Merkle root</div>

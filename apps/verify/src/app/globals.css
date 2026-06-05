@@ -360,6 +360,15 @@ body {
  * AI-slop tell the persona sweep flagged). .serif-i is genuine serif italic. */
 .serif    { font-family: var(--serif); font-style: normal; letter-spacing: -0.01em; }
 .serif-i  { font-family: var(--serif); font-style: italic; letter-spacing: -0.01em; }
+
+/* Dark-mobile standalone pages (e.g. /beta) use .mobile-dark-doc, NOT
+   .marketing-shell, so they never flip --ink to the light token. That left
+   .wordmark{color:var(--ink)} rendering near-black on the near-black canvas
+   (invisible). Flip the wordmark + its underline to the light ink on mobile. */
+@media (max-width: 768px) {
+  .mobile-dark-doc .wordmark { color: var(--color-mob-ink); }
+  .mobile-dark-doc .wordmark::after { background: var(--color-mob-ink); }
+}
 .text-accent { font-weight: 500; letter-spacing: -0.012em; color: var(--ink); }
 .num, .mono {
   font-family: var(--mono);
