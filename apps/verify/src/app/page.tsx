@@ -35,6 +35,7 @@ type LandingData = {
   lanternRoot: string;
   lanternBlock: string;
   lanternMinsAgo: string;
+  lanternStale: boolean;
 };
 
 async function getLandingData(): Promise<LandingData> {
@@ -64,6 +65,11 @@ async function getLandingData(): Promise<LandingData> {
     lanternRoot: shortRoot,
     lanternBlock: typeof l?.blockNumber === 'number' ? Number(l.blockNumber).toLocaleString() : '—',
     lanternMinsAgo: minsAgo != null ? `${minsAgo} min ago` : 'pending',
+    // Honest staleness: the attestor is scheduled every 10 min, but the
+    // free GHA cron can lag. If the newest root is older than 30 min, the
+    // badge drops the "Verified" claim and just states "Last attestation"
+    // so a stale root never reads as a fresh green check.
+    lanternStale: minsAgo != null && minsAgo > 30,
   };
 }
 
@@ -211,7 +217,7 @@ export default async function LandingPage() {
                         <div className="dash-row" key={v.id}>
                           <div className="dash-cell strong">{v.name}</div>
                           <div className="dash-cell mono small">{v.short}</div>
-                          <div className="dash-cell num small pos">Registered</div>
+                          <div className={'dash-cell num small ' + (v.id === 'aave-horizon' ? 'pos' : 'muted')}>{v.id === 'aave-horizon' ? 'Live' : 'Deployed'}</div>
                           <div className="dash-cell num small">{v.asset}</div>
                           <div className="dash-cell num small" style={{ textAlign: 'right' }}>{v.chain}</div>
                         </div>
@@ -221,7 +227,8 @@ export default async function LandingPage() {
               </div>
             </div>
             <p className="mono cap muted" style={{ textAlign: 'center', marginTop: 18, opacity: 0.7 }}>
-              Live vault TVL + registered venues · read from Scribe · your portfolio in /app/portfolio
+              Live vault TVL · 1 venue live today (Aave, via a test pool); the rest are deployed and register through mainnet ·{' '}
+              <a href="/docs/honesty" style={{ textDecoration: 'underline' }}>honest disclosures</a>
             </p>
           </div>
         </section>
@@ -444,11 +451,11 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                         Merkle attestation · every 10 min
                       </div>
                     </div>
-                    <div className="check-badge">
+                    <div className="check-badge" style={d.lanternStale ? { opacity: 0.6 } : undefined}>
                       <svg width="14" height="14" viewBox="0 0 14 14">
                         <path d="M3 7.2 5.8 10 11 4.2" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      Verified · {d.lanternMinsAgo}
+                      {d.lanternStale ? 'Last attestation' : 'Verified'} · {d.lanternMinsAgo}
                     </div>
                   </div>
                   <div className="lantern-grid">
