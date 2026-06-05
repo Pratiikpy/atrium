@@ -20,9 +20,9 @@
 
 <br/>
 
-[![Atrium investor brief, a ten-slide deck live at useatrium.me/pitch](apps/verify/public/brand/assets/readme-deck.png)](https://www.useatrium.me/pitch)
+[![Atrium architecture, the live deployed system with verified contract addresses](apps/verify/public/brand/assets/readme-architecture.png)](https://www.useatrium.me/architecture)
 
-<sub>The ten-slide investor brief, live at [**useatrium.me/pitch**](https://www.useatrium.me/pitch)</sub>
+<sub>The live system map and verified addresses at [**useatrium.me/architecture**](https://www.useatrium.me/architecture)</sub>
 
 </div>
 
