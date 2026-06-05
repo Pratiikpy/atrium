@@ -45,7 +45,7 @@
   --dark-line:   oklch(22% 0.006 60);
 
   /* === Typography === */
-  --serif: var(--font-serif, "Instrument Serif"), "Times New Roman", serif;
+  --serif: var(--font-instrument, "Instrument Serif"), "Times New Roman", serif;
   --sans:  var(--font-geist, "Geist"), ui-sans-serif, system-ui, sans-serif;
   --mono:  "Geist Mono", ui-monospace, monospace;
 
@@ -136,10 +136,10 @@
   --color-status-red:   var(--neg);
 
   /* Typography aliases (legacy code uses --font-display / --font-body).
-     NOTE: do NOT alias --font-serif here. It is next/font's output variable
-     (Instrument_Serif, set on <html> in layout.tsx); re-aliasing it to
-     var(--serif) created a cycle that collapsed the wordmark to Geist on
-     routes where the cyclic value won (the /team, /sla, /learn class). */
+     --font-serif is aliased in the @theme block below (Tailwind v4's serif
+     utility reads it). next/font's serif now lives under --font-instrument to
+     break the name collision that previously cycled --font-serif <-> --serif
+     and collapsed the wordmark to Geist/Georgia on /team, /sla, /learn. */
   --font-display: var(--sans);
   --font-body:    var(--sans);
   --font-mono:    var(--mono);
@@ -278,7 +278,9 @@
 
   --font-sans: var(--sans);
   --font-mono: var(--mono);
-  /* --font-serif intentionally not re-aliased here (next/font owns it; see note above). */
+  /* Tailwind v4 serif utility -> --serif (which reads next/font's --font-instrument).
+     No cycle now that next/font no longer owns --font-serif. */
+  --font-serif: var(--serif);
   --font-display: var(--sans);
   --font-body: var(--sans);
 

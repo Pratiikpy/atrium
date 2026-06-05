@@ -21,7 +21,11 @@ const serif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],
   style: ['normal', 'italic'],
-  variable: '--font-serif',
+  // Own variable name (NOT --font-serif): --font-serif collides with Tailwind
+  // v4's serif theme key, which created a var cycle that collapsed the wordmark
+  // to Geist/Georgia on some routes. --serif reads this; Tailwind's --font-serif
+  // reads --serif. Linear, no cycle.
+  variable: '--font-instrument',
   display: 'swap',
 });
 
