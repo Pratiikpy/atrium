@@ -61,8 +61,19 @@ export function VaultWithdraw() {
   // balance (a connected user must not be able to submit more than they hold and
   // eat a raw chain revert (launch-audit defect).
   const overBalance = redeemableUsd != null && parseFloat(amount) > redeemableUsd + 1e-9;
+  // Audit U-15 follow-up: the over-balance gate can only fire once redeemableUsd
+  // is known. While a connected wallet's balanceOf -> convertToAssets reads are
+  // still loading, redeemableUsd is null and `overBalance` short-circuits to
+  // false, so the button would fall open for an over-balance amount and eat a
+  // raw chain revert (the exact defect this gate prevents). Hold the button
+  // (showing "Checking balance…") until the redeemable balance resolves.
+  const balanceUnverified = !!address && redeemableUsd == null;
   const ready =
-    deployment?.ready === true && parseFloat(amount) >= 0.000001 && !overBalance;
+    deployment?.ready === true &&
+    !!address &&
+    parseFloat(amount) >= 0.000001 &&
+    !overBalance &&
+    !balanceUnverified;
   const busy = status.kind === 'submitting';
 
   return (
@@ -115,7 +126,7 @@ export function VaultWithdraw() {
           disabled={!ready || busy}
           className="w-full rounded-md border border-divider bg-parchment-light px-5 py-3 text-sm min-h-[44px] font-medium text-ink hover:border-ink/30 disabled:opacity-50"
         >
-          {buttonLabel(status, amount)}
+          {buttonLabel(status, amount, balanceUnverified)}
         </button>
         {helper && (
           <p className="text-[10px] uppercase tracking-wider text-muted">{helper}</p>
@@ -133,9 +144,11 @@ export function VaultWithdraw() {
 function buttonLabel(
   status: ReturnType<typeof useVaultWithdraw>['status'],
   amount: string,
+  balanceUnverified?: boolean,
 ): string {
   if (status.kind === 'submitting') return 'Submitting…';
   if (status.kind === 'success') return 'Withdraw again';
+  if (balanceUnverified && parseFloat(amount) > 0) return 'Checking balance…';
   return `Withdraw ${amount || '0'} USDC`;
 }
 
