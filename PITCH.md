@@ -131,7 +131,8 @@ testnets, and the core flows produce real on-chain transactions.
   chaos fault, run a liquidation drill, verify proof of reserves, revoke with the
   kill switch.
 - **The suite is green.** 768 frontend and library tests pass; the Stylus core
-  carries Kani formal-verification proofs on solvency and mandate-expiry invariants.
+  has 9 Kani formal-verification proofs authored on solvency and mandate-expiry
+  invariants (the dedicated CI lane lands Month 3).
 
 ---
 

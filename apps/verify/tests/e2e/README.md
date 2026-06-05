@@ -5,7 +5,7 @@ Five end-to-end journeys per TDD §9. Each test runs in one of two modes:
 | Mode | Trigger | What is asserted |
 |---|---|---|
 | local | `pnpm test:e2e` (default) | Honest pending UI: disabled buttons, helper copy naming the missing contract, "pending" badges. Verifies the real-data discipline holds before deployment. |
-| sepolia | `E2E_MODE=sepolia pnpm test:e2e` | Real tx hashes, Arbiscan links, post-success UI transitions. Lights up only once Stylus contracts deploy (the internal ops log). |
+| sepolia | `E2E_MODE=sepolia pnpm test:e2e` | Real tx hashes, Arbiscan links, post-success UI transitions. Lights up only once Stylus contracts deploy. |
 
 ## The five journeys
 
@@ -28,7 +28,7 @@ pnpm test:e2e --grep "deposit"
 pnpm test:e2e --project=mobile-safari
 
 # sepolia mode (against deployed contracts)
-E2E_MODE=sepolia E2E_BASE_URL=https://verify.useatrium.me pnpm test:e2e
+E2E_MODE=sepolia E2E_BASE_URL=https://www.useatrium.me pnpm test:e2e
 ```
 
 ## Updating tests after deployment

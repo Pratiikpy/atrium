@@ -32,6 +32,6 @@ Pre-flight:
 ## Post-deploy smoke test
 
 - Run `tests/e2e/full-journey.spec.ts` against the live testnet
-- Verify Lantern publishes an attestation within 60 minutes
+- Verify Lantern publishes an attestation within ~10 minutes
 - Verify Scribe indexer is < 30s behind chain head
-- Verify Codex /v1/venues/health returns all 6 venues
+- Verify Codex /v1/venues/health returns all 7 venues

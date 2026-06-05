@@ -93,7 +93,7 @@ And the money path is on-chain, not a mockup:
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Withdraw from vault    | [`0x976e…ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
 | Deposit (mobile)       | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
-| Proof-of-reserves root | `0x4b9e…ef1f0` (block 272828085, readable on [`/lantern`](https://www.useatrium.me/lantern))                       |
+| Proof-of-reserves root | a fresh signed root is published on-chain every 10 minutes; verify your own balance on [`/lantern`](https://www.useatrium.me/lantern)                       |
 
 ## Verify it yourself in 60 seconds
 
@@ -144,7 +144,7 @@ cd apps/verify && pnpm install && pnpm dev   # then open http://localhost:3000
 | Suite       | What it covers                                                   | Status         |
 | ----------- | ---------------------------------------------------------------- | -------------- |
 | **Vitest**  | 768 frontend + library tests                                     | green          |
-| **Foundry** | 660+ Solidity contract + integration tests                       | green          |
+| **Foundry** | 600+ Solidity contract + integration tests                       | green          |
 | **cargo**   | Rust/Stylus unit + property tests (Coffer, Plinth, Sigil, Vigil) | green          |
 | **Kani**    | 9 formal-verification proofs authored (CI lane lands Month 3)    | in development |
 

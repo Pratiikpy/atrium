@@ -13,8 +13,8 @@ Defense in depth, not single points of failure. PRD §21 has the STRIDE matrix p
 
 - Every off chain to on chain action requires a wallet signature
 - Every off chain to off chain action requires a signed response or x402 payment
-- No single key admin path. Anywhere.
-- Praetor 3 of 5 multisig plus 48h timelock for every parameter change and upgrade
+- Target: no single-key admin path anywhere. Today admin is a single founder deployer key behind the 48h timelock; the Praetor 3-of-5 Safe ceremony is queued (see /docs/honesty).
+- Praetor multisig (3-of-5 target) plus 48h timelock for every parameter change and upgrade
 - Emergency pause is multisig only, no timelock, pause only (cannot upgrade)
 
 ## Oracles

@@ -52,7 +52,7 @@ Off-chain, three services pace the system:
 | `AtriumRouter` | Solidity | Dispatches user open/close calls to the right venue adapter (v1.0 + v1.1 via `version()` probe). |
 | `Aqueduct` + `AqueductReceiver` + `AqueductClaimback` | Solidity | Chainlink CCIP collateral bridge with reorg-safe replay protection and claim-back. |
 | `PorticoRegistry` | Solidity | Whitelist of approved adapters, keyed by `venue_id`. Multisig + 48h timelock for changes. |
-| `PraetorTimelock` | Solidity | 3-of-5 multisig with 48h delay for every parameter change. Instant `emergencyPause` lever, no timelock. |
+| `PraetorTimelock` | Solidity | 48h-delay timelock on every parameter change (admin today is a single founder deployer key; 3-of-5 Safe queued). Instant `emergencyPause` lever, no timelock. |
 | `PosternKillSwitch` | Solidity | One-tx revoke of every active Sigil mandate + Postern session key for the calling wallet. |
 | `LanternAttestor` | Solidity | Merkle root of share balances every 10 minutes; off-chain attestor signs, on-chain stores. |
 | `Edict` | Solidity | Jurisdiction tier registry. Plinth + Coffer gate sensitive actions behind a minimum tier. |

@@ -60,14 +60,14 @@ A feature without these is not done. Surface what is missing instead of hiding i
 
 ## Verifier Mode rules (the judge facing surface)
 
-`verify.useatrium.me` is the demo surface. Per PRD §26.1.
+`www.useatrium.me` is the demo surface. Per PRD §26.1.
 
 - Each step renders a single primary action.
 - After each step, surface the resulting tx hash with an Arbiscan link.
 - Show the Kani CI badge top right.
 - Chaos Mode button injects a random fault. The UI must show graceful degradation messages, not a crash.
 - Kill Switch button revokes all Sigil mandates and Postern session keys in one batched tx. Confirm dialog before firing.
-- Backup path: if `verify.useatrium.me` 404s on judge day, fall back to a pre recorded Loom and a QR to a mirror.
+- Backup path: if `www.useatrium.me` 404s on judge day, fall back to a pre recorded Loom and a QR to a mirror.
 
 ## Copy on screen
 
