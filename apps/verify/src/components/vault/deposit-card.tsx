@@ -122,7 +122,7 @@ function DepositStatusLine({
   if (status.kind === 'idle' || status.kind === 'checking') return null;
   if (status.kind === 'approving') {
     return (
-      <p className="text-xs text-ink-soft">
+      <p role="status" aria-live="polite" className="text-xs text-ink-soft">
         Approve tx submitted · <ArbiscanLink hash={status.hash} />
         <br />
         The deposit sends automatically once the approve confirms (second wallet prompt).
@@ -131,14 +131,14 @@ function DepositStatusLine({
   }
   if (status.kind === 'depositing') {
     return (
-      <p className="text-xs text-ink-soft">
+      <p role="status" aria-live="polite" className="text-xs text-ink-soft">
         Deposit tx submitted · <ArbiscanLink hash={status.hash} />
       </p>
     );
   }
   if (status.kind === 'success') {
     return (
-      <p className="text-xs text-live">
+      <p role="status" aria-live="polite" className="text-xs text-live">
         Deposited. <ArbiscanLink hash={status.depositHash} /> ·{' '}
         <button type="button" onClick={onReset} className="underline">
           deposit more
@@ -148,7 +148,7 @@ function DepositStatusLine({
   }
   if (status.kind === 'error') {
     return (
-      <p className="text-xs text-neg">
+      <p role="alert" className="text-xs text-neg">
         Failed: {humanizeReason(status.reason)} ·{' '}
         <button type="button" onClick={onReset} className="underline">
           retry

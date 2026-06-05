@@ -48,7 +48,7 @@ export function NotificationsList() {
     );
   }
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2" aria-live="polite">
       {data.notifications.map((n) => (
         <li key={n.id} className={'rounded-md border bg-parchment p-4 text-sm ' + severityClass(n.severity)}>
           <div className="flex items-baseline justify-between gap-3">
