@@ -456,34 +456,29 @@ export default function PitchPage() {
                 <span className="pitch-cat-name" role="cell">
                   {row[0]}
                 </span>
-                <span className="pitch-cat-cell" role="cell">
-                  {row[1]}
-                </span>
-                <span className="pitch-cat-cell" role="cell">
-                  {row[2]}
-                </span>
-                <span className="pitch-cat-cell" role="cell">
-                  {row[3]}
-                </span>
-                <span className="pitch-cat-cell" role="cell">
-                  {row[4]}
-                </span>
+                {(['CROSS-VENUE NETTING', 'NON-CUSTODIAL', 'ON-CHAIN POR', 'KYC-GATED'] as const).map(
+                  (label, i) => (
+                    <span className="pitch-cat-cell" role="cell" data-label={label} key={label}>
+                      {row[i + 1]}
+                    </span>
+                  ),
+                )}
               </div>
             ))}
             <div className="pitch-cat-row pitch-cat-row-self" role="row">
               <span className="pitch-cat-name pitch-cat-self-name" role="cell">
                 Atrium
               </span>
-              <span className="pitch-cat-cell pitch-pos" role="cell">
+              <span className="pitch-cat-cell pitch-pos" role="cell" data-label="CROSS-VENUE NETTING">
                 Across venues
               </span>
-              <span className="pitch-cat-cell pitch-pos" role="cell">
+              <span className="pitch-cat-cell pitch-pos" role="cell" data-label="NON-CUSTODIAL">
                 Yes
               </span>
-              <span className="pitch-cat-cell pitch-pos" role="cell">
+              <span className="pitch-cat-cell pitch-pos" role="cell" data-label="ON-CHAIN POR">
                 Signed Merkle
               </span>
-              <span className="pitch-cat-cell pitch-pos" role="cell">
+              <span className="pitch-cat-cell pitch-pos" role="cell" data-label="KYC-GATED">
                 No
               </span>
             </div>

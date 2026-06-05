@@ -833,6 +833,26 @@
   /* table → stacked rows on phones */
   .pitch-cat-head { display: none; }
   .pitch-cat-row,
-  .pitch-cat-row-self { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
-  .pitch-cat-cell { text-align: left; }
+  .pitch-cat-row-self { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
+  .pitch-cat-name { font-weight: 600; }
+  /* On phones the header row is hidden + cells stack, so each value lost its
+     column label. Show the label inline (data-label) so the matrix stays
+     readable: "LABEL ............ value". */
+  .pitch-cat-cell {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+  }
+  .pitch-cat-cell::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    text-align: left;
+  }
 }
