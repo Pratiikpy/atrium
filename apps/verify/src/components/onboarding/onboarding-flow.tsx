@@ -372,21 +372,21 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
           Set up a second device before deposit.
         </h2>
         <p className="mt-3 text-[14px] leading-[1.55] text-ink-soft">
-          A single passkey on a single device is one lost phone away from total loss. Atrium has
-          three recovery paths; pick at least one before you put real value (or testnet value
-          that took time to earn) into the vault.
+          A single passkey on a single device is one lost phone away from total loss. Atrium ships
+          three recovery paths; setup lands in Settings, Recovery before mainnet (that tab is a
+          roadmap banner today). On testnet there is no real value at risk.
         </p>
         <ul className="mt-4 space-y-2.5 text-[13px] leading-[1.55] text-ink-soft">
           <li className="flex gap-2.5">
-            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-testnet" />
             <span><strong className="text-ink">Recovery passkey on a second device</strong>  iPad, second phone, laptop. Add it from /app/settings  Recovery.</span>
           </li>
           <li className="flex gap-2.5">
-            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-testnet" />
             <span><strong className="text-ink">3 recovery guardians</strong>  trusted EOAs that can co-sign a passkey reset. Set up in /app/settings  Recovery.</span>
           </li>
           <li className="flex gap-2.5">
-            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-live" />
+            <span className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-testnet" />
             <span><strong className="text-ink">Authenticator app</strong>  Authy, 1Password, Bitwarden. Backup TOTP code stored encrypted.</span>
           </li>
         </ul>
