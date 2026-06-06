@@ -132,6 +132,24 @@ export function VerifierStepRunner({ step }: { step: number }) {
     }
   }, [chaos.status]);
 
+  // Pending steps (open position, margin recompute, liquidation drill) cannot
+  // run on testnet yet. Surface the blocker up front, regardless of wallet, so
+  // a judge is not invited to connect and run a step that will not execute.
+  // Pre-fix: the disconnected view showed the generic "connect to run" prompt
+  // for pending steps too, identical to the four live steps.
+  const stepPending = 'pending' in config.action;
+  if (stepPending) {
+    return (
+      <div className="mt-8 rounded-md border border-testnet/30 bg-testnet/5 p-6">
+        <p className="text-sm font-medium text-testnet">Pending on testnet</p>
+        <p className="mt-2 text-sm text-ink-soft">{config.pendingReason}</p>
+        <p className="mt-3 text-xs text-muted">
+          The four live steps (deposit, chaos drill, proof of reserves, kill switch) run end to end today.
+        </p>
+      </div>
+    );
+  }
+
   // Empty state: no wallet
   if (!isConnected) {
     const connector = connectors[0];
