@@ -91,8 +91,9 @@ export default function BrandPage() {
         {/* App icon gallery */}
         <h3 className="mt-12 font-display text-xl text-ink">App icon</h3>
         <p className="mt-2 max-w-prose text-sm text-ink-soft">
-          Ink tile, italic A, status bar at the base. The status bar tracks Plinth margin health
-          and is the only animated element in the brand system.
+          Ink tile, italic A, status bar at the base. The status bar breathes amber as the testnet
+          heartbeat and is the only animated element in the brand system; a status API flips it
+          green or red to signal Plinth margin health during a demo or chaos drill.
         </p>
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           <div className="rounded-md border border-line bg-paper p-8">
