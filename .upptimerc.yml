@@ -11,7 +11,7 @@ workflowSchedule:
 
 sites:
   - name: Verify (production)
-    url: https://verify.useatrium.me
+    url: https://useatrium.me
   - name: Codex API
     url: https://codex.useatrium.me/healthz
   - name: Tablet (tax service)
@@ -28,7 +28,7 @@ sites:
     url: https://lantern-attestor.useatrium.me/api/cron
     method: GET
   - name: Subgraph (proxied)
-    url: https://verify.useatrium.me/api/scribe/health
+    url: https://useatrium.me/api/scribe/health
 
 status-website:
   cname: status.useatrium.me
