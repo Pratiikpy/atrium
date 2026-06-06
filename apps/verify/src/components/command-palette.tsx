@@ -45,6 +45,20 @@ function matches(c: Command, q: string): boolean {
     .every((tok) => hay.includes(tok));
 }
 
+// Relevance score for ranking matched results: a hit on the LABEL outranks a
+// hit that only matched the group or keywords, so typing a page name (e.g.
+// "trade") surfaces the Trade page before its Trade-group siblings (Portfolio,
+// Markets, Transfer). Ties keep COMMANDS order (Array.sort is stable).
+function score(c: Command, q: string): number {
+  const ql = q.toLowerCase().trim();
+  if (!ql) return 0;
+  const label = c.label.toLowerCase();
+  if (label === ql) return 3;
+  if (label.startsWith(ql)) return 2;
+  if (label.includes(ql)) return 1;
+  return 0;
+}
+
 export function CommandPalette() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -52,7 +66,13 @@ export function CommandPalette() {
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const results = useMemo(() => COMMANDS.filter((c) => matches(c, query)), [query]);
+  const results = useMemo(
+    () =>
+      COMMANDS.filter((c) => matches(c, query)).sort(
+        (a, b) => score(b, query) - score(a, query),
+      ),
+    [query],
+  );
 
   const close = useCallback(() => {
     setOpen(false);
