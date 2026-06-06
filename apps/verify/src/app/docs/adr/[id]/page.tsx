@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const adr = getAdr(id);
   return {
-    title: adr ? `Atrium · ADR-${adr.id}` : 'Atrium · ADR',
+    title: adr ? `ADR-${adr.id}` : 'ADR',
     description: adr?.title ?? 'Architecture decision record.',
   };
 }

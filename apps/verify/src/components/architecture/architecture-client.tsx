@@ -431,7 +431,7 @@ export function DeploymentsTable() {
           ? 'Robinhood Chain testnet (chainId 46630) · the full Atrium stack mirrored from Arbitrum. Click any address to copy it.'
           : tab === 'venues'
             ? '9 venue-adapter contracts deployed + verified. Seven venues are in the launch margin scope (Aave Horizon operational today); GMX, Morpho, and Synthetix are deployed but outside the initial seven. Click any address to copy it.'
-            : 'Solidity verified on Arbiscan + Sourcify · Stylus verified via cargo stylus verify. Click any address to copy it.'}
+            : 'Solidity verified on Arbiscan or Sourcify (router 0xF593 pending re-verification) · Stylus via cargo stylus verify. Click any address to copy it.'}
       </p>
     </div>
   );

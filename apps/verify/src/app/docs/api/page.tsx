@@ -262,7 +262,7 @@ data = r.json()`}
         <p className="mt-2">
           Codex source: <code className="font-mono text-ink">services/codex/</code> .
           Live status is pulled from{' '}
-          <code className="font-mono">/api/codex/health</code> once that endpoint lands.
+          <code className="font-mono">/api/codex/health</code>, the server-side probe shown in the status pill above.
         </p>
       </footer>
       </div>
