@@ -33,7 +33,7 @@ const serif = Instrument_Serif({
    SEO-06: Twitter card + keywords for landing shares.
    SEO-10: canonical via alternates. */
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://verify.useatrium.me'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://useatrium.me'),
   title: { template: '%s · Atrium', default: 'Atrium · verify' },
   description:
     'Atrium Verifier Mode. Watch a position open, a margin calculation run, a chaos drill, and a kill-switch revoke in 90 seconds. Every claim verifiable on-chain.',

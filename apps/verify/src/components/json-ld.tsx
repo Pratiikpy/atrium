@@ -16,7 +16,7 @@ export const ATRIUM_ORG_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Atrium',
-  url: 'https://verify.useatrium.me',
+  url: 'https://useatrium.me',
   // Honesty audit (2026-06-05): removed the `sameAs` social profiles. They
   // pointed at github.com/atrium-labs + twitter.com/atriumfi, which are not
   // accounts we own; asserting them in structured data tells search engines
@@ -31,5 +31,5 @@ export const ATRIUM_APP_SCHEMA = {
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web',
   description: 'Cross-venue portfolio margin for the EVM.',
-  url: 'https://verify.useatrium.me',
+  url: 'https://useatrium.me',
 };
