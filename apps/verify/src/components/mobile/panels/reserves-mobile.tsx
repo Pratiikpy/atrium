@@ -257,6 +257,14 @@ export function ReservesMobile() {
             <p className="text-[16px] text-neg">Could not load, retry</p>
             <button onClick={() => recent.refetch()} className="mt-2 min-h-[44px] text-[14px] text-mob-accent">Retry</button>
           </div>
+        ) : (recent.data ?? []).length === 0 && !recent.isLoading ? (
+          /* Honest empty state: previously the Last-24h list rendered just its
+             header over blank space when empty, indistinguishable from loading
+             or broken. An attestation gap is itself meaningful (cron stalled),
+             so name it plainly. */
+          <p className="mt-2 rounded-xl border border-mob-line bg-mob-bg-card px-4 py-3 text-[14px] text-mob-muted">
+            No attestations published in the last 24 hours.
+          </p>
         ) : (
           <ul className="mt-2 space-y-2">
             {(recent.data ?? []).map((a, i) => (
