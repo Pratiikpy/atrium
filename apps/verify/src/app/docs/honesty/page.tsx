@@ -135,6 +135,39 @@ export const DISCLOSURES: Disclosure[] = [
       'Year 2. Real Synthetix V3 `commitOrder` + sUSD-vs-USDC bridging, and real Morpho `supplyCollateral` + `borrow` + LLTV math. The contract scaffolds + tests are in place to make those follow-ups mechanical.',
     severity: 'interim',
   },
+  {
+    id: 'gas-sponsorship',
+    surface: 'Sponsored gas (Postern ERC-4337 paymaster)',
+    what:
+      'Postern is the ERC-4337 + EIP-7702 layer; the passkey and session keys are live, but no Pimlico/bundler/verifying-paymaster is wired in the repo yet. On testnet today gas is self-funded: you pay your own Sepolia ETH, like any wallet. Onboarding + settings say so out loud, and /api/settings/gas returns sponsored:null, never a faked 0.',
+    why:
+      'The sponsored-gas leg needs a bundler + a funded verifying paymaster, neither of which is stood up on Sepolia yet. Only the gas-sponsorship leg is pending; the wallet + session keys work today.',
+    whenReal:
+      'When the Pimlico verifying paymaster is wired and funded (pre-mainnet). The Postern layer + session keys are already live; the sponsored-gas credit flips on with the paymaster.',
+    severity: 'interim',
+  },
+  {
+    id: 'ipfs-pinning',
+    surface: 'Proof-of-reserves IPFS pinning (Lantern)',
+    what:
+      'Lantern signs and commits the Merkle root of all balances on-chain each cycle, and that root is verifiable now. The full leaf tree is not yet pinned to IPFS, so the per-wallet inclusion proof (verify your own balance is in the root) is gated. /lantern + /app/reserves say "once the tree is pinned" rather than faking the proof.',
+    why:
+      'Pinning the leaf tree needs a web3.storage (or equivalent) token, a founder credential not yet provisioned.',
+    whenReal:
+      'Once the attestor runs with a web3.storage token. The on-chain root + the client-side inclusion-proof verifier are already shipped; only the pinned-tree fetch is pending.',
+    severity: 'interim',
+  },
+  {
+    id: 'tax-tablet',
+    surface: 'Tax report (Tablet computation service)',
+    what:
+      'The tax page computes UK CGT through the Tablet service (verify -> Tablet -> Scribe). Tablet is deployed and reachable and the chain returns 200, but its /summary response is incomplete (only realized_gain_usd; the page needs proceeds, cost basis, and tax owed), so the tax surface stays gated instead of showing a partial figure as final.',
+    why:
+      'Tablet /summary does not yet return the full CGT shape, so wiring it now would render an incomplete report as if it were complete.',
+    whenReal:
+      'When Tablet /summary returns proceeds + cost-basis + tax-owed and the page maps them. The verify -> Tablet -> Scribe chain already works; only the summary shape is pending.',
+    severity: 'interim',
+  },
 ];
 
 const SEV_LABELS: Record<Disclosure['severity'], { label: string; color: string }> = {
