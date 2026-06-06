@@ -120,7 +120,13 @@ export function MarketsMobile() {
             onClick={e => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-mob-muted/40" />
-            <h3 className="text-[18px] font-medium text-mob-ink">{selected.label}</h3>
+            {/* Show the operational status in the sheet too: the sheet covers the
+                list's StatusPill, so a SOON (not-yet-openable) venue must read as
+                SOON here before the user taps Trade and hits the gate on /app/trade. */}
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-[18px] font-medium text-mob-ink">{selected.label}</h3>
+              <StatusPill status={getStatus(selected.id)?.status ?? 'pending'} />
+            </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-[14px]">
               <div><span className="text-mob-muted">Kind</span><br/><span className="text-mob-ink capitalize">{selected.kind}</span></div>
               <div><span className="text-mob-muted">Haircut</span><br/><span className="text-mob-ink">{(selected.haircutBps / 100).toFixed(1)}%</span></div>
