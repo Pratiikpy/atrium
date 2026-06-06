@@ -50,7 +50,7 @@ export function PitchDeck() {
   }, [i, go]);
 
   return (
-    <div className="deck deck-dark">
+    <div className="deck deck-dark mobile-dark-doc">
       <nav className="deck-rail" aria-label="Slides">
         {NAV.map((s, idx) => (
           <button
