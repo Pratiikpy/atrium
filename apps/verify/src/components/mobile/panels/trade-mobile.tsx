@@ -5,6 +5,7 @@ import { useOpenPosition } from '@/lib/use-open-position';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
@@ -114,7 +115,7 @@ export function TradeMobile() {
         <input
           inputMode="decimal"
           value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
+          onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
           className="mt-2 w-full bg-transparent font-mono text-[24px] text-mob-ink outline-none"
         />
       </label>

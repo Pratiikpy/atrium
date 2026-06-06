@@ -6,6 +6,7 @@ import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 /**
  * Top-up banner, appears on the Portfolio when the liquidation buffer
@@ -128,7 +129,7 @@ function TopUpModal({
           type="text"
           inputMode="decimal"
           value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
+          onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
           className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-3 py-2.5 font-mono text-lg text-ink focus:border-ink/40 focus:outline-none"
         />
       </label>

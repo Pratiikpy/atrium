@@ -7,6 +7,7 @@ import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-stat
 import { useScopedWallet } from '@/lib/use-scoped-wallet';
 import { useTransfer, isDestChainSupported } from '@/lib/use-transfer';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 /**
  * Transfer form. Audit P-2 fix: prior version had hardcoded balances
@@ -165,7 +166,7 @@ export function TransferForm() {
             inputMode="decimal"
             value={amount}
             placeholder="0.00"
-            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
+            onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-2xl text-ink focus:border-ink/40 focus:outline-none"
           />
           <p className="mt-1 text-[10px] text-muted">

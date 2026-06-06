@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTransfer, isDestChainSupported } from '@/lib/use-transfer';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 /**
  * TransferMobile - the Move panel for /app/transfer at < md.
@@ -64,7 +65,7 @@ export function TransferMobile() {
           inputMode="decimal"
           value={amount}
           placeholder="0"
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
+          onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
           className="mt-2 w-full bg-transparent font-mono text-[24px] text-mob-ink outline-none placeholder:text-mob-muted"
         />
       </label>

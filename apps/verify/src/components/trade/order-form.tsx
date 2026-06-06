@@ -8,6 +8,7 @@ import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-stat
 import { useOpenPosition } from '@/lib/use-open-position';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 import { SlippageSelect } from '@/components/trade/slippage-select';
 import { HelpTip } from '@/components/ui/help-tip';
 
@@ -175,7 +176,7 @@ export function OrderForm({
             inputMode="decimal"
             value={size}
             placeholder="0.00"
-            onChange={(e) => setSize(e.target.value.replace(/[^0-9.]/g, ''))}
+            onChange={(e) => setSize(sanitizeAmount(e.target.value))}
             className="mt-1 w-full rounded-md border border-divider bg-parchment px-3 py-2.5 font-mono text-lg text-ink focus:border-ink/40 focus:outline-none"
           />
         </label>
