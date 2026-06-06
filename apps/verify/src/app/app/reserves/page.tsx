@@ -8,7 +8,7 @@ import { ReservesMobile } from '@/components/mobile/panels/reserves-mobile';
 
 export const metadata = {
   title: 'Reserves',
-  description: 'Proof-of-reserves attestation every ≤10 minutes. Verify your own balance locally.',
+  description: 'Proof-of-reserves: signed Merkle attestations on-chain, refreshed roughly hourly. Inclusion proofs once the tree is IPFS-pinned.',
 };
 
 export default function ReservesPage() {
