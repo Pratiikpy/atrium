@@ -37,7 +37,7 @@ A hedged trader holds a $3M perp on one venue and $500K of T-bills as collateral
 The `Plinth` engine returns **~51% of isolated margin freed** on a canonical equal-size hedge, locked by a unit test with a 40-70% guardrail band:
 
 ```bash
-cargo test -p atrium-plinth span::hedge_frees_a_pinned_share_of_the_isolated_margin
+cd contracts/plinth && cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture
 ```
 
 That is not a slide. It is a passing test you can run. (The dollar figures above are an illustrative scale, not a live reading. No venue cross-margins across other venues today; Atrium is the substrate that does.)
@@ -108,7 +108,7 @@ cast call 0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3 "totalAssets()(uint256)" \
 curl -s https://www.useatrium.me/api/vault/stats
 
 # 3. The ~51% margin-saving headline, as a test you can run
-cargo test -p atrium-plinth span::hedge_frees_a_pinned_share_of_the_isolated_margin
+cd contracts/plinth && cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture
 ```
 
 The contract read (6-decimal USDC) and the API's `vaultTvlUsd` are the same number. The test passes. That is the whole product in three commands, and not one of them touches a slide.
