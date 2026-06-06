@@ -101,7 +101,7 @@ export function TransferForm() {
   // never submit a dead tx (persona-sweep cross-chain fix).
   const destSupported = isDestChainSupported(to);
   const helper = !destSupported
-    ? `Cross-chain transfer to ${CHAINS.find((c) => c.id === to)?.label ?? to} is pending its CCIP lane on testnet; pick a supported destination.`
+    ? `Cross-chain transfer to ${CHAINS.find((c) => c.id === to)?.label ?? to} is pending its CCIP lane on testnet; it lands when that lane opens.`
     : readinessMessage(deployment, 'Transfer');
   const ready =
     destSupported && deployment?.ready === true && amount.length > 0 && parseFloat(amount) > 0 && !preflight;
