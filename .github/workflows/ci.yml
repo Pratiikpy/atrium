@@ -224,7 +224,10 @@ jobs:
 
   subgraph:
     name: Subgraph build
-    runs-on: ubuntu-latest
+    # Pinned to 22.04: a subgraph build dependency fails on the ubuntu-24.04
+    # runner image with "Unsupported platform: Linux x64 24". 22.04 is supported
+    # into 2027; revisit when the graph toolchain supports the 24.04 image.
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
       contents: read
