@@ -137,8 +137,7 @@ export function VerifierStepRunner({ step }: { step: number }) {
   // a judge is not invited to connect and run a step that will not execute.
   // Pre-fix: the disconnected view showed the generic "connect to run" prompt
   // for pending steps too, identical to the four live steps.
-  const stepPending = 'pending' in config.action;
-  if (stepPending) {
+  if (config && 'pending' in config.action) {
     return (
       <div className="mt-8 rounded-md border border-testnet/30 bg-testnet/5 p-6">
         <p className="text-sm font-medium text-testnet">Pending on testnet</p>
