@@ -49,6 +49,16 @@ async function fetchRecent(): Promise<RecentRow[]> {
   );
 }
 
+// Redeemable = Coffer.totalAssets() (what backs every share right now), read by
+// the summary route independently of Scribe. The desktop reserves page shows
+// this as its headline stat; the mobile panel was omitting it. Honest null when
+// the vault is undeployed or the read reverts.
+async function fetchSummary(): Promise<{ redeemableUsd: string | null }> {
+  const r = await fetch('/api/reserves/summary');
+  if (!r.ok) return { redeemableUsd: null };
+  return r.json();
+}
+
 function timeAgo(ts: number): string {
   const diff = Math.floor(Date.now() / 1000) - ts;
   if (diff < 60) return `${diff}s ago`;
@@ -66,6 +76,11 @@ export function ReservesMobile() {
   const recent = useQuery({
     queryKey: ['lantern-recent-mobile'],
     queryFn: fetchRecent,
+    refetchInterval: 60_000,
+  });
+  const summary = useQuery({
+    queryKey: ['reserves-summary-mobile'],
+    queryFn: fetchSummary,
     refetchInterval: 60_000,
   });
 
@@ -144,6 +159,20 @@ export function ReservesMobile() {
   return (
     <div className="flex flex-col gap-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <MobileReservesHeader />
+
+      {/* Redeemable now (Coffer.totalAssets) - the headline PoR number. The
+          desktop shows it prominently; the mobile panel was omitting it, so a
+          phone user saw the proof structure but not what it backs. Honest "—"
+          when the read reverts / vault undeployed, matching the summary route. */}
+      <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-4">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-mob-muted">Redeemable now</p>
+        <p className="mt-1 text-[26px] font-semibold text-mob-ink">
+          {summary.data?.redeemableUsd ?? '—'}
+        </p>
+        <p className="mt-0.5 text-[11px] text-mob-muted">
+          {summary.data?.redeemableUsd != null ? 'Coffer.totalAssets() · live read' : 'pending'}
+        </p>
+      </section>
 
       {/* Latest attestation card */}
       {data && (
