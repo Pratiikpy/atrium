@@ -18,6 +18,13 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    tag: 'v0.3.0',
+    date: '2026-05-28',
+    title: 'Unified design system',
+    summary:
+      'Front end rebuilt on one design system: shared tokens, the Atrium component library, and every marketing and app route restyled to a single visual language. Landing, the /app dashboard, and 30-plus pages reconciled against the design reference. The contract and data layer is unchanged; this is the surface the app presents today.',
+  },
+  {
     tag: 'v0.2.1',
     date: '2026-05-25',
     title: 'Audit closure',
