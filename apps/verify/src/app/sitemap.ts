@@ -31,7 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/team',
     '/cohort',
     '/lantern',
-    '/lantern/sla',
+    '/sla',
     '/changelog',
     '/agents/marketplace',
     '/rostrum',

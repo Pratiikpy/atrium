@@ -31,7 +31,10 @@ const serif = Instrument_Serif({
 
 /* SEO-02: metadataBase enables relative canonical URLs across all pages.
    SEO-06: Twitter card + keywords for landing shares.
-   SEO-10: canonical via alternates. */
+   SEO-10: canonical is per-page. The layout does NOT set a global canonical:
+   a global '/' made every non-overriding subpage canonicalize to the
+   homepage (Google then de-indexes them as duplicates). The landing sets its
+   own canonical '/'; other pages self-canonicalize to their own URL. */
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://useatrium.me'),
   title: { template: '%s · Atrium', default: 'Atrium · verify' },
@@ -51,7 +54,6 @@ export const metadata: Metadata = {
   },
   keywords: ['portfolio margin', 'cross-venue', 'Arbitrum', 'DeFi', 'EVM'],
   robots: { index: true, follow: true },
-  alternates: { canonical: '/' },
 };
 
 export const viewport: Viewport = {
