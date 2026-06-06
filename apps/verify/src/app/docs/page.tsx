@@ -30,24 +30,6 @@ const DOCS = [
     repoOnly: true,
   },
   {
-    title: 'docs/plan-tracker.md',
-    sub: 'Source of truth for every landed fix across the audit waves',
-    pages: 'patch register',
-    repoOnly: true,
-  },
-  {
-    title: 'docs/MASTER_PLAN.md',
-    sub: '12-month build plan with status markers',
-    pages: 'Months 1–12',
-    repoOnly: true,
-  },
-  {
-    title: 'docs/LAUNCH_READINESS.md',
-    sub: 'Pre-demo checklist · what is built · what is deferred',
-    pages: 'Pre-demo audit',
-    repoOnly: true,
-  },
-  {
     // Link-integrity fix (use-everything 2026-06-03): the GitHub repo is not
     // public yet, so the blob link 404'd. /benchmarks is the live in-app
     // competitive comparison, so point there instead of a dead external link.

@@ -70,7 +70,7 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
               <p className="font-medium text-testnet">{tabMeta.label}, coming {tabMeta.readyMonth}</p>
               <p className="mt-1 text-ink-soft">
                 The {tabMeta.label.toLowerCase()} tab is scaffolded but not yet wired.
-                See <code className="font-mono">docs/MASTER_PLAN.md</code> for the exact ship date.
+                Ships per the launch roadmap.
               </p>
             </div>
           )}

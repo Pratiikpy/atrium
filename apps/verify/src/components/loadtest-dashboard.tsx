@@ -47,7 +47,7 @@ export function LoadtestDashboard() {
       <div className="mt-12 rounded-md border border-divider bg-parchment p-8 text-center">
         <p className="text-ink-soft">No load-test runs yet.</p>
         <p className="mt-2 text-sm text-muted">
-          The continuous loadtest runner starts per <code>docs/MASTER_PLAN.md</code> Phase 9. Metrics
+          The continuous loadtest runner starts per the launch roadmap (Phase 9). Metrics
           will appear here as soon as the first run completes.
         </p>
       </div>

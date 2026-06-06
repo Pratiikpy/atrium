@@ -74,9 +74,8 @@ describe('readinessMessage()', () => {
       missing: ['Coffer'],
     };
     const msg = readinessMessage(notReady, 'Deposit')!;
-    // Honesty discipline, the message names a real planning doc with the
-    // phase, not a vague "coming soon". The roadmap doc was renamed
-    // ATRIUM_12_MONTH_ROADMAP.md → docs/MASTER_PLAN.md; accept either.
-    expect(msg).toMatch(/ROADMAP|Month 1 W2|MASTER_PLAN/);
+    // Honesty discipline, the message names the launch roadmap with the
+    // phase, not a vague "coming soon".
+    expect(msg).toMatch(/roadmap|Month 1 W2/i);
   });
 });

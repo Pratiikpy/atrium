@@ -4,7 +4,7 @@
 
 Email **security@useatrium.me** with a description and reproduction steps.
 
-- PGP encryption optional. See `runbooks/pgp-key-generation.md` for the public key (placeholder until Phase 7 publishes).
+- PGP encryption optional. A public key will be published once generated; until then, open a private GitHub Security Advisory for a confidential channel.
 - Best-effort 48-hour acknowledgment. Critical issues triaged same-day.
 - 90-day responsible disclosure window.
 
@@ -64,14 +64,10 @@ Where live code differs from this posture, the gap is honestly logged in `audits
 
 ## Incident response
 
-Operational runbooks for each service live under `runbooks/`. Key procedures:
-
-- `runbooks/key-rotation.md`: deployer key rotation
-- `runbooks/incident-notifier.md`: notifier outage
-- `runbooks/incident-lantern.md`: Lantern attestor outage
-- `runbooks/incident-scribe.md`: subgraph indexer lag
-- `runbooks/incident-keeper.md`: vigil-keeper failover
-- `runbooks/pgp-key-generation.md`: PGP key for encrypted disclosures
+Operational and incident-response runbooks (key rotation, per-service outage
+playbooks, on-call procedure) are maintained internally and are not published in
+the public repository, to avoid exposing infrastructure detail. The public
+`runbooks/deploy.md` covers the deploy checklist.
 
 ## Threat model
 

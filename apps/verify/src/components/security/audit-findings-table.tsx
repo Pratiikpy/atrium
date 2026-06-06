@@ -63,7 +63,7 @@ export function AuditFindingsTable() {
             <strong className="font-mono">{summary.pending}</strong> pending
           </span>
           <span className="text-muted">
-            . source: <code className="font-mono">docs/plan-tracker.md</code>
+            . sourced from the audit register
           </span>
         </div>
       )}
@@ -105,8 +105,8 @@ export function AuditFindingsTable() {
           ))}
           {findings.length > 40 && (
             <p className="rounded-md border border-divider bg-parchment-soft px-3 py-2 text-center text-[11px] text-muted">
-              showing first 40 of {findings.length} . see{' '}
-              <code className="font-mono">docs/plan-tracker.md</code> for the full register
+              showing first 40 of {findings.length} . see the{' '}
+              <code className="font-mono">audits/</code> directory for the full security review
             </p>
           )}
         </div>
@@ -159,8 +159,8 @@ export function AuditFindingsTable() {
           </table>
           {findings.length > 40 && (
             <p className="border-t border-divider bg-parchment-soft px-3 py-2 text-center text-[11px] text-muted">
-              showing first 40 of {findings.length} . see{' '}
-              <code className="font-mono">docs/plan-tracker.md</code> for the full register
+              showing first 40 of {findings.length} . see the{' '}
+              <code className="font-mono">audits/</code> directory for the full security review
             </p>
           )}
         </div>

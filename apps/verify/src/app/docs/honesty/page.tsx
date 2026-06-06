@@ -87,7 +87,7 @@ export const DISCLOSURES: Disclosure[] = [
     what:
       'Every Atrium contract currently has `praetor_multisig = <deployer EOA>`. Anything dangerous (upgrade, parameter change, pause) requires that one key to sign.',
     why:
-      'The deployer key bootstraps the system. The 3-of-5 Gnosis Safe ceremony is queued (see `scripts/safe-ceremony.md`) but requires 5 hardware wallets + a coordinated session.',
+      'The deployer key bootstraps the system. The 3-of-5 Gnosis Safe ceremony is queued but requires 5 hardware wallets + a coordinated session.',
     whenReal:
       'After the Safe ceremony lands. Script `scripts/transfer-admin.s.sol` hands admin from the deployer EOA to a 3-of-5 Safe in one Foundry run.',
     severity: 'interim',
