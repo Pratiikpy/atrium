@@ -52,7 +52,7 @@ export function HelpTip({ term }: { term: string }) {
       {open && (
         <span
           role="tooltip"
-          className="absolute bottom-full left-1/2 z-50 mb-1.5 w-56 -translate-x-1/2 rounded-md border border-divider bg-parchment px-3 py-2 text-[11px] leading-[1.5] text-ink shadow-md"
+          className="absolute bottom-full left-1/2 z-50 mb-1.5 w-56 -translate-x-1/2 rounded-md border border-divider bg-parchment px-3 py-2 text-[11px] font-normal normal-case tracking-normal leading-[1.5] text-ink shadow-md"
         >
           {explanation}
         </span>
