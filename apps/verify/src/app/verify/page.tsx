@@ -29,9 +29,9 @@ export default function VerifierOverviewPage() {
         <p className="eyebrow text-xs uppercase tracking-wider text-muted">Verifier</p>
         <h1 className="mt-2 font-display text-4xl text-ink sm:text-5xl">Verify every claim</h1>
         <p className="mt-6 max-w-prose text-balance text-lg text-ink-soft">
-          Atrium makes seven claims. Each one is a real contract call on Arbitrum Sepolia you
-          can run yourself and check on Arbiscan, no trust required. Start at step one, or jump
-          to any step.
+          Atrium makes seven claims. Each is a real contract on Arbitrum Sepolia you can read and
+          check on Arbiscan, no trust required. The four live steps you can run end to end yourself;
+          three are pending on testnet and show their blocker. Start at step one, or jump to any step.
         </p>
 
         <ol className="mt-10 space-y-3">
