@@ -89,6 +89,15 @@ export function MarketsMobile() {
       {/* Loading */}
       {isLoading && <div className="space-y-2">{[0,1,2,3].map(i => <div key={i} className="skeleton h-[88px] rounded-xl" />)}</div>}
 
+      {/* No search matches: the filtered list otherwise rendered blank with no
+          explanation when a search string matched zero venues (indistinguishable
+          from a broken/empty page). */}
+      {!isLoading && filtered.length === 0 && (
+        <p className="rounded-xl border border-mob-line bg-mob-bg-card px-4 py-8 text-center text-[14px] text-mob-muted">
+          No venues match “{search}”.
+        </p>
+      )}
+
       {/* Cards */}
       {!isLoading && filtered.map(venue => {
         const vs = getStatus(venue.id);
