@@ -103,6 +103,13 @@ export async function listLiveContracts(): Promise<Array<{ slug: string; address
     if (!addr) continue;
     if (!/^0x[0-9a-f]{40}$/i.test(addr)) continue;
     if (addr.toLowerCase() === ZERO_ADDRESS) continue;
+    // Skip slugs that carry a real address but are NOT live production
+    // subsystems: superseded versions, on-chain mocks, placeholder records,
+    // and verification-source duplicates. The registry has no status field,
+    // so the status lives in the slug. Without this the landing "live" dots
+    // and the /venues Try-it mirror counted deprecated + mock + placeholder
+    // contracts (e.g. faucet-deprecated-v1, mock-aave-pool) as live.
+    if (/deprecated|placeholder|pre-event-extension|current-source|^mock-/.test(slug)) continue;
     live.push({ slug, address: addr });
   }
   return live;

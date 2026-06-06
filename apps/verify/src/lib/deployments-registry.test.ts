@@ -142,6 +142,27 @@ describe('listLiveContracts()', () => {
     expect(slugs).toEqual(['coffer', 'sigil']);
   });
 
+  it('excludes superseded/mock/placeholder/deprecated slugs even with real addresses', async () => {
+    // A judge using the /venues Try-it (its mirror reads this list) or the
+    // landing "live" dots must not see deprecated, mock, placeholder,
+    // legacy-version, or verification-source duplicates counted as live.
+    (readFile as any).mockResolvedValueOnce(
+      JSON.stringify({
+        contracts: {
+          coffer: { address: REAL_ADDRESS },
+          'faucet-deprecated-v1': { address: REAL_ADDRESS },
+          'mock-aave-pool': { address: REAL_ADDRESS },
+          'adapter-aave-horizon-v1.1-pool-placeholder': { address: REAL_ADDRESS },
+          'lantern-attestor-v1-pre-event-extension': { address: REAL_ADDRESS },
+          'atrium-router-v2-current-source': { address: REAL_ADDRESS },
+          plinth: { address: REAL_ADDRESS },
+        },
+      }),
+    );
+    const slugs = (await listLiveContracts()).map((c) => c.slug).sort();
+    expect(slugs).toEqual(['coffer', 'plinth']);
+  });
+
   it('returns empty array when registry is unreadable', async () => {
     (readFile as any).mockRejectedValue(new Error('ENOENT'));
     expect(await listLiveContracts()).toEqual([]);
