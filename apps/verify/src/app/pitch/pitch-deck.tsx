@@ -324,7 +324,7 @@ const CORE = [
   { name: 'Sigil', lang: 'STYLUS', blurb: 'EIP-712 agent mandates. Capped, time-boxed delegations with a one-tap kill switch.', addr: '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9' },
   { name: 'Vigil', lang: 'STYLUS', blurb: 'Liquidation engine. Soft-liquidates an account before it goes underwater.', addr: '0x5ccd3422f430f6d034ff46715b41509de9d0deed' },
   { name: 'AtriumRouter', lang: 'SOLIDITY', blurb: 'Opens a position across margin, vault, and adapter in a single transaction.', addr: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0' },
-  { name: 'Lantern', lang: 'SOLIDITY', blurb: 'Publishes a signed Merkle proof-of-reserves root every 10 minutes.', addr: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888' },
+  { name: 'Lantern', lang: 'SOLIDITY', blurb: 'Publishes a signed Merkle proof-of-reserves root roughly hourly.', addr: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888' },
 ];
 function Architecture() {
   return (

@@ -425,7 +425,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                 Every dollar, <span className="accent-grad">on the public record.</span>
               </h2>
               <p className="section-sub">
-                Lantern publishes a signed Merkle attestation every 10 minutes. Anyone
+                Lantern publishes a signed Merkle attestation roughly hourly. Anyone
                 can verify a balance against it locally, without trusting Atrium.
               </p>
             </div>

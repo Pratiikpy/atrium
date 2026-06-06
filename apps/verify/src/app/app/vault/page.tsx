@@ -66,7 +66,7 @@ export default function VaultPage() {
         <ul className="mt-4 space-y-2 text-sm text-ink-soft">
           <li>• Virtual-shares offset prevents the ERC-4626 inflation attack (audit B-7).</li>
           <li>• TVL drop {'>'} 30% in one block trips the circuit breaker and pauses deposits.</li>
-          <li>• Withdrawal SLA: settle within 1 block (≈250 ms on Arbitrum Sepolia) when no breaker is active; on-chain attestation every ≤10 minutes via Lantern.</li>
+          <li>• Withdrawal SLA: settle within 1 block (≈250 ms on Arbitrum Sepolia) when no breaker is active; on-chain attestation roughly hourly via Lantern.</li>
           <li>• USDC contract paused-check before every deposit (audit C-23).</li>
         </ul>
         <p className="mt-3 text-xs text-muted">
