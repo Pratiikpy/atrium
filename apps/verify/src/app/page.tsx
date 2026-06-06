@@ -317,7 +317,7 @@ export default async function LandingPage() {
               </div>
             </div>
             <p className="mono cap muted" style={{ textAlign: 'center', marginTop: 18, opacity: 0.7 }}>
-How a cross-chain transfer flows through Chainlink CCIP · run a live transfer in /app/transfer
+How a cross-chain transfer flows through Chainlink CCIP · walk the flow in /app/transfer (the testnet CCIP lane is pending)
             </p>
           </div>
         </section>
