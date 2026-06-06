@@ -43,16 +43,18 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Atrium' },
   openGraph: {
-    // Templated like `title` so a subpage share gets a page-specific og:title
-    // ("Team · Atrium", "Architecture Decision Records · Atrium") instead of
-    // inheriting one generic string. A page's own openGraph.title still wins.
-    title: { template: '%s · Atrium', default: 'Atrium · verify' },
+    // Default og:title for pages that do not set their own openGraph.title.
+    // NOTE: Next.js does NOT derive og:title from the page `title`, so a
+    // template here is inert for subpages (verified: they fall to this
+    // default). Page-specific social titles require a per-page openGraph.title
+    // (see /benchmarks); tracked as low-impact polish, not done globally yet.
+    title: 'Atrium · verify',
     description: 'Cross-venue portfolio margin on Arbitrum. Verifiable in 90 seconds.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: { template: '%s · Atrium', default: 'Atrium · cross-venue portfolio margin' },
+    title: 'Atrium · cross-venue portfolio margin',
     description: 'One wallet posts collateral once. Trades across venues with one margin number.',
   },
   keywords: ['portfolio margin', 'cross-venue', 'Arbitrum', 'DeFi', 'EVM'],
