@@ -119,7 +119,7 @@ export function CommandPalette() {
         style={{ width: '100%', textAlign: 'left', cursor: 'text', font: 'inherit' }}
       >
         <SearchIcon />
-        <span>Search · positions, agents</span>
+        <span>Search · jump to a page</span>
         <kbd className="kbd">⌘K</kbd>
       </button>
 
