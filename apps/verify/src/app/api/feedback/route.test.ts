@@ -27,12 +27,12 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 
-describe('POST /api/feedback, auth gate', () => {
-  it('401 when there is no verified session', async () => {
+describe('POST /api/feedback, anonymous posting', () => {
+  it('accepts feedback with no session (the form posts anonymously; abuse is bounded by the per-IP rate limit)', async () => {
     getSessionMock.mockResolvedValue(null);
     const r = await POST(jsonReq({ category: 'bug', message: 'something is broken' }) as never);
-    expect(r.status).toBe(401);
-    expect((await r.json()).error).toBe('unauthorized');
+    expect(r.status).toBe(200);
+    expect((await r.json()).ok).toBe(true);
   });
 });
 

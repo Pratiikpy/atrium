@@ -67,7 +67,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     title: 'Trigger margin recompute',
     action: { kind: 'plinth-recompute-margin', pending: true },
     pendingReason:
-      'Margin recompute runs against an open position, so it lights up once step 2 (open a position) is runnable.',
+      'Plinth margin recompute runs against an open position, so it lights up once step 2 (open a position) is runnable.',
   },
   4: {
     step: 4,
