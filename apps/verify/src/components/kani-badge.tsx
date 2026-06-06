@@ -101,7 +101,7 @@ function KaniBadgeResolved({ status }: { status: KaniStatus }) {
   const linkHref = status.proof_run_url ?? '/security#audit-findings-register';
   const hasMeasurement = status.passed != null;
   const titleText = !hasMeasurement
-    ? 'Kani CI status not yet wired (target: Month 2 W1). Total proofs in repo: ' + status.total
+    ? 'Kani CI status not yet wired (CI lane lands Month 3). Total proofs in repo: ' + status.total
     : `${status.passed} of ${status.total} Kani invariants in CI · last run ${status.last_run_at ?? 'n/a'}`;
   const visibleText = !hasMeasurement
     ? `Kani CI · status pending (${status.total} proofs)`
