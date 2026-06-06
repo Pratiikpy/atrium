@@ -74,10 +74,7 @@ pub async fn run(network: &str, action: LanternAction) -> Result<()> {
                 .context("POST to lantern cron failed")?;
 
             let status = response.status();
-            let body_text = response
-                .text()
-                .await
-                .context("read cron response body")?;
+            let body_text = response.text().await.context("read cron response body")?;
 
             if !status.is_success() {
                 bail!(
@@ -102,10 +99,7 @@ pub async fn run(network: &str, action: LanternAction) -> Result<()> {
                         if let Some(root) = r.root {
                             println!("Merkle root:   {}", root);
                         }
-                        println!(
-                            "Arbiscan:      https://sepolia.arbiscan.io/tx/{}",
-                            tx
-                        );
+                        println!("Arbiscan:      https://sepolia.arbiscan.io/tx/{}", tx);
                     } else {
                         println!(
                             "Lantern cron returned status={} (no tx). Body: {}",

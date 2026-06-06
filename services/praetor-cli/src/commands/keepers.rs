@@ -110,9 +110,7 @@ async fn slash(network: &str, keeper: &str, reason: &str) -> Result<()> {
     println!("Vigil also enforces on-chain that the keeper has missed enough windows;");
     println!("if not, the call reverts with NotEnoughMisses(misses). Run `praetor keepers list`");
     println!("first to confirm missedWindows24h >= max_misses_per_window (default 3).");
-    println!(
-        "(Iter 48 rename: this error was previously named TooManyMisses, inverted semantic.)"
-    );
+    println!("(Iter 48 rename: this error was previously named TooManyMisses, inverted semantic.)");
     Ok(())
 }
 
