@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import type { TaxJurisdiction, TaxYear } from './tax-types';
 
 interface Allowance {
@@ -45,10 +46,16 @@ export function TaxAllowanceProgress({
   jurisdiction: TaxJurisdiction;
   year: TaxYear;
 }) {
+  const { isConnected } = useAccount();
   const { data } = useQuery({
     queryKey: ['tax-allowance', jurisdiction, year],
     queryFn: () => fetchAllowance(jurisdiction, year),
     refetchInterval: 5 * 60_000,
+    // Gate on connection like TaxStatRow: a disconnected page must not show a
+    // user-specific "$0 used" next to the stat row's "-" realised gain (usage
+    // is unknowable without the gain). The published allowance constant below
+    // still renders; only the per-user usage waits for a wallet.
+    enabled: isConnected,
   });
   const isPending = data?.source === 'pending' || data?.usedUsd == null;
   return (
@@ -77,11 +84,15 @@ export function TaxAllowanceProgress({
         <span>$0</span>
         <span>{data?.remainingUsd ?? '-'} · annual allowance</span>
       </div>
-      {isPending && (
+      {!isConnected ? (
+        <p className="mt-3 text-[10px] uppercase tracking-wider text-muted">
+          connect a wallet to see your allowance usage
+        </p>
+      ) : isPending ? (
         <p className="mt-3 text-[10px] uppercase tracking-wider text-muted">
           scribe pending · refresh after contracts deploy
         </p>
-      )}
+      ) : null}
     </div>
   );
 }
