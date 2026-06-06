@@ -29,9 +29,10 @@ export default function ReservesPage() {
             Prove your balance to anyone in seconds
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted">
-            Atrium never custodies your funds. Every ≤10 minutes, Lantern publishes a signed Merkle
-            attestation on-chain; press verify to generate a proof that your balance is in it - no
-            trust required.
+            Atrium never custodies your funds. Lantern signs a Merkle attestation of every balance
+            on-chain (the free scheduler refreshes it roughly hourly). The root is checkable now;
+            pressing verify builds your inclusion proof once the attestor pins the full tree to IPFS
+            with a web3.storage token. No trust required.
           </p>
         </div>
         {/* Audit P-11 fix: button now reads the latest Lantern attestation
