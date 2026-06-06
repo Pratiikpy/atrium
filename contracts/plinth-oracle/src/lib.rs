@@ -1,7 +1,7 @@
 // PlinthOracle, dual-oracle price reader extracted from Plinth.
 //
 // The caller (Plinth) passes in the feed addresses + tolerance + freshness;
-// this contract reads Chainlink Data Streams + Pyth, applies all the same
+// this contract reads Chainlink Data Feeds + Pyth, applies all the same
 // hardening (negative-price refusal, decimals-read failure surfacing, freshness
 // window, 50 bps disagreement tolerance), and returns the median price in Q64.64.
 //

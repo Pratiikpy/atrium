@@ -17,7 +17,7 @@ pragma solidity ^0.8.28;
 ///         freshness window and stale-round gate. The price is admin-settable
 ///         so a demo can move the mark or test the 50bps disagreement revert.
 ///         This is NOT a security model; it is a testnet harness, exactly like
-///         contracts/mocks/MockAavePool.sol. Real Chainlink Data Streams land
+///         contracts/mocks/MockAavePool.sol. Real Chainlink Data Feeds land
 ///         at the Year-2 mainnet flip. Per docs/conventions/security.md:
 ///         testnet posture only; never deploy where real funds depend on it.
 contract MockChainlinkUsdFeed {

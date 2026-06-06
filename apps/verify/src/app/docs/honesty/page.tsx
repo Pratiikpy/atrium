@@ -160,7 +160,7 @@ export default function HonestyPage() {
         </p>
         <p className="mt-3 max-w-prose text-ink-soft">
           Every other integration on this page is real testnet code (Chainlink CCIP, Chainlink
-          Data Streams, Curve, Trade.xyz, Polymarket, USDC, x402, WebAuthn, EIP-712 mandates).
+          Data Feeds, Curve, Trade.xyz, Polymarket, USDC, x402, WebAuthn, EIP-712 mandates).
         </p>
       </section>
 
