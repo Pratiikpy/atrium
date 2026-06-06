@@ -169,8 +169,8 @@ function Welcome({ onNext }: { onNext: () => void }) {
         />
         <FeatureRow
           icon={<TradeIcon />}
-          title="Gas is sponsored"
-          desc="The first ten UserOperations are on us. You&rsquo;ll never see a gas dialog this session."
+          title="Gas sponsorship is coming"
+          desc="Your first ten UserOperations will be on us once the paymaster ships. On testnet today gas is self-funded, the same status shown in Settings."
         />
         <FeatureRow
           icon={<ReservesIcon />}
