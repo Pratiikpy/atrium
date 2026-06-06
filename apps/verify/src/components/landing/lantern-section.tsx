@@ -61,7 +61,7 @@ function MerkleTreeViz() {
           );
         })}
       </svg>
-      <p className="mt-4 text-center text-xs text-muted">Signed by Lantern about every 10 minutes, on chain and verifiable now. IPFS pin and client-side inclusion proof light up with a web3.storage token.</p>
+      <p className="mt-4 text-center text-xs text-muted">Signed by Lantern on chain and verifiable now; the free scheduler refreshes it roughly hourly. IPFS pin and client-side inclusion proof light up with a web3.storage token.</p>
     </div>
   );
 }
