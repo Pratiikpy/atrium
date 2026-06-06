@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useOpenPosition } from '@/lib/use-open-position';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
+import { VENUES } from '@/lib/venues';
 
 /**
  * TradeMobile  the Trade panel for /app/trade at < md.
@@ -30,7 +31,12 @@ export function TradeMobile() {
   const { data: deployment } = useDeploymentStatus(2);
   const isSubmitting = status.kind === 'submitting' || status.kind === 'resolving';
   const amountValid = amount.length > 0 && parseFloat(amount) > 0;
-  const ready = deployment?.ready === true && amountValid && !isSubmitting;
+  // Audit fix (hostile-judge sweep): mobile submitted open({ venue: 'hyperliquid' })
+  // with no operational gate, so a connected user could sign a guaranteed-revert tx
+  // (the Hyperliquid scaffold adapter reverts on-chain). Mirror the desktop OrderForm:
+  // gate the CTA on the venue's operational flag. Only Aave Horizon is openable today.
+  const venueOperational = VENUES.find((v) => v.id === 'hyperliquid')?.operational ?? false;
+  const ready = deployment?.ready === true && amountValid && !isSubmitting && venueOperational;
   const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
 
   // Bug-hunt fix (2026-06-02): mobile computed notional = amount * leverage and
@@ -57,7 +63,9 @@ export function TradeMobile() {
         <div className="flex items-baseline justify-between">
           <div>
             <div className="font-display text-[22px] italic text-mob-ink">HSLA-PERP</div>
-            <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">HL-HIP3 . tokenized</div>
+            <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">
+              HL-HIP3 . tokenized{!venueOperational && <span className="text-mob-accent"> . soon</span>}
+            </div>
           </div>
           <div className="text-right">
             <div className="font-mono text-[18px] text-mob-ink">pending</div>
@@ -154,9 +162,13 @@ export function TradeMobile() {
         {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . HSLA-PERP`}
       </button>
       {/* Honest readiness gate (mirrors desktop): explains why the CTA is off. */}
-      {!deployment?.ready && (
+      {!venueOperational ? (
+        <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">
+          Hyperliquid HIP-3 is not openable on testnet yet. Aave Horizon is the live venue today.
+        </p>
+      ) : !deployment?.ready ? (
         <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">{helper}</p>
-      )}
+      ) : null}
       {status.kind === 'error' && (
         <p className="text-center font-mono text-[11px] text-mob-neg">
           {/* Bug-hunt fix (2026-06-02): showed the raw machine code (e.g.

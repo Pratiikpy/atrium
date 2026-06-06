@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTransfer } from '@/lib/use-transfer';
+import { useTransfer, isDestChainSupported } from '@/lib/use-transfer';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 
 /**
@@ -30,11 +30,16 @@ export function TransferMobile() {
 
   const busy = status.kind === 'submitting' || status.kind === 'pending';
   const amountValid = amount.length > 0 && parseFloat(amount) > 0;
-  const canMove = amountValid && !preflight && !busy;
+  // Audit fix (hostile-judge sweep): mobile gated only on amount/preflight, so once
+  // connected the Move button enabled for the unwired rh-chain CCIP lane (selector 0n)
+  // and submit() silently no-opped with no feedback. Mirror the desktop transfer form:
+  // gate on isDestChainSupported(to) and disclose the pending lane.
+  const destSupported = isDestChainSupported(to);
+  const canMove = amountValid && destSupported && !preflight && !busy;
 
   return (
     <div className="md:hidden flex flex-col gap-4">
-      <SectionHead t="Aqueduct . Chainlink CCIP" more="~7–12s" />
+      <SectionHead t="Aqueduct . Chainlink CCIP" more={destSupported ? '~7–12s' : 'lane pending'} />
 
       {/* Chain stack with swap button */}
       <div className="relative flex flex-col gap-2.5">
@@ -73,7 +78,7 @@ export function TransferMobile() {
           </div>
           <div className="font-mono text-[11px] text-mob-muted">testnet</div>
         </div>
-        <Row l="Estimated time" v="~7–12s" />
+        <Row l="Estimated time" v={destSupported ? '~7–12s' : 'lane pending'} />
         <Row l="CCIP fee" v="pending" />
         <Row l="Gas" v="sponsored" />
         <Row l="Plinth credit" v="on arrival" />
@@ -89,6 +94,11 @@ export function TransferMobile() {
       </button>
 
       {/* Honest status / preflight reason (no dead button). */}
+      {!destSupported && (
+        <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">
+          Cross-chain transfer to {CHAIN_LABELS[to] ?? to} is pending its CCIP lane on testnet; it lands when that lane opens.
+        </p>
+      )}
       {preflight && (
         <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">{preflight}</p>
       )}

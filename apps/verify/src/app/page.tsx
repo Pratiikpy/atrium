@@ -278,7 +278,7 @@ export default async function LandingPage() {
                   >
                     <div className="transfer-card">
                       <div className="mono cap muted">From</div>
-                      <div className="strong" style={{ marginTop: 6, fontSize: 15 }}>Ethereum Sepolia</div>
+                      <div className="strong" style={{ marginTop: 6, fontSize: 15 }}>Robinhood Chain</div>
                       <div className="num" style={{ fontSize: 28, marginTop: 14, letterSpacing: '-0.02em' }}>
                         50,000 <span style={{ fontSize: 16, color: 'var(--muted)' }}>USDC</span>
                       </div>
@@ -295,7 +295,7 @@ export default async function LandingPage() {
                     </div>
                     <div className="transfer-card">
                       <div className="mono cap muted">To</div>
-                      <div className="strong" style={{ marginTop: 6, fontSize: 15 }}>Robinhood Chain</div>
+                      <div className="strong" style={{ marginTop: 6, fontSize: 15 }}>Arbitrum Sepolia</div>
                       <div className="num" style={{ fontSize: 28, marginTop: 14, letterSpacing: '-0.02em' }}>
                         50,000 <span style={{ fontSize: 16, color: 'var(--muted)' }}>USDC</span>
                       </div>
