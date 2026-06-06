@@ -364,7 +364,7 @@ export function PositionFlow() {
 const TABS: { key: string; label: string; rows: Row[]; copyable: boolean }[] = [
   { key: 'core', label: 'Arbitrum · Core 15', rows: CORE_15, copyable: true },
   { key: 'venues', label: 'Arbitrum · Adapters 9', rows: VENUES_9, copyable: true },
-  { key: 'rh', label: 'Robinhood Chain 8', rows: ROBINHOOD_8, copyable: true },
+  { key: 'rh', label: 'Robinhood Chain · 8', rows: ROBINHOOD_8, copyable: true },
 ];
 
 export function DeploymentsTable() {
