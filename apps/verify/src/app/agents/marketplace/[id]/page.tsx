@@ -44,7 +44,7 @@ const AGENTS: Record<string, ReferenceAgent> = {
     name: 'Augur',
     strat: 'Mean reversion . hourly',
     intro:
-      'Trades 1-hour deviations on tokenized perps. Closes the position when price returns to the range mid. Open-source Python; backtested 2024-2026 on real Hyperliquid HIP-3 prints.',
+      'Trades 1-hour deviations on tokenized perps. Closes the position when price returns to the range mid. Open-source Python; strategy logic and live PnL land in Phase 6 of the launch plan, so the numbers below show pending until then.',
     cadence: 'Hourly . 24x daily',
     instruments: 'HIP-3 perps . Bollinger 20/2',
     venues: ['HL-HIP3', 'HL-HIP4'],
