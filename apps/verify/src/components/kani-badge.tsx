@@ -73,14 +73,15 @@ export function KaniBadge() {
       {failed ? (
         <Link
           href="/security#audit-findings-register"
-          className="fixed right-4 bottom-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+          className="fixed right-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+          style={{ bottom: 'calc(1rem + var(--consent-h, 0px))' }}
           title="Kani status fetch failed"
         >
           <span className="size-2 rounded-full bg-testnet" aria-hidden />
           Kani CI · status unavailable
         </Link>
       ) : !status ? (
-        <span className="fixed right-4 bottom-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm">
+        <span className="fixed right-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm" style={{ bottom: 'calc(1rem + var(--consent-h, 0px))' }}>
           <span className="size-2 rounded-full bg-muted/40" aria-hidden />
           Kani CI · checking
         </span>
@@ -110,7 +111,8 @@ function KaniBadgeResolved({ status }: { status: KaniStatus }) {
   return (
     <Link
       href={linkHref as any}
-      className="fixed right-4 bottom-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+      className="fixed right-4 z-40 hidden md:inline-flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-1.5 text-xs font-medium text-ink-soft shadow-sm hover:text-ink"
+      style={{ bottom: 'calc(1rem + var(--consent-h, 0px))' }}
       title={titleText}
     >
       <span className={`size-2 rounded-full ${dotColor}`} aria-hidden />
