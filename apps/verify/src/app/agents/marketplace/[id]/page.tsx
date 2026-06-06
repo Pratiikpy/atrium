@@ -126,13 +126,14 @@ export default async function AgentProfilePage({
       <section className="mt-12">
         <h2 className="font-display text-2xl text-ink">Data sources</h2>
         <p className="mt-2 max-w-prose text-sm text-muted">
-          Every number on this page is sourced. Pending means the index is reachable but the
-          measurement has not landed yet (honest empty state, not fake zero).
+          Every number on this page is sourced. Pending means a source is not live yet, either the
+          index is reachable with no measurement landed, or the service is still being provisioned
+          (honest empty state, not fake zero).
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <DataSource label="Scribe (subgraph)" status="live" detail="reads mandate + action history" />
           <DataSource label="Rostrum (on-chain)" status="live" detail="reads reputation + deboost" />
-          <DataSource label="Codex (x402 API)" status="live" detail="reads venue health + price" />
+          <DataSource label="Codex (x402 API)" status="pending" detail="venue health + price, worker pending deploy" />
         </div>
       </section>
 
