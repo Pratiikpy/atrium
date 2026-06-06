@@ -75,8 +75,15 @@ export function AgentsMobile() {
         <NewMandateButton />
       </div>
 
-      {/* Active mandate banner */}
-      {active ? (
+      {/* Active mandate banner. Distinguish error from empty: on a first-load
+          API error mandates.data is undefined -> active undefined -> this showed
+          "No active mandate" (a confident-wrong claim during an outage). The
+          desktop my-mandates-panel shows an explicit error; mirror it. */}
+      {mandates.error ? (
+        <div className="rounded-2xl border border-neg/40 bg-neg/5 px-4 py-5 text-center">
+          <div className="font-mono text-[10.5px] uppercase tracking-wider text-neg">Could not load your mandates</div>
+        </div>
+      ) : active ? (
         <ActiveMandate m={active} />
       ) : (
         <div className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-5 text-center">
