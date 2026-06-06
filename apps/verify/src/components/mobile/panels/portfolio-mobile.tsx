@@ -163,7 +163,14 @@ export function PortfolioMobile() {
               <span className="inline-block h-4 w-32 animate-pulse rounded bg-mob-bg-elev" />
             </li>
           )}
-          {!positions.isLoading && (positions.data?.positions?.length ?? 0) === 0 && (
+          {/* Distinguish error from empty: previously a first-load API error left
+              positions.data undefined, so this rendered "No positions yet" - a
+              confident-wrong claim during an outage. The desktop open-positions
+              table shows an explicit error; mirror it. */}
+          {!positions.isLoading && positions.error && (
+            <li className="p-5 text-center text-[13px] text-neg">Could not load positions</li>
+          )}
+          {!positions.isLoading && !positions.error && (positions.data?.positions?.length ?? 0) === 0 && (
             <li className="p-5 text-center text-mob-muted text-[13px]">
               No positions yet
               <Link href="/app/trade" className="ml-2 underline">Open one</Link>
@@ -189,7 +196,10 @@ export function PortfolioMobile() {
               <span className="inline-block h-4 w-32 animate-pulse rounded bg-mob-bg-elev" />
             </li>
           )}
-          {!activity.isLoading && (activity.data?.activities?.length ?? 0) === 0 && (
+          {!activity.isLoading && activity.error && (
+            <li className="p-5 text-center text-[13px] text-neg">Could not load activity</li>
+          )}
+          {!activity.isLoading && !activity.error && (activity.data?.activities?.length ?? 0) === 0 && (
             <li className="p-5 text-center text-mob-muted text-[13px]">No activity yet</li>
           )}
           {activity.data?.activities?.slice(0, 4).map((a) => (
