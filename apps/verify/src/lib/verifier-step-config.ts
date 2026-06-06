@@ -53,21 +53,21 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     title: 'Deposit USDC to Coffer',
     action: { kind: 'coffer-deposit', amountUsd: '1' },
     pendingReason:
-      'Coffer ERC-4626 vault is not in the deployments registry yet. Step 1 deploys in Month 1 W2.',
+      'Coffer is not reachable in the deployments registry right now.',
   },
   2: {
     step: 2,
     title: 'Open a hedged position on Plinth',
     action: { kind: 'plinth-open-position', pending: true },
     pendingReason:
-      'Plinth Stylus contract not deployed yet (see the launch plan Phase 2).',
+      'Plinth is deployed; the demo open-position is gated on the venue instrument-config (Plinth set_instrument_risk), the pending testnet op. An open reverts until it lands.',
   },
   3: {
     step: 3,
     title: 'Trigger margin recompute',
     action: { kind: 'plinth-recompute-margin', pending: true },
     pendingReason:
-      'Plinth margin-update path ships with the Plinth deploy (Month 1 W2).',
+      'Margin recompute runs against an open position, so it lights up once step 2 (open a position) is runnable.',
   },
   4: {
     step: 4,
@@ -84,7 +84,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     step: 5,
     title: 'Trigger liquidation via Vigil',
     action: { kind: 'vigil-liquidate', pending: true },
-    pendingReason: 'Vigil liquidator deploys in Month 1 W2 alongside Plinth.',
+    pendingReason: 'Vigil is deployed, but a liquidation needs an under-collateralised position, which depends on step 2 (open a position) being runnable first.',
   },
   6: {
     step: 6,
