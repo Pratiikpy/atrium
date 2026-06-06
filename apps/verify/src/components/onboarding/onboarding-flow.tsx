@@ -35,6 +35,7 @@ type FaucetStatus = {
   reason?: string;
   usdcDrop?: number;
   ethDrop?: number;
+  faucetUsdcBalance?: number;
   source: 'pending' | 'faucet';
 };
 
@@ -492,6 +493,16 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
           </tbody>
         </table>
       </div>
+
+      {status?.available &&
+        status.usdcDrop != null &&
+        status.usdcDrop > 0 &&
+        status.faucetUsdcBalance != null &&
+        status.faucetUsdcBalance < status.usdcDrop * 4 && (
+          <p className="mt-3 text-[11px] uppercase tracking-wider text-testnet">
+            Faucet running low · about {Math.floor(status.faucetUsdcBalance / status.usdcDrop)} claims left before it is topped up
+          </p>
+        )}
 
       <div className="mt-8 flex gap-2.5">
         {claimStatus.kind === 'success' ? (
