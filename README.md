@@ -89,11 +89,11 @@ Full address list: [Arbitrum Sepolia](./docs/deployment.md), Robinhood Chain mir
 
 And the money path is on-chain, not a mockup:
 
-| Action                 | Transaction                                                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Withdraw from vault    | [`0x976e…ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
-| Deposit (mobile)       | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
-| Proof-of-reserves root | a fresh signed root is published on-chain every 10 minutes; verify your own balance on [`/lantern`](https://www.useatrium.me/lantern)                       |
+| Action                 | Transaction                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Withdraw from vault    | [`0x976e…ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf)                    |
+| Deposit (mobile)       | [`0x8c8d…0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347)                    |
+| Proof-of-reserves root | a fresh signed root is published on-chain every 10 minutes; verify your own balance on [`/lantern`](https://www.useatrium.me/lantern) |
 
 ## Verify it yourself in 60 seconds
 
@@ -187,13 +187,13 @@ atrium/
 
 ## Docs
 
-| Doc                                                                                | What it answers                                     |
-| ---------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`docs/architecture.md`](./docs/architecture.md)                                   | System architecture and security model              |
-| [`docs/deployment.md`](./docs/deployment.md)                                       | Live URLs and every deployed address                |
-| [`docs/development.md`](./docs/development.md)                                     | Local setup + cloned reference repos                |
-| [`docs/conventions/`](./docs/conventions/)                                         | Security, testing, UI, writing, and git conventions |
-| [`audits/`](./audits/) · [`runbooks/`](./runbooks/) | Security review and ops procedures                |
+| Doc                                                 | What it answers                                     |
+| --------------------------------------------------- | --------------------------------------------------- |
+| [`docs/architecture.md`](./docs/architecture.md)    | System architecture and security model              |
+| [`docs/deployment.md`](./docs/deployment.md)        | Live URLs and every deployed address                |
+| [`docs/development.md`](./docs/development.md)      | Local setup + cloned reference repos                |
+| [`docs/conventions/`](./docs/conventions/)          | Security, testing, UI, writing, and git conventions |
+| [`audits/`](./audits/) · [`runbooks/`](./runbooks/) | Security review and ops procedures                  |
 
 ## Security
 
