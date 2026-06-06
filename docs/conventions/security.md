@@ -19,7 +19,7 @@ Defense in depth, not single points of failure. PRD §21 has the STRIDE matrix p
 
 ## Oracles
 
-Dual oracle with median plus tolerance. Chainlink Data Feeds primary plus Pyth secondary.
+Dual oracle: the median of Chainlink Data Feeds and Pyth within a 50 bps tolerance, or Plinth pauses. Median, not primary plus fallback (ADR-007).
 
 - Both must be live for normal operation
 - If either is stale beyond 60 seconds, revert with `OracleStaleError`
