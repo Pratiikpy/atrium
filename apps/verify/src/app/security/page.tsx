@@ -5,6 +5,10 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Security',
   description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+  openGraph: {
+    title: 'Security · Atrium',
+    description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+  },
 };
 
 export default function SecurityPage() {
