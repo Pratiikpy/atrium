@@ -165,7 +165,7 @@ export function TransferForm() {
             inputMode="decimal"
             value={amount}
             placeholder="0.00"
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-2xl text-ink focus:border-ink/40 focus:outline-none"
           />
           <p className="mt-1 text-[10px] text-muted">

@@ -175,7 +175,7 @@ export function OrderForm({
             inputMode="decimal"
             value={size}
             placeholder="0.00"
-            onChange={(e) => setSize(e.target.value)}
+            onChange={(e) => setSize(e.target.value.replace(/[^0-9.]/g, ''))}
             className="mt-1 w-full rounded-md border border-divider bg-parchment px-3 py-2.5 font-mono text-lg text-ink focus:border-ink/40 focus:outline-none"
           />
         </label>

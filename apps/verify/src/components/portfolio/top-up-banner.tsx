@@ -128,7 +128,7 @@ function TopUpModal({
           type="text"
           inputMode="decimal"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
           className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-3 py-2.5 font-mono text-lg text-ink focus:border-ink/40 focus:outline-none"
         />
       </label>

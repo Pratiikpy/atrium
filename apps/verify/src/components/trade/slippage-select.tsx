@@ -74,7 +74,7 @@ export function SlippageSelect({
           type="text"
           inputMode="decimal"
           value={custom}
-          onChange={(e) => setCustom(e.target.value)}
+          onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ''))}
           onBlur={applyCustom}
           onKeyDown={(e) => e.key === 'Enter' && applyCustom()}
           placeholder="0.00"
