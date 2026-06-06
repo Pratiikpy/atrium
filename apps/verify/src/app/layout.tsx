@@ -43,13 +43,16 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Atrium' },
   openGraph: {
-    title: 'Atrium · verify',
+    // Templated like `title` so a subpage share gets a page-specific og:title
+    // ("Team · Atrium", "Architecture Decision Records · Atrium") instead of
+    // inheriting one generic string. A page's own openGraph.title still wins.
+    title: { template: '%s · Atrium', default: 'Atrium · verify' },
     description: 'Cross-venue portfolio margin on Arbitrum. Verifiable in 90 seconds.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Atrium · cross-venue portfolio margin',
+    title: { template: '%s · Atrium', default: 'Atrium · cross-venue portfolio margin' },
     description: 'One wallet posts collateral once. Trades across venues with one margin number.',
   },
   keywords: ['portfolio margin', 'cross-venue', 'Arbitrum', 'DeFi', 'EVM'],
