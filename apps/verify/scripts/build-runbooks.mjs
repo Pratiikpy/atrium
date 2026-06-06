@@ -75,7 +75,10 @@ function category(slug) {
  */
 const PUBLIC_ALLOWLIST = new Set([
   'deploy.md',
-  'incident-response.md',
+  // incident-response.md pulled (judge loop 2026-06-06): it carries internal
+  // ops detail (Discord #ops-alerts channels, on-call references, multisig pause
+  // commands) and points at removed files (on-call-rotation.md, incidents/) -
+  // same class as the other ops runbooks already removed from public.
   'browserstack-setup.md',
 ]);
 

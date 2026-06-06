@@ -239,7 +239,6 @@ subgraph/INDEXING-LOG.md
 *.fix-note
 runbooks/*.md
 !runbooks/deploy.md
-!runbooks/incident-response.md
 !runbooks/browserstack-setup.md
 
 # Audit-agent scratch (never commit): probe scripts + temp captures

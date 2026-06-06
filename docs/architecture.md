@@ -66,7 +66,7 @@ Off-chain, three services pace the system:
 - **Per-adapter per-block notional cap.** Coffer enforces a notional cap per adapter per block so a compromised adapter can drain at most 1% of TVL per block.
 - **Account abstraction emergency lever.** Postern Kill Switch routes through `Sigil.revoke_all_on_behalf_of` so the revoke counts against the user, not the kill-switch contract.
 
-Full audit history under [`audits/`](../audits/). Incident post-mortems under [`incidents/`](../incidents/).
+Full audit history under [`audits/`](../audits/).
 
 ## Off-chain services
 

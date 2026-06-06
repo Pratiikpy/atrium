@@ -111,10 +111,9 @@ export async function POST(req: NextRequest) {
   }
   chaosLastCall.set(ip, now);
 
-  // The chaos route needs a key to sign with. CHAOS_PRIVATE_KEY isolates
-  // the chaos surface from the deployer EOA per the
-  // 2026-05-24 deployer-key-leak incident (incidents/...). The chaos key
-  // has multisig privileges on the contracts so it can pause / unpause;
+  // The chaos route needs a key to sign with. CHAOS_PRIVATE_KEY isolates the
+  // chaos surface from the deployer EOA as a least-privilege measure. The chaos
+  // key has multisig privileges on the contracts so it can pause / unpause;
   // it does NOT have timelock rights, so it can't drain the protocol.
   const chaosKey = process.env.CHAOS_PRIVATE_KEY;
   if (!chaosKey || !/^0x[0-9a-fA-F]{64}$/.test(chaosKey)) {

@@ -175,7 +175,7 @@ atrium/
 ├── subgraph/                 # The Graph indexer (Scribe)
 ├── tests/                    # Cross-package + adapter-conformance tests
 ├── docs/                     # Architecture, deployment, conventions
-├── audits/  ·  incidents/  ·  runbooks/
+├── audits/  ·  runbooks/
 └── resources/                # Cloned reference repos (see docs/resources.md)
 ```
 
@@ -193,7 +193,7 @@ atrium/
 | [`docs/deployment.md`](./docs/deployment.md)                                       | Live URLs and every deployed address                |
 | [`docs/development.md`](./docs/development.md)                                     | Local setup + cloned reference repos                |
 | [`docs/conventions/`](./docs/conventions/)                                         | Security, testing, UI, writing, and git conventions |
-| [`audits/`](./audits/) · [`incidents/`](./incidents/) · [`runbooks/`](./runbooks/) | Audits, post-mortems, ops procedures                |
+| [`audits/`](./audits/) · [`runbooks/`](./runbooks/) | Security review and ops procedures                |
 
 ## Security
 

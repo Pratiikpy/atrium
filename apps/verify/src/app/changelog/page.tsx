@@ -60,9 +60,9 @@ export default function ChangelogPage() {
         <h1 className="font-display text-5xl text-ink">Changelog</h1>
         <p className="mt-4 max-w-prose text-ink-soft">
           Public milestones, each tied to a dated git tag. Detailed
-          per-release notes live in the repository under{' '}
-          <code className="font-mono text-ink">audits/</code> and{' '}
-          <code className="font-mono text-ink">incidents/</code>.
+          per-release notes live in the dated git tags and{' '}
+          <code className="font-mono text-ink">CHANGELOG.md</code>, with the public
+          security review under <code className="font-mono text-ink">audits/</code>.
         </p>
       </section>
 

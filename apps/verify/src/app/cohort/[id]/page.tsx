@@ -69,7 +69,7 @@ export default async function CohortPartnerPage({ params }: Params) {
             <li>· No incident report on file.</li>
           </ul>
           <p className="mt-4 text-xs text-muted">
-            Partner audit reports land in <code className="font-mono text-ink">incidents/</code> if
+            Partner audit reports are published with the partner&rsquo;s permission if
             anything ever requires one.
           </p>
         </Card>
