@@ -32,7 +32,7 @@ export default function SettingsPage() {
           Wallet &amp; account
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Postern is the ERC-4337 + EIP-7702 layer that holds your passkey, session keys, and gas sponsorship credit.
+          Postern is the ERC-4337 + EIP-7702 layer that holds your passkey and session keys, and sponsors gas once the paymaster ships (gas is self-funded on testnet today).
         </p>
       </header>
 
