@@ -47,8 +47,17 @@ export default function SecurityPage() {
         <Block heading="Disclose a vulnerability">
           <p className="text-ink-soft">
             Email <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>.
-            We respond within 48 hours. Critical issues are triaged same-day. PGP key at{' '}
-            <code className="font-mono">/.well-known/pgp.asc</code>.
+            We respond within 48 hours. Critical issues are triaged same-day. A PGP key will be
+            published once generated; until then, open a private{' '}
+            <a
+              className="text-ink hover:underline"
+              href="https://github.com/Pratiikpy/atrium/security/advisories/new"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              GitHub Security Advisory
+            </a>
+            .
           </p>
         </Block>
 

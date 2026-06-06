@@ -4,7 +4,8 @@
 Contact: mailto:security@useatrium.me
 Contact: https://github.com/Pratiikpy/atrium/security/advisories/new
 Expires: 2027-12-31T23:59:59Z
-Encryption: https://useatrium.me/security/pgp.asc
+# Encryption: a PGP key will be published at /security/pgp.asc once generated.
+# Until then, use the GitHub Security Advisory link above for a private channel.
 Preferred-Languages: en
 Canonical: https://useatrium.me/.well-known/security.txt
 Policy: https://useatrium.me/security
