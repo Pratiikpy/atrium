@@ -21,9 +21,20 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
+/**
+ * Confirmed cohort partner ids. Empty until a partner signs a partnership LOI
+ * and deposits on testnet (the "no inflated numbers" rule). Only a confirmed id
+ * renders the partner template; every other id 404s, so a crafted URL such as
+ * /cohort/<some-firm> cannot render a misleading "Cohort partner: Some Firm"
+ * title for a partnership that does not exist. Add an id here when a partner
+ * actually joins (or wire this to the live Scribe partner list).
+ */
+const CONFIRMED_PARTNER_IDS: readonly string[] = [];
+
 export default async function CohortPartnerPage({ params }: Params) {
   const { id } = await params;
   if (!/^[a-z0-9-]{2,40}$/.test(id)) notFound();
+  if (!CONFIRMED_PARTNER_IDS.includes(id)) notFound();
 
   return (
     <MarketingShell>
