@@ -11,8 +11,8 @@ import { Pill } from "./primitives";
  * while the hero is in view (white wordmark + nav + button on dark bg).
  */
 const NAV_LINKS = [
-  { href: "/#portfolio", label: "Product" },
-  { href: "/#agents", label: "Agents" },
+  { href: "/#portfolio-feature", label: "Product" },
+  { href: "/#agents-feature", label: "Agents" },
   { href: "/architecture", label: "Architecture" },
   { href: "/lantern", label: "Reserves" },
   { href: "/docs", label: "Docs" },
