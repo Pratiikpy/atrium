@@ -6,6 +6,10 @@ import { DISCLOSURES } from '@/app/docs/honesty/page';
 export const metadata = {
   title: 'Docs',
   description: 'Spec, technical design, runbooks, ADRs. Single source of truth.',
+  openGraph: {
+    title: 'Docs · Atrium',
+    description: 'Spec, technical design, runbooks, ADRs. Single source of truth.',
+  },
 };
 
 // Audit honesty fix (#12/#40/#41): cards used to link every doc to a GitHub
