@@ -16,6 +16,9 @@ const PROCESSORS = [
   { name: 'DigitalOcean', url: 'https://digitalocean.com', purpose: 'Daemon hosting (vigil-keeper, lantern-attestor)', data: 'No user PII, service-to-service only', location: 'United States', dpa: 'https://www.digitalocean.com/legal/data-processing-agreement' },
   { name: 'The Graph', url: 'https://thegraph.com', purpose: 'Subgraph indexer (Scribe)', data: 'Public on-chain data only (no PII)', location: 'Decentralized', dpa: null },
   { name: 'Web3.storage', url: 'https://web3.storage', purpose: 'IPFS pinning for Lantern Merkle roots', data: 'Public Merkle roots only (no PII)', location: 'United States', dpa: null },
+  { name: 'Resend', url: 'https://resend.com', purpose: 'Transactional email delivery (opt-in alert notifications)', data: 'Email address, alert content', location: 'United States', dpa: null },
+  { name: 'Telegram', url: 'https://telegram.org', purpose: 'Alert delivery to a user-supplied chat (opt-in)', data: 'Telegram chat ID, alert content', location: 'United Arab Emirates / global', dpa: null },
+  { name: 'Discord', url: 'https://discord.com', purpose: 'Alert delivery to a user-supplied webhook (opt-in)', data: 'Discord webhook URL, alert content', location: 'United States', dpa: null },
 ] as const;
 
 export default function SubProcessorsPage() {
