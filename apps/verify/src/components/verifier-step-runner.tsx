@@ -34,9 +34,9 @@ interface RunState {
  *   - success (tx confirmed → Arbiscan link)
  *   - permission (wrong chain, wrong tier → guidance)
  *
- * Real wiring lands Month 2 when the contracts deploy to Sepolia. This
- * component is the scaffolding the wiring drops into; no fake tx hashes,
- * no fake success states.
+ * The four live steps fire real transactions against the deployed Sepolia
+ * contracts; the pending steps surface their blocker instead of a fake run.
+ * No fake tx hashes, no fake success states.
  */
 export function VerifierStepRunner({ step }: { step: number }) {
   const { address, isConnected, chain } = useAccount();
