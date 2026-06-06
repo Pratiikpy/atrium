@@ -27,8 +27,8 @@ export function MobileBottomNav() {
   const pathname = usePathname() ?? '';
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-mob-hairline bg-mob-bg/85 backdrop-blur-xl"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}
+      className="fixed inset-x-0 z-40 grid grid-cols-5 border-t border-mob-hairline bg-mob-bg/85 backdrop-blur-xl transition-[bottom] duration-200"
+      style={{ bottom: 'var(--consent-h, 0px)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}
       aria-label="Primary"
     >
       {TABS.map(({ href, label, icon: Icon }) => {
