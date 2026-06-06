@@ -245,6 +245,8 @@ runbooks/*.md
 apps/verify/.tmp_audit/
 apps/verify/_vf_*.mjs
 apps/verify/_re_*.mjs
+apps/verify/_vf_*
+apps/verify/vf_*.html
 apps/verify/_check_*.mjs
 apps/verify/.tmp_*
 apps/verify/_audit_shot.mjs
