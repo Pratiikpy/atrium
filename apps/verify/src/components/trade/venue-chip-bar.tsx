@@ -42,8 +42,16 @@ export function VenueChipBar({
             <p className={'mt-1 text-[10px] ' + (isActive ? 'text-dark-white-55' : 'text-muted')}>
               {v.label}
             </p>
-            <p className={'mt-2 text-[10px] uppercase tracking-wider ' + (isActive ? 'text-dark-white-55' : 'text-muted')}>
-              haircut · {(v.haircutBps / 100).toFixed(1)}%
+            {/* Openability cue: only Aave Horizon is tradeable today; the rest
+                are deployed-but-scaffolded (open reverts). Badge 'soon' in amber
+                so a judge sees which venue actually trades before selecting. */}
+            <p
+              className={
+                'mt-2 text-[10px] uppercase tracking-wider ' +
+                (isActive ? 'text-dark-white-55' : v.operational ? 'text-live' : 'text-testnet')
+              }
+            >
+              {v.operational ? 'live' : 'soon'} · haircut {(v.haircutBps / 100).toFixed(1)}%
             </p>
           </button>
         );
