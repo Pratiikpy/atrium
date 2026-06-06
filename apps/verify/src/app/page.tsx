@@ -27,7 +27,7 @@ export const metadata = {
  */
 type LandingData = {
   tvl: string;
-  venuesLive: number;
+  venuesDeployed: number;
   venuesTotal: number;
   agents: string;
   queries: string;
@@ -57,7 +57,7 @@ async function getLandingData(): Promise<LandingData> {
   const minsAgo = ts ? Math.max(0, Math.round((Date.now() / 1000 - ts) / 60)) : null;
   return {
     tvl: typeof m?.testnetTvlUsd === 'string' ? (m.testnetTvlUsd as string) : '—',
-    venuesLive: typeof venues.count === 'number' ? venues.count : 0,
+    venuesDeployed: typeof venues.count === 'number' ? venues.count : 0,
     venuesTotal: typeof venues.total === 'number' ? venues.total : 0,
     agents: m?.registeredAgents != null ? String(m.registeredAgents) : '—',
     queries: m?.codex24hQueries != null ? String(m.codex24hQueries) : '—',
@@ -192,7 +192,7 @@ export default async function LandingPage() {
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Venue adapters</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.venuesLive} / {d.venuesTotal}</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.venuesDeployed} / {d.venuesTotal}</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Margin engine</div>
@@ -544,7 +544,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                 <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>x402 micropayments</div>
               </div>
               <div className="number-big">
-                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesLive} / {d.venuesTotal}</div>
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesDeployed} / {d.venuesTotal}</div>
                 <div className="mono cap muted" style={{ marginTop: 14 }}>Venue adapters deployed</div>
                 <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>Aave Horizon registered; rest ship Month 1 W2</div>
               </div>
@@ -846,7 +846,7 @@ function MobileLanding({ data }: { data: LandingData }) {
                 <div className="mock">
                   <div className="mock-head"><span className="l">Buying power</span><span className="pill">live</span></div>
                   <div className="big">{data.tvl}</div>
-                  <div className="mock-row"><span className="l">Venue adapters</span><span className="v">{data.venuesLive} / {data.venuesTotal}</span></div>
+                  <div className="mock-row"><span className="l">Venue adapters</span><span className="v">{data.venuesDeployed} / {data.venuesTotal}</span></div>
                   <div className="mock-row"><span className="l">Margin</span><span className="v">SPAN</span></div>
                   <div className="mock-row"><span className="l">Engine</span><span className="v">Stylus</span></div>
                 </div>
@@ -889,7 +889,7 @@ function MobileLanding({ data }: { data: LandingData }) {
               <div className="head">Live testnet surface</div>
               <div className="stats-grid">
                 <div className="stat"><div className="l">TVL</div><div className="v">{data.tvl}</div><div className="s">from Scribe</div></div>
-                <div className="stat"><div className="l">Venues</div><div className="v">{data.venuesLive}/{data.venuesTotal}</div><div className="s">registered</div></div>
+                <div className="stat"><div className="l">Venues</div><div className="v">{data.venuesDeployed}/{data.venuesTotal}</div><div className="s">registered</div></div>
                 <div className="stat"><div className="l">Lantern</div><div className="v">{data.lanternRoot}</div><div className="s">{data.lanternMinsAgo}</div></div>
                 <div className="stat"><div className="l">Agents</div><div className="v">{data.agents}</div><div className="s">Rostrum</div></div>
               </div>
