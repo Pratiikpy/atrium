@@ -15,8 +15,9 @@ export default function LoadtestPage() {
       <div className="mx-auto max-w-5xl">
       <h1 className="font-display text-5xl text-ink">Loadtest</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
-        Public latency + gas measurements. A synthetic load generator hits every Atrium contract
-        24/7 at 1, 10, and 100 tx/s tiers. Reproduction script lives in
+        Public latency + gas measurements. The continuous load generator that hits every Atrium
+        contract at 1, 10, and 100 tx/s starts in Phase 9 of the launch roadmap; the figures below
+        are the baseline runs captured so far. Reproduction script lives in
         <code className="ml-1 font-mono text-ink">services/loadtest/</code>.
       </p>
 
