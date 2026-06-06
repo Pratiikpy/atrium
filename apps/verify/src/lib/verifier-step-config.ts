@@ -108,7 +108,7 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
     // deployment-status gate (which reads `?step=7`) keeps the button
     // disabled and renders this banner instead.
     pendingReason:
-      'PosternKillSwitch not deployed yet. Sigil + Postern key registry land per the launch plan Phase 2.',
+      'PosternKillSwitch is not reachable in the deployments registry right now.',
   },
 };
 
