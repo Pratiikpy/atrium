@@ -75,7 +75,11 @@ async function getLandingData(): Promise<LandingData> {
 
 /**
  * Landing page (2026-05-28; reference-parity rebuild 2026-06-03).
- * Responsive single-tree render. No dual-render with separate mobile component.
+ * Currently a dual render, CSS-toggled by viewport: a desktop tree
+ * (.atrium-desktop-only) and a separate mobile tree (.atrium-mobile-only ->
+ * <MobileLanding>). Both read the same getLandingData() so figures never
+ * diverge; the intended end state is a single responsive tree (mobile-unify
+ * tech debt - this ships both trees, so the HTML carries two <h1>s).
  * Previews render REAL backend data (getLandingData), not prototype figures.
  */
 export default async function LandingPage() {
