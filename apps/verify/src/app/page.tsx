@@ -794,7 +794,7 @@ function MobileLanding({ data }: { data: LandingData }) {
               <div className="label-row">
                 <div className="left">
                   <div><strong>Fig. 01</strong> · Capital convergence</div>
-                  <div style={{ marginTop: 3 }}>Plan view · live testnet</div>
+                  <div style={{ marginTop: 3 }}>Plan view · illustrative schematic</div>
                 </div>
                 <div className="right">
                   <div><strong>Sheet 02 / 08</strong></div>
@@ -804,8 +804,8 @@ function MobileLanding({ data }: { data: LandingData }) {
 
               <div className="pool">
                 <div className="l">Pool · unified margin</div>
-                <div className="v">{data.tvl}</div>
-                <div className="s">Buying power · live</div>
+                <div className="v">$10,772,190</div>
+                <div className="s">Buying power · 3.0× portfolio margin</div>
               </div>
 
               <div className="venues">
