@@ -3,7 +3,7 @@ import { buildMetadata } from '@/lib/build-metadata';
 
 export const metadata = buildMetadata({
   title: 'Benchmarks',
-  description: 'Side-by-side comparison against closest comparables. Honest numbers from competitor docs and on-chain reads.',
+  description: 'Side-by-side qualitative comparison against the closest comparables, checked against each protocol public docs and on-chain reads. Honest where Atrium loses.',
   canonical: '/benchmarks',
 });
 
@@ -13,7 +13,8 @@ export default function BenchmarksPage() {
       <div className="mx-auto max-w-4xl">
       <h1 className="font-display text-5xl text-ink">Benchmarks</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
-        Side-by-side against the closest comparables. Numbers come from competitor docs and on-chain reads.
+        Side-by-side against the closest comparables. Each row is a qualitative check against each
+        protocol&rsquo;s public docs and our own on-chain reads, not a head-to-head benchmark number.
         Where Atrium loses, we say so.
       </p>
 
