@@ -86,7 +86,7 @@ export const SUBSYSTEMS = {
   edict: {
     brand: 'Edict',
     plain: 'Access tiers',
-    benefit: 'Optional KYC tiers that unlock features for jurisdictions that require them.',
+    benefit: 'Optional KYC tiers that enable features for jurisdictions that require them.',
   },
   tablet: {
     brand: 'Tablet',

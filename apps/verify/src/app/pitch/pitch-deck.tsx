@@ -143,7 +143,6 @@ function Founder() {
         </p>
       </div>
       <figure className="dk-founder-photo">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/assets/founder.jpg" alt="Pratik presenting Atrium" loading="eager" />
         <figcaption>Speaking on Web3 at a college event I hosted</figcaption>
       </figure>
