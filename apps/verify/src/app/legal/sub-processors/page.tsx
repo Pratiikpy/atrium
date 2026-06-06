@@ -19,6 +19,8 @@ const PROCESSORS = [
   { name: 'Resend', url: 'https://resend.com', purpose: 'Transactional email delivery (opt-in alert notifications)', data: 'Email address, alert content', location: 'United States', dpa: null },
   { name: 'Telegram', url: 'https://telegram.org', purpose: 'Alert delivery to a user-supplied chat (opt-in)', data: 'Telegram chat ID, alert content', location: 'United Arab Emirates / global', dpa: null },
   { name: 'Discord', url: 'https://discord.com', purpose: 'Alert delivery to a user-supplied webhook (opt-in)', data: 'Discord webhook URL, alert content', location: 'United States', dpa: null },
+  { name: 'Coinbase Wallet SDK', url: 'https://www.coinbase.com', purpose: 'Coinbase Wallet connector in the wallet picker; its SDK pings cca-lite.coinbase.com on page load', data: 'IP address, connection telemetry', location: 'United States', dpa: null },
+  { name: 'WalletConnect', url: 'https://walletconnect.com', purpose: 'Wallet connection relay when you connect a non-injected wallet', data: 'Wallet address, session + pairing metadata', location: 'Global (decentralized relay)', dpa: null },
 ] as const;
 
 export default function SubProcessorsPage() {
@@ -27,7 +29,7 @@ export default function SubProcessorsPage() {
       <article className="mx-auto max-w-4xl space-y-8 text-ink-soft">
         <header>
           <h1 className="font-display text-5xl text-ink">Sub-processors</h1>
-          <p className="mt-2 text-sm italic text-muted">Last updated: 2026-05-28</p>
+          <p className="mt-2 text-sm italic text-muted">Last updated: 2026-06-06</p>
           <p className="mt-2">
             Third-party services that process data on behalf of Atrium. Changes to this list
             are published in <Link href="/changelog" className="underline">/changelog</Link>.
