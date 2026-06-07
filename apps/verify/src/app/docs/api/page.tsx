@@ -31,7 +31,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/margin/:user',
     summary: 'Plinth margin number for a wallet. Returns collateral, required margin, buying power, paused state.',
     pricing: '$0.001 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/margin/0xYourWallet`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/margin/0xYourWallet`,
     status: 'pending',
   },
   {
@@ -39,7 +39,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/positions/:user',
     summary: 'Open positions across every Portico-whitelisted venue. Includes notional, entry, mark (when oracle live), unrealised PnL.',
     pricing: '$0.001 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/positions/0xYourWallet`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/positions/0xYourWallet`,
     status: 'pending',
   },
   {
@@ -47,7 +47,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/risk/:user',
     summary: 'Per-venue risk decomposition. Maps each venue to its share of total required margin + haircut applied.',
     pricing: '$0.002 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/risk/0xYourWallet`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/risk/0xYourWallet`,
     status: 'pending',
   },
   {
@@ -55,7 +55,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/venues',
     summary: 'Live venue health table. Per-venue: deployed address, paused state, last oracle ts, notional cap remaining this block.',
     pricing: '$0.0005 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/venues`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/venues`,
     status: 'pending',
   },
   {
@@ -63,7 +63,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/agents/:id/perf',
     summary: 'Agent performance snapshot. 7/30/90 day PnL, total actions, failure rate, deboost tier, mandate count.',
     pricing: '$0.001 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/agents/augur/perf`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/agents/augur/perf`,
     status: 'pending',
   },
   {
@@ -71,7 +71,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/backtest/:strategy',
     summary: 'Replay a published ResearchAttestation backtest. Returns IPFS notebook URL + delta bps + trade count.',
     pricing: '$0.005 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/backtest/mean-reversion-v1`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/backtest/mean-reversion-v1`,
     status: 'pending',
   },
   {
@@ -79,7 +79,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/attestation/:wallet',
     summary: 'Lantern proof-of-reserves Merkle proof for a wallet. Returns latest root + the inclusion path.',
     pricing: '$0.0005 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://codex.useatrium.me/attestation/0xYourWallet`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/attestation/0xYourWallet`,
     status: 'pending',
   },
   {
@@ -87,7 +87,7 @@ const ENDPOINTS: Endpoint[] = [
     path: '/options/:symbol',
     summary: 'Stoa Black-Scholes Greeks for a tokenized option. Strike + expiry inferred from symbol.',
     pricing: '$0.002 per call',
-    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://codex.useatrium.me/options/rTSLA-DEC25-180C`,
+    exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/options/rTSLA-DEC25-180C`,
     status: 'pending',
   },
 ];
@@ -126,7 +126,7 @@ X402_TOKEN=$(./gen-x402.sh 0.001 0x...codex-address)
 
 # 2. Call any Codex endpoint with the token
 curl -H "X-PAYMENT: $X402_TOKEN" \\
-     https://codex.useatrium.me/margin/0xYourWallet
+     https://atrium-codex.prtk8899.workers.dev/v1/margin/0xYourWallet
 
 # Response (illustrative shape; values are an example, not a live read):
 # {
@@ -227,7 +227,7 @@ import { arbitrumSepolia } from 'viem/chains';
 
 const wallet = createWalletClient({ chain: arbitrumSepolia, transport: http() });
 const token = await x402Sign(wallet, { amountUsd: 0.001, recipient: CODEX_ADDR });
-const res = await fetch('https://codex.useatrium.me/margin/' + userAddr, {
+const res = await fetch('https://atrium-codex.prtk8899.workers.dev/v1/margin/' + userAddr, {
   headers: { 'X-PAYMENT': token },
 });
 const data = await res.json();`}
@@ -240,7 +240,7 @@ import httpx
 
 token = x402_sign(amount_usd=0.001, recipient=CODEX_ADDR, signer=wallet)
 r = httpx.get(
-    f'https://codex.useatrium.me/margin/{user_addr}',
+    f'https://atrium-codex.prtk8899.workers.dev/v1/margin/{user_addr}',
     headers={'X-PAYMENT': token},
 )
 data = r.json()`}

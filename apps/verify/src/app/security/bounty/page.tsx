@@ -28,7 +28,7 @@ export default function BountyPage() {
               </ul>
             </li>
             <li>Atrium app at <code className="font-mono text-ink">useatrium.me</code></li>
-            <li>Codex API at <code className="font-mono text-ink">codex.useatrium.me</code> (live on worker deploy)</li>
+            <li>Codex API at <code className="font-mono text-ink">atrium-codex.prtk8899.workers.dev</code> (live)</li>
             <li>Tablet API at <code className="font-mono text-ink">tablet.useatrium.me</code> (when behind auth)</li>
           </ul>
         </section>
