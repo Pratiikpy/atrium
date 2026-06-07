@@ -7,9 +7,9 @@ dataSources:
     name: Plinth
     network: arbitrum-sepolia
     source:
-      address: "0xd86f579ec880eaab27dfa698ae056d1893ec7553"
+      address: "0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e"
       abi: Plinth
-      startBlock: 270803107
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,9 +51,9 @@ dataSources:
     name: Vigil
     network: arbitrum-sepolia
     source:
-      address: "0x5ccd3422f430f6d034ff46715b41509de9d0deed"
+      address: "0x348b0a08df4372a804a5faa118428393c2cfaff5"
       abi: Vigil
-      startBlock: 270802353
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -90,9 +90,9 @@ dataSources:
     name: Coffer
     network: arbitrum-sepolia
     source:
-      address: "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3"
+      address: "0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd"
       abi: Coffer
-      startBlock: 270800974
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -196,9 +196,9 @@ dataSources:
     name: Sigil
     network: arbitrum-sepolia
     source:
-      address: "0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9"
+      address: "0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f"
       abi: Sigil
-      startBlock: 270801710
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -250,9 +250,9 @@ dataSources:
     name: PorticoRegistry
     network: arbitrum-sepolia
     source:
-      address: "0x9a9af6e50491cd4694699d48564bbff18f9b40bc"
+      address: "0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd"
       abi: PorticoRegistry
-      startBlock: 270408449
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -418,9 +418,9 @@ dataSources:
     name: AtriumRouter
     network: arbitrum-sepolia
     source:
-      address: "0xf593e012196bde8a58ccdbf685f7a74fd3bd35e0"
+      address: "0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3"
       abi: AtriumRouter
-      startBlock: 270726101
+      startBlock: 274700000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
