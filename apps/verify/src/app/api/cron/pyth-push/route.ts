@@ -29,8 +29,14 @@ export async function GET(req: NextRequest) {
   // Vercel attaches `Authorization: Bearer ${CRON_SECRET}` to cron invocations.
   // Reject anything else so the endpoint can't be spammed publicly (each call
   // spends testnet ETH on a real on-chain tx).
+  // Fail CLOSED: a missing CRON_SECRET must reject, never wave callers through.
+  // (Each invocation spends real testnet ETH on an on-chain tx, so an open
+  // endpoint is a drain vector, not just an info leak.)
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!secret) {
+    return NextResponse.json({ error: 'server_misconfigured' }, { status: 500 });
+  }
+  if (req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
