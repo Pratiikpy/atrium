@@ -9,6 +9,7 @@ import { useOpenPosition } from '@/lib/use-open-position';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
+import { walletQuery } from '@/lib/use-scoped-wallet';
 import { SlippageSelect } from '@/components/trade/slippage-select';
 import { HelpTip } from '@/components/ui/help-tip';
 
@@ -36,12 +37,17 @@ interface ImpactPreview {
   source: 'plinth' | 'pending';
 }
 
-async function fetchImpact(sizeUsd: string, venue: string): Promise<ImpactPreview> {
-  if (!sizeUsd || parseFloat(sizeUsd) <= 0) {
+async function fetchImpact(sizeUsd: string, venue: string, wallet?: string): Promise<ImpactPreview> {
+  if (!sizeUsd || parseFloat(sizeUsd) <= 0 || !wallet) {
     return { initialMarginUsd: '-', maintenanceMarginUsd: '-', source: 'pending' };
   }
   try {
-    const r = await fetch(`/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}`);
+    // The margin-impact route is IDOR-locked (requireWalletMatch): it MUST
+    // receive the connected wallet. Without it the route falls back to
+    // DEMO_WALLET and 403s the real session ("Wallet mismatch"), which the
+    // catch below swallows into source:'pending' - so the live preview never
+    // populated for a real connected user. Pass the wallet through.
+    const r = await fetch(walletQuery(`/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}`, wallet));
     if (!r.ok) throw new Error();
     const j = await r.json();
     return { initialMarginUsd: j.initialMarginUsd ?? null, maintenanceMarginUsd: j.maintenanceMarginUsd ?? null, source: j.source ?? 'pending' };
@@ -76,9 +82,9 @@ export function OrderForm({
   const deferredSize = useDeferredValue(size);
 
   const { data: impact } = useQuery({
-    queryKey: ['order-form-impact', deferredSize, venue],
-    queryFn: () => fetchImpact(deferredSize, venue),
-    enabled: deferredSize.length > 0,
+    queryKey: ['order-form-impact', deferredSize, venue, address],
+    queryFn: () => fetchImpact(deferredSize, venue, address),
+    enabled: deferredSize.length > 0 && !!address,
     refetchInterval: 10_000,
   });
   const { data: deployment } = useDeploymentStatus(2);
