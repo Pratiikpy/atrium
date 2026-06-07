@@ -49,29 +49,29 @@
       "block": 270408479
     },
     "coffer": {
-      "address": "0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd",
-      "tx": "0xc8a0bae453cc659e019fc3a135972c440e57d3431d7be452cfd244056e9b661d",
+      "address": "0x64b6aa920044878cf6fe74786f3a5c7c3f30376e",
+      "tx": "0xdfc0a7ce89419e1f6e3c47d4be3f93cdc2f839891a61408778ca14d3947e1f0c",
       "block": 270800974,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T06:23:07.414Z",
+      "deployed_at": "2026-06-07T23:45:42.722Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "sigil": {
-      "address": "0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f",
-      "tx": "0x8cd19692e349a1afb6a3e1d2c1a3896cfb4393259c479c684c111d0118c769ee",
+      "address": "0x9d8424bd5e7b639ba7abaff3d09d2a9e7bcb445f",
+      "tx": "0x316c5b26e23a68b04a1736b048d78f3df9689899d58db673c93e810bba860fe6",
       "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
       "block": 270801710,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T06:24:16.682Z",
+      "deployed_at": "2026-06-07T23:46:19.898Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "vigil": {
-      "address": "0x348b0a08df4372a804a5faa118428393c2cfaff5",
-      "tx": "0x44b3a4f9a096e90ef567cd687594403b999c73582f907eb696b679059d71ce6b",
+      "address": "0xbd7169203dc65068dfb3a4fa4712ff26f48cfc85",
+      "tx": "0x34c66a763055397d0dfe214cfcb06f3309203e8ba961772d4993fe3f4c06b216",
       "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
       "block": 270802353,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T06:25:32.451Z",
+      "deployed_at": "2026-06-07T23:47:13.699Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "plinth-math": {
@@ -91,15 +91,15 @@
       "note": "Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
-      "address": "0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e",
-      "tx": "0xd68253fff6c6562174de7c96ca2a06ce15fef433b70a6881787cfb04b53c9d59",
+      "address": "0xeccfa8220ff56e7848cccaeffbacf4e8442cf20b",
+      "tx": "0xe10c3d796d465b2af8adf0e4eeb5d8cea78d1de7b8f5cd1fbc220faa64dfd5db",
       "block": 270803107,
       "kind": "stylus",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7).",
-      "deployed_at": "2026-06-07T06:26:40.685Z"
+      "deployed_at": "2026-06-07T23:48:33.269Z"
     },
     "atrium-router": {
-      "address": "0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3",
+      "address": "0x29531F665821A107c8b9bC15F93a6E1A4ACA1aB7",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
