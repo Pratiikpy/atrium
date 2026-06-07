@@ -1,0 +1,8 @@
+# Test scratch — never deploy. The live Rabby wallet profiles under
+# qa-evidence churn temp files (BrowserMetrics-*.pma) during a UI test
+# run, which races the archive upload and fails the deploy with ENOENT.
+# These are E2E fixtures, not app source.
+qa-evidence
+.forge-cache
+arch_tmp.html
+honesty_tmp.html
