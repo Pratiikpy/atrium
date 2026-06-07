@@ -4,8 +4,10 @@ vi.mock('@/lib/portfolio-source', () => ({
   tryGetPlinth: vi.fn(),
   tryGetCofferCollateralAssets: vi.fn(),
 }));
+vi.mock('@/lib/scribe-helpers', () => ({ gql: vi.fn() }));
 
 import { tryGetPlinth, tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
+import { gql } from '@/lib/scribe-helpers';
 
 /**
  * Iter 64 audit fix: locks the LL-9 fix on /api/portfolio/summary.
@@ -53,6 +55,9 @@ describe('GET /api/portfolio/summary, LL-9 formatUsd', () => {
   it('formats USDC values with $ prefix and 2 decimals', async () => {
     // 1_500_000 micro-USDC = $1.50
     (tryGetPlinth as any).mockResolvedValue(fakePlinth(1_500_000n, 500_000n, 2_000_000n, false));
+    // OPEN NOTIONAL now sums |notional| of OPEN positions from Scribe (the
+    // get_account()[2] the route used to read is margin_version, not notional).
+    (gql as any).mockResolvedValue({ positions: [{ notionalSigned: '2000000' }] });
     const { GET } = await import('./route');
     const json = await (await GET()).json();
     expect(json.totalAccountValueUsd).toBe('$1.50');

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { tryGetPlinth, tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
 import { formatUsd } from '@/lib/format-usd';
+import { gql } from '@/lib/scribe-helpers';
 import { requireWalletMatch } from '@/lib/auth-session';
 import { noCacheHeaders } from '@/lib/no-cache-headers';
 
@@ -32,7 +33,10 @@ export async function GET(req?: Request) {
     });
   }
   try {
-    const [, required, notional, paused] = await plinth.read.getAccount([wallet]);
+    // get_account returns (collateral, requiredMargin, marginVersion, isPaused).
+    // The 3rd value is the margin VERSION counter, NOT notional - reading it as
+    // notional made OPEN NOTIONAL render ~$0.00 even with a live open position.
+    const [, required, , paused] = await plinth.read.getAccount([wallet]);
     // Collateral is read LIVE from the Coffer (convertToAssets), NOT Plinth's
     // cached collateral_value_wei. Plinth caches the raw ERC-4626 share balance,
     // which is stale until a recompute and ~1e6x inflated on a small vault, so
@@ -54,6 +58,30 @@ export async function GET(req?: Request) {
     // Free margin = collateral above what open positions require, clamped at 0.
     // Mirrors the buying-power route's definition so the two surfaces agree.
     const free = collateral > required ? collateral - required : 0n;
+    // OPEN NOTIONAL = sum of |notional| of the user's OPEN positions, read from
+    // Scribe (the same source the positions table uses). Best-effort: a Scribe
+    // hiccup leaves notional at 0 rather than failing the whole summary.
+    let totalNotionalRaw = 0n;
+    try {
+      const posData = await gql<{ positions: Array<{ notionalSigned: string }> }>(
+        `query Notional($u: Bytes!) {
+          positions(where: { owner: $u, closedAtBlock: null }, first: 200) { notionalSigned }
+        }`,
+        { u: wallet.toLowerCase() },
+      );
+      for (const p of posData.positions ?? []) {
+        const n = BigInt(p.notionalSigned);
+        totalNotionalRaw += n < 0n ? -n : n;
+      }
+    } catch {
+      // Scribe unavailable: show $0 notional rather than 500 the whole summary.
+    }
+    // Utilisation = posted margin as a share of collateral, only meaningful when
+    // there is an open position (else OPEN NOTIONAL sub reads "No open positions yet").
+    const utilisationPct =
+      totalNotionalRaw > 0n && collateral > 0n
+        ? Number((required * 10000n) / collateral) / 100
+        : null;
     // Audit LL-9 fix: hand-rolled `fmtUsdc` truncated the fractional part
     // (`$1.99` for $1.999999) instead of locale-rounding. Use the
     // CI-tested formatUsd helper for consistent rounding + thousands
@@ -68,7 +96,8 @@ export async function GET(req?: Request) {
       totalCollateralUsd: formatUsd(collateral, USDC_DECIMALS),
       buyingPowerUsd: formatUsd(free, USDC_DECIMALS),
       totalRequiredMarginUsd: formatUsd(required, USDC_DECIMALS),
-      totalNotionalUsd: formatUsd(notional, USDC_DECIMALS),
+      totalNotionalUsd: formatUsd(totalNotionalRaw, USDC_DECIMALS),
+      utilisationPct,
       // Audit U-23: pre-fix the success path returned `pnl24hUsd: null` with
       // `pnl24hDirection: 'flat'`, direction implies "we measured a flat
       // PnL" but the value is null because we never measured. The pending
