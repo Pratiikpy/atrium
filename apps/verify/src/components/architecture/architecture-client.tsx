@@ -53,7 +53,7 @@ const NODES: MapNode[] = [
     blurb:
       'The dispatcher. Takes a signed transaction and routes it: collateral to Coffer, a margin recompute on Plinth, and the position to the right per-venue adapter.',
     tags: ['Solidity', 'router', 'v1.1'],
-    address: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0',
+    address: '0x09BE855e5CA0fB3c11c4D0d2708660Dcc963a004',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -143,7 +143,7 @@ const CORE_15: Row[] = [
   { name: 'Plinth-Oracle', address: '0x66064d18722f50e055d74daf51a13fd8e331f0b7', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Sigil', address: '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Vigil', address: '0x5ccd3422f430f6d034ff46715b41509de9d0deed', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'AtriumRouter', address: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'AtriumRouter', address: '0x09BE855e5CA0fB3c11c4D0d2708660Dcc963a004', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PorticoRegistry', address: '0x9a9af6e50491cd4694699d48564bbff18f9b40bc', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PraetorTimelock', address: '0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PosternKillSwitch', address: '0xCD899f715462A33Ae880310d72b37bde102ab0b7', lang: 'SOLIDITY', explorer: ARBISCAN },

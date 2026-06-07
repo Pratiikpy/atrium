@@ -99,11 +99,11 @@
       "deployed_at": "2026-05-24T15:28:58.569Z"
     },
     "atrium-router": {
-      "address": "0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0",
+      "address": "0x09BE855e5CA0fB3c11c4D0d2708660Dcc963a004",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror. | SUPERSEDED 2026-06-02: points at DEAD old plinth 0x485218e3 + 4-arg pre-V11 source; replaced by atrium-router-v2 (pending 48h adapter-auth cutover)."
+      "note": "2026-06-07 CUTOVER DONE: verified V11 AtriumRouter 0x09BE (Sourcify + Etherscan verified, 5-arg) wired to live plinth 0xd86f579e / coffer 0xc7bf0145 / registry 0x9a9af6e5. Supersedes the unverified 0xF593."
     },
     "rostrum": {
       "address": "0x748A0a4E53F3E94f9a279bfDC5eCbF8A7c88f093",
