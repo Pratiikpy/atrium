@@ -49,7 +49,7 @@ jobs:
           LANTERN_ATTESTOR_ADDRESS:   ${{ secrets.LANTERN_CONTRACT_ADDR }}
           COFFER_ADDRESS:             ${{ secrets.COFFER_ADDR }}
           USDC_ADDR:                  ${{ secrets.USDC_ADDR }}
-          WEB3_STORAGE_TOKEN:         ${{ secrets.WEB3_STORAGE_TOKEN }}
+          PINATA_JWT:                 ${{ secrets.PINATA_JWT }}
           LANTERN_KEY_PASSPHRASE:     ${{ secrets.LANTERN_KEY_PASSPHRASE }}
       - name: Notify ops on failure
         if: failure()

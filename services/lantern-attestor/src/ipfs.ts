@@ -1,7 +1,7 @@
 import type { Tree } from './merkle';
 
 /**
- * Pin the Merkle tree (leaves + layers) to IPFS via web3.storage free tier.
+ * Pin the Merkle tree (leaves + layers) to IPFS via Pinata.
  * Users download the tree and verify their own inclusion proof.
  *
  * Audit XXX-2 + XXX-3: shares the same CID validation pattern used by the
@@ -15,9 +15,12 @@ const CID_REGEX = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{58,127})$/;
 const PIN_TIMEOUT_MS = 30_000;
 
 export async function pinTreeToIpfs(tree: Tree): Promise<string> {
-  const token = process.env.WEB3_STORAGE_TOKEN;
+  // Pinata replaces the retired web3.storage upload API (api.web3.storage was
+  // shut down when web3.storage migrated to Storacha/w3up). Pinata's
+  // pinJSONToIPFS keeps the same simple Bearer-token + single-POST shape.
+  const token = process.env.PINATA_JWT;
   if (!token) {
-    console.warn('[lantern] WEB3_STORAGE_TOKEN missing; skipping IPFS pin');
+    console.warn('[lantern] PINATA_JWT missing; skipping IPFS pin');
     return '';
   }
 
@@ -33,26 +36,28 @@ export async function pinTreeToIpfs(tree: Tree): Promise<string> {
     })),
   };
 
-  // Audit XXX-2 fix: explicit timeout. Pre-fix the Lantern hourly cron
-  // could hang forever on a slow web3.storage response, stalling
-  // subsequent publishes. 30s is generous for a typical tree-payload
-  // upload (sub-100KB) while bounding the worst case.
-  const r = await fetch('https://api.web3.storage/upload', {
+  // Audit XXX-2 fix: explicit timeout. Pre-fix the Lantern cron could hang
+  // forever on a slow pin response, stalling subsequent publishes. 30s is
+  // generous for a typical tree-payload upload (sub-100KB).
+  const r = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      pinataContent: payload,
+      pinataMetadata: { name: `lantern-tree-${payload.root}` },
+    }),
     signal: AbortSignal.timeout(PIN_TIMEOUT_MS),
   });
-  if (!r.ok) throw new Error(`web3.storage ${r.status}`);
-  const json = (await r.json()) as { cid?: unknown };
+  if (!r.ok) throw new Error(`pinata ${r.status}`);
+  const json = (await r.json()) as { IpfsHash?: unknown };
   // Audit XXX-3 fix: validate the returned CID shape before propagating.
   // A malformed CID reaching downstream consumers would be the same SSRF
   // surface as UUU-2 / R-1, keep this check in sync with those regexes.
-  if (typeof json.cid !== 'string' || !CID_REGEX.test(json.cid)) {
-    throw new Error(`web3.storage returned malformed CID: ${typeof json.cid}`);
+  if (typeof json.IpfsHash !== 'string' || !CID_REGEX.test(json.IpfsHash)) {
+    throw new Error(`pinata returned malformed CID: ${typeof json.IpfsHash}`);
   }
-  return json.cid;
+  return json.IpfsHash;
 }
