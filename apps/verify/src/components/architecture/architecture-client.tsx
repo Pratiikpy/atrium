@@ -53,7 +53,7 @@ const NODES: MapNode[] = [
     blurb:
       'The dispatcher. Takes a signed transaction and routes it: collateral to Coffer, a margin recompute on Plinth, and the position to the right per-venue adapter.',
     tags: ['Solidity', 'router', 'v1.1'],
-    address: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0',
+    address: '0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -65,7 +65,7 @@ const NODES: MapNode[] = [
     blurb:
       'Your collateral. An ERC-4626 USDC vault with a per-block per-adapter pull cap, so a compromised adapter can drain at most ~1% of TVL in a block. Refuses to operate when USDC state is unreadable.',
     tags: ['Stylus', 'ERC-4626', 'per-block cap'],
-    address: '0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3',
+    address: '0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -77,7 +77,7 @@ const NODES: MapNode[] = [
     blurb:
       'The heart of Atrium. SPAN portfolio margin: one buying-power number across venues that nets correlated exposure. Split into Plinth, Plinth-Math, and Plinth-Oracle to fit the 24KB code cap.',
     tags: ['Stylus', 'dual-oracle', 'SPAN'],
-    address: '0xd86f579ec880eaab27dfa698ae056d1893ec7553',
+    address: '0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -101,7 +101,7 @@ const NODES: MapNode[] = [
     blurb:
       'Turns one typed signature into a bounded agent mandate: one agent, one strategy, one cap, one expiry. The Postern Kill Switch routes through Sigil to revoke every mandate at once.',
     tags: ['Stylus', 'EIP-712', 'mandates'],
-    address: '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9',
+    address: '0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -113,7 +113,7 @@ const NODES: MapNode[] = [
     blurb:
       'Three independent keepers race to liquidate any account that falls under-collateralised. Liquidations are partial (≤10% per block) and route to the most-liquid venue first.',
     tags: ['Stylus', 'keepers', 'partial'],
-    address: '0x5ccd3422f430f6d034ff46715b41509de9d0deed',
+    address: '0x348b0a08df4372a804a5faa118428393c2cfaff5',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -137,14 +137,14 @@ const RH_EXPLORER = 'https://testnet.robinhood.com/address/'; // Robinhood Chain
 type Row = { name: string; address: string; lang: Lang; explorer: string };
 
 const CORE_15: Row[] = [
-  { name: 'Coffer', address: '0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Plinth', address: '0xd86f579ec880eaab27dfa698ae056d1893ec7553', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Coffer', address: '0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Plinth', address: '0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Plinth-Math', address: '0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Plinth-Oracle', address: '0x66064d18722f50e055d74daf51a13fd8e331f0b7', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Sigil', address: '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Vigil', address: '0x5ccd3422f430f6d034ff46715b41509de9d0deed', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'AtriumRouter', address: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0', lang: 'SOLIDITY', explorer: ARBISCAN },
-  { name: 'PorticoRegistry', address: '0x9a9af6e50491cd4694699d48564bbff18f9b40bc', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'Sigil', address: '0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Vigil', address: '0x348b0a08df4372a804a5faa118428393c2cfaff5', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'AtriumRouter', address: '0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'PorticoRegistry', address: '0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PraetorTimelock', address: '0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PosternKillSwitch', address: '0xCD899f715462A33Ae880310d72b37bde102ab0b7', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'LanternAttestor v2', address: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888', lang: 'SOLIDITY', explorer: ARBISCAN },

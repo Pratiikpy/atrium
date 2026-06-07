@@ -327,11 +327,11 @@ function Moat() {
 
 /* ── Slide 5 · The architecture ──────────────────────────────── */
 const CORE = [
-  { name: 'Coffer', lang: 'STYLUS', blurb: 'ERC-4626 vault. Holds collateral once; orchestrators pull up to a per-block cap.', addr: '0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3' },
-  { name: 'Plinth', lang: 'STYLUS', blurb: 'SPAN margin engine. One buying-power number across venues, netting correlated risk.', addr: '0xd86f579ec880eaab27dfa698ae056d1893ec7553' },
-  { name: 'Sigil', lang: 'STYLUS', blurb: 'EIP-712 agent mandates. Capped, time-boxed delegations with a one-tap kill switch.', addr: '0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9' },
-  { name: 'Vigil', lang: 'STYLUS', blurb: 'Liquidation engine. Soft-liquidates an account before it goes underwater.', addr: '0x5ccd3422f430f6d034ff46715b41509de9d0deed' },
-  { name: 'AtriumRouter', lang: 'SOLIDITY', blurb: 'Opens a position across margin, vault, and adapter in a single transaction.', addr: '0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0' },
+  { name: 'Coffer', lang: 'STYLUS', blurb: 'ERC-4626 vault. Holds collateral once; orchestrators pull up to a per-block cap.', addr: '0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd' },
+  { name: 'Plinth', lang: 'STYLUS', blurb: 'SPAN margin engine. One buying-power number across venues, netting correlated risk.', addr: '0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e' },
+  { name: 'Sigil', lang: 'STYLUS', blurb: 'EIP-712 agent mandates. Capped, time-boxed delegations with a one-tap kill switch.', addr: '0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f' },
+  { name: 'Vigil', lang: 'STYLUS', blurb: 'Liquidation engine. Soft-liquidates an account before it goes underwater.', addr: '0x348b0a08df4372a804a5faa118428393c2cfaff5' },
+  { name: 'AtriumRouter', lang: 'SOLIDITY', blurb: 'Opens a position across margin, vault, and adapter in a single transaction.', addr: '0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3' },
   { name: 'Lantern', lang: 'SOLIDITY', blurb: 'Publishes a signed Merkle proof-of-reserves root roughly hourly.', addr: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888' },
 ];
 function Architecture() {
