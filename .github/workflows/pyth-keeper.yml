@@ -1,0 +1,49 @@
+name: pyth-keeper
+
+# Keeps the on-chain Pyth USDC/USD price fresh inside Plinth's 60s window so
+# Aave-Horizon opens never revert ERR_ORACLE_STALE. Free always-on keeper for
+# Hobby (no Vercel Pro): each run self-loops for ~5.4h pushing every ~50s, and
+# the */30 cron restarts it. GitHub throttles schedules (see the Lantern
+# incident: cron fires hours apart), so the long in-run loop is what actually
+# provides coverage; the cron + workflow_dispatch just (re)start it. The
+# equivalent Vercel cron lives in apps/verify (route + vercel.json) and is the
+# cleaner path once the project is on Pro.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+# Don't stack runs: a fresh dispatch cancels the previous long-lived loop.
+concurrency:
+  group: pyth-keeper
+  cancel-in-progress: true
+
+jobs:
+  keep-fresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Foundry (cast)
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Push fresh Pyth price every ~50s
+        env:
+          ARBITRUM_SEPOLIA_RPC_URL: ${{ secrets.ARBITRUM_SEPOLIA_RPC_URL }}
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.PYTH_KEEPER_KEY }}
+        run: |
+          if [ -z "$ARBITRUM_SEPOLIA_RPC_URL" ] || [ -z "$DEPLOYER_PRIVATE_KEY" ]; then
+            echo "missing ARBITRUM_SEPOLIA_RPC_URL or PYTH_KEEPER_KEY secret"; exit 1
+          fi
+          end=$((SECONDS + 19800))   # ~5.5h, just under the job timeout
+          n=0
+          while [ "$SECONDS" -lt "$end" ]; do
+            n=$((n + 1))
+            if bash scripts/pyth-push-usdc.sh >/tmp/push.log 2>&1; then
+              echo "[$n] pushed @ ${SECONDS}s"
+            else
+              echo "[$n] push failed (will retry next tick):"; tail -2 /tmp/push.log
+            fi
+            sleep 50
+          done
+          echo "loop done after $n pushes; cron will restart"
