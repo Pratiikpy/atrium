@@ -84,16 +84,20 @@ async function main() {
   if (!coffer || !plinth) throw new Error('coffer/plinth missing from Stylus checkpoint; run redeploy-stylus.mjs first');
   const { pk, address: deployer } = await loadDeployerKey();
   console.log(`Deployer: ${deployer}\nCoffer: ${coffer}\nPlinth: ${plinth}`);
+  // No-48h test deploy: DEPLOY_ADMIN_AS_DEPLOYER=1 sets the Router/Aave/Aqueduct
+  // praetor_timelock to the deployer EOA, so setAuthorizedCaller etc. are direct
+  // deployer calls instead of 48h-timelock-gated. Testnet-only; prod keeps TIMELOCK.
+  const timelockArg = process.env.DEPLOY_ADMIN_AS_DEPLOYER === '1' ? deployer : TIMELOCK;
 
   const out = existsSync(OUT_PATH) ? JSON.parse(await readFile(OUT_PATH, 'utf8')) : {};
 
   const plan = [
     ['atrium-router', 'contracts/atrium-router/src/AtriumRouter.sol:AtriumRouter',
-      [plinth, coffer, REGISTRY, deployer, TIMELOCK]],
+      [plinth, coffer, REGISTRY, deployer, timelockArg]],
     ['adapter-aave-horizon', 'contracts/adapters/aave-horizon/src/AaveHorizonAdapterV11.sol:AaveHorizonAdapterV11',
-      [MOCK_AAVE_POOL, USDC, coffer, deployer, TIMELOCK]],
+      [MOCK_AAVE_POOL, USDC, coffer, deployer, timelockArg]],
     ['aqueduct-receiver', 'contracts/aqueduct/src/AqueductReceiver.sol:AqueductReceiver',
-      [CCIP_ROUTER, USDC, coffer, deployer, TIMELOCK]],
+      [CCIP_ROUTER, USDC, coffer, deployer, timelockArg]],
   ];
 
   for (const [name, path, ctorArgs] of plan) {

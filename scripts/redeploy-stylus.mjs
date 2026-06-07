@@ -211,7 +211,7 @@ async function deployStylusCtor(name, contractDir, ctorArgs, pk) {
   return { address: addrMatch[1], tx: txMatch?.[1] ?? null };
 }
 
-async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, registry, pk, deployer) {
+async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, registry, pk, deployer, timelock) {
   console.log(`\n### Deploying Plinth (constructor + multi-fragment factory) ###`);
   // Arbitrum Sepolia well-known oracle addresses per DEPLOY_PLAN.md.
   // Sepolia Pyth runs the mainnet-equity relay (see TDD §13.2 + the
@@ -224,7 +224,7 @@ async function deployPlinth(coffer, sigil, vigil, plinthMath, plinthOracle, regi
     registry['chainlink-eth-usd-oracle']?.address ?? CHAINLINK_ETH_USD_SEPOLIA,
     registry['pyth-oracle']?.address ?? PYTH_SEPOLIA,
     deployer,
-    registry['praetor-timelock'].address,
+    timelock ?? registry['praetor-timelock'].address,
     plinthMath,
     plinthOracle,
   ];
@@ -273,7 +273,11 @@ async function main() {
   const usdc = registry.contracts['usdc']?.address ?? '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
   console.log(`USDC: ${usdc}`);
   const ZERO = '0x0000000000000000000000000000000000000000';
-  const timelock = registry.contracts['praetor-timelock'].address;
+  const realTimelock = registry.contracts['praetor-timelock'].address;
+  // No-48h test deploy: DEPLOY_ADMIN_AS_DEPLOYER=1 sets praetor_timelock to the
+  // deployer EOA, so admin ops (set_instrument_risk, set_adapter, ...) are direct
+  // deployer calls instead of 48h-timelock-gated. Testnet-only; prod keeps realTimelock.
+  const timelock = process.env.DEPLOY_ADMIN_AS_DEPLOYER === '1' ? deployer : realTimelock;
   const portico = registry.contracts['portico-registry'].address;
   // Year-1 testnet caps: 100k USDC global, 5k USDC per user.
   const depositCap = (100_000n * 10n ** 6n).toString();
@@ -324,7 +328,7 @@ async function main() {
       const plinthOracle = registry.contracts['plinth-oracle'].address;
       const { address, tx } = await deployPlinth(
         cofferAddr, sigilAddr, vigilAddr, plinthMath, plinthOracle,
-        registry.contracts, pk, deployer,
+        registry.contracts, pk, deployer, timelock,
       );
       checkpoint.plinth = { address, tx, deployed_at: new Date().toISOString() };
       await saveCheckpoint(checkpoint);
