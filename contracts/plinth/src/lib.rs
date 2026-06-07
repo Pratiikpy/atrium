@@ -238,6 +238,7 @@ sol_storage! {
         address pyth_oracle;
         address praetor_multisig;
         address praetor_timelock;  // F-32 fix: 48h-gated parameter changes
+        address authorized_router;  // FIRE-OWN fix: the trusted AtriumRouter that may open_position_for(owner) on a user's behalf
         address plinth_math_address;    // A.7 fix: split SPAN compute
         address plinth_oracle_address;  // A.7 fix: split oracle reading
 
@@ -383,10 +384,61 @@ impl Plinth {
             notional_signed,
             action_sigil,
             intent_sigil,
+            Address::ZERO,
         );
 
         self.is_updating.set(false);
         result
+    }
+
+    /// Router-only: open a position on behalf of `owner`. The trusted
+    /// AtriumRouter (set via set_authorized_router) calls Plinth on the user's
+    /// behalf, so resolve_owner-from-caller would file the position under the
+    /// Router (FIRE-OWN bug: router goes underwater + the user can't close).
+    /// This entry lets the Router name the real owner. Mirrors open_position's
+    /// reentrancy guard exactly.
+    pub fn open_position_for(
+        &mut self,
+        owner: Address,
+        venue_id: u8,
+        instrument_id: FixedBytes<32>,
+        notional_signed: I256,
+        action_sigil: Bytes,
+        intent_sigil: Bytes,
+    ) -> Result<U256, PlinthError> {
+        self.assert_not_globally_paused()?;
+        let caller = self.vm().msg_sender();
+        let router = self.authorized_router.get();
+        // Only the trusted Router may name an arbitrary owner. Closed until a
+        // router is set (zero address never equals a real caller).
+        if router.is_zero() || caller != router || owner.is_zero() {
+            return Err(PlinthError::code(ERR_UNAUTHORIZED));
+        }
+        if self.is_updating.get() {
+            return Err(PlinthError::code(ERR_REENTRANT));
+        }
+        self.is_updating.set(true);
+        let result = self.open_position_inner(
+            venue_id,
+            instrument_id,
+            notional_signed,
+            action_sigil,
+            intent_sigil,
+            owner,
+        );
+        self.is_updating.set(false);
+        result
+    }
+
+    /// Timelock-only: set the authorized AtriumRouter permitted to call
+    /// open_position_for on a user's behalf. Mirrors set_instrument_risk's gate.
+    pub fn set_authorized_router(&mut self, router: Address) -> Result<(), PlinthError> {
+        let caller = self.vm().msg_sender();
+        if caller != self.praetor_timelock.get() {
+            return Err(PlinthError::code(ERR_UNAUTHORIZED));
+        }
+        self.authorized_router.set(router);
+        Ok(())
     }
 
     fn open_position_inner(
@@ -396,9 +448,24 @@ impl Plinth {
         notional_signed: I256,
         action_sigil: Bytes,
         intent_sigil: Bytes,
+        explicit_owner: Address,
     ) -> Result<U256, PlinthError> {
         let caller = self.vm().msg_sender();
-        let owner = self.resolve_owner(caller, &action_sigil, &intent_sigil)?;
+        // FIRE-OWN fix: when the trusted Router opens on a user's behalf it
+        // passes the REAL owner (non-zero) and empty sigils, so use that owner
+        // directly on the owner-direct path. ANY non-empty sigil still goes
+        // through resolve_owner so agent-mandate signatures + caps stay
+        // enforced. The direct (non-Router) path passes Address::ZERO and is
+        // unchanged (Option<Address> isn't a Stylus ABI type, so a zero
+        // sentinel is used instead).
+        let owner = if !explicit_owner.is_zero()
+            && action_sigil.is_empty()
+            && intent_sigil.is_empty()
+        {
+            explicit_owner
+        } else {
+            self.resolve_owner(caller, &action_sigil, &intent_sigil)?
+        };
         self.assert_account_not_paused(owner)?;
 
         // Audit blocker fix (contracts-rust #2): bind the calldata args to the

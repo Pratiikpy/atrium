@@ -20,6 +20,19 @@ interface IPlinth {
         bytes calldata intent_sigil
     ) external returns (uint256);
 
+    // FIRE-OWN fix: open on behalf of the real `owner`. The Router calls Plinth
+    // on the user's behalf, so plain openPosition would file the position under
+    // the Router (caller). This entry, gated to the Router by Plinth's
+    // set_authorized_router, records the real owner so the user can close.
+    function openPositionFor(
+        address owner,
+        uint8 venue_id,
+        bytes32 instrument_id,
+        int256 notional_signed,
+        bytes calldata action_sigil,
+        bytes calldata intent_sigil
+    ) external returns (uint256);
+
     function closePosition(uint256 position_id) external returns (int256);
 
     function getAccount(address user)
@@ -238,8 +251,8 @@ contract AtriumRouter is ReentrancyGuard {
         (, uint256 required_before,,) = plinth.getAccount(user);
 
         // Step 1: Plinth validates margin and records the margin-side row.
-        plinth_position_id = plinth.openPosition(
-            venue_id, instrument_id, notional_signed, action_sigil, intent_sigil
+        plinth_position_id = plinth.openPositionFor(
+            user, venue_id, instrument_id, notional_signed, action_sigil, intent_sigil
         );
 
         // Step 2: resolve adapter.
