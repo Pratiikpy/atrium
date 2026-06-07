@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/lib/portfolio-source', () => ({
   tryGetPlinth: vi.fn(),
+  tryGetCofferCollateralAssets: vi.fn(),
 }));
 
-import { tryGetPlinth } from '@/lib/portfolio-source';
+import { tryGetPlinth, tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
 
 /**
  * Iter 64 audit fix: locks the LL-9 fix on /api/portfolio/summary.
@@ -25,6 +26,10 @@ const ORIGINAL_WALLET = process.env.DEMO_WALLET_ADDRESS;
 const TEST_WALLET = '0x' + 'a'.repeat(40);
 
 function fakePlinth(collateral: bigint, required: bigint, notional: bigint, paused: boolean) {
+  // The route now reads collateral LIVE from the Coffer (convertToAssets), not
+  // Plinth's cached share balance. Mirror the same collateral into the Coffer
+  // mock so these tests exercise the value through the new source.
+  (tryGetCofferCollateralAssets as any).mockResolvedValue(collateral);
   return {
     read: {
       getAccount: vi.fn().mockResolvedValue([collateral, required, notional, paused] as [bigint, bigint, bigint, boolean]),

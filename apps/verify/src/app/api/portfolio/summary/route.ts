@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { tryGetPlinth } from '@/lib/portfolio-source';
+import { tryGetPlinth, tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
 import { formatUsd } from '@/lib/format-usd';
 import { requireWalletMatch } from '@/lib/auth-session';
 import { noCacheHeaders } from '@/lib/no-cache-headers';
@@ -32,7 +32,25 @@ export async function GET(req?: Request) {
     });
   }
   try {
-    const [collateral, required, notional, paused] = await plinth.read.getAccount([wallet]);
+    const [, required, notional, paused] = await plinth.read.getAccount([wallet]);
+    // Collateral is read LIVE from the Coffer (convertToAssets), NOT Plinth's
+    // cached collateral_value_wei. Plinth caches the raw ERC-4626 share balance,
+    // which is stale until a recompute and ~1e6x inflated on a small vault, so
+    // it rendered a $1.45 deposit as $1,450,000. The Coffer is the same source
+    // the /app/vault page reads. (The deeper contract fix - Plinth storing
+    // convertToAssets so the on-chain margin check is correct too - is tracked
+    // separately; this makes every displayed figure honest now.)
+    const collateral = await tryGetCofferCollateralAssets(wallet);
+    if (collateral === null) {
+      return NextResponse.json({
+        totalAccountValueUsd: null,
+        totalRequiredMarginUsd: null,
+        totalNotionalUsd: null,
+        pnl24hUsd: null,
+        pnl24hDirection: null,
+        source: 'pending',
+      });
+    }
     // Free margin = collateral above what open positions require, clamped at 0.
     // Mirrors the buying-power route's definition so the two surfaces agree.
     const free = collateral > required ? collateral - required : 0n;

@@ -3,8 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('@/lib/scribe-helpers', () => ({
   gql: vi.fn(),
 }));
+vi.mock('@/lib/portfolio-source', () => ({
+  tryGetCofferCollateralAssets: vi.fn(),
+}));
 
 import { gql } from '@/lib/scribe-helpers';
+import { tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
 
 /**
  * Iter 62 audit fix: locks KK-3 + KK-4 fixes on
@@ -31,6 +35,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.resetModules();
   process.env.DEMO_WALLET_ADDRESS = TEST_WALLET;
+  // Default: Coffer unavailable -> currentUsd falls back to the Scribe latest,
+  // preserving the pre-fix series assertions. Tests that assert the live-Coffer
+  // currentUsd override this explicitly.
+  (tryGetCofferCollateralAssets as any).mockResolvedValue(null);
 });
 
 afterEach(() => {
@@ -110,6 +118,21 @@ describe('GET /api/portfolio/buying-power, KK-4 formatUsd precision', () => {
     // output: "$7.00" with locale separator (none needed at this scale).
     expect(json.series[0].valueUsd).toBe('$7.00');
     expect(json.currentUsd).toBe('$7.00');
+  });
+
+  it('currentUsd reads the live Coffer asset value, not the share-inflated Scribe collateral', async () => {
+    // Bug fix (2026-06-07): Scribe's collateralValueWei carries Plinth's raw
+    // ERC-4626 share balance (~1e6x inflated on a small vault). currentUsd must
+    // come from the Coffer's convertToAssets so $1.45 never renders as $1.45M.
+    (gql as any).mockResolvedValue({
+      marginUpdates: [
+        { blockNumber: '100', timestamp: '1700000000', collateralValueWei: '1450000000000', requiredMarginWei: '0' },
+      ],
+    });
+    (tryGetCofferCollateralAssets as any).mockResolvedValue(1_450_000n); // $1.45 in USDC 6dp
+    const { GET } = await import('./route');
+    const json = await (await GET()).json();
+    expect(json.currentUsd).toBe('$1.45');
   });
 
   it('clamps free margin to 0 when required exceeds collateral', async () => {

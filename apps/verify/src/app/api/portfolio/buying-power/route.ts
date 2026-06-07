@@ -4,6 +4,7 @@ import { parseTsOrNull } from '@/lib/format-time';
 import { formatUsd } from '@/lib/format-usd';
 import { requireWalletMatch } from '@/lib/auth-session';
 import { noCacheHeaders } from '@/lib/no-cache-headers';
+import { tryGetCofferCollateralAssets } from '@/lib/portfolio-source';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,8 +64,16 @@ export async function GET(req?: Request) {
       series.push({ ts, valueUsd: formatUsd(free, USDC_DECIMALS) });
     }
     const latest = series[series.length - 1];
+    // currentUsd: the LIVE buying power from the Coffer (convertToAssets), NOT
+    // the Scribe marginUpdate's collateralValueWei, which carries Plinth's raw
+    // share balance (~1e6x inflated on a small vault -> rendered $1.45M). This
+    // matches the summary route + the /app/vault page so every surface agrees.
+    // The 30d SERIES stays Scribe-sourced (share-based) but is empty until a
+    // position exists, so it is latent until the contract emits convertToAssets.
+    const cofferAssets = await tryGetCofferCollateralAssets(wallet);
+    const currentUsd = cofferAssets !== null ? formatUsd(cofferAssets, USDC_DECIMALS) : (latest?.valueUsd ?? null);
     return NextResponse.json({
-      currentUsd: latest?.valueUsd ?? null,
+      currentUsd,
       series,
       windowDays: 30,
       source: 'plinth' as const,

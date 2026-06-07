@@ -131,6 +131,16 @@ function BigStatCard({
   emphasis?: boolean;
 }) {
   const display = loading ? null : value ?? '-';
+  // Scale the number down for long values so a large balance never overflows
+  // and clips the card (e.g. "$1,450,000.00" at 42px ran past the edge).
+  // Length-based: short numbers stay big + bold per the design intent.
+  const valLen = (display ?? '-').length;
+  const valueFontSize =
+    valLen >= 12
+      ? 'clamp(18px, 2.0vw, 24px)'
+      : valLen >= 9
+        ? 'clamp(24px, 2.7vw, 34px)'
+        : 'clamp(28px, 3.2vw, 42px)';
   const valueColor =
     direction === 'up'
       ? 'oklch(0.58 0.13 145)'
@@ -159,9 +169,9 @@ function BigStatCard({
         <div className="skeleton mt-3 h-10 w-44 rounded" />
       ) : (
         <p
-          className="mt-3 font-sans font-medium leading-none"
+          className="mt-3 overflow-hidden font-sans font-medium leading-none text-ellipsis"
           style={{
-            fontSize: 'clamp(28px, 3.2vw, 42px)',
+            fontSize: valueFontSize,
             letterSpacing: '-0.02em',
             color: valueColor,
             fontVariantNumeric: 'tabular-nums lining-nums',
