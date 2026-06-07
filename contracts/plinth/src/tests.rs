@@ -68,6 +68,8 @@ sol! {
 
     function balanceOf(address user) external view returns (uint256);
 
+    function convertToAssets(uint256 shares) external view returns (uint256);
+
     function isRegisteredAdapter(address adapter) external view returns (bool);
 }
 
@@ -140,10 +142,15 @@ fn mock_oracle(vm: &TestVM, price: U256) {
     vm.mock_static_call(oracle(), calldata, Ok(ret));
 }
 
-/// Mock the Coffer.balanceOf static call for `who` -> `bal`.
+/// Mock the Coffer.balanceOf static call for `who` -> `bal`, and convertToAssets
+/// as identity (1:1 share:asset in tests) so `collateral` keeps the same numeric
+/// meaning after the 2026-06-07 fund-safety fix (Plinth now converts the share
+/// balance to assets before the underwater check).
 fn mock_coffer(vm: &TestVM, who: Address, bal: U256) {
     let calldata = balanceOfCall { user: who }.abi_encode();
     vm.mock_static_call(coffer(), calldata, Ok(bal.abi_encode()));
+    let cta = convertToAssetsCall { shares: bal }.abi_encode();
+    vm.mock_static_call(coffer(), cta, Ok(bal.abi_encode()));
 }
 
 /// Mock the PlinthMath.requiredMargin static call for a single-position vector.

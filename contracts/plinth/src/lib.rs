@@ -175,6 +175,7 @@ sol_interface! {
     }
     interface ICoffer {
         function balanceOf(address user) external view returns (uint256);
+        function convertToAssets(uint256 shares) external view returns (uint256);
         function totalAssets() external view returns (uint256);
     }
     interface IPorticoRegistry {
@@ -979,8 +980,20 @@ impl Plinth {
         // liquidation against a HEALTHY account whose Coffer view merely
         // hiccuped. Wrongful-liquidation trigger. Closes #28 family site 3.
         let coffer = ICoffer::new(self.coffer_address.get());
-        let collateral = coffer
+        // FUND-SAFETY FIX (2026-06-07 units audit): collateral must be the USDC
+        // ASSET value, not the raw ERC-4626 share balance. coffer.balance_of
+        // returns SHARES, which on a small vault are ~1e6x the assets (the
+        // virtual-share offset). Comparing share-collateral against the asset-
+        // denominated `required` below made every account read ~1e6x
+        // over-collateralized, so the underwater gate + Vigil liquidation never
+        // fired (undercollateralized positions un-liquidatable). Convert shares
+        // to assets so the comparison is apples-to-apples (mirrors what
+        // /app/vault and the portfolio routes already do).
+        let shares = coffer
             .balance_of(self.vm(), Call::new(), user)
+            .map_err(|_| PlinthError::code(ERR_COFFER_UNREACHABLE))?;
+        let collateral = coffer
+            .convert_to_assets(self.vm(), Call::new(), shares)
             .map_err(|_| PlinthError::code(ERR_COFFER_UNREACHABLE))?;
 
         // Bump margin_version
