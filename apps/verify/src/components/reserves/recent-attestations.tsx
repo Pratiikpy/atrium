@@ -59,8 +59,13 @@ export function RecentAttestationsTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-divider-soft">
+          {/* Key on blockNumber, not a.id: a.id is the Merkle root, which the
+              Lantern attestor republishes unchanged every cron tick when reserves
+              don't move, so two distinct attestations (different blocks/times)
+              share a root and React warned "two children with the same key".
+              Each attestation is its own block, so block+id is unique. */}
           {data.attestations.map((a) => (
-            <tr key={a.id} className="hover:bg-parchment-soft/40">
+            <tr key={`${a.blockNumber}-${a.id}`} className="hover:bg-parchment-soft/40">
               <td className="px-4 py-3 font-mono text-ink">{a.blockNumber}</td>
               <td className="px-4 py-3 font-mono text-xs text-muted">{a.attestationTime}</td>
               <td className="px-4 py-3 font-mono text-xs text-ink-soft">{a.rootHash.slice(0,10)}…</td>
