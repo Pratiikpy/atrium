@@ -3,7 +3,7 @@ import {
   PositionOpenedViaRouter,
   PositionClosedViaRouter,
 } from '../generated/AtriumRouter/AtriumRouter';
-import { RouterPositionEvent } from '../generated/schema';
+import { RouterPositionEvent, Position } from '../generated/schema';
 
 /**
  * AtriumRouter event indexer.
@@ -30,6 +30,20 @@ export function handlePositionOpenedViaRouter(event: PositionOpenedViaRouter): v
   r.blockNumber = event.block.number;
   r.timestamp = event.block.timestamp;
   r.save();
+
+  // Re-attribute the Plinth-side Position to the real trader. Plinth's
+  // PositionOpened event fires with owner = msg.sender, which is THIS
+  // router when the open is orchestrated through it, so the position
+  // would otherwise be filed under the router address and never appear
+  // in the user's portfolio (the portfolio query filters positions by
+  // owner). The router event carries the real user; rebind to them. The
+  // Plinth PositionOpened log precedes this one in the same tx, so the
+  // Position entity already exists by the time we run.
+  const pos = Position.load(event.params.plinth_position_id.toString());
+  if (pos !== null) {
+    pos.owner = event.params.user.toHexString();
+    pos.save();
+  }
 }
 
 export function handlePositionClosedViaRouter(event: PositionClosedViaRouter): void {
