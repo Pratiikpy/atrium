@@ -18,10 +18,11 @@ export default function RunbooksIndexPage() {
         <section>
           <h1 className="font-display text-5xl text-ink">Runbooks</h1>
           <p className="mt-4 max-w-prose text-ink-soft">
-            The operational playbooks Atrium runs on: what to do when a keeper stalls, how a deploy
-            goes out, how keys rotate, who is on call. {total} runbooks, rendered from the
+            The public subset of the operational playbooks Atrium runs on, rendered from the
             <code className="mx-1 font-mono text-ink">runbooks/</code> markdown that ships in the
-            repo. Each one is the same procedure an on-call engineer follows.
+            repo. {total} are published here; the incident-response, key-rotation, and on-call
+            playbooks are withheld (they name infrastructure and secret paths). Each published one
+            is the same procedure an on-call engineer follows.
           </p>
         </section>
 

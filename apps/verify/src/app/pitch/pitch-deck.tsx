@@ -38,6 +38,15 @@ export function PitchDeck() {
   const [i, setI] = useState(0);
   const go = useCallback((n: number) => setI((p) => Math.max(0, Math.min(TOTAL - 1, n))), []);
 
+  // Keep the active slide's rail item in view: on mobile the deck-rail scrolls
+  // horizontally and later numerals (IX-XI) clipped off-screen with no scroll
+  // affordance, so center the active item whenever the slide changes.
+  useEffect(() => {
+    document
+      .querySelector('.deck-rail-item.is-active')
+      ?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  }, [i]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'PageDown') go(i + 1);

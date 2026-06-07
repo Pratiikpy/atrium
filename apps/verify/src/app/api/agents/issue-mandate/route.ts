@@ -9,7 +9,9 @@ export const dynamic = 'force-dynamic';
 
 // --- Origin allowlist (Phase 3 CSRF hardening) ---
 const ALLOWED_ORIGINS = [
-  'https://verify.useatrium.me',
+  // verify.useatrium.me removed 2026-06-07: it is the dead old canonical
+  // (returns 000) left over from the domain migration; useatrium.me is the live
+  // origin. A dead origin in a CSRF allowlist is dead weight, not a real gate.
   'https://useatrium.me',
   'http://localhost:3000',
 ];
