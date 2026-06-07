@@ -112,8 +112,9 @@ export default function ArchitecturePage() {
             Real addresses, <em>verified on-chain.</em>
           </h2>
           <p className="arch-section-lede">
-            Every contract below is deployed on-chain with real bytecode and verified: Solidity source on
-            Arbiscan or Sourcify, Stylus via cargo stylus verify. Which venues are live today versus scaffolded is set out on{' '}
+            Every contract below is deployed on-chain with real bytecode. Solidity source is verified on
+            Arbiscan or Sourcify, Stylus via cargo stylus verify; the legacy router 0xF593 is pending
+            re-verification on its cutover. Which venues are live today versus scaffolded is set out on{' '}
             <a href="/docs/honesty" className="arch-inline-link">/docs/honesty</a>. Click any address to copy it.
           </p>
           <DeploymentsTable />
