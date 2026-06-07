@@ -32,7 +32,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Plinth margin number for a wallet. Returns collateral, required margin, buying power, paused state.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/margin/0xYourWallet`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -40,7 +40,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Open positions across every Portico-whitelisted venue. Includes notional, entry, mark (when oracle live), unrealised PnL.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/positions/0xYourWallet`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -48,7 +48,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Per-venue risk decomposition. Maps each venue to its share of total required margin + haircut applied.',
     pricing: '$0.002 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/risk/0xYourWallet`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -56,7 +56,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Live venue health table. Per-venue: deployed address, paused state, last oracle ts, notional cap remaining this block.',
     pricing: '$0.0005 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/venues`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -64,7 +64,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Agent performance snapshot. 7/30/90 day PnL, total actions, failure rate, deboost tier, mandate count.',
     pricing: '$0.001 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/agents/augur/perf`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -72,7 +72,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Replay a published ResearchAttestation backtest. Returns IPFS notebook URL + delta bps + trade count.',
     pricing: '$0.005 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/backtest/mean-reversion-v1`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -80,7 +80,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Lantern proof-of-reserves Merkle proof for a wallet. Returns latest root + the inclusion path.',
     pricing: '$0.0005 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" \\\n     https://atrium-codex.prtk8899.workers.dev/v1/attestation/0xYourWallet`,
-    status: 'pending',
+    status: 'live',
   },
   {
     method: 'GET',
@@ -88,7 +88,7 @@ const ENDPOINTS: Endpoint[] = [
     summary: 'Stoa Black-Scholes Greeks for a tokenized option. Strike + expiry inferred from symbol.',
     pricing: '$0.002 per call',
     exampleCurl: `curl -H "X-PAYMENT: $X402_TOKEN" https://atrium-codex.prtk8899.workers.dev/v1/options/rTSLA-DEC25-180C`,
-    status: 'pending',
+    status: 'live',
   },
 ];
 

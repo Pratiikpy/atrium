@@ -28,16 +28,14 @@ ARBITRUM_SEPOLIA_RPC = "https://sepolia-rollup.arbitrum.io/rpc"
 # Audit K-9 fix: x402 verifier needs these to validate USDC Transfer logs.
 # Arbitrum Sepolia USDC (verified at https://docs.circle.com/stablecoins/usdc-on-test-networks).
 CODEX_USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"
-# Phase theta audit follow-up (2026-05-25): pre-fix this value was the
-# deployer EOA 0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42, leaked on
-# 2026-05-24 (see incidents/). Any wrangler deploy that forgot to override
-# would route x402 payments to the leaked address. Following the comment
-# above (placeholders must be obviously non-hex), the placeholder now
-# fails the ADDR_REGEX format check in x402.ts:169, so the server returns
-# 'pay_to_not_configured' (503) loudly instead of silently routing.
-# Set via `wrangler secret put CODEX_PAY_TO_ADDRESS_PROD` or override
-# this var with the rotated multisig address.
-CODEX_PAY_TO_ADDRESS = "0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42"
+# Live x402 payout address (2026-06-07): a dedicated testnet wallet created
+# for this deployment; its private key is held off-repo by the founder
+# (~/.atrium/codex-payout-key.txt). The worker reads this var directly
+# (x402.ts:53,154) - there is NO secret-named override, so the real payout
+# address must live here. Pre-2026-06-07 this was the leaked deployer EOA
+# 0x7DB1c02a (see incidents/); routing x402 payments there was the bug this
+# fixes. For a public-repo fork, replace with your own payout before deploy.
+CODEX_PAY_TO_ADDRESS = "0xca31484DDd43B74516411CC1b9Ba32A0247dcbAf"
 CODEX_MIN_PAYMENT_USDC_WEI = "1000000"                                # $1.00 USDC (6 decimals)
 # Optional: Kani CI status proxy for the verify.useatrium.me badge.
 # Leave commented to render the badge in the honest "unknown" state.
