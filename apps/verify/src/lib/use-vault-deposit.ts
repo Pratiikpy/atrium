@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 import { parseUnits, erc20Abi } from 'viem';
 // Audit U-39: shared testnet-token constants. Pre-fix this file
 // hardcoded the same USDC address as /api/transfer/chain-balance/route.ts
@@ -80,6 +81,13 @@ export function useVaultDeposit(cofferAddress: `0x${string}` | null) {
   // approve, consumed by the auto-proceed effect below.
   const [pendingDeposit, setPendingDeposit] = useState<bigint | null>(null);
   const { writeContractAsync } = useWriteContract();
+  const queryClient = useQueryClient();
+
+  // Refresh balance-derived surfaces (vault stat cards + portfolio collateral)
+  // the instant the deposit confirms, instead of waiting for the next poll.
+  useEffect(() => {
+    if (status.kind === 'success') void queryClient.invalidateQueries();
+  }, [status.kind, queryClient]);
 
   // Read current USDC allowance so we can skip the approve tx when the
   // user has already authorised the vault for an equal-or-greater amount.

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 import { waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
 import { USDC_DECIMALS } from '@/lib/testnet-tokens';
@@ -51,6 +52,15 @@ export function useVaultWithdraw(cofferAddress: `0x${string}` | null) {
   const [status, setStatus] = useState<WithdrawStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
   const config = useConfig();
+  const queryClient = useQueryClient();
+
+  // Refresh balance-derived surfaces (vault stat cards + portfolio collateral)
+  // the instant the withdraw confirms, instead of waiting for the next poll.
+  // Pre-fix the cards lagged a fresh on-chain balance (caught driving the real
+  // money path: a confirmed withdraw left YOUR VALUE / TVL / shares stale).
+  useEffect(() => {
+    if (status.kind === 'success') void queryClient.invalidateQueries();
+  }, [status.kind, queryClient]);
 
   async function withdraw(assetsHuman: string) {
     if (!account) {
