@@ -8,7 +8,7 @@
       "block": 270408443
     },
     "portico-registry": {
-      "address": "0x9a9af6e50491cd4694699d48564bbff18f9b40bc",
+      "address": "0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd",
       "tx": "0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505",
       "block": 270408449
     },
@@ -49,30 +49,30 @@
       "block": 270408479
     },
     "coffer": {
-      "address": "0xc7bf0145371d3a79a9d43bab46dfee40f8a4aaf3",
-      "tx": "0x07ae5e44df7b6ada1a390af825389c8b37804421031f18f71490c2dee3a0e04b",
+      "address": "0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd",
+      "tx": "0xc8a0bae453cc659e019fc3a135972c440e57d3431d7be452cfd244056e9b661d",
       "block": 270800974,
       "kind": "stylus",
-      "deployed_at": "2026-05-24T15:17:02.917Z",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
+      "deployed_at": "2026-06-07T06:23:07.414Z",
+      "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "sigil": {
-      "address": "0xdba97d39ff790e69c3526bb0c0b99a38f686d6d9",
-      "tx": "0x1f7e8e3280a2ee279554cfe66d5efd5ce1a2360cb6b115877d6d4e9fc1504371",
+      "address": "0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f",
+      "tx": "0x8cd19692e349a1afb6a3e1d2c1a3896cfb4393259c479c684c111d0118c769ee",
       "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
       "block": 270801710,
       "kind": "stylus",
-      "deployed_at": "2026-05-24T15:21:15.358Z",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
+      "deployed_at": "2026-06-07T06:24:16.682Z",
+      "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "vigil": {
-      "address": "0x5ccd3422f430f6d034ff46715b41509de9d0deed",
-      "tx": "0xd573e52e14a6c88d435c7d574a88e51e0f0531b7fb17b670bfa2ab8cb8e6583e",
+      "address": "0x348b0a08df4372a804a5faa118428393c2cfaff5",
+      "tx": "0x44b3a4f9a096e90ef567cd687594403b999c73582f907eb696b679059d71ce6b",
       "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
       "block": 270802353,
       "kind": "stylus",
-      "deployed_at": "2026-05-24T15:24:46.090Z",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror."
+      "deployed_at": "2026-06-07T06:25:32.451Z",
+      "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "plinth-math": {
       "address": "0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab",
@@ -88,18 +88,18 @@
       "activationTx": "0x69bff2c17e520de5a7ebe2081d01821eadf42922508c4a49d946c898b6cb7248",
       "block": 270688421,
       "kind": "stylus",
-      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7) \u00e2\u20ac\u201d Chainlink + Pyth + median + 50bps tolerance"
+      "note": "Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
-      "address": "0xd86f579ec880eaab27dfa698ae056d1893ec7553",
-      "tx": "0x1fe8101fa244db42f2399ca07a63d0a873e6e921270e6940939ccf435e1a46e0",
+      "address": "0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e",
+      "tx": "0xd68253fff6c6562174de7c96ca2a06ce15fef433b70a6881787cfb04b53c9d59",
       "block": 270803107,
       "kind": "stylus",
-      "note": "2026-05-30 critical-fix redeploy. LIVE 2026-06-01: the 6 timelock ops executed and the cutover flipped to root+mirror.",
-      "deployed_at": "2026-05-24T15:28:58.569Z"
+      "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7).",
+      "deployed_at": "2026-06-07T06:26:40.685Z"
     },
     "atrium-router": {
-      "address": "0xF593e012196BDe8A58Ccdbf685f7A74fD3bD35e0",
+      "address": "0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
@@ -113,7 +113,7 @@
       "note": "Redeployed 2026-06-01 post-cutover: constructor plinth = live Plinth 0xd86f579e (was the dead 99-byte pre-cutover Plinth)."
     },
     "adapter-aave-horizon": {
-      "address": "0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1",
+      "address": "0xe0772031af844249f85bdac8D819c6dda70aa1E3",
       "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
       "deployed_at": "2026-05-25T19:25:00.000Z",
       "kind": "solidity",
