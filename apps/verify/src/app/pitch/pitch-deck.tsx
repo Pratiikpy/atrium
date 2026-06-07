@@ -344,7 +344,7 @@ function Architecture() {
       </div>
       <p className="dk-aside">
         Seven venue adapters are in the launch scope (Aave Horizon operational today); nine adapter contracts are
-        deployed and verified on Arbitrum Sepolia. Every address above is live; click to read the source.
+        deployed and verified on Arbitrum Sepolia. Every address above is live on-chain; click to read the source (the AtriumRouter is pending re-verification after its 2026-06-02 redeploy).
       </p>
     </div>
   );
@@ -419,7 +419,7 @@ function Proof() {
           </Link>
         </div>
         <p className="dk-aside">
-          Don&rsquo;t take it on faith. Read any contract on Arbiscan, replay any transaction, or verify your own balance
+          Don&rsquo;t take it on faith. Read the verified contracts on Arbiscan, replay any transaction, or verify your own balance
           against the on-chain Merkle root on{' '}
           <Link href="/lantern" className="dk-link">
             /lantern
