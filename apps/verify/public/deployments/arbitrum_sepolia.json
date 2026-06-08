@@ -8,7 +8,7 @@
       "block": 270408443
     },
     "portico-registry": {
-      "address": "0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd",
+      "address": "0x54bd8cbfef638bd9d9d3d71f95454edcfec89352",
       "tx": "0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505",
       "block": 270408449
     },
@@ -99,7 +99,7 @@
       "deployed_at": "2026-06-07T23:48:33.269Z"
     },
     "atrium-router": {
-      "address": "0x29531F665821A107c8b9bC15F93a6E1A4ACA1aB7",
+      "address": "0x71b194f93ad70879f8fd8ec476d450a8a4445d46",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
@@ -113,7 +113,7 @@
       "note": "Redeployed 2026-06-01 post-cutover: constructor plinth = live Plinth 0xd86f579e (was the dead 99-byte pre-cutover Plinth)."
     },
     "adapter-aave-horizon": {
-      "address": "0xe0772031af844249f85bdac8D819c6dda70aa1E3",
+      "address": "0xCE43b1f6Bcf60B6A0eA2d170970AEE8650924b86",
       "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
       "deployed_at": "2026-05-25T19:25:00.000Z",
       "kind": "solidity",

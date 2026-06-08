@@ -418,7 +418,7 @@ dataSources:
     name: AtriumRouter
     network: arbitrum-sepolia
     source:
-      address: "0x29531F665821A107c8b9bC15F93a6E1A4ACA1aB7"
+      address: "0x71b194f93ad70879f8fd8ec476d450a8a4445d46"
       abi: AtriumRouter
       startBlock: 274800000
     mapping:
