@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTransfer, isDestChainSupported } from '@/lib/use-transfer';
+import { useScopedWallet } from '@/lib/use-scoped-wallet';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
 
@@ -23,11 +25,46 @@ const CHAIN_LABELS: Record<string, string> = {
   'rh-chain': 'Robinhood Chain',
 };
 
+interface ChainBalance { balanceFormatted: string | null; source: 'rpc' | 'pending'; }
+
+// Mirror the desktop transfer-form: read the live per-chain USDC balance from
+// /api/transfer/chain-balance. Pre-fix the mobile ChainCard hardcoded 'bal
+// pending', so a mobile user saw 'pending' even with real USDC on Arb Sepolia -
+// the desktop's P-2 audit fix wired live balances but the mobile panel was never
+// updated. Found via real-wallet mobile QA (31-mobile-transfer.png: 0.49 USDC on
+// Arb Sepolia rendered as 'bal pending').
+async function fetchChainBalance(chain: string, wallet: string | null): Promise<ChainBalance> {
+  try {
+    const params = new URLSearchParams({ chain, token: 'USDC' });
+    if (wallet) params.set('wallet', wallet);
+    const r = await fetch(`/api/transfer/chain-balance?${params.toString()}`);
+    if (!r.ok) throw new Error();
+    return await r.json();
+  } catch {
+    return { balanceFormatted: null, source: 'pending' };
+  }
+}
+
 export function TransferMobile() {
   const [amount, setAmount] = useState('');
   const [from, setFrom] = useState('arb-sepolia');
   const [to, setTo] = useState('rh-chain');
   const { submit, status, txHash, preflight } = useTransfer();
+
+  // Live per-chain balances (mirrors desktop transfer-form fromBalance/toBalance).
+  const wallet = useScopedWallet();
+  const fromBalance = useQuery({
+    queryKey: ['mobile-chain-balance', from, wallet],
+    queryFn: () => fetchChainBalance(from, wallet),
+    refetchInterval: 30_000,
+    enabled: wallet != null,
+  });
+  const toBalance = useQuery({
+    queryKey: ['mobile-chain-balance', to, wallet],
+    queryFn: () => fetchChainBalance(to, wallet),
+    refetchInterval: 30_000,
+    enabled: wallet != null,
+  });
 
   const busy = status.kind === 'submitting' || status.kind === 'pending';
   const amountValid = amount.length > 0 && parseFloat(amount) > 0;
@@ -44,8 +81,8 @@ export function TransferMobile() {
 
       {/* Chain stack with swap button */}
       <div className="relative flex flex-col gap-2.5">
-        <ChainCard label="From" chain={CHAIN_LABELS[from] ?? from} amount={amount} />
-        <ChainCard label="To"   chain={CHAIN_LABELS[to] ?? to}   amount={amount} />
+        <ChainCard label="From" chain={CHAIN_LABELS[from] ?? from} amount={amount} balance={fromBalance.data?.balanceFormatted} />
+        <ChainCard label="To"   chain={CHAIN_LABELS[to] ?? to}   amount={amount} balance={toBalance.data?.balanceFormatted} />
         <button
           type="button"
           onClick={() => { setFrom(to); setTo(from); }}
@@ -119,13 +156,13 @@ export function TransferMobile() {
   );
 }
 
-function ChainCard({ label, chain, amount }: { label: string; chain: string; amount: string }) {
+function ChainCard({ label, chain, amount, balance }: { label: string; chain: string; amount: string; balance?: string | null }) {
   return (
     <div className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-4">
       <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-mob-muted">{label}</div>
       <div className="mt-1 flex items-baseline justify-between">
         <span className="text-[14px] text-mob-ink">{chain}</span>
-        <span className="font-mono text-[11px] text-mob-muted">bal pending</span>
+        <span className="font-mono text-[11px] text-mob-muted">{balance != null ? `bal ${balance}` : 'bal pending'}</span>
       </div>
       <div className="mt-1.5 font-mono text-[20px] text-mob-ink">
         {Number(amount || '0').toLocaleString()}<span className="ml-1.5 text-[12px] text-mob-muted">USDC</span>
