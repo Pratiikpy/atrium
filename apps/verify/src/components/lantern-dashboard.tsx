@@ -168,9 +168,27 @@ export function LanternDashboard() {
             <dt className="text-muted">Users in tree</dt>
             <dd className="text-ink">{data.leafCount}</dd>
           </div>
-          <div>
+          <div className="min-w-0">
             <dt className="text-muted">IPFS CID</dt>
-            <dd className="text-ink truncate">{data.ipfsPinned ? data.ipfsCid : 'tree pin pending'}</dd>
+            <dd className="truncate text-ink">
+              {data.ipfsPinned ? (
+                // Link to the path-gateway form (ipfs.io/ipfs/<CID>), which serves
+                // the pinned tree JSON directly for both CIDv0 + CIDv1. NOT the
+                // `<CID>.ipfs.dweb.link` subdomain form - that 500s for CIDv0 (Qm)
+                // CIDs, which is exactly what Pinata's pinJSONToIPFS returns.
+                <a
+                  href={`https://ipfs.io/ipfs/${data.ipfsCid}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  title="View the published Merkle tree on IPFS"
+                  className="underline underline-offset-2 hover:opacity-80"
+                >
+                  {data.ipfsCid}
+                </a>
+              ) : (
+                'tree pin pending'
+              )}
+            </dd>
           </div>
         </dl>
       </div>

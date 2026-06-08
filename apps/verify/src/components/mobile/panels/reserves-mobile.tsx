@@ -197,7 +197,7 @@ export function ReservesMobile() {
             <div>
               <span className="text-mob-muted">IPFS</span><br/>
               {data.ipfsCid ? (
-                <a href={`https://${data.ipfsCid}.ipfs.dweb.link/`} target="_blank" rel="noreferrer" className="text-mob-accent text-[14px]">
+                <a href={`https://ipfs.io/ipfs/${data.ipfsCid}`} target="_blank" rel="noreferrer" className="text-mob-accent text-[14px]">
                   {data.ipfsCid.slice(0, 8)}… ↗
                 </a>
               ) : (
