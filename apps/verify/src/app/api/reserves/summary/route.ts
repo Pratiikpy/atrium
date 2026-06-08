@@ -15,11 +15,20 @@ const USDC_DECIMALS = 6;
 // hours ago" + green tile and read it as fresh; the staleness signal
 // was implicit (compare the two strings) when it should be explicit.
 //
-// Threshold = 2x expected 10-min cadence + 5-minute grace for cron jitter
-// and CCIP confirmation depth. This catches a single missed publish AND
-// the start of a sustained outage.
-const TEN_MIN_CADENCE_SECONDS = 10 * 60;
-const STALE_THRESHOLD_SECONDS = 2 * TEN_MIN_CADENCE_SECONDS + 5 * 60;
+// Threshold = 2x the Lantern publish cadence + grace for cron jitter and CCIP
+// confirmation depth. This catches a single missed publish AND the start of a
+// sustained outage, without false-positiving between two healthy publishes.
+//
+// Cadence correction (2026-06-08): the constant was 10 min (the old `*/10` cron),
+// giving a 25-min threshold. But the permanent Lantern fix moved publishing to an
+// in-run self-loop every 45 min (lantern-cron.yml: `sleep 2700`), because GitHub
+// throttles the `cron:` schedule. A 25-min threshold against a 45-min cadence
+// flagged the flagship PoR "stale" for ~20 min of EVERY cycle even when the
+// attestor was perfectly healthy - a self-inflicted false alarm on the one
+// dashboard whose job is to look trustworthy. Align the threshold to the real
+// cadence. Found via live QA (api/reserves/summary: 18m ago but threshold 25m).
+const LANTERN_PUBLISH_CADENCE_SECONDS = 45 * 60; // mirrors lantern-cron.yml `sleep 2700`
+const STALE_THRESHOLD_SECONDS = 2 * LANTERN_PUBLISH_CADENCE_SECONDS + 10 * 60; // 100 min
 
 export async function GET() {
   // Redeemable = Coffer.totalAssets() (underlying USDC backing every share),

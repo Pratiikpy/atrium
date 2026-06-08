@@ -34,8 +34,9 @@ afterEach(() => {
 });
 
 const NOW_SEC = Math.floor(Date.now() / 1000);
-const FRESH_TS = String(NOW_SEC - 10 * 60); // 10 min ago, under the 25-min threshold
-const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago, well past the 25-min threshold
+const FRESH_TS = String(NOW_SEC - 10 * 60); // 10 min ago, under the 100-min threshold
+const FRESH_45_TS = String(NOW_SEC - 45 * 60); // 45 min = one healthy self-loop cadence; must read FRESH
+const STALE_TS = String(NOW_SEC - 200 * 60); // 200 min ago, well past the 100-min threshold
 
 describe('GET /api/reserves/summary, KK-13 formatUsd precision', () => {
   it('renders TVL via formatUsd with $ prefix and locale separators', async () => {
@@ -111,15 +112,30 @@ describe('GET /api/reserves/summary, iter-34 staleness flag', () => {
     expect(json.staleReason).toBe('no attestation indexed yet');
   });
 
-  it('exposes the staleThresholdMin = 25 in the response', async () => {
-    // Defined per iter-34, updated theta.3: 2x 10-min cadence + 5-min grace = 25 min.
+  it('exposes the staleThresholdMin = 100 in the response', async () => {
+    // 2x the 45-min Lantern self-loop cadence + 10-min grace = 100 min (cadence
+    // correction 2026-06-08; was 25 min for the retired 10-min `*/10` cron).
     (gql as any).mockResolvedValue({
       counter: null,
       lanternAttestations: [{ timestamp: FRESH_TS, leafCount: '8' }],
     });
     const { GET } = await import('./route');
     const json = await (await GET()).json();
-    expect(json.staleThresholdMin).toBe(25);
+    expect(json.staleThresholdMin).toBe(100);
+  });
+
+  it('reads a 45-min-old attestation (one healthy self-loop cadence) as FRESH', async () => {
+    // Regression lock for the cadence correction: a single 45-min publish gap is
+    // the NORMAL healthy state under the self-loop, so it must NOT read stale
+    // (pre-fix the 25-min threshold flagged it stale for ~20 min of every cycle).
+    (gql as any).mockResolvedValue({
+      counter: null,
+      lanternAttestations: [{ timestamp: FRESH_45_TS, leafCount: '8' }],
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET()).json();
+    expect(json.isStale).toBe(false);
+    expect(json.staleReason).toBeNull();
   });
 });
 
@@ -171,7 +187,7 @@ describe('GET /api/reserves/summary, Scribe outage', () => {
     expect(json.isStale).toBe(true);
     expect(json.staleReason).toBe('Scribe unavailable; freshness unknown');
     // staleThresholdMin still surfaces, consumers may render a tile
-    // labelled "threshold 25 min · unknown current age" honestly.
-    expect(json.staleThresholdMin).toBe(25);
+    // labelled "threshold 100 min · unknown current age" honestly.
+    expect(json.staleThresholdMin).toBe(100);
   });
 });
