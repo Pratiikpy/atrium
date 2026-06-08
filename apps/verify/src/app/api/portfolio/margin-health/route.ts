@@ -33,9 +33,20 @@ export async function GET(req?: Request) {
     // exceed Number.MAX_SAFE_INTEGER and corrupt the marginHealthBps int
     // shipped to the UI. Clamp to a sane uint16-style range before Number cast.
     const ratioBpsClamped = ratio > 1_000_000n ? 1_000_000 : Number(ratio);
-    const bufferBps = ratio > 10_000n
-      ? Math.min(1_000_000, Number(ratio - 10_000n))
-      : 0;
+    // No open positions (required margin 0) => no liquidation risk at all, so
+    // there is no meaningful buffer to show. Return null; the card renders that
+    // as "-". Pre-fix this fell to the `: 0` branch (ratio is exactly 10_000n
+    // when required=0, which is NOT > 10_000n), so a wallet with zero positions
+    // showed "LIQUIDATION BUFFER 0.0%" right next to "Vigil triggers liquidation
+    // when this hits zero" - i.e. it read as "you are being liquidated" in the
+    // single safest possible state. The `: 0` else now only fires when there IS
+    // a position whose buffer has genuinely eroded to zero. Found via real-wallet
+    // post-close QA (qa-evidence/rabby/wallet-flow/21-portfolio-postclose.png).
+    const bufferBps = required === 0n
+      ? null
+      : ratio > 10_000n
+        ? Math.min(1_000_000, Number(ratio - 10_000n))
+        : 0;
     // Audit LL-7 fix: same off-by-up-to-2× bug as JJ-2. Pre-fix:
     // `(collateral * 10_000n) / (required + 1n)` would compute
     // `collateral * 5000` when required=1 instead of `collateral * 10_000`.
