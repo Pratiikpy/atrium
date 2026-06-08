@@ -441,6 +441,12 @@ impl Plinth {
         Ok(())
     }
 
+    /// View the trusted Router (FIRE-OWN). Lets ops verify the close wiring
+    /// without guessing: close_position accepts caller == this address.
+    pub fn authorized_router(&self) -> Address {
+        self.authorized_router.get()
+    }
+
     fn open_position_inner(
         &mut self,
         venue_id: u8,
