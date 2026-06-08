@@ -589,7 +589,16 @@ impl Plinth {
         let agent = pos.agent.get(); // Phase 2a: read agent for record_close
         let is_user = caller == owner;
         let is_vigil = caller == self.vigil_address.get();
-        if !is_user && !is_vigil {
+        // FIRE-OWN fix (symmetric to open_position_for): the trusted Router
+        // closes on the owner's behalf, so it is neither the owner nor Vigil.
+        // The Router has already verified pos_owner == the close caller via its
+        // own NotPositionOwner check, so accepting the authorized router here is
+        // safe AND required - otherwise the owner-attribution fix would make
+        // every router-routed close revert ERR_UNAUTHORIZED. owner's margin is
+        // still the account released (read from pos.owner above), not caller's.
+        let router = self.authorized_router.get();
+        let is_router = !router.is_zero() && caller == router;
+        if !is_user && !is_vigil && !is_router {
             return Err(PlinthError::code(ERR_UNAUTHORIZED));
         }
 
