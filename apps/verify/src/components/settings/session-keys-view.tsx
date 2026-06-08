@@ -172,21 +172,48 @@ export function SessionKeysView() {
             </div>
           ) : keys.length === 0 ? (
             <div className="rounded-md border border-divider/60 bg-parchment-soft/40 px-4 py-6 text-center">
-              <p className="text-sm text-ink">
-                {live ? 'No active session keys.' : 'Session-key registry pending.'}
-              </p>
-              <p className="mt-1 text-[12px] text-muted">
-                {live
-                  ? 'A session key is issued when you delegate to an agent. Issue one from the Agents page.'
-                  : 'The PosternKeyRegistry is not deployed to this environment yet. Live keys appear here once it is.'}
-              </p>
-              {live && (
-                <Link
-                  href="/app/agents"
-                  className="mt-3 inline-block text-sm text-ink underline-offset-2 hover:underline"
-                >
-                  Delegate to an agent →
-                </Link>
+              {/* Distinct honest empty states. registryAddress resolving means
+                  the PosternKeyRegistry IS deployed (verified on-chain: bytecode
+                  at the resolved address), so a signed-out visitor must see
+                  "connect wallet", not "registry not deployed". The prior copy
+                  gated the not-deployed line on !live, and `live` is false
+                  whenever the keys query is disabled (which it is while
+                  disconnected, per `enabled: wallet != null`). That falsely told
+                  every signed-out visitor the live registry was missing. */}
+              {!deployed ? (
+                <>
+                  <p className="text-sm text-ink">Session-key registry pending.</p>
+                  <p className="mt-1 text-[12px] text-muted">
+                    The PosternKeyRegistry is not deployed to this environment yet. Live keys appear here once it is.
+                  </p>
+                </>
+              ) : !account ? (
+                <>
+                  <p className="text-sm text-ink">Connect your wallet to see your session keys.</p>
+                  <p className="mt-1 text-[12px] text-muted">
+                    Session keys are read per-wallet from the on-chain PosternKeyRegistry.
+                  </p>
+                </>
+              ) : live ? (
+                <>
+                  <p className="text-sm text-ink">No active session keys.</p>
+                  <p className="mt-1 text-[12px] text-muted">
+                    A session key is issued when you delegate to an agent. Issue one from the Agents page.
+                  </p>
+                  <Link
+                    href="/app/agents"
+                    className="mt-3 inline-block text-sm text-ink underline-offset-2 hover:underline"
+                  >
+                    Delegate to an agent →
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-ink">Session keys unavailable.</p>
+                  <p className="mt-1 text-[12px] text-muted">
+                    The registry is deployed but the read did not complete. Refresh to retry.
+                  </p>
+                </>
               )}
             </div>
           ) : (
