@@ -2,19 +2,25 @@ name: lantern-cron
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    # Restart cadence only. GitHub throttles schedules (fires hours apart, see
+    # the Lantern staleness incidents), so the in-run self-loop below is what
+    # actually keeps the on-chain root fresh; the cron just (re)starts it.
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+  # A fresh cron/dispatch cancels the previous long-lived loop (mirrors
+  # services pyth-keeper), so runs never stack and coverage restarts cleanly.
+  cancel-in-progress: true
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Long-lived: the publish step loops ~5.3h. GH free-tier job cap is 6h.
+    timeout-minutes: 350
     permissions:
       contents: read
     steps:
@@ -35,8 +41,25 @@ jobs:
           echo "LANTERN_KEY_PATH=$RUNNER_TEMP/lantern.key" >> "$GITHUB_ENV"
         env:
           LANTERN_KEY_ENVELOPE: ${{ secrets.LANTERN_KEY_ENVELOPE }}
-      - name: Trigger Lantern publish
-        run: pnpm --filter @atrium/lantern-attestor publish-now
+      - name: Trigger Lantern publish (in-run self-loop)
+        run: |
+          # GitHub throttles the schedule (fires hours apart), so a single
+          # publish per run lets the on-chain root drift past the ~130min
+          # staleness threshold the /reserves UI checks. Mirror the proven
+          # services pyth-keeper pattern: loop in-run for ~5.3h, publishing every
+          # ~45min - well inside the staleness window - so the proof stays fresh
+          # for the whole run. Unlike pyth (price push every ~50s), each lantern
+          # publish is an on-chain attestation that costs gas, so the cadence is
+          # minutes. The ~130min freshness buffer after the final publish covers
+          # the gap until the throttled cron restarts a fresh loop.
+          end=$((SECONDS + 19200))   # ~5.33h
+          n=0
+          while [ "$SECONDS" -lt "$end" ]; do
+            pnpm --filter @atrium/lantern-attestor publish-now || echo "lantern publish #$n failed; retrying next tick"
+            n=$((n + 1))
+            [ "$SECONDS" -lt "$end" ] && sleep 2700   # ~45min
+          done
+          echo "lantern loop done after $n publishes; cron will restart a fresh loop"
         env:
           SCRIBE_URL:                 ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC:       ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
