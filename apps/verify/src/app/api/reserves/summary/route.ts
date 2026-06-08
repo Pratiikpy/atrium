@@ -3,6 +3,7 @@ import { gql } from '@/lib/scribe-helpers';
 import { ago, parseTsOrNull } from '@/lib/format-time';
 import { formatUsd } from '@/lib/format-usd';
 import { tryGetRedeemableAssets } from '@/lib/coffer-source';
+import { tryGetLanternAttestationOnchain } from '@/lib/lantern-source';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,13 +88,40 @@ export async function GET() {
       source: 'scribe' as const,
     });
   } catch {
-    // Scribe failure → treat as stale. Consumer rendering should fall back
-    // to the "stale" visual rather than the "fresh" one, since unknown
-    // truth is closer to stale than fresh per the honesty contract.
+    // Scribe failure → try a DIRECT on-chain LanternAttestor read BEFORE
+    // degrading to "pending". The attestation root + block are on-chain (the
+    // source of truth Scribe merely indexes), so PoR freshness should survive
+    // a subgraph outage. Found via live QA 2026-06-08: a Graph Studio free-tier
+    // subgraph outage took the flagship PoR dark for minutes despite a fresh
+    // on-chain attestation. tvl/leafCount stay null (they live in the event,
+    // not contract storage), exactly as with no fallback - but freshness is
+    // recovered from the contract's latest_block + that block's timestamp.
+    const onchain = await tryGetLanternAttestationOnchain();
+    if (onchain) {
+      const nowSec = Math.floor(Date.now() / 1000);
+      const ageSec = nowSec - onchain.timestampSec;
+      const isStale = ageSec > STALE_THRESHOLD_SECONDS;
+      return NextResponse.json({
+        tvlUsd: null,
+        redeemableUsd,
+        lastAttestedTvlUsd: null,
+        lastAttestedAgo: ago(onchain.timestampSec),
+        leafCount: null,
+        isStale,
+        staleReason: isStale
+          ? `${Math.round(ageSec / 60)} min since last on-chain attestation; threshold ${Math.round(STALE_THRESHOLD_SECONDS / 60)} min (Scribe down; read direct from LanternAttestor)`
+          : 'Scribe down; freshness read direct from the on-chain LanternAttestor',
+        staleThresholdMin: Math.round(STALE_THRESHOLD_SECONDS / 60),
+        source: 'lantern-onchain' as const,
+      });
+    }
+    // Both Scribe AND the on-chain read failed → honest pending. Consumer
+    // rendering should fall back to the "stale" visual rather than "fresh",
+    // since unknown truth is closer to stale than fresh per the honesty
+    // contract. redeemableUsd is independent of Scribe (direct Coffer read),
+    // so it can still be present even when both attestation paths are down.
     return NextResponse.json({
       tvlUsd: null,
-      // redeemableUsd is independent of Scribe (direct Coffer read), so it can
-      // still be present even when the subgraph is down.
       redeemableUsd,
       lastAttestedTvlUsd: null,
       lastAttestedAgo: 'pending',

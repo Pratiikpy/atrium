@@ -3,8 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('@/lib/scribe-helpers', () => ({
   gql: vi.fn(),
 }));
+vi.mock('@/lib/lantern-source', () => ({
+  tryGetLanternAttestationOnchain: vi.fn(),
+}));
 
 import { gql } from '@/lib/scribe-helpers';
+import { tryGetLanternAttestationOnchain } from '@/lib/lantern-source';
 
 /**
  * Iter 65 audit fix: locks iter-34 (staleness flag), KK-13 (formatUsd
@@ -175,8 +179,44 @@ describe('GET /api/reserves/summary, KK-14 parseTsOrNull guard', () => {
 });
 
 describe('GET /api/reserves/summary, Scribe outage', () => {
-  it('returns source:pending with isStale:true on gql failure', async () => {
+  // Robustness fix 2026-06-08: when Scribe is down, the route falls back to a
+  // DIRECT on-chain LanternAttestor read (latest_block + that block's
+  // timestamp) before degrading to "pending", so PoR freshness survives a
+  // Graph Studio free-tier subgraph outage. Source becomes 'lantern-onchain'.
+  it('falls back to on-chain LanternAttestor when Scribe is down (source:lantern-onchain, fresh)', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe 503'));
+    (tryGetLanternAttestationOnchain as any).mockResolvedValue({
+      blockNumber: 274900000n,
+      root: '0x' + 'ab'.repeat(32),
+      timestampSec: Math.floor(Date.now() / 1000) - 5 * 60, // 5 min ago
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET()).json();
+    expect(json.source).toBe('lantern-onchain');
+    expect(json.isStale).toBe(false); // 5 min < 100 min threshold
+    expect(json.lastAttestedAgo).not.toBe('pending'); // real age, e.g. "5m ago"
+    expect(json.lastAttestedAgo).toMatch(/ago|now/i);
+    // tvl/leafCount stay null - they live in the event, not contract storage.
+    expect(json.tvlUsd).toBeNull();
+    expect(json.leafCount).toBeNull();
+  });
+
+  it('marks the on-chain fallback stale when older than the threshold', async () => {
+    (gql as any).mockRejectedValue(new Error('Scribe 503'));
+    (tryGetLanternAttestationOnchain as any).mockResolvedValue({
+      blockNumber: 274000000n,
+      root: '0x' + 'cd'.repeat(32),
+      timestampSec: Math.floor(Date.now() / 1000) - 200 * 60, // 200 min > 100
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET()).json();
+    expect(json.source).toBe('lantern-onchain');
+    expect(json.isStale).toBe(true);
+  });
+
+  it('returns source:pending only when BOTH Scribe AND the on-chain read fail', async () => {
+    (gql as any).mockRejectedValue(new Error('Scribe 503'));
+    (tryGetLanternAttestationOnchain as any).mockResolvedValue(null);
     const { GET } = await import('./route');
     const json = await (await GET()).json();
     expect(json.source).toBe('pending');
