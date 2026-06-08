@@ -88,7 +88,7 @@ export function ConnectedSitesCard() {
           user could add a session, see it once, and lose it on the next
           isolate. Surface the caveat once. */}
       <p className="mt-3 rounded-md border border-testnet/30 bg-testnet/5 px-3 py-2 text-[11px] text-ink-soft">
-        <span className="font-medium text-testnet">Heads up:</span> until Postern lands Month 1 W2, session state lives in the API's local memory and may reset on cold starts. Real on-chain revocation runs through PosternKeyRegistry.
+        <span className="font-medium text-testnet">Heads up:</span> until the Postern smart wallet ships, session state lives in the API's local memory and may reset on cold starts. Real on-chain revocation runs through PosternKeyRegistry.
       </p>
 
       {!data?.sites.length ? (

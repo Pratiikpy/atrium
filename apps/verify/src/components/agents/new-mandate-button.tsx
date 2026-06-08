@@ -308,7 +308,7 @@ function humanizeIssueError(reason: string): string {
   // outlier. Founder-voice (writing.md): plain, conversational copy.
   if (reason === 'wallet_not_connected') return 'connect wallet first';
   if (reason === 'sigil_not_deployed')
-    return 'Sigil is not deployed on this network, mandate signing lights up Month 1 W2';
+    return 'Sigil is not deployed on this network, mandate signing lights up once Sigil is live on this network';
   if (reason === 'signature_rejected') return 'wallet rejected the signature';
   if (reason.startsWith('Unknown venue slug:')) return reason;
   return reason.slice(0, 200);

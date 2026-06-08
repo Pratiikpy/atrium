@@ -87,7 +87,7 @@ const NODES: MapNode[] = [
     role: 'PER-VENUE · PORTICO',
     lang: 'SOLIDITY',
     blurb:
-      'One adapter per venue, each speaking the IPorticoAdapter interface. Nine adapter contracts are deployed and verified on Arbitrum Sepolia; seven venues are in the launch margin scope (Aave Horizon is operational today; the rest register in PorticoRegistry in Month 1 W2): Hyperliquid HIP-3, Aave Horizon, Pendle V2, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4. GMX, Morpho, and Synthetix adapters are deployed but outside the initial seven.',
+      'One adapter per venue, each speaking the IPorticoAdapter interface. Nine adapter contracts are deployed and verified on Arbitrum Sepolia; seven venues are in the launch margin scope (Aave Horizon is operational today; the rest are registering in PorticoRegistry): Hyperliquid HIP-3, Aave Horizon, Pendle V2, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4. GMX, Morpho, and Synthetix adapters are deployed but outside the initial seven.',
     tags: ['Solidity', 'Portico', '7 venues'],
     address: '0x449dD148eDFd26D8E7a449553009402107AA935a',
     chain: 'ARBITRUM SEPOLIA',

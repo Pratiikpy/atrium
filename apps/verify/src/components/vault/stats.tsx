@@ -28,7 +28,7 @@ export function VaultStats() {
     queryFn: () => fetchStats(wallet),
     refetchInterval: 30_000,
   });
-  const sourceCaption = data?.source === 'coffer' ? 'from Coffer · live RPC' : 'coffer pending · deploy Month 1 W2';
+  const sourceCaption = data?.source === 'coffer' ? 'from Coffer · live RPC' : 'coffer pending · syncing';
   // Only show wallet-scoped values when a wallet is actually connected. When
   // disconnected, useScopedWallet() returns null and /api/vault/stats falls back
   // to DEMO_WALLET_ADDRESS (kept so smoke tests + the explicit demo path still

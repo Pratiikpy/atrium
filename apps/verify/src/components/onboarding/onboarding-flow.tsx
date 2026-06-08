@@ -554,7 +554,7 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
           ? `Faucet status unavailable · ${error}`
           : status?.available
             ? 'Faucet rate-limited to one claim per address per month'
-            : status?.reason ?? 'Faucet deploys with Coffer (Month 1 W2)'}
+            : status?.reason ?? 'Faucet deploys with Coffer'}
       </p>
       <div className="mt-4 flex items-center justify-between">
         <button type="button" onClick={onBack} className="text-xs text-muted hover:text-ink">
@@ -615,7 +615,7 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             (isLive ? 'text-[var(--color-status-green)]' : 'text-muted')
           }
         >
-          {isLive ? '● Plinth · margin ok' : '● Plinth · source built · deploy Month 1 W2'}
+          {isLive ? '● Plinth · margin ok' : '● Plinth · source built · deploy pending'}
         </p>
 
         <div className="mt-5 grid grid-cols-3 gap-4 border-t border-divider pt-6">

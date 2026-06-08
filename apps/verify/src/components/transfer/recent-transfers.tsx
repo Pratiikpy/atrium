@@ -43,7 +43,7 @@ export function RecentTransfers() {
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center text-sm text-ink-soft">
         No transfers yet.
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {data?.source === 'pending' ? 'aqueduct deploy month 1 w2' : 'send your first one above'}
+          {data?.source === 'pending' ? 'aqueduct CCIP lane pending' : 'send your first one above'}
         </p>
       </div>
     );
