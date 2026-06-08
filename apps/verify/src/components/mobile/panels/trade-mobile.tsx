@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useOpenPosition } from '@/lib/use-open-position';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
@@ -81,6 +83,39 @@ export function TradeMobile() {
   // 4000 on mobile, 1000 on desktop). Match desktop: the typed amount IS the
   // notional; leverage stays a UI-only slider. Submit + display now agree.
   const notional = Number(amount || '0').toFixed(2);
+
+  // Margin preview: wire the SAME /api/trade/margin-impact path the desktop
+  // MarginImpactPanel reads (initial/maintenance margin + liquidation buffer
+  // from Plinth's per-venue haircut), so a mobile trader is not blind to their
+  // margin. Pre-fix the order summary hardcoded 'pending' for these rows with a
+  // "until the margin-impact fetch is wired into mobile" TODO; this wires it.
+  // Found via real-wallet mobile QA (28-mobile-trade.png: desktop showed real
+  // margin, mobile showed pending). walletQuery() keeps the authed-fetch shape so
+  // the IDOR gate does not 403 the preview (same fix the desktop order form took).
+  const wallet = useScopedWallet();
+  const { data: impact } = useQuery({
+    queryKey: ['mobile-margin-impact', venueId, notional, wallet],
+    queryFn: async () => {
+      try {
+        const r = await fetch(
+          walletQuery(
+            `/api/trade/margin-impact?size=${encodeURIComponent(notional)}&venue=${encodeURIComponent(venueId)}`,
+            wallet,
+          ),
+        );
+        if (!r.ok) throw new Error();
+        return (await r.json()) as {
+          initialMarginUsd: string | null;
+          maintenanceMarginUsd: string | null;
+          liquidationBufferBps: number | null;
+        };
+      } catch {
+        return null;
+      }
+    },
+    refetchInterval: 10_000,
+    enabled: amountValid,
+  });
 
   const submit = () => {
     if (!ready) return;
@@ -198,14 +233,19 @@ export function TradeMobile() {
       {/* Order summary */}
       <div className="rounded-2xl border border-mob-line bg-mob-bg-card">
         <Row l="Notional" v={`$${Number(notional).toLocaleString()}`} />
-        {/* Bug-hunt fix (2026-06-02): this showed the FULL position size as
-            "Initial margin", but initial margin is the venue haircut (e.g. 10% on
-            HL), so a $1,000 size should read ~$100, not $1,000 - a wrong number
-            presented as a real computed figure next to honest 'pending' rows.
-            Show 'pending' until the margin-impact fetch is wired into mobile. */}
-        <Row l="Initial margin" v="pending" />
-        <Row l="Liquidation" v="pending" />
-        <Row l="Fee" v="pending" />
+        {/* Wired to /api/trade/margin-impact (2026-06-08): initial + maintenance
+            margin come from Plinth's per-venue initial-margin haircut, liquidation
+            buffer from the resulting account health - the same fields the desktop
+            MarginImpactPanel shows. Falls back to 'pending' only when the fetch
+            has not resolved or returns the pending source (no wallet, or a venue
+            Plinth has no instrument config for), never a wrong computed number.
+            The dropped "Fee" row had no data source and the desktop omits it. */}
+        <Row l="Initial margin" v={impact?.initialMarginUsd ?? 'pending'} />
+        <Row l="Maintenance margin" v={impact?.maintenanceMarginUsd ?? 'pending'} />
+        <Row
+          l="Liquidation buffer"
+          v={impact?.liquidationBufferBps != null ? `${(impact.liquidationBufferBps / 100).toFixed(1)}%` : 'pending'}
+        />
         <Row l="Gas" v="sponsored" />
       </div>
 
