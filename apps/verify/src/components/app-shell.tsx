@@ -146,7 +146,14 @@ export function AppShell({
             testnet
           </span>
         </header>
-        <main style={{ padding: '16px', paddingBottom: 'calc(112px + env(safe-area-inset-bottom, 0px))' }}>{isMobile ? (mobile ?? children) : null}</main>
+        {/* paddingBottom must clear BOTH the bottom nav AND the persistent
+            emergency-stop FAB (kill-switch-mobile.tsx: fixed bottom-24 right-4,
+            size-14 -> reaches ~152px from the bottom). Pre-fix this was 112px, so
+            the last rows of long panels (e.g. the trade order summary's
+            "Liquidation buffer" value, which is right-aligned under the FAB)
+            scrolled behind the shield. 164px = 152px FAB reach + a 12px margin.
+            Found via real-wallet mobile QA (29-mobile-trade-margin-wired.png). */}
+        <main style={{ padding: '16px', paddingBottom: 'calc(164px + env(safe-area-inset-bottom, 0px))' }}>{isMobile ? (mobile ?? children) : null}</main>
         {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
             never rendered one - the built MobileBottomNav was orphaned, leaving
             mobile users with no in-app navigation between screens. Now wired. */}
