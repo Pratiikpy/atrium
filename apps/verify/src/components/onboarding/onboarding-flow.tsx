@@ -588,7 +588,13 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
       .catch(() => setBp({ currentUsd: null, source: 'pending' }));
   }, [wallet]);
 
-  const isLive = bp?.source === 'plinth' && bp.currentUsd != null && parseFloat(bp.currentUsd) > 0;
+  // plinthReachable: Plinth returned a buying-power figure (it is deployed and
+  // reachable), independent of whether THIS user has any buying power yet. The
+  // prior copy collapsed "you have no buying power" into "Plinth deploy
+  // pending", falsely telling disconnected/no-deposit users the deployed Plinth
+  // (0xe01d09ed) was undeployed.
+  const plinthReachable = bp?.source === 'plinth';
+  const isLive = plinthReachable && bp!.currentUsd != null && parseFloat(bp!.currentUsd) > 0;
   const buyingPower = isLive ? `$${bp!.currentUsd}` : 'pending';
 
   return (
@@ -615,7 +621,11 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             (isLive ? 'text-[var(--color-status-green)]' : 'text-muted')
           }
         >
-          {isLive ? '● Plinth · margin ok' : '● Plinth · source built · deploy pending'}
+          {isLive
+            ? '● Plinth · margin ok'
+            : plinthReachable
+            ? '● Plinth · live · buying power pending'
+            : '● Plinth · computing'}
         </p>
 
         <div className="mt-5 grid grid-cols-3 gap-4 border-t border-divider pt-6">
@@ -655,7 +665,7 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             </>
           ) : (
             <>
-              Once Plinth deploys, one deposit gives you buying power across all {VENUE_COUNT}{' '}
+              One deposit gives you buying power across all {VENUE_COUNT}{' '}
               venues at once, and you never re-post collateral per venue.
             </>
           )}
