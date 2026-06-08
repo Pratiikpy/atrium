@@ -55,11 +55,11 @@ export const STEP_CONFIG = {
   },
   '6': {
     title: 'Verify proof of reserves',
-    // Phase theta-followup (2026-05-25): cadence updated. Pre-fix said
-    // "hourly Merkle roots" but Phase θ.3 moved Lantern from Vercel
-    // daily cron to a GHA cron running roughly hourly, 6× the
-    // resolution.
-    body: 'Lantern publishes a fresh Merkle root roughly hourly via GHA cron. The page shows your balance as a Merkle leaf with a verifiable inclusion proof against the latest root.',
+    // Cadence (2026-06-08): GitHub throttles plain cron, so Lantern runs an
+    // in-run self-loop publishing about every 45 min (the */30 cron just
+    // restarts it). Was "roughly hourly via GHA cron" pre-self-loop; matches
+    // the lantern dashboard copy + the 100-min staleThresholdMin.
+    body: 'Lantern publishes a fresh Merkle root about every 45 minutes via an in-run self-loop. The page shows your balance as a Merkle leaf with a verifiable inclusion proof against the latest root.',
     contract: 'Lantern.AttestationPublished',
     nextStep: 7,
   },
