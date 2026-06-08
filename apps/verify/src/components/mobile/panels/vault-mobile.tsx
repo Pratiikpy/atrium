@@ -8,7 +8,9 @@
  */
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
+import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
 import { useBalanceAware } from '@/lib/use-balance-aware';
@@ -33,6 +35,27 @@ export function VaultMobile() {
     token: ARB_SEPOLIA_USDC,
     decimals: USDC_DECIMALS,
     inputAmount: amount,
+  });
+
+  // Vault POSITION (redeemable value of your shares), same /api/vault/stats path
+  // the desktop VaultStats reads. Mobile previously showed only the wallet USDC
+  // balance, so a depositor could not see what they actually held in the vault on
+  // this screen. Found via real-wallet mobile QA (qa-evidence/rabby/wallet-flow/
+  // 25-mobile-vault-connected.png - sparse screen, position invisible on mobile).
+  const wallet = useScopedWallet();
+  const { data: vaultStats } = useQuery({
+    queryKey: ['vault-stats', wallet],
+    queryFn: async () => {
+      try {
+        const r = await fetch(walletQuery('/api/vault/stats', wallet));
+        if (!r.ok) throw new Error();
+        return (await r.json()) as { userValueUsd: string | null; userSharesFormatted: string | null };
+      } catch {
+        return { userValueUsd: null, userSharesFormatted: null };
+      }
+    },
+    refetchInterval: 30_000,
+    enabled: wallet != null,
   });
 
   const deposit = useVaultDeposit(cofferAddress ?? null);
@@ -93,6 +116,19 @@ export function VaultMobile() {
           ${balanceFormatted ?? '-'}
         </p>
       </section>
+
+      {/* Vault position card - redeemable value of your shares. Mirrors the desktop
+          "Your value" tile so mobile depositors can see what they hold, not just
+          their wallet balance. Renders only once a real position exists. */}
+      {wallet != null && vaultStats?.userValueUsd && vaultStats.userValueUsd !== '-' && (
+        <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-4">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-mob-muted">Your vault position</p>
+          <p className="mt-1 text-[24px] font-medium text-mob-ink">{vaultStats.userValueUsd}</p>
+          <p className="mt-1 text-[12px] text-mob-muted">
+            redeemable · {vaultStats.userSharesFormatted ?? '-'} shares
+          </p>
+        </section>
+      )}
 
       {/* Segmented control */}
       <div className="grid grid-cols-2 gap-1 rounded-xl border border-mob-line bg-mob-bg-card p-1">
