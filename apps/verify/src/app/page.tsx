@@ -146,8 +146,8 @@ export default async function LandingPage() {
             the dashboard frame shows what /app/portfolio looks like populated. */}
         <section id="portfolio-feature" className="feature">
           <div className="container">
-            <div className="section-head product-feature-head">
-              <div className="product-feature-copy">
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
                 <div className="eyebrow mono cap">Plinth · margin engine</div>
                 <p className="section-sub">
                   Plinth computes a SPAN-style cross-product margin number in Rust,
@@ -240,16 +240,18 @@ export default async function LandingPage() {
         {/* ============== FEATURE · AQUEDUCT (CCIP bridge) ============== */}
         <section id="bridge" className="feature">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Aqueduct · Chainlink CCIP</div>
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
+                <div className="eyebrow mono cap">Aqueduct · Chainlink CCIP</div>
+                <p className="section-sub">
+                  Aqueduct routes assets through Chainlink CCIP. Collateral posted on
+                  Robinhood Chain becomes Plinth credit on Arbitrum in under ten seconds.
+                </p>
+              </div>
               <h2 className="h2">
                 Move collateral between chains in{' '}
                 <span className="accent-grad">one transaction.</span>
               </h2>
-              <p className="section-sub">
-                Aqueduct routes assets through Chainlink CCIP. Collateral posted on
-                Robinhood Chain becomes Plinth credit on Arbitrum in under ten seconds.
-              </p>
             </div>
             <div className="feature-stage">
               <div className="product-frame">
@@ -263,7 +265,7 @@ export default async function LandingPage() {
                     <span style={{ opacity: 0.5, marginRight: 6 }}>https://</span>
                     useatrium.me/app/transfer
                   </div>
-                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>sample</div>
+                  <div className="mono cap" style={{ opacity: 0.85, fontSize: 10.5 }}>sample</div>
                 </div>
                 <div className="product-body" style={{ padding: 32 }}>
                   <div className="mono cap muted">Cross-chain transfer · Aqueduct</div>
@@ -329,16 +331,18 @@ How a cross-chain transfer flows through Chainlink CCIP · walk the flow in /app
         {/* ============== FEATURE · SIGIL (agent mandates, dark) ============== */}
         <section id="agents-feature" className="feature dark">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Sigil · ERC-8004 mandates</div>
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
+                <div className="eyebrow mono cap">Sigil · ERC-8004 mandates</div>
+                <p className="section-sub">
+                  You sign one Intent Sigil, an EIP-712 mandate authorising one agent, for
+                  one strategy, for a finite window. Postern issues a session key. Your
+                  master key never moves.
+                </p>
+              </div>
               <h2 className="h2">
                 Agents trade with <span className="accent-grad">bounded mandates.</span>
               </h2>
-              <p className="section-sub">
-                You sign one Intent Sigil, an EIP-712 mandate authorising one agent, for
-                one strategy, for a finite window. Postern issues a session key. Your
-                master key never moves.
-              </p>
             </div>
             <div className="feature-stage">
               <div className="product-frame">
@@ -352,7 +356,7 @@ How a cross-chain transfer flows through Chainlink CCIP · walk the flow in /app
                     <span style={{ opacity: 0.5, marginRight: 6 }}>https://</span>
                     useatrium.me/app/agents/delphi.eth
                   </div>
-                  <div className="mono cap" style={{ opacity: 0.5, fontSize: 9.5 }}>sample</div>
+                  <div className="mono cap" style={{ opacity: 0.85, fontSize: 10.5 }}>sample</div>
                 </div>
                 <div className="product-body dark" style={{ padding: 0 }}>
                   <div className="agent-head">
@@ -364,7 +368,7 @@ How a cross-chain transfer flows through Chainlink CCIP · walk the flow in /app
                         Volatility arbitrage · running
                       </div>
                     </div>
-                    <div className="mono cap" style={{ color: 'var(--live)' }}>● live</div>
+                    <div className="mono cap" style={{ color: 'color-mix(in oklch, white 45%, transparent)' }}>● sample</div>
                   </div>
                   <div style={{ padding: '8px 24px 24px' }}>
                     {[
@@ -423,15 +427,17 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
         {/* ============== FEATURE · LANTERN (proof-of-reserves) ============== */}
         <section id="reserves" className="feature">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Lantern · proof-of-reserves</div>
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
+                <div className="eyebrow mono cap">Lantern · proof-of-reserves</div>
+                <p className="section-sub">
+                  Lantern publishes a signed Merkle attestation roughly hourly. Anyone
+                  can verify a balance against it locally, without trusting Atrium.
+                </p>
+              </div>
               <h2 className="h2">
                 Every dollar, <span className="accent-grad">on the public record.</span>
               </h2>
-              <p className="section-sub">
-                Lantern publishes a signed Merkle attestation roughly hourly. Anyone
-                can verify a balance against it locally, without trusting Atrium.
-              </p>
             </div>
             <div className="feature-stage">
               <div className="product-frame">
@@ -561,16 +567,18 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
         {/* ============== SUBSYSTEMS · Four architectural blocks (reference parity) ============== */}
         <section id="subsystems" className="subsystems">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Subsystems</div>
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
+                <div className="eyebrow mono cap">Subsystems</div>
+                <p className="section-sub">
+                  Each subsystem owns one responsibility. Thirteen are live on testnet
+                  today; all eighteen ship at launch, with Stoa conditional on Phase-2
+                  funding.
+                </p>
+              </div>
               <h2 className="h2">
                 Eighteen named pieces. <span className="accent-grad">Four architectural blocks.</span>
               </h2>
-              <p className="section-sub">
-                Each subsystem owns one responsibility. Thirteen are live on testnet
-                today; all eighteen ship at launch, with Stoa conditional on Phase-2
-                funding.
-              </p>
             </div>
             <div className="subsys-stack">
               {[
@@ -648,16 +656,18 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
         {/* ============== ARCHITECTURE (reference parity) ============== */}
         <section id="architecture" className="architecture">
           <div className="container">
-            <div className="section-head centered">
-              <div className="eyebrow mono cap">Architecture</div>
+            <div className="section-head feature-split-head">
+              <div className="feature-split-copy">
+                <div className="eyebrow mono cap">Architecture</div>
+                <p className="section-sub">
+                  Risk math lives in Rust, deployed as Stylus. The venue layer lives in
+                  Solidity, on OpenZeppelin patterns. Chainlink CCIP is the messaging bus
+                  between chains.
+                </p>
+              </div>
               <h2 className="h2">
                 Stylus for hot math. <span className="accent-grad">Solidity</span> for the venue layer.
               </h2>
-              <p className="section-sub">
-                Risk math lives in Rust, deployed as Stylus. The venue layer lives in
-                Solidity, on OpenZeppelin patterns. Chainlink CCIP is the messaging bus
-                between chains.
-              </p>
             </div>
             <div className="arch-stack">
               {[
