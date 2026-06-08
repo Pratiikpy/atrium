@@ -7,9 +7,9 @@ dataSources:
     name: Plinth
     network: arbitrum-sepolia
     source:
-      address: "0xeccfa8220ff56e7848cccaeffbacf4e8442cf20b"
+      address: "0xe01d09edcf889bf5577666f0aa61f5701c72a26c"
       abi: Plinth
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,9 +51,9 @@ dataSources:
     name: Vigil
     network: arbitrum-sepolia
     source:
-      address: "0xbd7169203dc65068dfb3a4fa4712ff26f48cfc85"
+      address: "0x5e099faf4fbc70832ea5e12178a9f9dec96ba194"
       abi: Vigil
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -90,9 +90,9 @@ dataSources:
     name: Coffer
     network: arbitrum-sepolia
     source:
-      address: "0x64b6aa920044878cf6fe74786f3a5c7c3f30376e"
+      address: "0xb62762000686a9589b01d63ba7e50f51f46a86ef"
       abi: Coffer
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -196,9 +196,9 @@ dataSources:
     name: Sigil
     network: arbitrum-sepolia
     source:
-      address: "0x9d8424bd5e7b639ba7abaff3d09d2a9e7bcb445f"
+      address: "0x517afac9b39c01c0cf044b335742c95960959cdc"
       abi: Sigil
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -252,7 +252,7 @@ dataSources:
     source:
       address: "0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd"
       abi: PorticoRegistry
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -418,9 +418,9 @@ dataSources:
     name: AtriumRouter
     network: arbitrum-sepolia
     source:
-      address: "0x71b194f93ad70879f8fd8ec476d450a8a4445d46"
+      address: "0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562"
       abi: AtriumRouter
-      startBlock: 274800000
+      startBlock: 275000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

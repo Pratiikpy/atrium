@@ -8,7 +8,7 @@
       "block": 270408443
     },
     "portico-registry": {
-      "address": "0x54bd8cbfef638bd9d9d3d71f95454edcfec89352",
+      "address": "0x3FceF659077B4E0d3ccf2162A80Be1Ed0818A81e",
       "tx": "0x8371174f4e92d47692deb4aaef335bc3543c0ad0623c185bd457173c44934505",
       "block": 270408449
     },
@@ -49,29 +49,29 @@
       "block": 270408479
     },
     "coffer": {
-      "address": "0x64b6aa920044878cf6fe74786f3a5c7c3f30376e",
-      "tx": "0xdfc0a7ce89419e1f6e3c47d4be3f93cdc2f839891a61408778ca14d3947e1f0c",
+      "address": "0xb62762000686a9589b01d63ba7e50f51f46a86ef",
+      "tx": "0x7f59c79f6fe95f1046b5a365072ca442327770dbd50c4d86900461e51b3bf62a",
       "block": 270800974,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T23:45:42.722Z",
+      "deployed_at": "2026-06-08T01:11:57.335Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "sigil": {
-      "address": "0x9d8424bd5e7b639ba7abaff3d09d2a9e7bcb445f",
-      "tx": "0x316c5b26e23a68b04a1736b048d78f3df9689899d58db673c93e810bba860fe6",
+      "address": "0x517afac9b39c01c0cf044b335742c95960959cdc",
+      "tx": "0x5de6c8af100d3a29dc1e516c821c977e632f8fb4f18a2d4458d7364d5c208a24",
       "activationTx": "0x2a1da43ea0709412f58eea101f7a224c299475bd019673a76a3a1c1fae96bb35",
       "block": 270801710,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T23:46:19.898Z",
+      "deployed_at": "2026-06-08T01:12:28.570Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "vigil": {
-      "address": "0xbd7169203dc65068dfb3a4fa4712ff26f48cfc85",
-      "tx": "0x34c66a763055397d0dfe214cfcb06f3309203e8ba961772d4993fe3f4c06b216",
+      "address": "0x5e099faf4fbc70832ea5e12178a9f9dec96ba194",
+      "tx": "0x8df23297d0b6083a40b2a705fe8206e851ee783f36f5ce99107933767fcc0c9e",
       "activationTx": "0x2bfd74b778f2f298be6b1e629973dda939282e7cd507dd2b5ecf3496e49bfe89",
       "block": 270802353,
       "kind": "stylus",
-      "deployed_at": "2026-06-07T23:47:13.699Z",
+      "deployed_at": "2026-06-08T01:13:05.661Z",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7)."
     },
     "plinth-math": {
@@ -91,15 +91,15 @@
       "note": "Dual-oracle price reader extracted from Plinth (Phase A.7), Chainlink + Pyth + median + 50bps tolerance"
     },
     "plinth": {
-      "address": "0xeccfa8220ff56e7848cccaeffbacf4e8442cf20b",
-      "tx": "0xe10c3d796d465b2af8adf0e4eeb5d8cea78d1de7b8f5cd1fbc220faa64dfd5db",
+      "address": "0xe01d09edcf889bf5577666f0aa61f5701c72a26c",
+      "tx": "0x3e1672ca854f8c63c92099b3f2843397cf81f49e7c8ca52b4d99ebdb98935027",
       "block": 270803107,
       "kind": "stylus",
       "note": "Redeployed 2026-05-30 (18 confirmed-critical fix pass). coffer/vigil use #[constructor] + a one-time praetor-gated set_plinth() to break the coffer<->plinth construct cycle; sigil still initialize()-based; plinth via multi-fragment factory (cargo-stylus 0.10.7).",
-      "deployed_at": "2026-06-07T23:48:33.269Z"
+      "deployed_at": "2026-06-08T01:14:08.633Z"
     },
     "atrium-router": {
-      "address": "0x71b194f93ad70879f8fd8ec476d450a8a4445d46",
+      "address": "0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562",
       "tx": "0x3e96234b389258515dda252306cb046c8aa1c9c9de7812b5854645af749a85ac",
       "block": 270726101,
       "kind": "solidity",
@@ -113,7 +113,7 @@
       "note": "Redeployed 2026-06-01 post-cutover: constructor plinth = live Plinth 0xd86f579e (was the dead 99-byte pre-cutover Plinth)."
     },
     "adapter-aave-horizon": {
-      "address": "0xCE43b1f6Bcf60B6A0eA2d170970AEE8650924b86",
+      "address": "0x449dD148eDFd26D8E7a449553009402107AA935a",
       "tx": "0x08d4d069c1370449aff4a5c8281f2e6eaa97811161f9f60917161e52ac79e48a",
       "deployed_at": "2026-05-25T19:25:00.000Z",
       "kind": "solidity",
