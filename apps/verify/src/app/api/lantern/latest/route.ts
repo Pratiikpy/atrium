@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { gql } from '@/lib/scribe-helpers';
 import { parseTsOrNull } from '@/lib/format-time';
 import { safeErrorDetail } from '@/lib/safe-error';
+import { tryGetLatestAttestationEvent } from '@/lib/lantern-source';
 
 /**
  * GET /api/lantern/latest
@@ -104,6 +105,28 @@ export async function GET() {
     };
     return NextResponse.json(wire);
   } catch (err) {
+    // Scribe failure → recover the FULL latest attestation directly from the
+    // on-chain AttestationPublished event before degrading to 503. The
+    // attestation (root, block, timestamp, leafCount, ipfsCid) is on-chain (the
+    // source of truth Scribe merely indexes), so the dashboard survives a
+    // subgraph outage. Found via live QA 2026-06-08: a Graph Studio free-tier
+    // outage left this route (the /lantern dashboard's source) 503 despite a
+    // fresh on-chain attestation, while /api/reserves/summary already had an
+    // on-chain fallback. This brings the dashboard's route to parity.
+    const onchain = await tryGetLatestAttestationEvent();
+    if (onchain) {
+      const wire: AttestationWire & { source: 'lantern-onchain' } = {
+        root: onchain.root,
+        blockNumber: onchain.blockNumber,
+        timestamp: onchain.timestamp,
+        leafCount: onchain.leafCount,
+        ipfsCid: onchain.ipfsCid,
+        ipfsPinned: onchain.ipfsCid.length > 0,
+        source: 'lantern-onchain',
+      };
+      return NextResponse.json(wire);
+    }
+    // Both Scribe AND the on-chain event read failed → honest 503.
     return NextResponse.json(
       { error: 'scribe_unavailable', detail: safeErrorDetail(err) },
       { status: 503 }

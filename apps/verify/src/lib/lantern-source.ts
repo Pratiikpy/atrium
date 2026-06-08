@@ -66,3 +66,75 @@ export async function tryGetLanternAttestationOnchain(): Promise<LanternOnchainA
     return null;
   }
 }
+
+/** Full attestation recovered from the AttestationPublished event (carries the
+ * fields not in contract storage: leafCount + ipfsCid + publish timestamp). */
+export interface LanternEventAttestation {
+  root: `0x${string}`;
+  blockNumber: number;
+  timestamp: number;
+  leafCount: number;
+  ipfsCid: string;
+}
+
+const ATTESTATION_PUBLISHED_EVENT = {
+  type: 'event',
+  name: 'AttestationPublished',
+  inputs: [
+    { name: 'root', type: 'bytes32', indexed: true },
+    { name: 'block_number', type: 'uint256', indexed: false },
+    { name: 'timestamp', type: 'uint256', indexed: false },
+    { name: 'leafCount', type: 'uint256', indexed: true },
+    { name: 'ipfsCid', type: 'string', indexed: false },
+  ],
+} as const;
+
+/**
+ * Recover the FULL latest attestation by reading the AttestationPublished event
+ * directly on-chain - used by /api/lantern/latest (the dashboard's route) as a
+ * Scribe fallback. Unlike the getter-only read above, this carries leafCount +
+ * ipfsCid (event-only fields), so the dashboard's wire shape is unchanged and
+ * it renders fully despite a subgraph outage. Filters by the contract's
+ * latest_root (indexed), bounding the log range to a window around latest_block
+ * (the publish tx is at >= the snapshot block it records). Returns null on any
+ * failure, so the caller falls through to its existing honest 503.
+ */
+export async function tryGetLatestAttestationEvent(): Promise<LanternEventAttestation | null> {
+  const address = await loadContractAddress('lantern-attestor');
+  if (!address) return null;
+  try {
+    const { createPublicClient, http, getContract } = await import('viem');
+    const { arbitrumSepolia } = await import('viem/chains');
+    const rpc = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
+    const client = createPublicClient({ chain: arbitrumSepolia, transport: http(rpc) });
+    const lantern = getContract({ address: address as `0x${string}`, abi: LANTERN_ABI, client });
+    const [latestBlock, latestRoot] = await Promise.all([
+      lantern.read.latest_block() as Promise<bigint>,
+      lantern.read.latest_root() as Promise<`0x${string}`>,
+    ]);
+    if (latestBlock === 0n) return null;
+    const fromBlock = latestBlock > 20_000n ? latestBlock - 20_000n : 0n;
+    const logs = await client.getContractEvents({
+      address: address as `0x${string}`,
+      abi: [ATTESTATION_PUBLISHED_EVENT],
+      eventName: 'AttestationPublished',
+      args: { root: latestRoot },
+      fromBlock,
+      toBlock: 'latest',
+    });
+    const ev = logs[logs.length - 1];
+    const a = ev?.args as
+      | { root?: `0x${string}`; block_number?: bigint; timestamp?: bigint; leafCount?: bigint; ipfsCid?: string }
+      | undefined;
+    if (!a || a.block_number == null || a.timestamp == null || a.leafCount == null) return null;
+    return {
+      root: (a.root ?? latestRoot) as `0x${string}`,
+      blockNumber: Number(a.block_number),
+      timestamp: Number(a.timestamp),
+      leafCount: Number(a.leafCount),
+      ipfsCid: a.ipfsCid ?? '',
+    };
+  } catch {
+    return null;
+  }
+}

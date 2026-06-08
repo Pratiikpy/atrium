@@ -3,8 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('@/lib/scribe-helpers', () => ({
   gql: vi.fn(),
 }));
+vi.mock('@/lib/lantern-source', () => ({
+  tryGetLatestAttestationEvent: vi.fn(),
+}));
 
 import { gql } from '@/lib/scribe-helpers';
+import { tryGetLatestAttestationEvent } from '@/lib/lantern-source';
 
 /**
  * Iter 70 audit fix: locks J-M10 + NN-3 + TT-17 on /api/lantern/latest.
@@ -174,15 +178,38 @@ describe('GET /api/lantern/latest, happy path', () => {
   });
 });
 
-describe('GET /api/lantern/latest, 503 on Scribe outage', () => {
-  it('returns 503 + scribe_unavailable (NOT silent 404)', async () => {
+describe('GET /api/lantern/latest, Scribe outage', () => {
+  // Robustness fix 2026-06-08: when Scribe is down, the route recovers the FULL
+  // latest attestation from the on-chain AttestationPublished event (root +
+  // block + timestamp + leafCount + ipfsCid) before degrading to 503 - so the
+  // /lantern dashboard renders fully despite a subgraph outage.
+  it('falls back to the on-chain event when Scribe is down (full attestation, source:lantern-onchain)', async () => {
     (gql as any).mockRejectedValue(new Error('Scribe down'));
+    (tryGetLatestAttestationEvent as any).mockResolvedValue({
+      root: '0x' + 'ab'.repeat(32),
+      blockNumber: 275102614,
+      timestamp: 1780928132,
+      leafCount: 4,
+      ipfsCid: 'QmWHPF766yKNJrW1example',
+    });
+    const { GET } = await import('./route');
+    const res = await GET();
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.source).toBe('lantern-onchain');
+    expect(json.leafCount).toBe(4);
+    expect(json.root).toMatch(/^0x[0-9a-f]{64}$/i);
+    expect(json.ipfsPinned).toBe(true); // CID present
+  });
+
+  it('returns 503 + scribe_unavailable only when BOTH Scribe AND the on-chain read fail', async () => {
+    (gql as any).mockRejectedValue(new Error('Scribe down'));
+    (tryGetLatestAttestationEvent as any).mockResolvedValue(null);
     const { GET } = await import('./route');
     const res = await GET();
     // Load-bearing: 503 (not 404) so the dashboard can distinguish
-    // "no data yet" (empty state) from "we can't reach Scribe"
-    // (outage banner). Both ship with `exists: false` semantics but
-    // the status code is the load-bearing signal.
+    // "no data yet" (empty state) from "we can't reach either source"
+    // (outage banner). The status code is the load-bearing signal.
     expect(res.status).toBe(503);
     const json = await res.json();
     expect(json.error).toBe('scribe_unavailable');
