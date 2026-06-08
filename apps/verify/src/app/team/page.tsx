@@ -71,7 +71,7 @@ export default function TeamPage() {
             <li><strong className="text-ink">Best product option, no compromise.</strong> When two paths fork, take the one that makes the product more correct, trustworthy, and defensible.</li>
             <li><strong className="text-ink">Live dashboards never inflate.</strong> If two of three keepers are up, the page shows two of three.</li>
             <li><strong className="text-ink">Tripwires beat silent slips.</strong> Scope cuts get announced the same day they happen.</li>
-            <li><strong className="text-ink">No fake immutability.</strong> Contracts are upgradeable today behind a multisig and a 48-hour timelock, we say so out loud.</li>
+            <li><strong className="text-ink">No fake immutability.</strong> Contracts are upgradeable; on testnet today admin is a single deployer key, with a 3-of-5 multisig + 48-hour timelock as the mainnet target. We say so out loud.</li>
           </ul>
           <Link href="/manifesto" className="mt-6 inline-block text-sm text-ink underline-offset-2 hover:underline">
             Read the manifesto →

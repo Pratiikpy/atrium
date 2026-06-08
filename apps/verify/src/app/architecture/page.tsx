@@ -23,7 +23,7 @@ const STATS = [
 const SECURITY = [
   {
     t: 'Timelock + multisig',
-    b: 'Every parameter setter is timelock-gated (48h). Emergency pause is multisig-only with no delay. It can pause but cannot upgrade.',
+    b: 'In the mainnet design, every parameter setter is timelock-gated (48h) and emergency pause is multisig-only with no delay (it can pause but cannot upgrade). On testnet today, admin is a single deployer key; the 3-of-5 multisig + timelock is the mainnet target.',
   },
   {
     t: 'Dual-oracle reads',

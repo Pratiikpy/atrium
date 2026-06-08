@@ -28,7 +28,7 @@ export default function SecurityPage() {
             <li>• Kani plus proptest invariants: 9 Kani proofs authored, 5 of 9 proptest invariants pass locally. Formal-verification CI lane lands Month 3.</li>
             <li>• Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.</li>
             <li>• 3-keeper redundancy with economic slashing.</li>
-            <li>• Praetor 3-of-5 multisig plus 48-hour PraetorTimelock on every parameter change.</li>
+            <li>• Praetor 3-of-5 multisig plus 48-hour PraetorTimelock on every parameter change (the mainnet target; testnet admin today is a single deployer key).</li>
             <li>• ERC-7201 namespaced storage for safe upgrades.</li>
             <li>• Per-adapter per-block notional cap on Coffer.</li>
             <li>• Postern Kill Switch revokes every Sigil mandate plus every ERC-7715 session key in one batched tx.</li>

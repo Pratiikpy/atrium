@@ -25,7 +25,7 @@ export default function PressPage() {
             Atrium is a cross-venue portfolio margin protocol on Arbitrum. One wallet
             posts collateral once and trades across multiple on-chain venues with a
             single margin number. The protocol uses SPAN-style risk scenarios, formal
-            verification via Kani, and a 48-hour timelocked multisig for upgrades.
+            verification via Kani, and, for upgrades, a single deployer-key admin on testnet today (with a 48-hour timelocked 3-of-5 multisig as the mainnet target).
             Currently deployed on Arbitrum Sepolia testnet.
           </p>
         </section>
