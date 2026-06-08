@@ -8,6 +8,7 @@ import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useBalanceAware } from '@/lib/use-balance-aware';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { ARB_SEPOLIA_USDC, USDC_DECIMALS } from '@/lib/testnet-tokens';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 /**
  * Vault · Deposit. Audit U-15: previously the submit button had
@@ -69,11 +70,11 @@ export function VaultDeposit() {
             )}
           </div>
           <input
-            type="number"
+            type="text"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
             disabled={busy}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-lg text-ink min-h-[44px] focus:border-ink/40 focus:outline-none"
           />

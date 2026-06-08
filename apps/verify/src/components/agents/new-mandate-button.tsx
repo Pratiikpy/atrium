@@ -7,6 +7,7 @@ import { VENUES } from '@/lib/venues';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useIssueMandate } from '@/lib/use-issue-mandate';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 const SIGIL_MAX_VENUES = 8;
 const ZERO_ADDR = '0x' + '0'.repeat(40);
@@ -318,10 +319,10 @@ function NumberField({ label, value, onChange }: { label: string; value: string;
     <label className="block">
       <span className="text-[10px] uppercase tracking-wider text-muted">{label}</span>
       <input
-        type="number"
+        type="text"
         inputMode="decimal"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(sanitizeAmount(e.target.value))}
         className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-3 py-2.5 font-mono text-sm text-ink focus:border-ink/40 focus:outline-none"
       />
     </label>

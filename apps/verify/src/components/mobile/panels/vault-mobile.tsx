@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
 import { useBalanceAware } from '@/lib/use-balance-aware';
@@ -112,10 +113,10 @@ export function VaultMobile() {
       <div className="relative">
         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-mob-muted">$</span>
         <input
-          type="number"
+          type="text"
           inputMode="decimal"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
           placeholder="0.00"
           className="h-[56px] w-full rounded-xl border border-mob-line bg-mob-bg-card pl-8 pr-20 text-[18px] text-mob-ink placeholder:text-mob-muted focus:border-mob-accent focus:outline-none"
         />

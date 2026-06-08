@@ -9,6 +9,7 @@ import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { USDC_DECIMALS } from '@/lib/testnet-tokens';
+import { sanitizeAmount } from '@/lib/sanitize-amount';
 
 // Read the connected wallet's redeemable USDC: Coffer.balanceOf(user) shares
 // -> convertToAssets. Used to gate an over-balance withdraw client-side (the
@@ -107,11 +108,11 @@ export function VaultWithdraw() {
             )}
           </span>
           <input
-            type="number"
+            type="text"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
             disabled={busy}
             className="mt-1 w-full rounded-md border border-divider bg-parchment-light px-4 py-3 font-mono text-lg text-ink min-h-[44px] focus:border-ink/40 focus:outline-none"
           />

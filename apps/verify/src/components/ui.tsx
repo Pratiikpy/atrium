@@ -294,6 +294,7 @@ export function NumberField({
       {label && <span className="text-xs uppercase tracking-wider text-muted">{label}</span>}
       <input
         type="number"
+        step="any"
         placeholder={placeholder}
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
