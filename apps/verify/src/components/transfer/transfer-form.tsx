@@ -195,7 +195,7 @@ export function TransferForm() {
         <p className="text-[9px] uppercase tracking-wider text-muted">
           {quote.data?.source === 'estimate'
             ? 'testnet estimate · not a live CCIP router quote'
-            : 'aqueduct pending · estimate populates after deploy'}
+            : 'estimate populates for a cross-chain route'}
         </p>
 
         <button

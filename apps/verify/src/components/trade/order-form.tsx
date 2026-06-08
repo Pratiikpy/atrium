@@ -217,7 +217,7 @@ export function OrderForm({
         </div>
       </dl>
       <p className="mt-2 text-[9px] uppercase tracking-wider text-muted">
-        {impact?.source === 'plinth' ? 'from Plinth.update_margin · simulated' : 'plinth pending · figures populate after deploy'}
+        {impact?.source === 'plinth' ? 'from Plinth.update_margin · simulated' : 'margin pending · figures populate once Plinth prices your order'}
       </p>
 
       <button
