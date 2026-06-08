@@ -590,9 +590,17 @@ impl Plinth {
     pub fn close_position(&mut self, position_id: U256) -> Result<I256, PlinthError> {
         self.assert_not_globally_paused()?;
         let caller = self.vm().msg_sender();
-        let pos = self.positions.getter(position_id);
-        let owner = pos.owner.get();
-        let agent = pos.agent.get(); // Phase 2a: read agent for record_close
+        // FIRE-OWN: read owner + agent in a scope that RELEASES the positions
+        // StorageGuard before reading vigil_address / authorized_router below.
+        // Holding the guard across those reads returned stale/zero in Stylus,
+        // so is_router/is_vigil silently failed for the Router even with
+        // authorized_router set; is_user passed (same guard) which masked it.
+        // open_position_for reads authorized_router with NO held guard - which
+        // is exactly why the OPEN path worked and the close did not.
+        let (owner, agent) = {
+            let pos = self.positions.getter(position_id);
+            (pos.owner.get(), pos.agent.get())
+        };
         let is_user = caller == owner;
         let is_vigil = caller == self.vigil_address.get();
         // FIRE-OWN fix (symmetric to open_position_for): the trusted Router
@@ -621,6 +629,7 @@ impl Plinth {
         }
         self.is_updating.set(true);
 
+        let pos = self.positions.getter(position_id);
         let entry_price = pos.entry_price_q64.get();
         let venue_id: u8 = pos.venue_id.get().to::<u8>();
         let instrument_id = pos.instrument_id.get();
