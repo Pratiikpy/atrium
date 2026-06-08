@@ -202,6 +202,17 @@ describe('POST /api/lantern/verify-inclusion, real verification (079-BE6)', () =
     expect((json.recomputedRoot as string).toLowerCase()).toBe(root.toLowerCase());
   });
 
+  it('fetches the BARE CID, not <CID>/tree.json (regression: Pinata pins the tree JSON directly)', async () => {
+    // The web3.storage->Pinata migration changed the pin from a directory to a
+    // direct JSON object; appending /tree.json 404'd every proof as "tree not
+    // pinned yet" despite the tree being pinned. Lock the fetch path to the CID.
+    (global.fetch as any).mockResolvedValue(treeResponse());
+    await POST(makePostRequest({ root, ipfsCid: VALID_CID, wallet: walletA }));
+    const calledUrl = (global.fetch as any).mock.calls[0][0] as string;
+    expect(calledUrl).toMatch(new RegExp(`/ipfs/${VALID_CID}$`)); // ends with the CID
+    expect(calledUrl).not.toMatch(/tree\.json/);
+  });
+
   it('REJECTS a present wallet when the published tree does not hash to the attested root (the core fix)', async () => {
     // Pre-fix this returned ok purely on the address match, ignoring the root.
     (global.fetch as any).mockResolvedValue(treeResponse());

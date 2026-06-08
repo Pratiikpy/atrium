@@ -48,8 +48,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, reason: 'gateway_misconfigured' }, { status: 500 });
   }
   try {
-    const r = await fetch(`${gateway}/ipfs/${ipfsCid}/tree.json`, {
-      signal: AbortSignal.timeout(4000),
+    // The attestor pins the tree JSON DIRECTLY via Pinata's pinJSONToIPFS
+    // (services/lantern-attestor/src/ipfs.ts), so the CID resolves to the tree
+    // object itself - NOT a directory containing tree.json. The OLD web3.storage
+    // upload pinned a directory (hence the historical `/tree.json` suffix); the
+    // Pinata migration changed the structure but this fetch path wasn't updated,
+    // so EVERY inclusion proof 404'd as "tree not pinned yet" despite the tree
+    // being correctly pinned + fetchable. Found via live QA 2026-06-08: bare CID
+    // returns the tree JSON, `<CID>/tree.json` returns "no link named tree.json".
+    const r = await fetch(`${gateway}/ipfs/${ipfsCid}`, {
+      // 8s (was 4s): a public gateway resolving a cold CID can exceed 4s; the
+      // verifier is user-initiated, not on a hot path, so the headroom is cheap.
+      signal: AbortSignal.timeout(8000),
     });
     if (!r.ok) {
       return NextResponse.json({ ok: false, reason: 'IPFS gateway unreachable; tree not pinned yet' });
