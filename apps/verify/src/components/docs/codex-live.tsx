@@ -49,7 +49,7 @@ interface TryEndpoint {
 const TRY_ENDPOINTS: TryEndpoint[] = [
   { id: 'margin', codexPath: 'GET /margin/:user', mirror: (w) => `/api/portfolio/margin-health?wallet=${w}`, needsWallet: true },
   { id: 'positions', codexPath: 'GET /positions/:user', mirror: (w) => `/api/portfolio/positions?wallet=${w}`, needsWallet: true },
-  { id: 'venues', codexPath: 'GET /venues', mirror: () => '/api/protocol/subsystems', needsWallet: false },
+  { id: 'venues', codexPath: 'GET /venues', mirror: () => '/api/codex/venues', needsWallet: false },
   { id: 'attestation', codexPath: 'GET /attestation/:wallet', mirror: () => '/api/lantern/latest', needsWallet: false },
 ];
 
