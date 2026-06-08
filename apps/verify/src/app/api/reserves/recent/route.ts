@@ -10,10 +10,23 @@ export const dynamic = 'force-dynamic';
 // handlers. The window param lets the client choose how many hourly
 // attestation rows to fetch, so the tabs can drive real queries.
 // Lantern publishes hourly so 24/168/720 rows ≈ 24h/7d/30d.
+// Audit follow-up (2026-06-08 mobile QA): these were ROW limits with the
+// assumption "Lantern publishes hourly so 24 rows ~= 24h". The self-loop
+// publishes irregularly (~45min when looping, gaps on cron restarts), so 24
+// rows actually spanned ~2 days - the "Last 24h" list rendered 2-day-old rows.
+// Fix: fetch a generous row cap THEN filter by real timestamp below, so "24h"
+// means the last 24 hours of wall-clock, not the last 24 attestations. Caps are
+// sized to cover the window even at a dense ~15min cadence (subgraph first: max
+// is 1000).
 const WINDOW_TO_LIMIT: Record<string, number> = {
-  '24h': 24,
-  '7d': 168,
-  '30d': 720,
+  '24h': 120,
+  '7d': 700,
+  '30d': 1000,
+};
+const WINDOW_TO_SECONDS: Record<string, number> = {
+  '24h': 86_400,
+  '7d': 604_800,
+  '30d': 2_592_000,
 };
 
 /**
@@ -34,7 +47,11 @@ function parseIntOrNull(s: string | null | undefined): number | null {
 // the window param.
 export async function GET(req: Request) {
   const windowKey = new URL(req.url).searchParams.get('window') ?? '24h';
-  const limit = WINDOW_TO_LIMIT[windowKey] ?? 24;
+  const limit = WINDOW_TO_LIMIT[windowKey] ?? 120;
+  // Real wall-clock cutoff so the window label is accurate (see the note on
+  // WINDOW_TO_LIMIT). force-dynamic above keeps this evaluated per request.
+  const windowSeconds = WINDOW_TO_SECONDS[windowKey] ?? 86_400;
+  const cutoffSeconds = Math.floor(Date.now() / 1000) - windowSeconds;
   try {
     const data = await gql<{
       lanternAttestations: Array<{ root: string; blockNumber: string; timestamp: string; leafCount: string; ipfsCid: string }>;
@@ -71,6 +88,9 @@ export async function GET(req: Request) {
       const leaves = parseIntOrNull(a.leafCount);
       const ts = parseTsOrNull(a.timestamp);
       if (block == null || leaves == null || ts == null) continue;
+      // Drop rows older than the requested window (ts is unix seconds). This is
+      // what makes "Last 24h" mean 24 hours rather than 24 rows.
+      if (ts < cutoffSeconds) continue;
       // Launch-review P0 (fake-as-live): this used to hardcode pinned:true +
       // status:'PASS' on EVERY row, claiming end-to-end-verifiable proof of
       // reserves even when the Merkle tree was never pinned to IPFS (so a user

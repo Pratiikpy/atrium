@@ -6,6 +6,14 @@ vi.mock('@/lib/scribe-helpers', () => ({
 
 import { gql } from '@/lib/scribe-helpers';
 
+// Recent timestamp (1h ago) for mock rows. The route now drops attestations
+// older than the requested window (added 2026-06-08 so "Last 24h" means 24
+// hours of wall-clock, not the last 24 rows), so fixed historical timestamps
+// like the old 1700000000 (2023) would be filtered out before the corrupt-row
+// assertions could run. Using a now-relative value keeps the rows inside the
+// default 24h window regardless of when the suite runs.
+const RECENT_TS = String(Math.floor(Date.now() / 1000) - 3600);
+
 /**
  * Iter 65 audit fix: locks MM-2 on /api/reserves/recent. Zero tests
  * pinned it pre-iter-65.
@@ -39,7 +47,7 @@ function row(overrides: Partial<{
   return {
     root: '0x' + 'a'.repeat(64),
     blockNumber: '12345',
-    timestamp: '1700000000',
+    timestamp: RECENT_TS,
     leafCount: '8',
     ...overrides,
   };
@@ -76,7 +84,7 @@ describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
   it('drops rows with empty timestamp', async () => {
     (gql as any).mockResolvedValue({
       lanternAttestations: [
-        row({ root: '0xc1', timestamp: '1700000000' }),
+        row({ root: '0xc1', timestamp: RECENT_TS }),
         row({ root: '0xc2', timestamp: '' }),
       ],
     });
@@ -90,7 +98,7 @@ describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
       lanternAttestations: [
         row({ root: '0xd1', timestamp: '-1' }),
         row({ root: '0xd2', timestamp: '999999999999' }),
-        row({ root: '0xd3', timestamp: '1700000000' }),
+        row({ root: '0xd3', timestamp: RECENT_TS }),
       ],
     });
     const { GET } = await import('./route');
@@ -101,7 +109,7 @@ describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
 
   it('formats attestationTime as a non-empty locale string when valid', async () => {
     (gql as any).mockResolvedValue({
-      lanternAttestations: [row({ root: '0xe1', timestamp: '1700000000' })],
+      lanternAttestations: [row({ root: '0xe1', timestamp: RECENT_TS })],
     });
     const { GET } = await import('./route');
     const json = await (await GET(new Request("http://localhost/api/reserves/recent"))).json();
@@ -165,9 +173,11 @@ describe('GET /api/reserves/recent, MM-2 corrupt-row drop', () => {
   });
 });
 
-// Audit U-11: ?window param drives the gql limit so the "24h / 7d / 30d"
-// tabs in the UI fetch the right slice of attestations instead of being
-// dead spans.
+// Audit U-11 + 2026-06-08 follow-up: ?window drives BOTH a generous gql row cap
+// AND a real wall-clock timestamp filter, so the "24h / 7d / 30d" tabs return the
+// right slice of attestations by TIME. Pre-follow-up the windows were pure row
+// limits (24/168/720) on a "Lantern publishes hourly" assumption; the self-loop
+// publishes irregularly, so 24 rows spanned ~2 days and "Last 24h" lied.
 describe('GET /api/reserves/recent, window param', () => {
   function makeReq(window: string | undefined) {
     const url = new URL('http://localhost/api/reserves/recent');
@@ -175,45 +185,60 @@ describe('GET /api/reserves/recent, window param', () => {
     return new Request(url.toString());
   }
 
-  it('defaults to limit=24 when no window param is given', async () => {
+  it('defaults to row cap 120 when no window param is given', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(makeReq(undefined));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 24 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 120 });
   });
 
-  it('window=24h → limit=24 (hourly attestations × 24h)', async () => {
+  it('window=24h → row cap 120', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(makeReq('24h'));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 24 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 120 });
   });
 
-  it('window=7d → limit=168 (hourly × 7d)', async () => {
+  it('window=7d → row cap 700', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(makeReq('7d'));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 168 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 700 });
   });
 
-  it('window=30d → limit=720 (hourly × 30d)', async () => {
+  it('window=30d → row cap 1000 (subgraph first: max)', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(makeReq('30d'));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 720 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 1000 });
   });
 
-  it('unknown window falls back to limit=24 rather than rejecting', async () => {
+  it('unknown window falls back to row cap 120 rather than rejecting', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(makeReq('99y'));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 24 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 120 });
   });
 
-  it('GET with bare base-URL (no window param) defaults to 24', async () => {
+  it('GET with bare base-URL (no window param) defaults to 120', async () => {
     (gql as any).mockResolvedValue({ lanternAttestations: [] });
     const { GET } = await import('./route');
     await GET(new Request('http://localhost/api/reserves/recent'));
-    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 24 });
+    expect((gql as any).mock.calls[0][1]).toEqual({ limit: 120 });
+  });
+
+  it('drops attestations older than the requested window (24h) by real timestamp', async () => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    (gql as any).mockResolvedValue({
+      lanternAttestations: [
+        row({ root: '0xfresh', timestamp: String(nowSec - 3600) }),       // 1h ago → in window
+        row({ root: '0xstale', timestamp: String(nowSec - 2 * 86_400) }), // 2 days ago → out
+      ],
+    });
+    const { GET } = await import('./route');
+    const json = await (await GET(makeReq('24h'))).json();
+    const ids = json.attestations.map((a: any) => a.id);
+    expect(ids).toContain('0xfresh');
+    expect(ids).not.toContain('0xstale');
   });
 });
