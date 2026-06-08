@@ -696,10 +696,19 @@ impl Plinth {
             let _ = sigil.record_close(self.vm(), sctx, agent, abs_notional);
         }
 
-        // Release the guard BEFORE update_margin since that path takes the
-        // guard itself (do_update_margin set elsewhere wraps its own).
+        // FIRE-OWN: call the INNER do_update_margin, NOT the public update_margin.
+        // The public update_margin re-checks the caller (is_self || is_adapter ||
+        // is_vigil || is_praetor); a router-routed close has caller == the Router,
+        // which is none of those, so it reverted ERR_UNAUTHORIZED at THAT second
+        // gate - the same error code as the close-auth gate above, which masked
+        // the real location. open_position uses the inner (do_update_margin_with_
+        // kind) for exactly this reason. The close already authorized the caller
+        // (owner / vigil / authorized_router) above; recompute the owner's margin
+        // directly. The guard stays armed across the inner and is released after
+        // (do_update_margin does not arm its own).
+        let margin_result = self.do_update_margin(owner);
         self.is_updating.set(false);
-        self.update_margin(owner)?;
+        margin_result?;
         Ok(realized_pnl)
     }
 
