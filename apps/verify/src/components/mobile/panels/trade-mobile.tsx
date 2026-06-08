@@ -18,8 +18,39 @@ import { sanitizeAmount } from '@/lib/sanitize-amount';
  * Real-time price + chart data require the Plinth oracle path which is
  * pending; chart renders a static SVG line as a layout placeholder with
  * an honest 'pending' label.
+ *
+ * Venue parity fix (2026-06-08 pixel audit): the panel was hardcoded to
+ * Hyperliquid (HSLA-PERP), a scaffold whose open reverts and whose CTA is
+ * gated off  so a mobile user could never reach the one openable venue
+ * (Aave Horizon), the exact "dropped a judge onto a venue they cannot trade"
+ * trap the desktop TradeView already fixed. Mirror desktop here: default to
+ * the operational venue, add a venue selector, and make the display + CTA +
+ * open-call venue-aware. Form structure stays identical across venues, same
+ * as the desktop OrderForm (leverage + side are UI-only in v1).
  */
+
+// Display instrument symbol per venue (matches the /app/markets instrument
+// lists + lib/instruments.ts). Headline shows the instrument, subtitle shows
+// the venue. Local constant to avoid a server/client boundary import, same
+// pattern as order-form.tsx's venueShortLabel map.
+const INSTRUMENT_BY_VENUE: Record<string, string> = {
+  'hyperliquid': 'HSLA-PERP',
+  'aave-horizon': 'USDC-LEND',
+  'pendle-v2': 'PT-USDC',
+  'curve': '3POOL-LP',
+  'trade-xyz': 'NVDA-PERP',
+  'polymarket': 'ELECTION',
+  'hl-hip4': 'HSLA2-PERP',
+};
+
 export function TradeMobile() {
+  // Default to the venue that is actually openable today (Aave Horizon),
+  // matching the desktop TradeView default. Pre-fix this panel hardcoded
+  // Hyperliquid, which is operational:false, so the CTA was always disabled
+  // and a mobile judge never saw a tradeable venue.
+  const [venueId, setVenueId] = useState<string>(
+    VENUES.find((v) => v.operational)?.id ?? VENUES[0]?.id ?? 'aave-horizon',
+  );
   const [side, setSide] = useState<'long' | 'short'>('long');
   const [amount, setAmount] = useState('');
   const [leverage, setLeverage] = useState(4);
@@ -32,11 +63,14 @@ export function TradeMobile() {
   const { data: deployment } = useDeploymentStatus(2);
   const isSubmitting = status.kind === 'submitting' || status.kind === 'resolving';
   const amountValid = amount.length > 0 && parseFloat(amount) > 0;
-  // Audit fix (hostile-judge sweep): mobile submitted open({ venue: 'hyperliquid' })
-  // with no operational gate, so a connected user could sign a guaranteed-revert tx
-  // (the Hyperliquid scaffold adapter reverts on-chain). Mirror the desktop OrderForm:
-  // gate the CTA on the venue's operational flag. Only Aave Horizon is openable today.
-  const venueOperational = VENUES.find((v) => v.id === 'hyperliquid')?.operational ?? false;
+  // Gate the CTA on the SELECTED venue's operational flag (desktop parity).
+  // Only Aave Horizon is openable today; selecting a scaffold venue disables
+  // the CTA + shows the honest helper rather than signing a guaranteed-revert
+  // tx (the scaffold adapters revert on-chain).
+  const selectedVenue = VENUES.find((v) => v.id === venueId);
+  const venueOperational = selectedVenue?.operational ?? false;
+  const venueLabel = selectedVenue?.shortLabel ?? 'HL-HIP3';
+  const instrument = INSTRUMENT_BY_VENUE[venueId] ?? 'HSLA-PERP';
   const ready = deployment?.ready === true && amountValid && !isSubmitting && venueOperational;
   const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
 
@@ -50,22 +84,43 @@ export function TradeMobile() {
 
   const submit = () => {
     if (!ready) return;
-    // Default to Hyperliquid (HL-HIP3), matching the displayed instrument
-    // subtitle + the desktop trade default. Pre-fix this submitted to trade-xyz
-    // while the header showed HL-HIP3 / and desktop defaulted to Hyperliquid -
-    // a display/submit-venue mismatch + a desktop/mobile inconsistency.
-    void open({ venue: 'hyperliquid', side, sizeUsd: notional });
+    // Submit to the selected venue (was hardcoded 'hyperliquid'). The CTA is
+    // gated on venueOperational, so this only fires for an openable venue.
+    void open({ venue: venueId, side, sizeUsd: notional });
   };
 
   return (
     <div className="md:hidden flex flex-col gap-4">
+      {/* Venue selector  mirrors the desktop VenueChipBar. A live dot marks
+          the operational venue(s); a muted dot marks scaffold/pending ones, so
+          the user sees at a glance which venue is openable and can switch to it
+          (pre-fix the panel was locked to the one venue they could not trade). */}
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        {VENUES.map((v) => (
+          <button
+            key={v.id}
+            type="button"
+            onClick={() => setVenueId(v.id)}
+            aria-pressed={v.id === venueId}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition ${
+              v.id === venueId
+                ? 'border-mob-ink bg-mob-bg-card text-mob-ink'
+                : 'border-mob-line bg-mob-bg-card text-mob-muted'
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${v.operational ? 'bg-mob-live' : 'bg-mob-muted'}`} />
+            {v.shortLabel}
+          </button>
+        ))}
+      </div>
+
       {/* Pair head */}
       <section className="rounded-2xl border border-mob-line bg-mob-bg-card px-4 py-3.5">
         <div className="flex items-baseline justify-between">
           <div>
-            <div className="font-display text-[22px] italic text-mob-ink">HSLA-PERP</div>
+            <div className="font-display text-[22px] italic text-mob-ink">{instrument}</div>
             <div className="font-mono text-[10.5px] uppercase tracking-wider text-mob-muted">
-              HL-HIP3 . tokenized{!venueOperational && <span className="text-mob-accent"> . soon</span>}
+              {venueLabel} . tokenized{!venueOperational && <span className="text-mob-accent"> . soon</span>}
             </div>
           </div>
           <div className="text-right">
@@ -160,12 +215,14 @@ export function TradeMobile() {
         disabled={!ready}
         className={`rounded-full py-3.5 text-center font-medium transition disabled:opacity-50 ${side === 'long' ? 'bg-mob-live text-mob-bg' : 'bg-mob-neg text-mob-bg'}`}
       >
-        {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . HSLA-PERP`}
+        {isSubmitting ? 'Submitting...' : `${side === 'long' ? 'Open long' : 'Open short'} . ${instrument}`}
       </button>
-      {/* Honest readiness gate (mirrors desktop): explains why the CTA is off. */}
+      {/* Honest readiness gate (mirrors desktop OrderForm helper): for a non-
+          operational venue, explain it is deployed-but-not-openable and name the
+          live venue; otherwise surface the deployment-readiness helper. */}
       {!venueOperational ? (
         <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">
-          Hyperliquid HIP-3 is not openable on testnet yet. Aave Horizon is the live venue today.
+          {venueLabel} is deployed but not openable on testnet yet. Aave Horizon is the live venue today.
         </p>
       ) : !deployment?.ready ? (
         <p className="text-center text-[10.5px] uppercase tracking-wider text-mob-muted">{helper}</p>
