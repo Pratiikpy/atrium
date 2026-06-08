@@ -8,7 +8,7 @@ import { ReservesMobile } from '@/components/mobile/panels/reserves-mobile';
 
 export const metadata = {
   title: 'Reserves',
-  description: 'Proof-of-reserves: signed Merkle attestations on-chain, refreshed roughly hourly. Inclusion proofs once the tree is IPFS-pinned.',
+  description: 'Proof-of-reserves: signed Merkle attestations on-chain, refreshed about every 45 minutes. Inclusion proofs once the tree is IPFS-pinned.',
 };
 
 export default function ReservesPage() {
@@ -30,7 +30,8 @@ export default function ReservesPage() {
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted">
             Atrium never custodies your funds. Lantern signs a Merkle attestation of every balance
-            on-chain (the free scheduler refreshes it roughly hourly). The root is checkable now;
+            on-chain (an in-run self-loop refreshes it about every 45 minutes, since GitHub throttles
+            plain cron). The root is checkable now;
             pressing verify builds your inclusion proof once the attestor pins the full tree to IPFS
             with a web3.storage token. No trust required.
           </p>

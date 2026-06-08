@@ -170,8 +170,8 @@ const STEPS: Step[] = [
         Verify the reserves <em>yourself.</em>
       </>
     ),
-    body: "Atrium never holds your funds, and it proves it. Lantern publishes a signed Merkle root of all balances roughly hourly. Click verify and the server checks your wallet's inclusion proof against the on-chain root, a real result, never a fake 'verified'.",
-    spec: 'Latest signed root · attested block · leaf count · published roughly hourly',
+    body: "Atrium never holds your funds, and it proves it. Lantern publishes a signed Merkle root of all balances about every 45 minutes. Click verify and the server checks your wallet's inclusion proof against the on-chain root, a real result, never a fake 'verified'.",
+    spec: 'Latest signed root · attested block · leaf count · published about every 45 minutes',
     href: '/app',
     hrefLabel: 'Open proof of reserves',
     tiles: [

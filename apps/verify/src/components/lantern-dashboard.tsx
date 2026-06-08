@@ -111,16 +111,22 @@ export function LanternDashboard() {
       <div className="mt-12 rounded-md border border-divider bg-parchment-soft/40 p-6">
         <p className="text-sm font-medium text-ink">No attestation published yet</p>
         <p className="mt-2 text-sm text-ink-soft">
-          Lantern publishes roughly hourly. The first attestation lands after Coffer has at least one deposit.
+          Lantern publishes about every 45 minutes. The first attestation lands after Coffer has at least one deposit.
         </p>
       </div>
     );
   }
 
-  // Freshness: the attestor targets a 10-minute cadence but the free GHA cron
-  // can lag, so show the real age and flag stale rather than implying liveness.
+  // Freshness: the attestor runs an in-run self-loop publishing about every 45
+  // minutes (GitHub throttles plain cron, so the */30 schedule only restarts the
+  // loop). Show the real age and flag stale rather than implying liveness.
+  // Threshold = 2x the 45-min cadence + 10-min grace = 100 min, identical to
+  // /api/reserves/summary's STALE_THRESHOLD so the badge and the summary tile
+  // never disagree. Pre-fix this was 30 min against the old 10-min cron, which
+  // false-flagged a healthy 45-min cycle "stale" for ~15 min of every cycle.
+  const STALE_AFTER_MIN = 100;
   const minsAgo = Math.max(0, Math.floor((Date.now() / 1000 - data.timestamp) / 60));
-  const fresh = minsAgo <= 30;
+  const fresh = minsAgo <= STALE_AFTER_MIN;
   const publishedUtc =
     new Date(data.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
 

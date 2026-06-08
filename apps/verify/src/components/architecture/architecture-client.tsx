@@ -123,8 +123,8 @@ const NODES: MapNode[] = [
     role: 'PROOF OF RESERVES',
     lang: 'SOLIDITY',
     blurb:
-      'Every 10 minutes Lantern publishes a Merkle root of every Coffer balance on-chain and pins the tree to IPFS. Verify your own balance with a one-click inclusion proof.',
-    tags: ['Solidity', 'Merkle', '10-min'],
+      'About every 45 minutes Lantern publishes a Merkle root of every Coffer balance on-chain. The root is checkable now; one-click inclusion proofs light up once the tree is pinned to IPFS.',
+    tags: ['Solidity', 'Merkle', '45-min'],
     address: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
