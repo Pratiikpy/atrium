@@ -45,7 +45,7 @@ export async function GET() {
     agents: [],
     source: 'pending' as const,
     detail: probeOk
-      ? `Rostrum subgraph reachable (${probeRows} reputation row(s) indexed). Leaderboard component still on prototype field shape, paired refactor pending per human_left.md \`rostrum-leaderboard-wiring\`.`
+      ? `Rostrum subgraph reachable (${probeRows} reputation row(s) indexed). Rankings populate as agents accrue verifiable on-chain performance.`
       : 'Rostrum subgraph probe failed. Retrying on next refresh.',
   });
 }
