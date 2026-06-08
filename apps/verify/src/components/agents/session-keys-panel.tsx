@@ -13,13 +13,14 @@ export function SessionKeysPanel() {
     <div className="rounded-md border border-divider bg-parchment-soft/30 px-6 py-12 text-center">
       <p className="font-display text-xl text-ink">Session keys indexing pending</p>
       <p className="mx-auto mt-2 max-w-lg text-sm text-muted">
-        Postern session-key events aren&rsquo;t in the Scribe subgraph yet -
-        the entity is tracked in{' '}
-        <code className="font-mono text-ink">subgraph/indexing-todo.md</code>.
-        Once the schema adds <code className="font-mono text-ink">PosternSessionKey</code>{' '}
-        and the contracts deploy (Month 1 W2), this tab will list each active
-        session key with its scope, expiry, and an Arbiscan link to the
-        issuance tx.
+        Postern session-key events aren&rsquo;t in the Scribe subgraph schema yet,
+        so this historical tab can&rsquo;t list them. Once the{' '}
+        <code className="font-mono text-ink">PosternSessionKey</code> entity is added
+        to the subgraph, this tab will list each active session key with its scope,
+        expiry, and an Arbiscan link to the issuance tx. Your live session keys are
+        always visible on{' '}
+        <a href="/app/settings/session-keys" className="text-ink underline-offset-2 hover:underline">Settings</a>,
+        read straight from the PosternKeyRegistry on-chain.
       </p>
     </div>
   );
