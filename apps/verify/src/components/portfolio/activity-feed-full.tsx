@@ -53,7 +53,7 @@ export function ActivityFeedFull() {
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center">
         <p className="text-sm text-ink-soft">No activity indexed yet.</p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {data?.source === 'pending' ? 'scribe pending · contracts deploy month 1 w2' : 'open a position to record one'}
+          {data?.source === 'pending' ? 'scribe pending · indexing your on-chain activity' : 'open a position to record one'}
         </p>
       </div>
     );

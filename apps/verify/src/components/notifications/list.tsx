@@ -41,7 +41,7 @@ export function NotificationsList() {
         <p className="text-sm text-ink-soft">Inbox is empty.</p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
           {data?.source === 'pending'
-            ? 'notifications populate from scribe once contracts deploy'
+            ? 'notifications populate from your on-chain activity via Scribe'
             : 'this is the calm one. nothing to flag.'}
         </p>
       </div>

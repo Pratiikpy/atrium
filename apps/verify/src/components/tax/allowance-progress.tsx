@@ -90,7 +90,7 @@ export function TaxAllowanceProgress({
         </p>
       ) : isPending ? (
         <p className="mt-3 text-[10px] uppercase tracking-wider text-muted">
-          scribe pending · refresh after contracts deploy
+          scribe pending · Tablet tax service syncing
         </p>
       ) : null}
     </div>

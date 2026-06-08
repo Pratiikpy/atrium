@@ -246,7 +246,7 @@ function Drawer({
             ? 'Connect a wallet to read live per-venue margin from Plinth. The haircuts shown are the real published risk weights and apply to every account.'
             : anyLive
             ? 'These are per-venue siloed requirements. Open positions on more than one and Plinth nets the correlated risk, so your real portfolio margin is lower than the sum. See it on the portfolio page.'
-            : 'Plinth is not deployed to this environment yet, so per-venue margin reads as pending. The haircuts shown are the real published risk weights. Live numbers appear once contracts deploy.'}
+            : 'Plinth is not deployed to this environment yet, so per-venue margin reads as pending. The haircuts shown are the real published risk weights. Live numbers appear once Plinth is reachable in this environment.'}
         </p>
       </aside>
     </div>

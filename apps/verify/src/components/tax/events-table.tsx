@@ -49,7 +49,7 @@ export function TaxEventsTable({
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center text-sm">
         <p className="text-ink-soft">No realised events yet.</p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {data?.source === 'pending' ? 'tablet pulls from scribe once contracts deploy' : 'open and close a position to record one'}
+          {data?.source === 'pending' ? 'Tablet tax data appears after a realized (closed) trade' : 'open and close a position to record one'}
         </p>
       </div>
     );

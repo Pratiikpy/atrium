@@ -99,7 +99,7 @@ export function OpenPositionsTable({ filterVenueId }: { filterVenueId?: number |
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center">
         <p className="text-sm text-ink-soft">{mainText}</p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {isPending ? 'scribe pending · contracts deploy month 1 w2' : 'open one from Trade'}
+          {isPending ? 'scribe pending · indexing your on-chain activity' : 'open one from Trade'}
         </p>
       </div>
     );

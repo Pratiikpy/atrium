@@ -92,7 +92,7 @@ export function NotificationsMobile() {
         <div className="flex flex-col items-center gap-2 px-4 py-16">
           <p className="text-[16px] text-mob-muted">Inbox is empty</p>
           <p className="text-[14px] text-mob-muted/60 text-center">
-            {data?.source === 'pending' ? 'Notifications populate once contracts deploy' : 'Nothing to flag right now'}
+            {data?.source === 'pending' ? 'Notifications populate from your on-chain activity' : 'Nothing to flag right now'}
           </p>
         </div>
       </div>
