@@ -53,7 +53,7 @@ const NODES: MapNode[] = [
     blurb:
       'The dispatcher. Takes a signed transaction and routes it: collateral to Coffer, a margin recompute on Plinth, and the position to the right per-venue adapter.',
     tags: ['Solidity', 'router', 'v1.1'],
-    address: '0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3',
+    address: '0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -65,7 +65,7 @@ const NODES: MapNode[] = [
     blurb:
       'Your collateral. An ERC-4626 USDC vault with a per-block per-adapter pull cap, so a compromised adapter can drain at most ~1% of TVL in a block. Refuses to operate when USDC state is unreadable.',
     tags: ['Stylus', 'ERC-4626', 'per-block cap'],
-    address: '0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd',
+    address: '0xb62762000686a9589b01d63ba7e50f51f46a86ef',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -77,7 +77,7 @@ const NODES: MapNode[] = [
     blurb:
       'The heart of Atrium. SPAN portfolio margin: one buying-power number across venues that nets correlated exposure. Split into Plinth, Plinth-Math, and Plinth-Oracle to fit the 24KB code cap.',
     tags: ['Stylus', 'dual-oracle', 'SPAN'],
-    address: '0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e',
+    address: '0xe01d09edcf889bf5577666f0aa61f5701c72a26c',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -89,7 +89,7 @@ const NODES: MapNode[] = [
     blurb:
       'One adapter per venue, each speaking the IPorticoAdapter interface. Nine adapter contracts are deployed and verified on Arbitrum Sepolia; seven venues are in the launch margin scope (Aave Horizon is operational today; the rest register in PorticoRegistry in Month 1 W2): Hyperliquid HIP-3, Aave Horizon, Pendle V2, Curve, Trade.xyz, Polymarket, Hyperliquid HIP-4. GMX, Morpho, and Synthetix adapters are deployed but outside the initial seven.',
     tags: ['Solidity', 'Portico', '7 venues'],
-    address: '0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1',
+    address: '0x449dD148eDFd26D8E7a449553009402107AA935a',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -101,7 +101,7 @@ const NODES: MapNode[] = [
     blurb:
       'Turns one typed signature into a bounded agent mandate: one agent, one strategy, one cap, one expiry. The Postern Kill Switch routes through Sigil to revoke every mandate at once.',
     tags: ['Stylus', 'EIP-712', 'mandates'],
-    address: '0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f',
+    address: '0x517afac9b39c01c0cf044b335742c95960959cdc',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -113,7 +113,7 @@ const NODES: MapNode[] = [
     blurb:
       'Three independent keepers race to liquidate any account that falls under-collateralised. Liquidations are partial (≤10% per block) and route to the most-liquid venue first.',
     tags: ['Stylus', 'keepers', 'partial'],
-    address: '0x348b0a08df4372a804a5faa118428393c2cfaff5',
+    address: '0x5e099faf4fbc70832ea5e12178a9f9dec96ba194',
     chain: 'ARBITRUM SEPOLIA',
     chainId: 421614,
   },
@@ -137,14 +137,14 @@ const RH_EXPLORER = 'https://testnet.robinhood.com/address/'; // Robinhood Chain
 type Row = { name: string; address: string; lang: Lang; explorer: string };
 
 const CORE_15: Row[] = [
-  { name: 'Coffer', address: '0xa7f3bbbcca1c79fa1a2168a65336e77e28f49fcd', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Plinth', address: '0x81fa101b491a0116c8c2f4ddb0ee78efb62c481e', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Coffer', address: '0xb62762000686a9589b01d63ba7e50f51f46a86ef', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Plinth', address: '0xe01d09edcf889bf5577666f0aa61f5701c72a26c', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Plinth-Math', address: '0xc53dbfc0c35291f79e7d8d876603ab35ab97ddab', lang: 'STYLUS', explorer: ARBISCAN },
   { name: 'Plinth-Oracle', address: '0x66064d18722f50e055d74daf51a13fd8e331f0b7', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Sigil', address: '0x4f9c828f1088e0ea0ee677be4e268f046bf0bc8f', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'Vigil', address: '0x348b0a08df4372a804a5faa118428393c2cfaff5', lang: 'STYLUS', explorer: ARBISCAN },
-  { name: 'AtriumRouter', address: '0xB3ECb8e5A7A8690922f9c385a8A31B48Ad136eF3', lang: 'SOLIDITY', explorer: ARBISCAN },
-  { name: 'PorticoRegistry', address: '0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'Sigil', address: '0x517afac9b39c01c0cf044b335742c95960959cdc', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'Vigil', address: '0x5e099faf4fbc70832ea5e12178a9f9dec96ba194', lang: 'STYLUS', explorer: ARBISCAN },
+  { name: 'AtriumRouter', address: '0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'PorticoRegistry', address: '0x3FceF659077B4E0d3ccf2162A80Be1Ed0818A81e', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PraetorTimelock', address: '0x0dad24d7feb2bb797e0f69e02c2f32104fcf22d4', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'PosternKillSwitch', address: '0xCD899f715462A33Ae880310d72b37bde102ab0b7', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'LanternAttestor v2', address: '0xF0B90b94C0B8a52c545768bFf06a3932c67d5888', lang: 'SOLIDITY', explorer: ARBISCAN },
@@ -155,7 +155,7 @@ const CORE_15: Row[] = [
 ];
 
 const VENUES_9: Row[] = [
-  { name: 'Aave Horizon', address: '0xd71C5D88d62e92EE8941cAE51f8637a73111C4E1', lang: 'SOLIDITY', explorer: ARBISCAN },
+  { name: 'Aave Horizon', address: '0x449dD148eDFd26D8E7a449553009402107AA935a', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'Curve', address: '0xf3da25f3ff8bdddc093e34c2f2b117cdb7505682', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'GMX', address: '0x2531af9f7596d74f412bfab7d3b84ee7a32cd2d4', lang: 'SOLIDITY', explorer: ARBISCAN },
   { name: 'Hyperliquid', address: '0x87014fbace9ade49bf923bcfae74b4c858cf371e', lang: 'SOLIDITY', explorer: ARBISCAN },
