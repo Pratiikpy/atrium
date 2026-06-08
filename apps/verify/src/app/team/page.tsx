@@ -13,6 +13,7 @@ export const metadata = {
   openGraph: {
     title: 'Team · Atrium',
     description: 'How the team behind Atrium works, and the workstreams shipping in public.',
+    images: ['/opengraph-image'],
   },
 };
 

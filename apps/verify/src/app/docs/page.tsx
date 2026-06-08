@@ -9,6 +9,7 @@ export const metadata = {
   openGraph: {
     title: 'Docs · Atrium',
     description: 'Spec, technical design, runbooks, ADRs. Single source of truth.',
+    images: ['/opengraph-image'],
   },
 };
 

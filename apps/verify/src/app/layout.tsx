@@ -51,9 +51,17 @@ export const metadata: Metadata = {
     title: 'Atrium · verify',
     description: 'Cross-venue portfolio margin on Arbitrum. Verifiable in 90 seconds.',
     type: 'website',
+    // Default og:image. The app/opengraph-image.tsx file convention auto-applies
+    // to app/page.tsx, but a subpage that sets its own openGraph (title +
+    // description) shallow-replaces the inherited block and loses the card.
+    // Setting it here gives every page that does NOT set its own images a
+    // default; pages that override openGraph still need their own images entry
+    // (security/docs/manifesto/team/docs-honesty now do).
+    images: ['/opengraph-image'],
   },
   twitter: {
     card: 'summary_large_image',
+    images: ['/opengraph-image'],
     title: 'Atrium · cross-venue portfolio margin',
     description: 'One wallet posts collateral once. Trades across venues with one margin number.',
   },

@@ -8,6 +8,7 @@ export const metadata = {
   openGraph: {
     title: 'Security · Atrium',
     description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+    images: ['/opengraph-image'],
   },
 };
 

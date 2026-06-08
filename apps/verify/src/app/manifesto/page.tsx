@@ -6,6 +6,7 @@ export const metadata = {
   openGraph: {
     title: 'Manifesto · Atrium',
     description: 'Why Atrium exists. What we will not do. What we will.',
+    images: ['/opengraph-image'],
   },
 };
 
