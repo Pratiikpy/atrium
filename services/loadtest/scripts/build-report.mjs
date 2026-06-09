@@ -40,7 +40,7 @@ async function main() {
         p95: ep.p95 ?? 0,
         p99: ep.p99 ?? 0,
         budget: 2000,
-        source: 'k6 + useatrium.me',
+        source: `k6 ${k6.profile ?? 'unknown'} + useatrium.me`,
       });
     }
   }
@@ -71,6 +71,7 @@ async function main() {
       {
         generatedAt: new Date().toISOString(),
         k6_base_url: k6?.baseUrl ?? null,
+        k6_profile: k6?.profile ?? null,
         metrics,
       },
       null,

@@ -1,7 +1,11 @@
 /**
  * k6 latency probe for the verify-app API surface.
  *
- * Three load tiers: 1, 10, 100 requests/second per endpoint, 60 s each.
+ * Profiles:
+ *   - smoke: 1 request/second per endpoint for 30s. Default for public CI so
+ *     the test proves reachability without tripping hosted WAF/rate limits.
+ *   - full: 1, 10, 100 requests/second per endpoint, 60s each. Use only
+ *     against an explicitly provisioned target via LOADTEST_PROFILE=full.
  * Endpoints exercised:
  *   - /api/protocol/metrics       (subgraph + on-chain reads via /api/lantern/latest)
  *   - /api/protocol/subsystems    (live status of every contract)
@@ -13,7 +17,8 @@
  * dashboard payload at apps/verify/public/loadtest/latest.json.
  *
  * Usage:
- *   BASE_URL=https://useatrium.me k6 run scripts/api-load.k6.js
+ *   BASE_URL=https://useatrium.me LOADTEST_PROFILE=smoke k6 run scripts/api-load.k6.js
+ *   BASE_URL=https://staging.useatrium.me LOADTEST_PROFILE=full k6 run scripts/api-load.k6.js
  *   (or set BASE_URL=http://localhost:3000 for local dev runs)
  */
 
@@ -22,6 +27,7 @@ import { check, sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
 const BASE_URL = __ENV.BASE_URL || 'https://useatrium.me';
+const LOADTEST_PROFILE = __ENV.LOADTEST_PROFILE || 'smoke';
 
 const ENDPOINTS = [
   '/api/protocol/metrics',
@@ -30,11 +36,15 @@ const ENDPOINTS = [
   '/api/faucet/status',
 ];
 
-const TIERS = [
+const FULL_TIERS = [
   { rps: 1, duration: '60s' },
   { rps: 10, duration: '60s' },
   { rps: 100, duration: '60s' },
 ];
+const SMOKE_TIERS = [
+  { rps: 1, duration: '30s' },
+];
+const TIERS = LOADTEST_PROFILE === 'full' ? FULL_TIERS : SMOKE_TIERS;
 
 // Per-endpoint trend tracking so the summary export shows p50/p95/p99
 // for each route separately. k6 sums into one Trend if names collide.
@@ -83,6 +93,7 @@ export function handleSummary(data) {
   const out = {
     generatedAt: new Date().toISOString(),
     baseUrl: BASE_URL,
+    profile: LOADTEST_PROFILE,
     endpoints: ENDPOINTS.map((ep) => {
       const trend = data.metrics[`latency_${ep.replace(/\//g, '_')}`];
       return {
