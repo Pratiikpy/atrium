@@ -227,6 +227,15 @@ contract FakePlinth {
         positionOwner[id] = tx.origin;
     }
 
+    function openPositionFor(address owner, uint8, bytes32, int256, bytes calldata, bytes calldata)
+        external
+        returns (uint256 id)
+    {
+        nextPositionId++;
+        id = nextPositionId;
+        positionOwner[id] = owner;
+    }
+
     function closePosition(uint256) external pure returns (int256) { return int256(0); }
 
     function getPosition(uint256 position_id)

@@ -224,7 +224,8 @@ jobs:
 
   subgraph:
     name: Subgraph build
-    runs-on: ubuntu-latest
+    # graph test's matchstick binary does not support Ubuntu 24 yet.
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
       contents: read

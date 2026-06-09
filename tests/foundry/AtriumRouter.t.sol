@@ -573,24 +573,37 @@ contract FakePlinth {
     /// to abs(notional).
     function setMarginIncreasePerOpen(uint256 v) external { marginIncreasePerOpen = v; }
 
-    // Renamed to match the Stylus camelCase ABI selector that
-    // AtriumRouter calls after the 2026-05-24 C-3 selector fix.
-    function openPosition(uint8 venue, bytes32 instrument, int256 notional, bytes calldata, bytes calldata)
-        external
+    function _openFor(address owner, uint8 venue, bytes32 instrument, int256 notional)
+        internal
         returns (uint256 id)
     {
         openCalled = true;
         nextPositionId++;
         id = nextPositionId;
-        // tx.origin is the user when the Router calls this; record it.
-        positionOwner[id] = tx.origin;
+        positionOwner[id] = owner;
         positionVenue[id] = venue;
         positionInstrument[id] = instrument;
         positionNotional[id] = notional;
         // Iter 58 / FIRE76-2 test support: bump required_margin so the
         // Router's before/after delta read on `getAccount` returns a real
         // margin amount.
-        requiredMarginByUser[tx.origin] += marginIncreasePerOpen;
+        requiredMarginByUser[owner] += marginIncreasePerOpen;
+    }
+
+    // Retain the legacy selector for direct fake compatibility.
+    function openPosition(uint8 venue, bytes32 instrument, int256 notional, bytes calldata, bytes calldata)
+        external
+        returns (uint256 id)
+    {
+        return _openFor(tx.origin, venue, instrument, notional);
+    }
+
+    // Current Router selector: records the explicit owner passed by Router.
+    function openPositionFor(address owner, uint8 venue, bytes32 instrument, int256 notional, bytes calldata, bytes calldata)
+        external
+        returns (uint256 id)
+    {
+        return _openFor(owner, venue, instrument, notional);
     }
 
     function closePosition(uint256) external pure returns (int256) {

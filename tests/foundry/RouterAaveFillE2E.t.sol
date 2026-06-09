@@ -338,17 +338,29 @@ contract FakePlinth {
     function setPaused(address u, bool v) external { pausedFlag[u] = v; }
     function setMarginIncreasePerOpen(uint256 v) external { marginIncreasePerOpen = v; }
 
-    function openPosition(uint8, bytes32, int256, bytes calldata, bytes calldata)
-        external
+    function _openFor(address owner)
+        internal
         returns (uint256 id)
     {
         openCalled = true;
         nextPositionId++;
         id = nextPositionId;
-        // tx.origin is the user when the Router calls this; record it so the
-        // close-path ownership check (Router reads getPosition().owner) passes.
-        positionOwner[id] = tx.origin;
-        requiredMarginByUser[tx.origin] += marginIncreasePerOpen;
+        positionOwner[id] = owner;
+        requiredMarginByUser[owner] += marginIncreasePerOpen;
+    }
+
+    function openPosition(uint8, bytes32, int256, bytes calldata, bytes calldata)
+        external
+        returns (uint256 id)
+    {
+        return _openFor(tx.origin);
+    }
+
+    function openPositionFor(address owner, uint8, bytes32, int256, bytes calldata, bytes calldata)
+        external
+        returns (uint256 id)
+    {
+        return _openFor(owner);
     }
 
     function closePosition(uint256) external pure returns (int256) { return int256(0); }
