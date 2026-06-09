@@ -21,9 +21,9 @@ export default function TermsPage() {
         </header>
 
         <aside className="rounded-md border border-[var(--color-status-amber)] bg-[var(--color-status-amber)]/5 p-4 text-sm text-ink-soft">
-          <strong>Note:</strong> This document is a self-drafted GDPR/CCPA-compliant template.
-          Lawyer review is scheduled pre-mainnet. Until then, treat as best-effort compliance.
-          Material changes will be noted in <Link href="/changelog" className="underline">/changelog</Link>.
+          <strong>Note:</strong> Atrium is testnet-first. These terms cover the current public
+          testnet service. Material changes will be noted in{' '}
+          <Link href="/changelog" className="underline">/changelog</Link>.
         </aside>
 
         <Section title="1. Service definition">
@@ -79,8 +79,8 @@ export default function TermsPage() {
         <Section title="6. Limitation of liability">
           <p>
             For the testnet period (v1), total aggregate liability is capped at <strong>$0 USD</strong>.
-            No real funds are at risk. For mainnet (post-Phase 11), a separate Terms of Service
-            will define liability caps and require separate acceptance.
+            No real funds are at risk. A production release would require separate terms and
+            separate acceptance.
           </p>
         </Section>
 
@@ -103,7 +103,7 @@ export default function TermsPage() {
           </p>
           <p className="mt-2 text-sm text-muted">
             Choice rationale: Cayman Islands selected for crypto-native regulatory clarity.
-            Will be updated to match entity registration jurisdiction if different.
+            This section will be updated if the applicable entity or jurisdiction changes.
           </p>
         </Section>
 

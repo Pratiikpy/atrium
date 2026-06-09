@@ -4,7 +4,7 @@ import { ResetConsentButton } from '@/components/reset-consent-button';
 
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'GDPR and CCPA-compliant privacy policy for Atrium Verifier Mode.',
+  description: 'Privacy policy for Atrium testnet surfaces.',
 };
 
 export default function PrivacyPage() {
@@ -21,23 +21,19 @@ export default function PrivacyPage() {
           </p>
         </header>
 
-        {/* Lawyer-review marker */}
         <aside className="rounded-md border border-[var(--color-status-amber)] bg-[var(--color-status-amber)]/5 p-4 text-sm text-ink-soft">
-          <strong>Note:</strong> This document is a self-drafted GDPR/CCPA-compliant template.
-          Lawyer review is scheduled pre-mainnet ($2–5K budget allocated). Until then, treat as
-          best-effort compliance. Material changes will be noted in{' '}
+          <strong>Note:</strong> Atrium is testnet-first. This policy describes the current
+          public testnet surfaces and supporting APIs. Material changes will be noted in{' '}
           <Link href="/changelog" className="underline">/changelog</Link>.
         </aside>
 
         <Section title="1. Data controller">
           <p>
-            The data controller is <strong>Atrium</strong> (entity registration pending;
-            the Atrium project team operates as an unincorporated team until entity formation is
-            complete; see <Link href="/team" className="underline">/team</Link> for individuals).
+            The data controller for the public testnet surfaces is <strong>Atrium</strong>.
+            Contact us at <a href="mailto:privacy@useatrium.me" className="underline">privacy@useatrium.me</a>.
           </p>
           <p className="mt-2 text-sm text-muted">
-            Limitation: no formal entity is registered as of this writing. This policy will be
-            updated with the registered entity name and jurisdiction once incorporation completes.
+            Entity and jurisdiction details will be updated if they change for a production release.
           </p>
         </Section>
 
@@ -126,10 +122,6 @@ export default function PrivacyPage() {
           <p>
             Vercel and DigitalOcean process data in the United States. For EU→US transfers, we
             rely on Standard Contractual Clauses (SCCs) as published by each processor.
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            Limitation: we have not independently verified each processor{"'"}s SCC implementation.
-            This will be confirmed during lawyer review.
           </p>
         </Section>
 

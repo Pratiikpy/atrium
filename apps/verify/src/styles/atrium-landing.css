@@ -254,20 +254,20 @@
 }
 .atrium-desktop-only .feature-split-head {
   display: grid;
-  grid-template-columns: minmax(220px, 0.74fr) minmax(520px, 1.6fr);
-  gap: clamp(48px, 7vw, 112px);
-  align-items: end;
-  max-width: 980px;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(520px, 1.35fr);
+  gap: clamp(40px, 5.5vw, 78px);
+  align-items: center;
+  max-width: 1040px;
   margin: 0 auto;
   padding-bottom: 34px;
   border-bottom: 1px solid var(--hairline);
 }
 .atrium-desktop-only .feature-split-copy {
-  max-width: 300px;
+  max-width: 360px;
 }
 .atrium-desktop-only .feature-split-head .section-sub {
-  margin: 54px 0 0;
-  max-width: 280px;
+  margin: 20px 0 0;
+  max-width: 350px;
   color: var(--ink);
   text-align: left;
 }

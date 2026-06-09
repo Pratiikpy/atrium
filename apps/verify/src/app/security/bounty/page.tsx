@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
-  title: 'Bug Bounty',
-  description: 'Atrium bug bounty program scope, severity matrix, and disclosure process.',
+  title: 'Responsible Disclosure',
+  description: 'Atrium responsible disclosure scope and reporting process.',
 };
 
 export default function BountyPage() {
@@ -11,8 +11,13 @@ export default function BountyPage() {
     <MarketingShell>
       <article className="mx-auto max-w-3xl space-y-8 text-ink-soft">
         <header>
-          <h1 className="font-display text-5xl text-ink">Bug Bounty Program</h1>
-          <p className="mt-2 text-sm italic text-muted">Last updated: 2026-05-28</p>
+          <h1 className="font-display text-5xl text-ink">Responsible Disclosure</h1>
+          <p className="mt-2 text-sm italic text-muted">Last updated: 2026-06-09</p>
+          <p className="mt-4">
+            Atrium accepts vulnerability reports for the public testnet deployment.
+            A formal bounty program, including reward terms and legal scope, will
+            be published separately before it opens.
+          </p>
         </header>
 
         <section>
@@ -45,51 +50,17 @@ export default function BountyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink">Severity matrix</h2>
-          <p className="mt-3 text-sm text-muted">Aligned with Immunefi severity classification.</p>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-divider text-left text-muted">
-                  <th className="pb-2 pr-4">Severity</th>
-                  <th className="pb-2 pr-4">Examples</th>
-                  <th className="pb-2">Reward</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-divider">
-                <tr>
-                  <td className="py-2 pr-4 font-medium text-red-600">Critical</td>
-                  <td className="py-2 pr-4">Fund loss, unauthorized admin access, contract takeover</td>
-                  <td className="py-2">$5,000 – $25,000</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 font-medium text-orange-600">High</td>
-                  <td className="py-2 pr-4">Funds at risk (partial), privilege escalation</td>
-                  <td className="py-2">$1,000 – $5,000</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 font-medium text-yellow-600">Medium</td>
-                  <td className="py-2 pr-4">Information disclosure, denial of service</td>
-                  <td className="py-2">$250 – $1,000</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 font-medium text-muted">Low / Info</td>
-                  <td className="py-2 pr-4">Best-practice violations, minor info leaks</td>
-                  <td className="py-2">Swag + hall-of-fame credit</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="font-display text-2xl text-ink">Funding</h2>
-          <p className="mt-3">
-            Bounty payments are funded from the Praetor treasury post-mainnet. During testnet,
-            rewards are <strong>best-effort by the founding team</strong> with public{' '}
-            <Link href="/security/hall-of-fame" className="underline">hall-of-fame</Link> credit
-            and swag for all valid disclosures.
+          <h2 className="font-display text-2xl text-ink">Priority</h2>
+          <p className="mt-3 text-sm text-muted">
+            Reports are prioritized by impact, exploitability, affected surface,
+            and quality of reproduction.
           </p>
+          <ul className="mt-3 list-disc space-y-1 pl-5">
+            <li><strong>Critical:</strong> fund loss, unauthorized admin action, contract takeover.</li>
+            <li><strong>High:</strong> privilege escalation, incorrect accounting, exploitable denial of service.</li>
+            <li><strong>Medium:</strong> information disclosure, bypassable limits, user-impacting security flaws.</li>
+            <li><strong>Low:</strong> hardening issues and best-practice gaps without direct exploitability.</li>
+          </ul>
         </section>
 
         <section>
@@ -97,8 +68,8 @@ export default function BountyPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li><strong>90-day responsible disclosure window.</strong></li>
             <li>Report to <a href="mailto:security@useatrium.me" className="underline">security@useatrium.me</a>.</li>
-            <li>PGP encryption optional. A public key will be published once generated; until then, open a private GitHub Security Advisory.</li>
-            <li>We acknowledge within 48 hours. Critical issues triaged same-day.</li>
+            <li>Include steps to reproduce, affected route or contract, impact, and any transaction hashes.</li>
+            <li>We acknowledge within 48 hours and prioritize by severity.</li>
             <li>Do not publicly disclose until the 90-day window expires or we publish a fix.</li>
           </ul>
         </section>

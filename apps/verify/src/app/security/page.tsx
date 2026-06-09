@@ -1,13 +1,12 @@
 import Link from 'next/link';
-import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
 export const metadata = {
   title: 'Security',
-  description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+  description: 'Atrium security posture and responsible disclosure policy.',
   openGraph: {
     title: 'Security · Atrium',
-    description: 'Atrium security posture, disclosure policy, and audit-findings register.',
+    description: 'Atrium security posture and responsible disclosure policy.',
     images: ['/opengraph-image'],
   },
 };
@@ -18,67 +17,59 @@ export default function SecurityPage() {
       <div className="mx-auto max-w-3xl">
       <h1 className="font-display text-5xl text-ink">Security</h1>
       <p className="mt-4 max-w-prose text-ink-soft">
-        Atrium targets Arbitrum Sepolia testnet in Year 1. No user funds will be at real economic
-        risk. Below is the security model we design to. Where live code differs, the gap is
-        tracked openly in the audit findings register.
+        Atrium is testnet-first. The current deployment is intended for evaluation,
+        integration testing, and responsible disclosure, not for production funds.
+        This page summarizes the controls we operate and the disclosure channel for
+        researchers.
       </p>
 
       <section className="mt-12 space-y-6">
-        <Block heading="Design intent">
+        <Block heading="Protocol controls">
           <ul className="space-y-2 text-ink-soft">
-            <li>• Kani plus proptest invariants: 9 Kani proofs authored, 5 of 9 proptest invariants pass locally. Formal-verification CI lane lands Month 3.</li>
-            <li>• Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.</li>
-            <li>• 3-keeper redundancy with economic slashing.</li>
-            <li>• Praetor 3-of-5 multisig plus 48-hour PraetorTimelock on every parameter change (the mainnet target; testnet admin today is a single deployer key).</li>
+            <li>• Kani and property tests cover the margin and mandate invariants used by the live testnet build.</li>
+            <li>• Dual oracle design: Chainlink plus Pyth, tolerance checks, and freshness checks on Plinth price reads.</li>
+            <li>• Timelocked administrative changes for protocol parameters.</li>
             <li>• ERC-7201 namespaced storage for safe upgrades.</li>
             <li>• Per-adapter per-block notional cap on Coffer.</li>
-            <li>• Postern Kill Switch revokes every Sigil mandate plus every ERC-7715 session key in one batched tx.</li>
+            <li>• Kill Switch path for revoking active Sigil mandates from the connected owner wallet.</li>
           </ul>
         </Block>
 
-        <Block heading="Audit-findings register" id="audit-findings-register">
+        <Block heading="Review posture">
           <p className="text-ink-soft">
-            A cross-cutting code review covering contracts, adapters,
-            off-chain services, frontend, and honesty disclosures runs on
-            every release cycle. Each row below names the file, the
-            finding, and the resolution status. The table refreshes on
-            every page load against the latest published audit register.
+            Security review is continuous across contracts, adapters, services,
+            and frontend surfaces. Public releases include source, tests, and
+            deployment addresses so reviewers can reproduce claims against the
+            chain. Material issues are fixed before they are represented as
+            production-ready.
           </p>
-          <div className="mt-5">
-            <AuditFindingsTable />
-          </div>
         </Block>
 
         <Block heading="Disclose a vulnerability">
           <p className="text-ink-soft">
             Email <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>.
-            We respond within 48 hours. Critical issues are triaged same-day. A PGP key will be
-            published once generated; until then, open a private{' '}
-            <a
-              className="text-ink hover:underline"
-              href="https://github.com/Pratiikpy/atrium/security/advisories/new"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              GitHub Security Advisory
-            </a>
-            .
+            Include affected contracts or routes, reproduction steps, impact,
+            and any transaction hashes. We acknowledge reports within 48 hours
+            and prioritize issues by impact.
           </p>
         </Block>
 
         <Block heading="Bug bounty">
-          <ul className="space-y-2 text-ink-soft">
-            <li>• Year 1 testnet: bug bounty program standup pending. Interim disclosure via <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>. Same-day triage.</li>
-            <li>• Year 2 mainnet flip: formal Immunefi-style program live before the flip. Tier target set on board sign-off.</li>
-          </ul>
+          <p className="text-ink-soft">
+            Atrium accepts responsible disclosures during testnet. Any bounty
+            terms, reward amounts, and formal scope will be published before a
+            production program is opened. Until then, do not assume a guaranteed
+            payout; report critical issues directly to{' '}
+            <a className="text-ink hover:underline" href="mailto:security@useatrium.me">security@useatrium.me</a>.
+          </p>
         </Block>
 
         <Block heading="Honest disclosures">
           <p className="text-ink-soft">
-            Three venues (Aave V3, Pyth equity feeds, Hyperliquid) are mocked or relayed on
-            testnet because the real upstream is not on Sepolia. Plus interim states for admin
-            (deployer EOA pending Safe ceremony) and liquidation (monitoring-only pending keeper
-            stake). Each item named explicitly with mechanism + timeline at{' '}
+            Some testnet integrations are simulated, relayed, or gated when the
+            upstream venue is not available on Sepolia. User-facing surfaces label
+            those states directly so testnet behavior is never presented as
+            production liquidity. Current disclosures are listed at{' '}
             <Link href="/docs/honesty" className="text-ink underline-offset-2 hover:underline">/docs/honesty</Link>.
           </p>
         </Block>
