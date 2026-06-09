@@ -34,7 +34,13 @@ export function ConnectWallet({
   const isE2E = process.env.NEXT_PUBLIC_E2E === '1';
   const injectedConnector = connectors.find((c) => c.type === 'injected' || c.id === 'injected');
   const coinbaseConnector = connectors.find((c) => c.id === 'coinbaseWalletSDK' || c.id === 'coinbaseWallet');
-  const connector = isE2E ? connectors[0] : (injectedConnector ?? connectors[0]);
+  const hasInjectedProvider =
+    typeof window !== 'undefined' && 'ethereum' in window && Boolean(window.ethereum);
+  const connector = isE2E
+    ? connectors[0]
+    : ((hasInjectedProvider ? injectedConnector : coinbaseConnector) ??
+      injectedConnector ??
+      connectors[0]);
 
   if (isConnected && address) {
     const a = getAddress(address);
