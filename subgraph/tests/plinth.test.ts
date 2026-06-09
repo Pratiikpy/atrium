@@ -29,7 +29,7 @@ describe('Plinth handlers', () => {
       new ethereum.EventParam('venue_id', ethereum.Value.fromI32(1)),
       new ethereum.EventParam('instrument_id', ethereum.Value.fromBytes(Bytes.fromHexString('0xabcdef'))),
       new ethereum.EventParam('notional_signed', ethereum.Value.fromSignedBigInt(BigInt.fromI32(1000))),
-      new ethereum.EventParam('entry_price_q64', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(18446744073709551))),
+      new ethereum.EventParam('entry_price_q64', ethereum.Value.fromUnsignedBigInt(BigInt.fromString('18446744073709551'))),
       new ethereum.EventParam('intent_hash', ethereum.Value.fromBytes(Bytes.fromHexString('0x0000000000000000000000000000000000000000000000000000000000000000'))),
     ];
     handlePositionOpened(changetype<PositionOpened>(event));

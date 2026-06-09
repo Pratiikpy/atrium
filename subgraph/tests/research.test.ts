@@ -12,7 +12,7 @@ describe('Research handlers', () => {
       new ethereum.EventParam('ipfs_hash', ethereum.Value.fromBytes(Bytes.fromHexString('0xdeadbeefcafe'))),
       new ethereum.EventParam('trades_count', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(150))),
       new ethereum.EventParam('collateral_delta_bps', ethereum.Value.fromSignedBigInt(BigInt.fromI32(320))),
-      new ethereum.EventParam('timestamp_seconds', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1700000000))),
+      new ethereum.EventParam('timestamp_seconds', ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1700000000'))),
       new ethereum.EventParam('notebook_url', ethereum.Value.fromString('https://colab.research.google.com/test')),
     ];
     handleBacktestPublished(changetype<BacktestPublished>(event));
