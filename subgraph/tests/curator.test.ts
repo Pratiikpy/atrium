@@ -13,7 +13,7 @@ describe('Curator handlers', () => {
       new ethereum.EventParam('grant_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))),
       new ethereum.EventParam('grantee', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000001'))),
       new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(50000))),
-      new ethereum.EventParam('ipfs_attestation_cid', ethereum.Value.fromString('QmTest123')),
+      new ethereum.EventParam('ipfs_attestation_cid', ethereum.Value.fromBytes(Bytes.fromHexString('0x516d54657374313233'))),
     ];
     handleGrantCreated(changetype<GrantCreated>(createEvent));
     assert.fieldEquals('CuratorGrant', '1', 'state', 'pending');
@@ -21,6 +21,8 @@ describe('Curator handlers', () => {
     const claimEvent = newMockEvent();
     claimEvent.parameters = [
       new ethereum.EventParam('grant_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))),
+      new ethereum.EventParam('grantee', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000001'))),
+      new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(50000))),
     ];
     handleGrantClaimed(changetype<GrantClaimed>(claimEvent));
     assert.fieldEquals('CuratorGrant', '1', 'state', 'claimed');
@@ -32,7 +34,7 @@ describe('Curator handlers', () => {
       new ethereum.EventParam('grant_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(2))),
       new ethereum.EventParam('grantee', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000001'))),
       new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(30000))),
-      new ethereum.EventParam('ipfs_attestation_cid', ethereum.Value.fromString('QmTest456')),
+      new ethereum.EventParam('ipfs_attestation_cid', ethereum.Value.fromBytes(Bytes.fromHexString('0x516d54657374343536'))),
     ];
     handleGrantCreated(changetype<GrantCreated>(createEvent));
 

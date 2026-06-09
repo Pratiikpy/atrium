@@ -11,6 +11,7 @@ describe('Edict handlers', () => {
     event.parameters = [
       new ethereum.EventParam('user', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000001'))),
       new ethereum.EventParam('tier', ethereum.Value.fromI32(2)),
+      new ethereum.EventParam('timestamp', ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1700000000'))),
       new ethereum.EventParam('assigned_by', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000099'))),
     ];
     handleTierAssigned(changetype<TierAssigned>(event));

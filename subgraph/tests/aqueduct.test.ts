@@ -58,6 +58,7 @@ describe('Aqueduct handlers', () => {
     const event = newMockEvent();
     event.parameters = [
       new ethereum.EventParam('message_id', ethereum.Value.fromBytes(Bytes.fromHexString('0xbb'))),
+      new ethereum.EventParam('user', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000001'))),
       new ethereum.EventParam('amount_wei', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(250000))),
     ];
     handleCrossChainCreditClaimedBack(changetype<CrossChainCreditClaimedBack>(event));
@@ -69,7 +70,7 @@ describe('Aqueduct handlers', () => {
     const event = newMockEvent();
     event.parameters = [
       new ethereum.EventParam('by', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000099'))),
-      new ethereum.EventParam('reason', ethereum.Value.fromString('incident')),
+      new ethereum.EventParam('reason', ethereum.Value.fromBytes(Bytes.fromUTF8('incident'))),
     ];
     handleEmergencyPaused(changetype<EmergencyPaused>(event));
     assert.entityCount('AqueductPauseState', 1);

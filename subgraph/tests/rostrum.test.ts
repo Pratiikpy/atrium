@@ -81,7 +81,7 @@ describe('Rostrum handlers', () => {
     const event = newMockEvent();
     event.parameters = [
       new ethereum.EventParam('agent', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000002'))),
-      new ethereum.EventParam('action_kind', ethereum.Value.fromString('open_position')),
+      new ethereum.EventParam('action_kind', ethereum.Value.fromBytes(Bytes.fromUTF8('open_position'))),
     ];
     handleActionRecorded(changetype<ActionRecorded>(event));
     assert.entityCount('RostrumAgentAction', 1);
