@@ -56,6 +56,7 @@ const INDEXING_IGNORE = new Map([
   ['*.RiskParamsUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['*.ValidatorSetUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['*.DestinationUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
+  ['*.PraetorUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['Aqueduct.AqueductOnDestSet', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['Aqueduct.ClaimbackRegistryUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
   ['Aqueduct.LinkDeposited', 'operational top-up; LINK balance polled directly from ERC-20'],
@@ -75,6 +76,21 @@ const INDEXING_IGNORE = new Map([
   ['Sigil.SigilResumedEvent', 'timelock-only; captured via PraetorTimelock.Executed'],
   ['Vigil.VigilPausedEvent', 'admin pause hook; live is_paused state read directly via viem in deployments/status'],
   ['Vigil.VigilResumedEvent', 'timelock-only; captured via PraetorTimelock.Executed'],
+  ['AtriumRouter.RouterPaused', 'admin pause hook; live is_paused state read directly via viem in deployments/status'],
+  ['AtriumRouter.RouterResumed', 'timelock-only; captured via PraetorTimelock.Executed'],
+  ['AtriumRouter.HedgedPairOpened', 'compound router action; canonical legs captured by PositionOpenedViaRouter/Plinth'],
+  ['Coffer.CollateralReturned', 'withdraw/redeem fulfillment; canonical user flow captured by Withdraw'],
+  ['Vigil.KeeperUnstaked', 'keeper self-service stake accounting; live stake read directly from Vigil.jobs/keepers when surfaced'],
+  ['Vigil.RewardsClaimed', 'keeper reward withdrawal; accrued rewards already captured via KeeperRewarded'],
+  ['Vigil.KeeperMinStakeUpdated', 'Praetor multisig action; captured via PraetorTimelock.Executed'],
+  // Testnet-only mocks are deployed to make unsupported upstream protocols usable
+  // on Arbitrum Sepolia. Scribe indexes Atrium protocol events, not mock ERC-20
+  // or mock venue internals.
+  ['MockAavePool.Supply', 'testnet mock venue internals; Atrium flow captured via router/coffer/plinth events'],
+  ['MockAavePool.Withdraw', 'testnet mock venue internals; Atrium flow captured via router/coffer/plinth events'],
+  ['MockChainlinkUsdFeed.AnswerUpdated', 'testnet mock oracle internals; live price state read directly when needed'],
+  ['MockUSDC.Transfer', 'testnet mock ERC-20 internals; Coffer/Router events are canonical for product flows'],
+  ['MockUSDC.Approval', 'testnet mock ERC-20 internals; allowance is wallet/ERC-20 state, not a Scribe product event'],
 ]);
 
 const EVENT_RE = /^\s*event\s+([A-Z]\w*)\s*\(/gm;
