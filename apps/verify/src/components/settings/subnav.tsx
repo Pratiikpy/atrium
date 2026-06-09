@@ -22,13 +22,18 @@ export type SettingsTabId =
 
 const TAB_CONTEXT = createContext<{ active: SettingsTabId } | null>(null);
 
-const TABS: { id: SettingsTabId; label: string; icon: string; readyMonth?: string }[] = [
+const TABS: {
+  id: SettingsTabId;
+  label: string;
+  icon: string;
+  pending?: boolean;
+}[] = [
   { id: 'wallet', label: 'Wallet', icon: '✦' },
   { id: 'session-keys', label: 'Session keys', icon: '◉' },
-  { id: 'recovery', label: 'Recovery', icon: '◐', readyMonth: 'Month 8' },
-  { id: 'network', label: 'Network', icon: '⇌', readyMonth: 'Month 3' },
-  { id: 'notifications', label: 'Notifications', icon: '♬', readyMonth: 'Month 5' },
-  { id: 'account', label: 'Account', icon: '◌', readyMonth: 'Month 4' },
+  { id: 'recovery', label: 'Recovery', icon: '◐', pending: true },
+  { id: 'network', label: 'Network', icon: '⇌', pending: true },
+  { id: 'notifications', label: 'Notifications', icon: '♬', pending: true },
+  { id: 'account', label: 'Account', icon: '◌', pending: true },
 ];
 
 export function SettingsTabs({ children }: { children: ReactNode }) {
@@ -51,9 +56,11 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
                   : 'text-ink-soft hover:bg-parchment-soft/60 hover:text-ink')
               }
             >
-              <span aria-hidden className="text-xs opacity-70">{t.icon}</span>
+              <span aria-hidden className="text-xs opacity-70">
+                {t.icon}
+              </span>
               <span>{t.label}</span>
-              {t.readyMonth && !isActive && (
+              {t.pending && !isActive && (
                 <span className="ml-auto text-[9px] uppercase tracking-wider text-muted">
                   soon
                 </span>
@@ -65,12 +72,14 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
 
       <TAB_CONTEXT.Provider value={{ active }}>
         <div className="space-y-4">
-          {tabMeta?.readyMonth && active !== 'wallet' && (
+          {tabMeta?.pending && active !== 'wallet' && (
             <div className="rounded-md border border-testnet/30 bg-testnet/5 p-5 text-sm">
-              <p className="font-medium text-testnet">{tabMeta.label}, coming {tabMeta.readyMonth}</p>
+              <p className="font-medium text-testnet">
+                {tabMeta.label} pending
+              </p>
               <p className="mt-1 text-ink-soft">
-                The {tabMeta.label.toLowerCase()} tab is scaffolded but not yet wired.
-                Ships per the launch roadmap.
+                The {tabMeta.label.toLowerCase()} tab is not available in the
+                testnet app yet.
               </p>
             </div>
           )}
@@ -92,7 +101,13 @@ export function SettingsTabs({ children }: { children: ReactNode }) {
  * runtime will fail with `useContext is not a function` the moment a
  * server component tries to render it. Do not split.
  */
-export function SettingsTabPanel({ tab, children }: { tab: SettingsTabId; children: ReactNode }) {
+export function SettingsTabPanel({
+  tab,
+  children,
+}: {
+  tab: SettingsTabId;
+  children: ReactNode;
+}) {
   const ctx = useContext(TAB_CONTEXT);
   if (!ctx || ctx.active !== tab) return null;
   return <>{children}</>;

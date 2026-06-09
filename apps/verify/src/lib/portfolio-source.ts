@@ -79,7 +79,7 @@ const PLINTH_ABI = [
 // --- Coffer collateral: the FIX for the share-vs-asset display bug ---
 // Plinth caches coffer.balance_of (raw ERC-4626 SHARES) as collateral, which
 // (a) goes stale until a recompute and (b) on a small vault is ~1e6x the asset
-// value, so formatUsd(shares, 6) rendered a $1.45 deposit as $1,450,000. The
+// value, so formatting shares as USD rendered a $1.45 deposit as $1,450,000. The
 // vault page reads convertToAssets directly and is correct; the portfolio must
 // too. Reading the Coffer LIVE also fixes the deposit-staleness (no cached value).
 const COFFER_ABI = [

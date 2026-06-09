@@ -29,6 +29,7 @@ export function TradeView() {
     VENUES.find((v) => v.operational)?.id ?? VENUES[0]?.id ?? 'aave-horizon',
   );
   const [size, setSize] = useState<string>('');
+  const [leverage, setLeverage] = useState<number>(3);
 
   return (
     <>
@@ -38,9 +39,15 @@ export function TradeView() {
       </section>
 
       <section className="mt-6 grid gap-4 xl:grid-cols-[340px_1fr_320px]">
-        <OrderForm venue={venue} size={size} setSize={setSize} />
+        <OrderForm
+          venue={venue}
+          size={size}
+          setSize={setSize}
+          leverage={leverage}
+          setLeverage={setLeverage}
+        />
         <OrderBook venue={venue} />
-        <MarginImpactPanel venue={venue} size={size} />
+        <MarginImpactPanel venue={venue} size={size} leverage={leverage} />
       </section>
     </>
   );

@@ -4,7 +4,10 @@ import dynamic from 'next/dynamic';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
-import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
+import {
+  useDeploymentStatus,
+  readinessMessage,
+} from '@/lib/use-deployment-status';
 import { useOpenPosition } from '@/lib/use-open-position';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
@@ -15,7 +18,10 @@ import { HelpTip } from '@/components/ui/help-tip';
 
 /* PERF-04: Dynamic import, RiskPreviewModal only renders on first trade */
 const RiskPreviewModal = dynamic(
-  () => import('@/components/trade/risk-preview-modal').then((m) => m.RiskPreviewModal),
+  () =>
+    import('@/components/trade/risk-preview-modal').then(
+      (m) => m.RiskPreviewModal,
+    ),
   { ssr: false },
 );
 
@@ -37,9 +43,18 @@ interface ImpactPreview {
   source: 'plinth' | 'pending';
 }
 
-async function fetchImpact(sizeUsd: string, venue: string, wallet?: string): Promise<ImpactPreview> {
+async function fetchImpact(
+  sizeUsd: string,
+  venue: string,
+  leverage: number,
+  wallet?: string,
+): Promise<ImpactPreview> {
   if (!sizeUsd || parseFloat(sizeUsd) <= 0 || !wallet) {
-    return { initialMarginUsd: '-', maintenanceMarginUsd: '-', source: 'pending' };
+    return {
+      initialMarginUsd: '-',
+      maintenanceMarginUsd: '-',
+      source: 'pending',
+    };
   }
   try {
     // The margin-impact route is IDOR-locked (requireWalletMatch): it MUST
@@ -47,43 +62,57 @@ async function fetchImpact(sizeUsd: string, venue: string, wallet?: string): Pro
     // DEMO_WALLET and 403s the real session ("Wallet mismatch"), which the
     // catch below swallows into source:'pending' - so the live preview never
     // populated for a real connected user. Pass the wallet through.
-    const r = await fetch(walletQuery(`/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}`, wallet));
+    const r = await fetch(
+      walletQuery(
+        `/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}&leverage=${encodeURIComponent(String(leverage))}`,
+        wallet,
+      ),
+    );
     if (!r.ok) throw new Error();
     const j = await r.json();
-    return { initialMarginUsd: j.initialMarginUsd ?? null, maintenanceMarginUsd: j.maintenanceMarginUsd ?? null, source: j.source ?? 'pending' };
+    return {
+      initialMarginUsd: j.initialMarginUsd ?? null,
+      maintenanceMarginUsd: j.maintenanceMarginUsd ?? null,
+      source: j.source ?? 'pending',
+    };
   } catch {
-    return { initialMarginUsd: null, maintenanceMarginUsd: null, source: 'pending' };
+    return {
+      initialMarginUsd: null,
+      maintenanceMarginUsd: null,
+      source: 'pending',
+    };
   }
 }
 
 // Audit U-14 (closes QQ-9 + QQ-11 + QQ-12 lift-state-up note):
 // `venue` now comes from the parent TradeView via props, so the
 // VenueChipBar selection actually drives this form's margin preview
-// + Plinth API call. `leverage` and `side` remain UI-only for the
-// reason noted previously (Plinth's initial_margin_bps formula doesn't
-// take leverage as an input; long/short both charge the same haircut
-// in v1). Once Plinth adds leverage to its formula, pass it through.
+// + Plinth API call. `leverage` is lifted to TradeView so the slider
+// drives both the risk modal and the shared margin-impact preview.
 
 export function OrderForm({
   venue,
   size,
   setSize,
+  leverage,
+  setLeverage,
 }: {
   venue: string;
   size: string;
   setSize: (s: string) => void;
+  leverage: number;
+  setLeverage: (n: number) => void;
 }) {
   const [side, setSide] = useState<'long' | 'short'>('long');
-  const [leverage, setLeverage] = useState(3);
-  const [slippage, setSlippage] = useState(0.10);
+  const [slippage, setSlippage] = useState(0.1);
   const { address } = useAccount();
 
   // Debounce size for margin-impact queries
   const deferredSize = useDeferredValue(size);
 
   const { data: impact } = useQuery({
-    queryKey: ['order-form-impact', deferredSize, venue, address],
-    queryFn: () => fetchImpact(deferredSize, venue, address),
+    queryKey: ['order-form-impact', deferredSize, venue, leverage, address],
+    queryFn: () => fetchImpact(deferredSize, venue, leverage, address),
     enabled: deferredSize.length > 0 && !!address,
     refetchInterval: 10_000,
   });
@@ -91,19 +120,29 @@ export function OrderForm({
   // Only Aave Horizon is openable today; the other venues are deployed-but-
   // scaffolded (open_position reverts on-chain). Gate the Open button on this
   // so a user never signs a transaction that is guaranteed to revert.
-  const venueOperational = VENUES.find((v) => v.id === venue)?.operational ?? false;
+  const venueOperational =
+    VENUES.find((v) => v.id === venue)?.operational ?? false;
   const helper = !venueOperational
     ? `${venueShortLabel(venue)} is deployed but not openable on testnet yet. Open positions are live on Aave Horizon today.`
-    : readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
-  const { status: openStatus, open: openPosition, reset: resetOpen } = useOpenPosition();
-  const busy = openStatus.kind === 'resolving' || openStatus.kind === 'submitting';
+    : readinessMessage(
+        deployment,
+        side === 'long' ? 'Open long' : 'Open short',
+      );
+  const {
+    status: openStatus,
+    open: openPosition,
+    reset: resetOpen,
+  } = useOpenPosition();
+  const busy =
+    openStatus.kind === 'resolving' || openStatus.kind === 'submitting';
   // Validate the size as a positive number, not merely non-empty: a bare
   // `size.length > 0` left the Open button enabled for "0", "-5", and "abc"
   // (interactive form-edge sweep 2026-06-02). parseFloat rejects all three
   // (NaN/<=0). The deposit form already gates this way; match it here.
   const sizeNum = parseFloat(size);
   const sizeValid = Number.isFinite(sizeNum) && sizeNum > 0;
-  const ready = deployment?.ready === true && sizeValid && !busy && venueOperational;
+  const ready =
+    deployment?.ready === true && sizeValid && !busy && venueOperational;
 
   // First-trade risk preview gate. The flow doc treats this as required
   // before the very first open-position click. Persistence is per-device
@@ -176,7 +215,9 @@ export function OrderForm({
 
       <div className="mt-4">
         <label className="block">
-          <span className="text-[10px] uppercase tracking-wider text-muted">Size · USDC</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted">
+            Size · USDC
+          </span>
           <input
             type="text"
             inputMode="decimal"
@@ -190,7 +231,9 @@ export function OrderForm({
 
       <div className="mt-4">
         <div className="flex items-baseline justify-between">
-          <span className="text-[10px] uppercase tracking-wider text-muted flex items-center gap-1">Leverage <HelpTip term="leverage" /></span>
+          <span className="text-[10px] uppercase tracking-wider text-muted flex items-center gap-1">
+            Leverage <HelpTip term="leverage" />
+          </span>
           <span className="font-mono text-xs text-ink">{leverage}×</span>
         </div>
         <input
@@ -198,7 +241,12 @@ export function OrderForm({
           min={1}
           max={20}
           value={leverage}
-          onChange={(e) => setLeverage(parseInt(e.target.value, 10))}
+          onChange={(e) => {
+            const next = parseInt(e.target.value, 10);
+            setLeverage(
+              Number.isFinite(next) ? Math.min(20, Math.max(1, next)) : 1,
+            );
+          }}
           className="mt-2 w-full accent-ink"
           aria-label={`Leverage: ${leverage}×`}
         />
@@ -209,15 +257,28 @@ export function OrderForm({
       </div>
 
       <dl className="mt-5 space-y-1.5 border-t border-divider-soft pt-4 font-mono text-xs">
-        <Row label="Maintenance margin" value={impact?.maintenanceMarginUsd ?? '-'} />
+        <Row
+          label="Maintenance margin"
+          value={impact?.maintenanceMarginUsd ?? '-'}
+        />
         <Row label="Initial margin" value={impact?.initialMarginUsd ?? '-'} />
         <div className="flex items-center justify-between">
-          <dt className="text-muted flex items-center gap-1">Slippage tolerance <HelpTip term="slippage" /></dt>
-          <dd><SlippageSelect value={slippage} onChange={setSlippage} walletAddress={address} /></dd>
+          <dt className="text-muted flex items-center gap-1">
+            Slippage tolerance <HelpTip term="slippage" />
+          </dt>
+          <dd>
+            <SlippageSelect
+              value={slippage}
+              onChange={setSlippage}
+              walletAddress={address}
+            />
+          </dd>
         </div>
       </dl>
       <p className="mt-2 text-[9px] uppercase tracking-wider text-muted">
-        {impact?.source === 'plinth' ? 'from Plinth.update_margin · simulated' : 'margin pending · figures populate once Plinth prices your order'}
+        {impact?.source === 'plinth'
+          ? 'from Plinth.update_margin · simulated'
+          : 'margin pending · figures populate once Plinth prices your order'}
       </p>
 
       <button
@@ -229,12 +290,17 @@ export function OrderForm({
         {openButtonLabel(openStatus, side)}
       </button>
       {helper && (
-        <p className="mt-2 text-[10px] uppercase tracking-wider text-muted">{helper}</p>
+        <p className="mt-2 text-[10px] uppercase tracking-wider text-muted">
+          {helper}
+        </p>
       )}
       <OpenStatusLine status={openStatus} onReset={resetOpen} />
       <p className="mt-3 text-center text-[9px] uppercase tracking-wider text-muted">
         Your trade routes through a Portico-registered venue adapter.{' '}
-        <a href="/docs/api" className="underline">See adapter docs</a>.
+        <a href="/docs/api" className="underline">
+          See adapter docs
+        </a>
+        .
       </p>
       <RiskPreviewModal
         open={showRiskPreview}
@@ -266,7 +332,11 @@ function OpenStatusLine({
   status: ReturnType<typeof useOpenPosition>['status'];
   onReset: () => void;
 }) {
-  if (status.kind === 'idle' || status.kind === 'resolving' || status.kind === 'submitting') {
+  if (
+    status.kind === 'idle' ||
+    status.kind === 'resolving' ||
+    status.kind === 'submitting'
+  ) {
     return null;
   }
   if (status.kind === 'success') {
@@ -318,12 +388,12 @@ function Row({ label, value }: { label: string; value: string }) {
 // switches chips (pre-fix: always "HL-HIP3" regardless of selection).
 function venueShortLabel(id: string): string {
   const map: Record<string, string> = {
-    'hyperliquid': 'HL-HIP3',
+    hyperliquid: 'HL-HIP3',
     'aave-horizon': 'AAVE-V3',
     'pendle-v2': 'PENDLE',
-    'curve': 'CURVE',
+    curve: 'CURVE',
     'trade-xyz': 'TRADE',
-    'polymarket': 'PMK',
+    polymarket: 'PMK',
     'hl-hip4': 'HL-HIP4',
   };
   return map[id] ?? id.toUpperCase();

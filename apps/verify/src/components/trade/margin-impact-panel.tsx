@@ -6,13 +6,19 @@ import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 interface MarginImpact {
   buyingPowerAfterUsd: string | null;
   liquidationBufferBps: number | null;
+  notionalUsd: string | null;
   initialMarginUsd: string | null;
   maintenanceMarginUsd: string | null;
   notes: string;
   source: 'plinth' | 'pending';
 }
 
-async function fetchImpact(venue: string, size: string, wallet: string | null): Promise<MarginImpact> {
+async function fetchImpact(
+  venue: string,
+  size: string,
+  leverage: number,
+  wallet: string | null,
+): Promise<MarginImpact> {
   // Audit U-14: venue + size now come from the parent TradeView state.
   // Pre-fix the URL was `?size=1200&venue=hl-hip3`, but `hl-hip3` isn't
   // even a valid venue id (real id is `hyperliquid`), so the request always
@@ -23,6 +29,7 @@ async function fetchImpact(venue: string, size: string, wallet: string | null): 
     return {
       buyingPowerAfterUsd: null,
       liquidationBufferBps: null,
+      notionalUsd: null,
       initialMarginUsd: null,
       maintenanceMarginUsd: null,
       notes: 'Open a position to preview impact.',
@@ -32,7 +39,7 @@ async function fetchImpact(venue: string, size: string, wallet: string | null): 
   try {
     const r = await fetch(
       walletQuery(
-        `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}`,
+        `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}&leverage=${encodeURIComponent(String(leverage))}`,
         wallet,
       ),
     );
@@ -42,6 +49,7 @@ async function fetchImpact(venue: string, size: string, wallet: string | null): 
     return {
       buyingPowerAfterUsd: null,
       liquidationBufferBps: null,
+      notionalUsd: null,
       initialMarginUsd: null,
       maintenanceMarginUsd: null,
       notes: 'Open a position to preview impact.',
@@ -50,34 +58,58 @@ async function fetchImpact(venue: string, size: string, wallet: string | null): 
   }
 }
 
-export function MarginImpactPanel({ venue, size }: { venue: string; size: string }) {
+export function MarginImpactPanel({
+  venue,
+  size,
+  leverage,
+}: {
+  venue: string;
+  size: string;
+  leverage: number;
+}) {
   const wallet = useScopedWallet();
   const { data } = useQuery({
-    queryKey: ['margin-impact', venue, size, wallet],
-    queryFn: () => fetchImpact(venue, size, wallet),
+    queryKey: ['margin-impact', venue, size, leverage, wallet],
+    queryFn: () => fetchImpact(venue, size, leverage, wallet),
     refetchInterval: 10_000,
   });
   return (
     <aside className="rounded-md border border-divider bg-parchment p-5">
       <p className="eyebrow">Margin impact</p>
-      <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">What would be assumed</p>
+      <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">
+        What would be assumed
+      </p>
 
-      <p className="mt-4 font-mono text-3xl text-ink">{data?.buyingPowerAfterUsd ?? '-'}</p>
-      <p className="text-[10px] uppercase tracking-wider text-muted">Buying power with new position</p>
+      <p className="mt-4 font-mono text-3xl text-ink">
+        {data?.buyingPowerAfterUsd ?? '-'}
+      </p>
+      <p className="text-[10px] uppercase tracking-wider text-muted">
+        Buying power with new position
+      </p>
 
       <div className="mt-6 rounded-md bg-parchment-soft/60 px-4 py-3">
-        <p className="text-[10px] uppercase tracking-wider text-muted">Liquidation buffer</p>
+        <p className="text-[10px] uppercase tracking-wider text-muted">
+          Liquidation buffer
+        </p>
         <p className="mt-1 font-mono text-xl text-ink">
-          {data?.liquidationBufferBps != null ? `${(data.liquidationBufferBps / 100).toFixed(1)}%` : '-'}
+          {data?.liquidationBufferBps != null
+            ? `${(data.liquidationBufferBps / 100).toFixed(1)}%`
+            : '-'}
         </p>
       </div>
 
       <dl className="mt-5 space-y-1.5 text-xs">
+        <Row label="Priced notional" value={data?.notionalUsd ?? '-'} />
         <Row label="Initial margin" value={data?.initialMarginUsd ?? '-'} />
-        <Row label="Maintenance margin" value={data?.maintenanceMarginUsd ?? '-'} />
+        <Row
+          label="Maintenance margin"
+          value={data?.maintenanceMarginUsd ?? '-'}
+        />
       </dl>
 
-      <p className="mt-5 text-[10px] uppercase tracking-wider text-muted">Position effects</p>
+      <p className="mt-5 text-[10px] uppercase tracking-wider text-muted">
+        Position effects
+      </p>
       <p className="mt-2 text-[11px] text-ink-soft">{data?.notes}</p>
     </aside>
   );

@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
 
+vi.mock('@/lib/portfolio-source', () => ({
+  tryGetPlinth: vi.fn(async () => null),
+}));
+
 // The shared vitest.setup.ts sets a global DEMO_WALLET_ADDRESS so session-
 // gated route tests get a demo session. This route reads that env directly
 // to decide the (!plinth || !wallet) pending branch, the tests below
@@ -105,6 +109,27 @@ describe('GET /api/trade/margin-impact, JJ-1 input validation', () => {
     expect(json.error).toBe('invalid_size');
   });
 
+  it('rejects leverage below 1', async () => {
+    const res = await GET(makeRequest('size=100&leverage=0'));
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe('invalid_leverage');
+  });
+
+  it('rejects leverage above 20', async () => {
+    const res = await GET(makeRequest('size=100&leverage=21'));
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe('invalid_leverage');
+  });
+
+  it('rejects size multiplied by leverage above the $1B notional ceiling', async () => {
+    const res = await GET(makeRequest('size=100000000&leverage=20'));
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe('invalid_notional');
+  });
+
   it('rejects fractional values containing a sign (+100)', async () => {
     // The validation regex is strict: `^\d+(\.\d+)?$`, no leading sign
     // even though `parseFloat("+100") === 100` would work. The strict
@@ -155,6 +180,14 @@ describe('GET /api/trade/margin-impact, valid input passes JJ-1, falls to pendin
     expect(res.status).toBe(200);
   });
 
+  it('returns preview notional when leverage is supplied', async () => {
+    const res = await GET(makeRequest('size=100&leverage=3'));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.notionalUsd).toBe('$300.00');
+    expect(json.notes).toContain('3x');
+  });
+
   it('mentions the venue in pending notes (default hyperliquid)', async () => {
     // Audit fix (#19): default venue is now a real VENUES id ('hyperliquid'),
     // not the bogus 'hl-hip3' the route used to fall back to.
@@ -169,8 +202,6 @@ describe('GET /api/trade/margin-impact, valid input passes JJ-1, falls to pendin
     expect(json.notes).toContain('aave-v3');
   });
 });
-
-
 
 describe('GET /api/trade/margin-impact, P0-4 IDOR gate', () => {
   // The route reads wallet-scoped Plinth collateral/margin, so ?wallet= must be
