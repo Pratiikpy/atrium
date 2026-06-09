@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
+import { ConnectWallet } from '@/components/connect-wallet';
 
 /**
  * SettingsMobile  the More panel for /app/settings at < md.
@@ -31,6 +32,15 @@ export function SettingsMobile() {
         <div className="mt-0.5 text-[11px] text-mob-muted">
           {isConnected ? 'passkey . touch ID' : 'tap to connect'}
         </div>
+        {/* QA-judge fix (2026-06-09): make "tap to connect" real. This card was
+            the only mobile surface that hinted at connecting, but it was inert
+            text. Render the working ConnectWallet so the mobile settings panel
+            has a real connect button (mirrors the desktop sidebar wallet card). */}
+        {!isConnected && (
+          <div className="mt-3">
+            <ConnectWallet variant="inline" />
+          </div>
+        )}
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Chip>{chainLabel}</Chip>
           <Chip>eth-sepolia</Chip>

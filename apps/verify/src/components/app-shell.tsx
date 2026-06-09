@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import { AppShellActions } from './app-shell-actions';
 import { AppShellWalletCard } from './app-shell-wallet-card';
+import { ConnectWallet } from './connect-wallet';
 import { WrongChainBanner } from './wrong-chain-banner';
 import { MobileBottomNav } from './mobile/mobile-bottom-nav';
 import { CommandPalette } from './command-palette';
@@ -128,6 +130,13 @@ export function AppShell({
   // useIsMobile). With slots, each branch renders only its own viewport's
   // content; without slots, both fall back to {children}.
   const isMobile = useIsMobile();
+  // QA-judge fix (2026-06-09): the mobile app chrome had NO working connect
+  // control. ConnectWallet only rendered in the desktop sidebar + desktop
+  // settings; the mobile settings card said "tap to connect" but was dead text,
+  // so a real phone user clicking "Open testnet" could never connect a wallet.
+  // Surface a working ConnectWallet in the mobile header whenever disconnected,
+  // so every mobile app screen has a visible, functional connect entry point.
+  const { isConnected } = useAccount();
   return (
     <>
       {/* Mobile branch: minimal chrome wrapping the
@@ -149,10 +158,13 @@ export function AppShell({
           <Link href="/app" className="atrium-mark" style={{ fontSize: 20, textDecoration: 'none', color: 'var(--color-mob-ink)' }}>
             Atrium
           </Link>
-          <span className="pill testnet" style={{ fontSize: 9 }}>
-            <span className="dot" />
-            testnet
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {!isConnected && <ConnectWallet variant="inline" />}
+            <span className="pill testnet" style={{ fontSize: 9 }}>
+              <span className="dot" />
+              testnet
+            </span>
+          </div>
         </header>
         {/* paddingBottom must clear BOTH the bottom nav AND the persistent
             emergency-stop FAB (kill-switch-mobile.tsx: fixed bottom-24 right-4,
