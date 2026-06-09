@@ -27,7 +27,15 @@ import { CommandPalette } from './command-palette';
 function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
+    // Tablet dead-zone fix (2026-06-09): use 767px, NOT 768px. Tailwind's `md`
+    // breakpoint is min-width:768px (so 768px = desktop for every `md:` utility
+    // inside the panels). The shell previously used max-width:768px (768px =
+    // mobile), so at EXACTLY 768px the shell rendered the mobile branch while
+    // the Tailwind `md:` utilities inside rendered desktop — the content was in
+    // the DOM but `md:`-hidden, leaving an empty app (iPad portrait = 768px).
+    // Aligning the shell to <768 (max-width:767px) makes both agree: <768 mobile,
+    // >=768 desktop. Mirror this in globals.css `.atrium-mobile-only` toggle.
+    const mq = window.matchMedia('(max-width: 767px)');
     const update = () => setIsMobile(mq.matches);
     update();
     mq.addEventListener('change', update);

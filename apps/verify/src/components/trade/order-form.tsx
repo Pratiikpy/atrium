@@ -62,9 +62,18 @@ async function fetchImpact(
     // DEMO_WALLET and 403s the real session ("Wallet mismatch"), which the
     // catch below swallows into source:'pending' - so the live preview never
     // populated for a real connected user. Pass the wallet through.
+    // #8 fix (2026-06-09, option A): the preview is pinned to leverage=1 so it
+    // shows EXACTLY what the on-chain open submits. use-open-position sends
+    // notional = sizeUsd (no leverage; leveraged venues are Year-2 / #430), so a
+    // leveraged preview here would overstate the margin vs the real result. The
+    // slider still captures the user's intended leverage (shown in the UI +
+    // labelled "1x on-chain today"), and the API keeps full leverage support for
+    // when leveraged venues ship. `leverage` is retained in the query key so the
+    // hook re-runs cleanly if that policy changes.
+    void leverage;
     const r = await fetch(
       walletQuery(
-        `/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}&leverage=${encodeURIComponent(String(leverage))}`,
+        `/api/trade/margin-impact?size=${encodeURIComponent(sizeUsd)}&venue=${encodeURIComponent(venue)}&leverage=1`,
         wallet,
       ),
     );
@@ -254,6 +263,14 @@ export function OrderForm({
           <span>1×</span>
           <span>20×</span>
         </div>
+        {/* #8 (2026-06-09): honest note - leverage is captured but on-chain
+            notional is 1x on testnet; the margin below reflects that 1x reality,
+            not size x leverage. Prevents the preview overstating vs the submit. */}
+        <p className="mt-1.5 text-[9px] leading-snug text-muted">
+          Margin shown for{' '}
+          <span className="text-ink-soft">1× notional (on-chain today)</span>.
+          Leverage applies when leveraged venues ship at GA.
+        </p>
       </div>
 
       <dl className="mt-5 space-y-1.5 border-t border-divider-soft pt-4 font-mono text-xs">

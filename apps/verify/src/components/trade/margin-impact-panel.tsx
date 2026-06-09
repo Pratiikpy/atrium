@@ -37,9 +37,14 @@ async function fetchImpact(
     };
   }
   try {
+    // #8 fix (2026-06-09, option A): pin the preview to leverage=1 so it matches
+    // the on-chain open (notional = size, no leverage until leveraged venues
+    // ship at GA / #430). A leveraged preview would overstate margin vs the real
+    // submit. The API retains full leverage support for GA.
+    void leverage;
     const r = await fetch(
       walletQuery(
-        `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}&leverage=${encodeURIComponent(String(leverage))}`,
+        `/api/trade/margin-impact?size=${encodeURIComponent(size)}&venue=${encodeURIComponent(venue)}&leverage=1`,
         wallet,
       ),
     );

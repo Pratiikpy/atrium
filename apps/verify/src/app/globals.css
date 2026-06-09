@@ -1173,7 +1173,13 @@ input[type="range"] { cursor: ew-resize; }
  * ===================================================================== */
 .atrium-desktop-only { }
 .atrium-mobile-only { display: none; }
-@media (max-width: 768px) {
+/* Tablet dead-zone fix (2026-06-09): 767px, NOT 768px. Tailwind `md` is
+   min-width:768px, so 768px is desktop for every `md:` utility inside the
+   panels. Toggling the device split at max-width:768px made 768px render the
+   mobile-only branch whose inner content was then `md:`-hidden -> empty app at
+   exactly 768px (iPad portrait). Aligning to <768 (max-width:767px) matches the
+   shell's useIsMobile and Tailwind: <768 mobile, >=768 desktop, no gap. */
+@media (max-width: 767px) {
   .atrium-desktop-only { display: none !important; }
   .atrium-mobile-only { display: block; }
 }

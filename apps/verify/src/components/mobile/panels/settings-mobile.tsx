@@ -149,8 +149,12 @@ function MoreRow({
   right: string;
   icon: React.ReactNode;
 }) {
-  const className =
-    'flex items-center gap-3 border-b border-mob-hairline px-4 py-3.5 last:border-b-0 hover:bg-mob-bg-elev/50';
+  // #10 polish (2026-06-09): only navigable rows get the hover highlight. The
+  // disabled (no-href, e.g. "Recovery guardians · pending") variant already
+  // renders dimmed + cursor-default + aria-disabled; stripping hover from it too
+  // means a pending row never looks tappable on hover.
+  const baseClassName =
+    'flex items-center gap-3 border-b border-mob-hairline px-4 py-3.5 last:border-b-0';
   const content = (
     <>
       <span className="grid size-7 shrink-0 place-items-center rounded-full border border-mob-hairline bg-mob-bg-elev text-mob-ink-soft">
@@ -163,12 +167,15 @@ function MoreRow({
   return (
     <li>
       {href ? (
-        <Link href={href as any} className={className}>
+        <Link
+          href={href as any}
+          className={`${baseClassName} hover:bg-mob-bg-elev/50`}
+        >
           {content}
         </Link>
       ) : (
         <div
-          className={`${className} cursor-default opacity-70`}
+          className={`${baseClassName} cursor-default opacity-70`}
           aria-disabled="true"
         >
           {content}

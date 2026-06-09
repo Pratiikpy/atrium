@@ -228,6 +228,13 @@ export function TradeMobile() {
         <div className="mt-1 flex justify-between font-mono text-[9.5px] uppercase tracking-wider text-mob-muted">
           <span>1x</span><span>2x</span><span>4x</span><span>6x</span><span>10x</span>
         </div>
+        {/* #8 (2026-06-09): on-chain notional is 1x on testnet (notional = amount,
+            leverage UI-only by design); the Notional + margin below reflect 1x. */}
+        <p className="mt-2 text-[10px] leading-snug text-mob-muted">
+          Notional shown for{' '}
+          <span className="text-mob-ink-soft">1× on-chain today</span>. Leverage
+          applies when leveraged venues ship at GA.
+        </p>
       </div>
 
       {/* Order summary */}
