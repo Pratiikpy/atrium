@@ -39,6 +39,10 @@ jobs:
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
         run: |
+          if [ -z "$DISCORD_OPS_WEBHOOK" ]; then
+            echo "DISCORD_OPS_WEBHOOK not set; skipping failure notification."
+            exit 0
+          fi
           curl -s -X POST "$DISCORD_OPS_WEBHOOK" \
             -H "Content-Type: application/json" \
             -d '{"content":"⚠️ Subgraph health or chain/Scribe reconcile failed (block-lag or address drift). Check https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'

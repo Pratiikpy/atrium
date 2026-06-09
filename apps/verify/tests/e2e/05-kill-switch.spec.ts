@@ -123,6 +123,7 @@ test.describe('Journey 5, Kill Switch', () => {
     // the kill-switch action: "One tap revokes every agent mandate and
     // session key." The card heading is always visible on desktop without a
     // wallet, so we lock the real current surface here.
-    await expect(page.getByText(/emergency stop/i).first()).toBeVisible();
+    await page.waitForURL(/\/app\/portfolio/, { timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: /emergency stop/i })).toBeVisible();
   });
 });

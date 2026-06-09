@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   // SIWE binding to THIS host. Without these checks a signature created for
   // a different domain (phishing site, evil clone) could be replayed against
-  // Atrium. Trusted host comes from ATRIUM_AUTH_HOST (e.g. 'verify.useatrium.me');
+  // Atrium. Trusted host comes from ATRIUM_AUTH_HOST (e.g. 'useatrium.me');
   // falls back to the request's Host header in dev where the env isn't set.
   const expectedHost = (process.env.ATRIUM_AUTH_HOST ?? req.headers.get('host') ?? '').toLowerCase();
   if (!expectedHost) {

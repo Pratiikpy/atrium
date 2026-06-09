@@ -56,7 +56,7 @@ function formatEmailHtml(alert: Alert): string {
       <p style="margin:0;font-size:15px;line-height:1.55;color:#4A453F;">${escapeHtml(alert.body)}</p>
       ${linkRow}
       <p style="margin:32px 0 0;border-top:1px solid #DBD8D2;padding-top:16px;font-size:11px;color:#807872;">
-        You are receiving this because you enabled email alerts in /app/settings/notifications. <a href="https://verify.useatrium.me/app/settings/notifications" style="color:#807872;">Unsubscribe / adjust</a>.
+        You are receiving this because you enabled email alerts in /app/settings/notifications. <a href="https://useatrium.me/app/settings/notifications" style="color:#807872;">Unsubscribe / adjust</a>.
       </p>
     </td></tr>
   </table>

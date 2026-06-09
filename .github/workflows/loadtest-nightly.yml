@@ -19,7 +19,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://verify.useatrium.me' }}
+      BASE_URL: ${{ secrets.LOADTEST_BASE_URL || 'https://useatrium.me' }}
       FORK_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC || 'https://arbitrum-sepolia.publicnode.com' }}
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -67,8 +67,12 @@ jobs:
       - name: Notify ops on failure
         if: failure()
         run: |
+          if [ -z "$DISCORD_OPS_WEBHOOK" ]; then
+            echo "DISCORD_OPS_WEBHOOK not set; skipping failure notification."
+            exit 0
+          fi
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
-            $DISCORD_OPS_WEBHOOK
+            "$DISCORD_OPS_WEBHOOK"
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

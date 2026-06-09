@@ -23,7 +23,7 @@ ENV = "production"
 # than silently accepting free traffic. Wrangler does not error on these
 # at deploy time because they're vars (not bindings); the server is the
 # gate. See services/codex/src/middleware/x402.ts iter-42 guard.
-SCRIBE_URL = "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.8"
+SCRIBE_URL = "https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.15"
 ARBITRUM_SEPOLIA_RPC = "https://sepolia-rollup.arbitrum.io/rpc"
 # Audit K-9 fix: x402 verifier needs these to validate USDC Transfer logs.
 # Arbitrum Sepolia USDC (verified at https://docs.circle.com/stablecoins/usdc-on-test-networks).
@@ -37,7 +37,7 @@ CODEX_USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"
 # fixes. For a public-repo fork, replace with your own payout before deploy.
 CODEX_PAY_TO_ADDRESS = "0xca31484DDd43B74516411CC1b9Ba32A0247dcbAf"
 CODEX_MIN_PAYMENT_USDC_WEI = "1000000"                                # $1.00 USDC (6 decimals)
-# Optional: Kani CI status proxy for the verify.useatrium.me badge.
+# Optional: Kani CI status proxy for the useatrium.me badge.
 # Leave commented to render the badge in the honest "unknown" state.
 # KANI_STATUS_URL = "https://raw.githubusercontent.com/Pratiikpy/<repo>/main/apps/verify/public/kani-status.json"
 

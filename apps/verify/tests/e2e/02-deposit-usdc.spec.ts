@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
  * actually renders:
  *   - Button label: `Deposit {amount || '0'} USDC` (e.g. "Deposit 0 USDC")
  *   - Helper text: from `readinessMessage()`, names "Coffer" or "registry"
- *   - Amount input: `<input type="number" inputMode="decimal" />`
+ *   - Amount input: `<input type="text" inputMode="decimal" />`
  *
  * Locks the **real-data discipline** invariants from the audit:
  *   - No fake numbers on the page (vault TVL = 0)
@@ -78,14 +78,16 @@ test.describe('Journey 2, Deposit USDC', () => {
     await expect(page.getByText(/withdrawal sla/i).first()).toBeVisible();
   });
 
-  test('Amount input accepts numeric, locks to type=number @critical', async ({ page }) => {
+  test('Amount input accepts decimal text and preserves mobile decimal keyboard @critical', async ({ page }) => {
     await page.goto('/app/vault');
 
-    // Locks: type="number" (so mobile keyboards default to numeric pad)
-    //        inputMode="decimal" (so the keypad shows a period)
+    // Locks: type="text" + sanitizer (browser number inputs vary by locale and
+    // can reject intermediate decimal states)
+    //        inputMode="decimal" (so mobile keyboards still show a period)
     //        placeholder="0.00" (semantic honest empty state)
-    const amountInput = page.locator('input[type="number"][inputmode="decimal"]:visible').first();
+    const amountInput = page.locator('input[inputmode="decimal"][placeholder="0.00"]:visible').first();
     await expect(amountInput).toBeVisible();
+    await expect(amountInput).toHaveAttribute('type', 'text');
     await amountInput.fill('100.50');
     await expect(amountInput).toHaveValue('100.50');
   });

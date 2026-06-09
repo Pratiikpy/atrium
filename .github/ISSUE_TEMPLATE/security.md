@@ -25,5 +25,5 @@ attack pre-condition. -->
 
 ## Bounty preference
 
-- [ ] I'd like to be considered for the [bug bounty program](https://verify.useatrium.me/security/bounty)
+- [ ] I'd like to be considered for the [responsible disclosure program](https://useatrium.me/security/bounty)
 - [ ] No bounty needed, just want it fixed

@@ -29,14 +29,18 @@ jobs:
         env:
           SCRIBE_URL: ${{ secrets.SCRIBE_URL }}
           ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
-          DEPLOYMENT_REGISTRY_URL: https://verify.useatrium.me/deployments/arbitrum_sepolia.json
+          DEPLOYMENT_REGISTRY_URL: https://useatrium.me/deployments/arbitrum_sepolia.json
           KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
         run: pnpm --filter @atrium/vigil-keeper tick
       - name: Notify ops on failure
         if: failure()
         run: |
+          if [ -z "$DISCORD_OPS_WEBHOOK" ]; then
+            echo "DISCORD_OPS_WEBHOOK not set; skipping failure notification."
+            exit 0
+          fi
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
-            $DISCORD_OPS_WEBHOOK
+            "$DISCORD_OPS_WEBHOOK"
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}

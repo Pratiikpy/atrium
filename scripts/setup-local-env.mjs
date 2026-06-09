@@ -51,8 +51,8 @@ const USDC = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
 const DEPLOYER = '0x7DB1c02a3B860137D9360fB1BBE0000CD2009A42';
 const ARB_RPC = 'https://arbitrum-sepolia.publicnode.com';
 const RH_RPC = 'https://rpc.testnet.chain.robinhood.com';
-const SCRIBE = 'https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.7';
-const SITE = 'https://verify.useatrium.me';
+const SCRIBE = 'https://api.studio.thegraph.com/query/1753863/atrium-arbitrum-sepolia/v0.0.15';
+const SITE = 'https://useatrium.me';
 const RH_USDC = '0x67713074650Ad05c832C781101Ac447Cb847522E';
 const LINK_ARB = '0xb1D4538B4571d411F07960EF2838Ce337FE1E80E'; // Chainlink LINK, Arb Sepolia
 

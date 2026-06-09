@@ -153,10 +153,10 @@ Run these on every route before the page-specific tests. Any failure is at least
 
 ## S2. Setup before you start
 
-- **Where to run it:** locally, start the app and open ${cc('http://localhost:3000')} (the verify app under ${cc('apps/verify')}); or use the deployed site once it is published. The local subgraph URL is already wired in ${cc('apps/verify/.env.local')} to the v0.0.7 endpoint.
+- **Where to run it:** locally, start the app and open ${cc('http://localhost:3000')} (the verify app under ${cc('apps/verify')}); or use the deployed site once it is published. The local subgraph URL is already wired in ${cc('apps/verify/.env.local')} to the v0.0.15 endpoint.
 - **Wallet:** a browser wallet (Rabby or MetaMask) set to **Arbitrum Sepolia (chain 421614)**.
 - **Test funds:** use the in-app **Faucet** (test USDC + a little ETH, 24h cooldown). For extra gas, a public Arbitrum Sepolia faucet.
-- **Live numbers are syncing:** TVL / counts come from the subgraph **v0.0.7**, which is still indexing. Early on some tiles read ${cc('pending')} - that is **correct**, not a bug. Re-check after it catches up.
+- **Live numbers are syncing:** TVL / counts come from the subgraph **v0.0.15**. Early on some tiles may read ${cc('pending')} while an upstream indexer catches up - that is **correct**, not a bug. Re-check after it catches up.
 - **Testable now vs after the timelock (important):** opening a **cross-venue position** (and anything that routes funds through Coffer to an adapter) unlocks only **after the timelock executes (~2026-05-31 02:20 UTC)**. Until then, the correct behavior is that "open position" is **cleanly gated/disabled with an honest message** - so test that it is gated gracefully, *not* that it trades. **Everything else is testable today:** login, faucet, vault deposit/withdraw, portfolio reads, reserves, transfers UI, agents/mandate UI, all reads, all copy, all design, all states.
 - **One wallet covers everything.** Atrium is single-user-per-wallet (portfolio, vault, trade, transfer, mandates, reserves are all scoped to the connected wallet). There is **no user-to-user feature that needs a second wallet** - the agent and the keeper are services, not other users. So one funded Rabby wallet on Arbitrum Sepolia tests the entire product.
 

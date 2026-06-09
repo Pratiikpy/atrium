@@ -5,13 +5,15 @@
  */
 
 function buildCsp() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const devScriptEval = isProduction ? '' : " 'unsafe-eval'";
   const directives = [
     "default-src 'self'",
     // Audit fix (build-deploy #33): the New Relic browser agent (NewRelicLoader,
     // consent-gated) loads js-agent.newrelic.com and beacons to *.nr-data.net,
     // but the CSP blocked both - so even when NEXT_PUBLIC_NEW_RELIC_* is set the
     // agent silently failed. Allow its script + telemetry origins.
-    "script-src 'self' 'unsafe-inline' https://vercel.live https://js-agent.newrelic.com",
+    `script-src 'self' 'unsafe-inline'${devScriptEval} https://vercel.live https://js-agent.newrelic.com`,
     // Audit fix (real-Rabby sweep 2026-06-02): the Coinbase Wallet SDK (the
     // `coinbaseWallet` smartWalletOnly connector in lib/wagmi.ts) spawns a
     // `blob:` Worker on init. Without an explicit worker-src it falls back to
@@ -29,8 +31,8 @@ function buildCsp() {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    'upgrade-insecure-requests',
   ];
+  if (isProduction) directives.push('upgrade-insecure-requests');
   return directives.join('; ');
 }
 

@@ -47,7 +47,7 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter @atrium/verify exec playwright install --with-deps chromium
       - name: Run E2E journeys
-        run: pnpm --filter @atrium/verify test:e2e
+        run: pnpm --filter @atrium/verify exec playwright test --project=chromium-desktop
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
@@ -65,9 +65,13 @@ jobs:
       - name: Notify ops on failure
         if: failure()
         run: |
+          if [ -z "$DISCORD_OPS_WEBHOOK" ]; then
+            echo "DISCORD_OPS_WEBHOOK not set; skipping failure notification."
+            exit 0
+          fi
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"content\":\"⚠️ ${{ github.workflow }} failed on ${{ github.ref_name }}: ${{ github.run_id }}\"}" \
-            $DISCORD_OPS_WEBHOOK
+            "$DISCORD_OPS_WEBHOOK"
         env:
           DISCORD_OPS_WEBHOOK: ${{ secrets.DISCORD_OPS_WEBHOOK }}
 

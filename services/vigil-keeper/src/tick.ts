@@ -71,7 +71,7 @@ export async function tickOnce(): Promise<void> {
   }
 
   const registryUrl = process.env.DEPLOYMENT_REGISTRY_URL
-    ?? 'https://verify.useatrium.me/deployments/arbitrum_sepolia.json';
+    ?? 'https://useatrium.me/deployments/arbitrum_sepolia.json';
   const rpc = process.env.ARBITRUM_SEPOLIA_RPC ?? 'https://arbitrum-sepolia.publicnode.com';
 
   let registry: DeploymentRegistry;

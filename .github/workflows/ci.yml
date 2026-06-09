@@ -219,7 +219,7 @@ jobs:
       - name: Lighthouse CI (mobile)
         run: |
           npm install -g @lhci/cli
-          # Phase 11: remove the || echo to enforce 0.90 threshold once verify.useatrium.me is the LHCI URL
+          # Phase 11: remove the || echo to enforce 0.90 threshold once useatrium.me is the LHCI URL
           lhci autorun --config=.lighthouserc.json || echo "Lighthouse below threshold (soft-fail until prod URL)"
 
   subgraph:

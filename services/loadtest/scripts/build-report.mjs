@@ -40,7 +40,7 @@ async function main() {
         p95: ep.p95 ?? 0,
         p99: ep.p99 ?? 0,
         budget: 2000,
-        source: 'k6 + verify.useatrium.me',
+        source: 'k6 + useatrium.me',
       });
     }
   }

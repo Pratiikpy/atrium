@@ -13,7 +13,7 @@
  * dashboard payload at apps/verify/public/loadtest/latest.json.
  *
  * Usage:
- *   BASE_URL=https://verify.useatrium.me k6 run scripts/api-load.k6.js
+ *   BASE_URL=https://useatrium.me k6 run scripts/api-load.k6.js
  *   (or set BASE_URL=http://localhost:3000 for local dev runs)
  */
 
@@ -21,7 +21,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
-const BASE_URL = __ENV.BASE_URL || 'https://verify.useatrium.me';
+const BASE_URL = __ENV.BASE_URL || 'https://useatrium.me';
 
 const ENDPOINTS = [
   '/api/protocol/metrics',

@@ -16,7 +16,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  *   2. Set env: SUMSUB_WEBHOOK_SECRET, EDICT_CONTRACT_ADDR,
  *      PRAETOR_MULTISIG_KEY.
  *   3. In Sumsub dashboard . Integrations . Webhooks: add
- *      https://verify.useatrium.me/api/sumsub/callback with the secret.
+ *      https://useatrium.me/api/sumsub/callback with the secret.
  *
  * Security: verifies HMAC SHA-256 signature header before processing,
  * per Sumsub docs. Replays + spoofs rejected with 401.

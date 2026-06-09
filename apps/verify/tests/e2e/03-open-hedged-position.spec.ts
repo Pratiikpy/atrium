@@ -32,9 +32,8 @@ test.describe('Journey 3, Open hedged position', () => {
     // names AtriumRouter as the single-leg path and explicitly defers the
     // hedged batch flow to a follow-up release. Lock that honest wording so
     // a future refactor can't silently re-inflate it back to a fake hedge.
-    const body = (await page.textContent('body')) ?? '';
-    expect(/atriumrouter/i.test(body)).toBe(true);
-    expect(/hedged batch flow lands in a follow-up release/i.test(body)).toBe(true);
+    await expect(page.getByText(/Open a position through AtriumRouter/i)).toBeVisible();
+    await expect(page.getByText(/Hedged batch flow lands in a follow-up release/i)).toBeVisible();
   });
 
   test('Step 2 names AtriumRouter.open_position_via_adapter as the contract @critical', async ({ page }) => {
@@ -46,15 +45,14 @@ test.describe('Journey 3, Open hedged position', () => {
     await expect(page.getByText(/AtriumRouter\.open_position_via_adapter/i)).toBeVisible();
   });
 
-  test('Run step 2 button exists and is disabled before deployment @critical', async ({ page }) => {
+  test('Step 2 shows honest pending state before instrument config lands @critical', async ({ page }) => {
     await page.goto('/verify/2');
-    // The button label is literally "Run step 2" (per VerifierStepRunner).
-    // Matches both the not-connected state (where it's actually a Connect
-    // button) and the connected-but-not-deployed state.
-    const anyRunOrConnect = page
-      .getByRole('button')
-      .filter({ hasText: /(run step 2|connect with postern)/i });
-    await expect(anyRunOrConnect.first()).toBeVisible();
+    // Step 2 is intentionally not runnable while the venue instrument config
+    // is pending. The correct launch surface is an honest blocker, not a dead
+    // disabled action.
+    await expect(page.getByText(/Pending on testnet/i)).toBeVisible();
+    await expect(page.getByText(/instrument-config/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /run step 2|connect with postern/i })).toHaveCount(0);
   });
 
   test('Back to overview link points at /verify (not /verify/1) @critical', async ({ page }) => {

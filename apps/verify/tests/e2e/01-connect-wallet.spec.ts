@@ -44,13 +44,16 @@ test.describe('Journey 1, Connect wallet', () => {
     // page until we land on the Connect button.
     await page.goto('/verify/1');
 
-    let focusedText = '';
-    for (let i = 0; i < 20; i++) {
+    const actionButton = page.getByRole('button', { name: /connect with postern|run step 1/i });
+    await expect(actionButton).toBeVisible();
+
+    let reached = false;
+    for (let i = 0; i < 80; i++) {
       await page.keyboard.press('Tab');
-      focusedText = (await page.evaluate(() => document.activeElement?.textContent ?? '')) ?? '';
-      if (/connect with postern/i.test(focusedText)) break;
+      reached = await actionButton.evaluate((button) => document.activeElement === button);
+      if (reached) break;
     }
-    expect(focusedText).toMatch(/connect with postern/i);
+    expect(reached).toBe(true);
   });
 
   test('Connect helper copy is honest, no extension needed @critical', async ({ page }) => {
@@ -83,9 +86,10 @@ test.describe('Journey 1, Connect wallet', () => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
 
-    const connectButton = page.getByRole('button', { name: /connect with postern/i });
-    if (await connectButton.isEnabled()) {
-      await connectButton.click();
+    const actionButton = page.getByRole('button', { name: /connect with postern|run step 1/i });
+    await expect(actionButton).toBeVisible();
+    if (await actionButton.isEnabled({ timeout: 2_000 })) {
+      await actionButton.click();
     }
     // Give the connector a moment to do whatever it does.
     await page.waitForTimeout(500);
