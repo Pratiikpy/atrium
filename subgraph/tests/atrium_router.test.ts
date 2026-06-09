@@ -1,6 +1,7 @@
 import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'matchstick-as';
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handlePositionOpenedViaRouter, handlePositionClosedViaRouter } from '../src/atrium_router';
+import { PositionOpenedViaRouter, PositionClosedViaRouter } from '../generated/AtriumRouter/AtriumRouter';
 
 describe('AtriumRouter handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -15,7 +16,7 @@ describe('AtriumRouter handlers', () => {
       new ethereum.EventParam('plinth_position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(10))),
       new ethereum.EventParam('venue_position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(20))),
     ];
-    handlePositionOpenedViaRouter(event as any);
+    handlePositionOpenedViaRouter(changetype<PositionOpenedViaRouter>(event));
     assert.entityCount('RouterPositionEvent', 1);
   });
 
@@ -28,7 +29,7 @@ describe('AtriumRouter handlers', () => {
       new ethereum.EventParam('venue_position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(20))),
       new ethereum.EventParam('realized_pnl_signed', ethereum.Value.fromSignedBigInt(BigInt.fromI32(500))),
     ];
-    handlePositionClosedViaRouter(event as any);
+    handlePositionClosedViaRouter(changetype<PositionClosedViaRouter>(event));
     assert.entityCount('RouterPositionEvent', 1);
   });
 });

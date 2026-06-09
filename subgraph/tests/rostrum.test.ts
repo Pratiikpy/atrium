@@ -1,6 +1,7 @@
 import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'matchstick-as';
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleFollowStarted, handleFollowEnded, handleMirrorTradeFilled, handleMirrorTradeFailed, handleLeaderDeboosted, handleActionRecorded, handleReputationUpdated } from '../src/rostrum';
+import { FollowStarted, FollowEnded, MirrorTradeFilled, MirrorTradeFailed, LeaderDeboosted, ActionRecorded, ReputationUpdated } from '../generated/Rostrum/Rostrum';
 import { RostrumFollow } from '../generated/schema';
 
 describe('Rostrum handlers', () => {
@@ -14,7 +15,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('allocation_bps', ethereum.Value.fromI32(5000)),
       new ethereum.EventParam('expires_at', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(9999999))),
     ];
-    handleFollowStarted(event as any);
+    handleFollowStarted(changetype<FollowStarted>(event));
     assert.entityCount('RostrumFollow', 1);
     const id = '0x0000000000000000000000000000000000000001-0x0000000000000000000000000000000000000002';
     assert.fieldEquals('RostrumFollow', id, 'state', 'active');
@@ -38,7 +39,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('leader', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000002'))),
       new ethereum.EventParam('reason', ethereum.Value.fromString('user_cancelled')),
     ];
-    handleFollowEnded(event as any);
+    handleFollowEnded(changetype<FollowEnded>(event));
     assert.fieldEquals('RostrumFollow', id, 'state', 'ended');
   });
 
@@ -50,7 +51,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('leader_position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(42))),
       new ethereum.EventParam('follower_notional_signed', ethereum.Value.fromSignedBigInt(BigInt.fromI32(1000))),
     ];
-    handleMirrorTradeFilled(event as any);
+    handleMirrorTradeFilled(changetype<MirrorTradeFilled>(event));
     assert.entityCount('RostrumMirrorTrade', 1);
   });
 
@@ -62,7 +63,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('leader_position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(42))),
       new ethereum.EventParam('reason', ethereum.Value.fromString('insufficient_margin')),
     ];
-    handleMirrorTradeFailed(event as any);
+    handleMirrorTradeFailed(changetype<MirrorTradeFailed>(event));
     assert.entityCount('RostrumMirrorTrade', 1);
   });
 
@@ -72,7 +73,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('leader', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000002'))),
       new ethereum.EventParam('reason', ethereum.Value.fromString('poor_performance')),
     ];
-    handleLeaderDeboosted(event as any);
+    handleLeaderDeboosted(changetype<LeaderDeboosted>(event));
     assert.entityCount('RostrumLeaderDeboost', 1);
   });
 
@@ -82,7 +83,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('agent', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000002'))),
       new ethereum.EventParam('action_kind', ethereum.Value.fromString('open_position')),
     ];
-    handleActionRecorded(event as any);
+    handleActionRecorded(changetype<ActionRecorded>(event));
     assert.entityCount('RostrumAgentAction', 1);
   });
 
@@ -93,7 +94,7 @@ describe('Rostrum handlers', () => {
       new ethereum.EventParam('previous', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(500))),
       new ethereum.EventParam('next', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(750))),
     ];
-    handleReputationUpdated(event as any);
+    handleReputationUpdated(changetype<ReputationUpdated>(event));
     assert.entityCount('RostrumReputation', 1);
     assert.fieldEquals('RostrumReputation', '0x0000000000000000000000000000000000000002', 'previousScore', '500');
     assert.fieldEquals('RostrumReputation', '0x0000000000000000000000000000000000000002', 'currentScore', '750');

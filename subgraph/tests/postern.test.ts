@@ -2,6 +2,8 @@ import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'ma
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleKillSwitchActivated, handleSigilRevokeSkipped, handleSessionKeyIssued, handleSessionKeyRevoked, handleSessionKeyExpiredCleaned } from '../src/postern';
 import { PosternSessionKey } from '../generated/schema';
+import { KillSwitchActivated, SigilRevokeSkipped } from '../generated/PosternKillSwitch/PosternKillSwitch';
+import { SessionKeyIssued, SessionKeyRevoked, SessionKeyExpiredCleaned } from '../generated/PosternKeyRegistry/PosternKeyRegistry';
 
 describe('Postern handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -13,7 +15,7 @@ describe('Postern handlers', () => {
       new ethereum.EventParam('sigil_agents_revoked', ethereum.Value.fromI32(3)),
       new ethereum.EventParam('session_keys_cancelled', ethereum.Value.fromI32(2)),
     ];
-    handleKillSwitchActivated(event as any);
+    handleKillSwitchActivated(changetype<KillSwitchActivated>(event));
     assert.entityCount('KillSwitchEvent', 1);
   });
 
@@ -24,7 +26,7 @@ describe('Postern handlers', () => {
       new ethereum.EventParam('agent', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000002'))),
       new ethereum.EventParam('reason', ethereum.Value.fromBytes(Bytes.fromHexString('0x01'))),
     ];
-    handleSigilRevokeSkipped(event as any);
+    handleSigilRevokeSkipped(changetype<SigilRevokeSkipped>(event));
     assert.entityCount('SubsystemDiagnosticEvent', 1);
   });
 
@@ -38,7 +40,7 @@ describe('Postern handlers', () => {
       new ethereum.EventParam('sessionKey', ethereum.Value.fromAddress(keyAddr)),
       new ethereum.EventParam('expiresAt', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(9999999))),
     ];
-    handleSessionKeyIssued(issueEvent as any);
+    handleSessionKeyIssued(changetype<SessionKeyIssued>(issueEvent));
     const skId = '0x0000000000000000000000000000000000000001-0x0000000000000000000000000000000000000099';
     assert.fieldEquals('PosternSessionKey', skId, 'state', 'active');
 
@@ -47,7 +49,7 @@ describe('Postern handlers', () => {
       new ethereum.EventParam('user', ethereum.Value.fromAddress(userAddr)),
       new ethereum.EventParam('sessionKey', ethereum.Value.fromAddress(keyAddr)),
     ];
-    handleSessionKeyRevoked(revokeEvent as any);
+    handleSessionKeyRevoked(changetype<SessionKeyRevoked>(revokeEvent));
     assert.fieldEquals('PosternSessionKey', skId, 'state', 'revoked');
   });
 
@@ -61,14 +63,14 @@ describe('Postern handlers', () => {
       new ethereum.EventParam('sessionKey', ethereum.Value.fromAddress(keyAddr)),
       new ethereum.EventParam('expiresAt', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))),
     ];
-    handleSessionKeyIssued(issueEvent as any);
+    handleSessionKeyIssued(changetype<SessionKeyIssued>(issueEvent));
 
     const expireEvent = newMockEvent();
     expireEvent.parameters = [
       new ethereum.EventParam('user', ethereum.Value.fromAddress(userAddr)),
       new ethereum.EventParam('sessionKey', ethereum.Value.fromAddress(keyAddr)),
     ];
-    handleSessionKeyExpiredCleaned(expireEvent as any);
+    handleSessionKeyExpiredCleaned(changetype<SessionKeyExpiredCleaned>(expireEvent));
     const skId = '0x0000000000000000000000000000000000000001-0x0000000000000000000000000000000000000088';
     assert.fieldEquals('PosternSessionKey', skId, 'state', 'expired');
   });

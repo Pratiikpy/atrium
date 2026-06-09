@@ -1,6 +1,7 @@
 import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'matchstick-as';
 import { BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleAttestationPublished } from '../src/lantern';
+import { AttestationPublished } from '../generated/LanternAttestor/LanternAttestor';
 
 describe('Lantern handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -19,7 +20,7 @@ describe('Lantern handlers', () => {
       new ethereum.EventParam('leafCount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))),
       new ethereum.EventParam('ipfsCid', ethereum.Value.fromString('QmTest123')),
     ];
-    handleAttestationPublished(event1 as any);
+    handleAttestationPublished(changetype<AttestationPublished>(event1));
 
     // Second publish with same root but different tx
     const event2 = newMockEvent();
@@ -32,7 +33,7 @@ describe('Lantern handlers', () => {
       new ethereum.EventParam('leafCount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(7))),
       new ethereum.EventParam('ipfsCid', ethereum.Value.fromString('QmTest456')),
     ];
-    handleAttestationPublished(event2 as any);
+    handleAttestationPublished(changetype<AttestationPublished>(event2));
 
     // Both rows should exist (different IDs)
     assert.entityCount('LanternAttestation', 2);
@@ -50,7 +51,7 @@ describe('Lantern handlers', () => {
       new ethereum.EventParam('leafCount', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(10))),
       new ethereum.EventParam('ipfsCid', ethereum.Value.fromString('QmTest789')),
     ];
-    handleAttestationPublished(event as any);
+    handleAttestationPublished(changetype<AttestationPublished>(event));
 
     const id = '0x3333333333333333333333333333333333333333333333333333333333333333-2';
     assert.fieldEquals('LanternAttestation', id, 'leafCount', '10');

@@ -1,6 +1,7 @@
 import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'matchstick-as';
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleScheduled, handleExecuted, handleCancelled } from '../src/praetor_timelock';
+import { Scheduled, Executed, Cancelled } from '../generated/PraetorTimelock/PraetorTimelock';
 import { TimelockSchedule } from '../generated/schema';
 
 describe('PraetorTimelock handlers', () => {
@@ -14,7 +15,7 @@ describe('PraetorTimelock handlers', () => {
       new ethereum.EventParam('data', ethereum.Value.fromBytes(Bytes.fromHexString('0x1234'))),
       new ethereum.EventParam('scheduled_at', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))),
     ];
-    handleScheduled(event as any);
+    handleScheduled(changetype<Scheduled>(event));
     assert.entityCount('TimelockSchedule', 1);
     assert.fieldEquals('TimelockSchedule', '0xaabb', 'scheduledAt', '1000000');
   });
@@ -31,7 +32,7 @@ describe('PraetorTimelock handlers', () => {
     event.parameters = [
       new ethereum.EventParam('id', ethereum.Value.fromBytes(Bytes.fromHexString('0xaabb'))),
     ];
-    handleExecuted(event as any);
+    handleExecuted(changetype<Executed>(event));
     assert.fieldEquals('TimelockSchedule', '0xaabb', 'executedAt', '1100000');
   });
 
@@ -47,7 +48,7 @@ describe('PraetorTimelock handlers', () => {
     event.parameters = [
       new ethereum.EventParam('id', ethereum.Value.fromBytes(Bytes.fromHexString('0xccdd'))),
     ];
-    handleCancelled(event as any);
+    handleCancelled(changetype<Cancelled>(event));
     assert.fieldEquals('TimelockSchedule', '0xccdd', 'cancelledAt', '1050000');
   });
 });

@@ -2,6 +2,7 @@ import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'ma
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleMarginUpdated, handlePositionOpened, handlePositionClosed } from '../src/plinth';
 import { MarginAccount, Position, Counter } from '../generated/schema';
+import { MarginUpdated, PositionOpened, PositionClosed } from '../generated/Plinth/Plinth';
 
 describe('Plinth handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -15,7 +16,7 @@ describe('Plinth handlers', () => {
       new ethereum.EventParam('margin_version', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))),
       new ethereum.EventParam('block_number', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100))),
     ];
-    handleMarginUpdated(event as any);
+    handleMarginUpdated(changetype<MarginUpdated>(event));
     assert.entityCount('MarginAccount', 1);
     assert.entityCount('MarginUpdate', 1);
   });
@@ -31,7 +32,7 @@ describe('Plinth handlers', () => {
       new ethereum.EventParam('entry_price_q64', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(18446744073709551))),
       new ethereum.EventParam('intent_hash', ethereum.Value.fromBytes(Bytes.fromHexString('0x0000000000000000000000000000000000000000000000000000000000000000'))),
     ];
-    handlePositionOpened(event as any);
+    handlePositionOpened(changetype<PositionOpened>(event));
     assert.entityCount('Position', 1);
     assert.fieldEquals('Position', '42', 'entryPriceQ64', '18446744073709551');
     // Counter should exist with openPositionsCount = 1
@@ -70,7 +71,7 @@ describe('Plinth handlers', () => {
       new ethereum.EventParam('position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(42))),
       new ethereum.EventParam('realized_pnl_signed', ethereum.Value.fromSignedBigInt(BigInt.fromI32(500))),
     ];
-    handlePositionClosed(event as any);
+    handlePositionClosed(changetype<PositionClosed>(event));
     assert.fieldEquals('Position', '42', 'realizedPnlSigned', '500');
     assert.fieldEquals('Counter', 'global', 'openPositionsCount', '0');
     assert.fieldEquals('Counter', 'global', 'closedPositionsCount', '1');
@@ -82,7 +83,7 @@ describe('Plinth handlers', () => {
       new ethereum.EventParam('position_id', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(999))),
       new ethereum.EventParam('realized_pnl_signed', ethereum.Value.fromSignedBigInt(BigInt.fromI32(0))),
     ];
-    handlePositionClosed(event as any);
+    handlePositionClosed(changetype<PositionClosed>(event));
     assert.entityCount('Position', 0);
   });
 });

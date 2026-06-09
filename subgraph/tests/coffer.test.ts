@@ -2,6 +2,7 @@ import { test, assert, clearStore, newMockEvent, describe, beforeEach, logStore 
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleDeposit, handleWithdraw } from '../src/coffer';
 import { Counter } from '../generated/schema';
+import { Deposit, Withdraw } from '../generated/Coffer/Coffer';
 
 describe('Coffer handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -14,7 +15,7 @@ describe('Coffer handlers', () => {
       new ethereum.EventParam('assets', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))),
       new ethereum.EventParam('shares', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))),
     ];
-    handleDeposit(event as any);
+    handleDeposit(changetype<Deposit>(event));
     assert.entityCount('CofferDeposit', 1);
     assert.entityCount('CofferUserBalance', 1);
     assert.entityCount('Counter', 1);
@@ -31,7 +32,7 @@ describe('Coffer handlers', () => {
       new ethereum.EventParam('assets', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(500))),
       new ethereum.EventParam('shares', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(500))),
     ];
-    handleDeposit(event1 as any);
+    handleDeposit(changetype<Deposit>(event1));
 
     // Withdraw more than balance
     const event2 = newMockEvent();
@@ -42,7 +43,7 @@ describe('Coffer handlers', () => {
       new ethereum.EventParam('assets', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))),
       new ethereum.EventParam('shares', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))),
     ];
-    handleWithdraw(event2 as any);
+    handleWithdraw(changetype<Withdraw>(event2));
 
     // Balance should be clamped to zero, not negative
     const userId = '0x0000000000000000000000000000000000000001';
@@ -59,7 +60,7 @@ describe('Coffer handlers', () => {
       new ethereum.EventParam('assets', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(2000))),
       new ethereum.EventParam('shares', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(2000))),
     ];
-    handleDeposit(dep as any);
+    handleDeposit(changetype<Deposit>(dep));
 
     const wd = newMockEvent();
     wd.parameters = [
@@ -69,7 +70,7 @@ describe('Coffer handlers', () => {
       new ethereum.EventParam('assets', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(500))),
       new ethereum.EventParam('shares', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(500))),
     ];
-    handleWithdraw(wd as any);
+    handleWithdraw(changetype<Withdraw>(wd));
     assert.fieldEquals('Counter', 'global', 'totalWithdrawalsCount', '1');
   });
 });

@@ -1,6 +1,7 @@
 import { test, assert, clearStore, newMockEvent, describe, beforeEach, createMockedFunction } from 'matchstick-as';
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleLiquidationExecuted } from '../src/vigil';
+import { LiquidationExecuted } from '../generated/Vigil/Vigil';
 
 describe('Vigil handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -27,7 +28,7 @@ describe('Vigil handlers', () => {
       new ethereum.EventParam('recovered_collateral_wei', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5000))),
       new ethereum.EventParam('actual_liquidation_bps', ethereum.Value.fromI32(25)),
     ];
-    handleLiquidationExecuted(event as any);
+    handleLiquidationExecuted(changetype<LiquidationExecuted>(event));
 
     assert.entityCount('LiquidationEvent', 1);
     assert.entityCount('Keeper', 1);

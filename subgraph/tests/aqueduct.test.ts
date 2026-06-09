@@ -2,6 +2,7 @@ import { test, assert, clearStore, newMockEvent, describe, beforeEach } from 'ma
 import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { handleCrossChainCredit, handleCrossChainCreditSettled, handleCrossChainCreditClaimedBack, handleEmergencyPaused, handleResumed, handleLinkBalanceLow } from '../src/aqueduct';
 import { CrossChainCredit, AqueductPauseState } from '../generated/schema';
+import { CrossChainCredit as CrossChainCreditEvent, CrossChainCreditSettled, CrossChainCreditClaimedBack, EmergencyPaused, Resumed, LinkBalanceLow } from '../generated/Aqueduct/Aqueduct';
 
 describe('Aqueduct handlers', () => {
   beforeEach(() => { clearStore(); });
@@ -16,7 +17,7 @@ describe('Aqueduct handlers', () => {
       new ethereum.EventParam('collateral_amount_wei', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))),
       new ethereum.EventParam('expires_at_timestamp', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(9999999))),
     ];
-    handleCrossChainCredit(event as any);
+    handleCrossChainCredit(changetype<CrossChainCreditEvent>(event));
     assert.entityCount('CrossChainCredit', 1);
     assert.fieldEquals('CrossChainCredit', '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'isSettled', 'false');
     assert.fieldEquals('CrossChainCredit', '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', 'isClaimedBack', 'false');
@@ -38,7 +39,7 @@ describe('Aqueduct handlers', () => {
     event.parameters = [
       new ethereum.EventParam('message_id', ethereum.Value.fromBytes(Bytes.fromHexString('0xaa'))),
     ];
-    handleCrossChainCreditSettled(event as any);
+    handleCrossChainCreditSettled(changetype<CrossChainCreditSettled>(event));
     assert.fieldEquals('CrossChainCredit', '0xaa', 'isSettled', 'true');
   });
 
@@ -59,7 +60,7 @@ describe('Aqueduct handlers', () => {
       new ethereum.EventParam('message_id', ethereum.Value.fromBytes(Bytes.fromHexString('0xbb'))),
       new ethereum.EventParam('amount_wei', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(250000))),
     ];
-    handleCrossChainCreditClaimedBack(event as any);
+    handleCrossChainCreditClaimedBack(changetype<CrossChainCreditClaimedBack>(event));
     assert.fieldEquals('CrossChainCredit', '0xbb', 'isClaimedBack', 'true');
     assert.fieldEquals('CrossChainCredit', '0xbb', 'claimedBackAmountWei', '250000');
   });
@@ -70,7 +71,7 @@ describe('Aqueduct handlers', () => {
       new ethereum.EventParam('by', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000099'))),
       new ethereum.EventParam('reason', ethereum.Value.fromString('incident')),
     ];
-    handleEmergencyPaused(event as any);
+    handleEmergencyPaused(changetype<EmergencyPaused>(event));
     assert.entityCount('AqueductPauseState', 1);
     assert.fieldEquals('AqueductPauseState', '0', 'isPaused', 'true');
   });
@@ -84,7 +85,7 @@ describe('Aqueduct handlers', () => {
     event.parameters = [
       new ethereum.EventParam('by', ethereum.Value.fromAddress(Address.fromString('0x0000000000000000000000000000000000000099'))),
     ];
-    handleResumed(event as any);
+    handleResumed(changetype<Resumed>(event));
     assert.fieldEquals('AqueductPauseState', '0', 'isPaused', 'false');
   });
 
@@ -94,7 +95,7 @@ describe('Aqueduct handlers', () => {
       new ethereum.EventParam('balance', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100))),
       new ethereum.EventParam('last_month_usage', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5000))),
     ];
-    handleLinkBalanceLow(event as any);
+    handleLinkBalanceLow(changetype<LinkBalanceLow>(event));
     assert.entityCount('AlertEvent', 1);
   });
 });
