@@ -31,8 +31,8 @@
     "react-dom": "19.0.0",
     "siwe": "^2.3.2",
     "tailwind-merge": "^2.5.0",
-    "viem": "^2.21.0",
-    "wagmi": "^2.13.0"
+    "viem": "^2.52.2",
+    "wagmi": "^3.6.16"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
