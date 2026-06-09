@@ -9,7 +9,7 @@ dataSources:
     source:
       address: "0xe01d09edcf889bf5577666f0aa61f5701c72a26c"
       abi: Plinth
-      startBlock: 274900000
+      startBlock: 270803107
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -53,7 +53,7 @@ dataSources:
     source:
       address: "0x5e099faf4fbc70832ea5e12178a9f9dec96ba194"
       abi: Vigil
-      startBlock: 274900000
+      startBlock: 270802353
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -92,7 +92,7 @@ dataSources:
     source:
       address: "0xb62762000686a9589b01d63ba7e50f51f46a86ef"
       abi: Coffer
-      startBlock: 274900000
+      startBlock: 270800974
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -198,7 +198,7 @@ dataSources:
     source:
       address: "0x517afac9b39c01c0cf044b335742c95960959cdc"
       abi: Sigil
-      startBlock: 274900000
+      startBlock: 270801710
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -250,9 +250,9 @@ dataSources:
     name: PorticoRegistry
     network: arbitrum-sepolia
     source:
-      address: "0xB5e9d67754f01d3C71a4E37c8D325a44B571C8bd"
+      address: "0x3fcef659077b4e0d3ccf2162a80be1ed0818a81e"
       abi: PorticoRegistry
-      startBlock: 274900000
+      startBlock: 270408449
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -360,7 +360,7 @@ dataSources:
     name: LanternAttestor
     network: arbitrum-sepolia
     source:
-      address: "0xF0B90b94C0B8a52c545768bFf06a3932c67d5888"
+      address: "0xf0b90b94c0b8a52c545768bff06a3932c67d5888"
       abi: LanternAttestor
       startBlock: 270918668
     mapping:
@@ -418,9 +418,9 @@ dataSources:
     name: AtriumRouter
     network: arbitrum-sepolia
     source:
-      address: "0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562"
+      address: "0xe3e3bdc0b7fc9ec93fb0d6190a98ec1717b0b562"
       abi: AtriumRouter
-      startBlock: 274900000
+      startBlock: 270726101
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -51,19 +51,32 @@ for (const [name, slug] of Object.entries(NAME_TO_SLUG)) {
   const startBlock = entry.block ?? 0;
 
   // Match: name: <Name>\n    network: ...\n    source:\n      address: "0x..."\n      abi: <Name>\n      startBlock: <N>
-  // We patch address + startBlock by anchoring on the unique `name: <Name>` line that's followed within a few
-  // lines by `address:` and `startBlock:` lines. Per-name source blocks are unique so this is unambiguous.
+  // Patch both placeholder and already-nonzero addresses. Pre-fix this only
+  // matched 0x000... entries, so a cutover could leave Scribe indexing an old
+  // nonzero address forever.
   const blockPattern = new RegExp(
-    `(name: ${name}\\n    network: [^\\n]+\\n    source:\\n      address: ")0x0+(")(\\n      abi: ${name}\\n      startBlock: )0(\\n)`,
+    `(name: ${name}\\n    network: [^\\n]+\\n    source:\\n      address: ")0x[0-9a-fA-F]{40}(")(\\n      abi: ${name}\\n      startBlock: )\\d+(\\n)`,
     'g',
   );
-  const replaced = yaml.replace(blockPattern, `$1${addr}$2$3${startBlock}$4`);
-  if (replaced !== yaml) {
+  let matched = false;
+  let changed = false;
+  const replaced = yaml.replace(
+    blockPattern,
+    (full, beforeAddress, _oldAddressClose, beforeBlock, afterBlock) => {
+      matched = true;
+      const next = `${beforeAddress}${addr}"${beforeBlock}${startBlock}${afterBlock}`;
+      changed = changed || next !== full;
+      return next;
+    },
+  );
+  if (changed) {
     yaml = replaced;
     updates += 1;
     console.log(`  ${name.padEnd(22)} ${addr}  block ${startBlock}`);
+  } else if (matched) {
+    console.log(`  ${name.padEnd(22)} already current`);
   } else {
-    console.warn(`  ${name.padEnd(22)} no match, pattern drifted or already updated`);
+    console.warn(`  ${name.padEnd(22)} no match, pattern drifted`);
   }
 }
 
