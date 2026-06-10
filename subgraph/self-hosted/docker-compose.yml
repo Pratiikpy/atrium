@@ -7,19 +7,27 @@
 # graph-node we control reads Arbitrum Sepolia directly, so it cannot freeze the
 # way Studio did.
 #
-# Local (prove it):   docker compose up -d   then ../deploy-self-hosted.sh
-# Production (VPS):    copy this dir to the $5 VPS, set ETHEREUM_RPC to a real
-#                      archive RPC (Alchemy/Infura free tier indexes far faster
-#                      than the public node), docker compose up -d, deploy, then
-#                      point prod SCRIBE_URL at http://<vps-ip>:8000/subgraphs/name/atrium-local
+# SECURITY (this file is meant for a public VPS):
+#   - Only port 8000 (read-only GraphQL queries — the SCRIBE_URL target) binds to
+#     all interfaces. Front it with a TLS reverse proxy (Caddy/nginx) for
+#     https://scribe.useatrium.me.
+#   - Admin/deploy (8020), status (8030), metrics (8040) and ipfs (5001) bind to
+#     127.0.0.1 only — reachable by deploy.sh on the host, never the public net.
+#   - Postgres is NOT published; graph-node reaches it over the internal compose
+#     network. The DB password comes from $POSTGRES_PASSWORD (set a strong value in
+#     subgraph/self-hosted/.env), never hardcoded.
+#
+# Setup:  cp .env.example .env  &&  set POSTGRES_PASSWORD (strong random)
+# Local:  docker compose up -d   then ./deploy.sh
+# VPS:    set ETHEREUM_RPC to a real archive RPC (Alchemy free tier), up -d, deploy.
 services:
   graph-node:
     image: graphprotocol/graph-node:v0.35.1
     ports:
-      - '8000:8000'  # GraphQL (queries) -> SCRIBE_URL points here
-      - '8020:8020'  # JSON-RPC (deploy)
-      - '8030:8030'  # subgraph indexing status
-      - '8040:8040'  # metrics
+      - '8000:8000'              # GraphQL queries (public — SCRIBE_URL; front with TLS)
+      - '127.0.0.1:8020:8020'    # deploy admin — localhost only
+      - '127.0.0.1:8030:8030'    # indexing status — localhost only
+      - '127.0.0.1:8040:8040'    # metrics — localhost only
     depends_on:
       ipfs:
         condition: service_started
@@ -28,7 +36,7 @@ services:
     environment:
       postgres_host: postgres
       postgres_user: graph-node
-      postgres_pass: let-me-in
+      postgres_pass: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in subgraph/self-hosted/.env}
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
       # network name MUST match subgraph.yaml `network: arbitrum-sepolia`
@@ -39,21 +47,20 @@ services:
   ipfs:
     image: ipfs/kubo:v0.18.1
     ports:
-      - '5001:5001'
+      - '127.0.0.1:5001:5001'    # localhost only (deploy.sh uploads here)
     volumes:
       - ./data/ipfs:/data/ipfs
     restart: unless-stopped
   postgres:
     image: postgres:15
-    ports:
-      - '5432:5432'
+    # No published port: only graph-node reaches it over the internal network.
     command:
       - postgres
       - -cshared_preload_libraries=pg_stat_statements
       - -cmax_connections=200
     environment:
       POSTGRES_USER: graph-node
-      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in subgraph/self-hosted/.env}
       POSTGRES_DB: graph-node
       PGDATA: /var/lib/postgresql/data
       POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'

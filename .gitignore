@@ -255,3 +255,4 @@ PUBLIC_RELEASE_ACTION_PLAN.md
 .vercel
 ops/scribe-node/data/
 subgraph/self-hosted/data/
+subgraph/self-hosted/.env
