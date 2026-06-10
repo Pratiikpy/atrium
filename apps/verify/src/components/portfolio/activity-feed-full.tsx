@@ -49,11 +49,21 @@ export function ActivityFeedFull() {
   }
 
   if (!data?.activities.length) {
+    // Launch-QA: a disconnected user previously saw "No activity indexed yet",
+    // which mis-attributes an empty disconnected state to the indexer. Branch on
+    // wallet presence so the copy matches reality (mirrors the mobile panel).
+    const noWallet = wallet == null;
     return (
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center">
-        <p className="text-sm text-ink-soft">No activity indexed yet.</p>
+        <p className="text-sm text-ink-soft">
+          {noWallet ? 'Connect a wallet to see your activity.' : 'No activity yet.'}
+        </p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {data?.source === 'pending' ? 'scribe pending · indexing your on-chain activity' : 'open a position to record one'}
+          {noWallet
+            ? 'your deposits, trades, and mandates appear here'
+            : data?.source === 'pending'
+              ? 'scribe pending · indexing your on-chain activity'
+              : 'open a position to record one'}
         </p>
       </div>
     );

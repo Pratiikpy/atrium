@@ -19,8 +19,9 @@ export function Footer() {
             <p className="text-[12px] text-[var(--muted)]">
               <a href="mailto:support@useatrium.me" className="hover:text-[var(--ink)]">support@useatrium.me</a>
               {' · '}
-              Discord launching with testnet, see{' '}
-              <Link href="/security" className="hover:text-[var(--ink)]">/security</Link> for security@ contact
+              <a href="mailto:security@useatrium.me" className="hover:text-[var(--ink)]">security@useatrium.me</a>
+              {' · '}
+              Discord launching with testnet
             </p>
           </div>
           <FootCol title="Product" links={[

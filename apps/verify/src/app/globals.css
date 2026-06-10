@@ -620,7 +620,12 @@ body {
   }
 
   .marketing-shell .nav-mobile-sheet.open {
-    background: color-mix(in oklch, var(--color-mob-bg) 94%, transparent);
+    /* Launch-QA: was 94% (6% transparent), so the hero text bled through the
+       open mobile menu. Fully opaque + a blur backstop so the sheet reads as a
+       solid panel over any content. */
+    background: var(--color-mob-bg);
+    backdrop-filter: saturate(160%) blur(16px);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
     border-bottom-color: var(--color-mob-line);
     box-shadow: 0 20px 60px rgba(0,0,0,0.55);
   }

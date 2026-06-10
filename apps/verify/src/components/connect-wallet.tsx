@@ -23,7 +23,7 @@ export function ConnectWallet({
   className?: string;
 }) {
   const { address, isConnected } = useAccount();
-  const { connect, connectors, status, error } = useConnect();
+  const { connect, connectors, status, error, reset } = useConnect();
   const { disconnect } = useDisconnect();
   const pending = status === 'pending';
   // In an E2E build (NEXT_PUBLIC_E2E=1) the funded-key / mock connector is
@@ -68,15 +68,29 @@ export function ConnectWallet({
 
   if (variant === 'inline') {
     return (
-      <button
-        type="button"
-        onClick={handle}
-        disabled={!connector || pending}
-        aria-label="Connect wallet"
-        className={`inline-flex items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-xs font-medium text-parchment hover:bg-ink/90 disabled:opacity-50 ${className}`}
-      >
-        {pending ? 'Connecting…' : 'Connect wallet'}
-      </button>
+      <span className={`inline-flex flex-col items-start gap-1 ${className}`}>
+        <button
+          type="button"
+          onClick={handle}
+          disabled={!connector || pending}
+          aria-label="Connect wallet"
+          className="inline-flex items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-xs font-medium text-parchment hover:bg-ink/90 disabled:opacity-50"
+        >
+          {pending ? 'Connecting…' : 'Connect wallet'}
+        </button>
+        {/* Launch-QA: surface a failed/stalled connect (e.g. no extension and the
+            passkey popup was dismissed) instead of leaving "Connecting…" silent.
+            reset() clears the pending/error so the user can retry another way. */}
+        {error && (
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="text-left text-[10px] leading-tight text-neg underline decoration-neg/40 underline-offset-2"
+          >
+            Couldn&rsquo;t connect. Tap to try again.
+          </button>
+        )}
+      </span>
     );
   }
 
@@ -90,20 +104,32 @@ export function ConnectWallet({
       >
         {pending ? 'Connecting…' : 'Connect wallet'}
       </button>
-      {coinbaseConnector && coinbaseConnector !== connector && (
+      {/* Launch-QA: always offer the passkey path as an explicit, separate
+          choice (a real 2-way picker), so a judge with no browser extension is
+          never stuck on a single auto-selected connector. */}
+      {coinbaseConnector && (
         <button
           type="button"
           onClick={() => connect({ connector: coinbaseConnector })}
           disabled={pending}
           className="mt-2 block text-[12px] text-muted underline decoration-divider underline-offset-2 hover:text-ink disabled:opacity-50"
         >
-          or use a passkey wallet (no extension)
+          {hasInjectedProvider
+            ? 'or use a passkey wallet (no extension)'
+            : 'Connect with a passkey wallet (no extension needed)'}
         </button>
       )}
       {!connector && (
         <p className="mt-2 text-[12px] text-muted">No wallet connector configured.</p>
       )}
-      {error && <p className="mt-2 text-[12px] text-neg">{error.message}</p>}
+      {error && (
+        <p className="mt-2 text-[12px] text-neg">
+          {error.message}{' '}
+          <button type="button" onClick={() => reset()} className="underline underline-offset-2">
+            try again
+          </button>
+        </p>
+      )}
       <p className="mt-2 text-[11px] text-muted">
         Connect MetaMask, Rabby, or any browser wallet. Or use a passkey-bound smart wallet
         (Coinbase Smart Wallet), no seed phrase or extension required.

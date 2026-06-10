@@ -97,6 +97,42 @@ export function AgentsMobile() {
         </div>
       )}
 
+      {/* Launch-QA: the flagship agent-mandate enforcement proof (4 real
+          on-chain txs) was desktop-only. Condensed mobile version so phone
+          users and judges see it too. Mirrors EnforcementProofCard. */}
+      <div className="rounded-2xl border border-mob-line bg-mob-bg-card p-4">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-display text-[15px] italic text-mob-ink">The mandate is the limit.</span>
+          <span className="shrink-0 font-mono text-[8px] uppercase tracking-wider text-mob-muted">recorded · arb-sepolia</span>
+        </div>
+        <p className="mt-1 text-[11.5px] text-mob-muted/80">Enforced on-chain by the risk engine. Tap a tx to verify on Arbiscan.</p>
+        <ul className="mt-3 flex flex-col gap-1.5">
+          {([
+            ['Agent opens 2 USDC (in cap)', 'Position 11, owned by you', 'ok', '0xd198d4e8c60d00e2ac4ca1028a03636029d4617622b5a47971724cd5f0ea678f'],
+            ['Agent tries 10 USDC (over cap)', 'Reverts NotionalExceeded', 'no', '0x73859be872fc3cbf4a59fb6df0af7471c61a03108099962adcbebda8272c47de'],
+            ['You fire the kill switch', 'Agent revoked', 'ok', '0x65e24e9a9cebf66254e08081e520e657bb415b00f344b15b6d5386c3eed848d6'],
+            ['Agent acts after revoke', 'Reverts MandateRevoked', 'no', '0x41bf9904886c05a160291194d91dc346028b378981082f2b7227ee9f656551e3'],
+          ] as const).map(([step, outcome, kind, tx]) => (
+            <li key={tx}>
+              <a
+                href={`https://sepolia.arbiscan.io/tx/${tx}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-2 rounded-xl border border-mob-line bg-mob-bg-elev px-3 py-2"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[12px] text-mob-ink">{step}</span>
+                  <span className="block text-[10.5px] text-mob-muted">{outcome}</span>
+                </span>
+                <span className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wide ${kind === 'no' ? 'bg-neg/15 text-neg' : 'bg-mob-accent/20 text-mob-accent'}`}>
+                  {kind === 'no' ? 'blocked' : 'allowed'} ↗
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <SectionHead t="Rostrum . top 7d" moreHref="/rostrum" moreLabel="All ↗" />
 
       {/* Rostrum list */}

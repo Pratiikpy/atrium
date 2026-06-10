@@ -767,7 +767,25 @@ function MobileLanding({ data }: { data: LandingData }) {
         <div className="page landing-page">
           <nav className="topnav" aria-label="Mobile landing navigation">
             <Link href="/" className="mark">Atrium</Link>
-            <Link href="/app" className="cta">Open testnet ↗</Link>
+            <div className="topnav-right">
+              <Link href="/app" className="cta">Open testnet ↗</Link>
+              {/* Launch-QA fix: the mobile landing topnav previously had no menu,
+                  so Product/Agents/Architecture/Reserves/Docs were unreachable on
+                  phones (the desktop PublicNav is display:none under .atrium-desktop-only).
+                  Native <details> disclosure = working menu with no client JS. */}
+              <details className="m-menu">
+                <summary className="m-menu-btn" aria-label="Open menu">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12" /></svg>
+                </summary>
+                <div className="m-menu-sheet" role="menu">
+                  <Link href="/#product" role="menuitem">Product</Link>
+                  <Link href="/app/agents" role="menuitem">Agents</Link>
+                  <Link href="/architecture" role="menuitem">Architecture</Link>
+                  <Link href="/lantern" role="menuitem">Reserves</Link>
+                  <Link href="/docs" role="menuitem">Docs</Link>
+                </div>
+              </details>
+            </div>
           </nav>
 
           <div className="scroll">
