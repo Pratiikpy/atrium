@@ -102,7 +102,7 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   </header>
 
   <div class="summary">
-    <div class="stat"><div class="k">Flows proven</div><div class="v">18</div><div class="s">connect → deposit → open → withdraw → delegate → verify → and more</div></div>
+    <div class="stat"><div class="k">Flows proven</div><div class="v">17</div><div class="s">connect → deposit → open → withdraw → delegate → verify → and more</div></div>
     <div class="stat"><div class="k">On-chain txs</div><div class="v">4</div><div class="s"><span class="live" id="vTxs">verifying live…</span></div></div>
     <div class="stat"><div class="k">Tests passing</div><div class="v">792</div><div class="s">unit + contract; core SPAN invariant Kani-proven</div></div>
     <div class="stat"><div class="k">Chain tip</div><div class="v" id="tipBig" style="font-size:24px;font-family:var(--mono)">…</div><div class="s"><span class="live" id="tipNote">reading live…</span></div></div>
@@ -154,35 +154,28 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
       <div class="shots"><figure class="shot"><img src="/proof/08-reject.png" alt="Rejected state"><figcaption>Rejected in Rabby → "Failed: Cancelled in wallet · retry".</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="network"><h3><span class="fn">07</span>Wrong network — caught and switched</h3>
-      <p class="lede">On the wrong chain, the write button becomes a "Switch to Arbitrum Sepolia" action instead of building a doomed tx — found and fixed across all six write surfaces. One click switches Rabby and the form arms.</p>
-      <div class="shots">
-        <figure class="shot"><img src="/proof/12-wrongchain.png" alt="Wrong network guard"><figcaption>Wrong chain → "Switch to Arbitrum Sepolia", no broken tx.</figcaption></figure>
-        <figure class="shot"><img src="/proof/13-afterswitch.png" alt="After switch"><figcaption>After switch → vault cards arm, normal deposit/withdraw.</figcaption></figure>
-      </div>
-    </div>
   </section>
 
   <!-- ACT 2 — AGENTIC & TRUST -->
   <section class="act" id="act-agentic">
     <div class="act-h"><span class="n">Act II</span><h2>Agentic &amp; trust</h2><span class="sub">delegate within limits · prove reserves · pay-per-call</span></div>
 
-    <div class="flow" id="mandate"><h3><span class="fn">08</span>Delegate to an agent — a signed mandate</h3>
+    <div class="flow" id="mandate"><h3><span class="fn">07</span>Delegate to an agent — a signed mandate</h3>
       <p class="lede">Issue an EIP-712 <em>Intent Sigil</em> that lets an AI agent trade within signed limits — per-action cap, total cap, actions/day, expiry, venue allowlist. Gasless to sign; the master key never moves; a one-tap kill switch revokes everything. The contract rejects anything outside the signed scope, on-chain.</p>
       <div class="shots"><figure class="shot"><img src="/proof/11-mandate.png" alt="New mandate form"><figcaption>EIP-712 mandate — agent, caps, actions/day, expiry, venue allowlist. Signed via Rabby.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="por"><h3><span class="fn">09</span>Proof of Reserves — verify it yourself</h3>
+    <div class="flow" id="por"><h3><span class="fn">08</span>Proof of Reserves — verify it yourself</h3>
       <p class="lede">Atrium never custodies funds and proves it: Lantern publishes a signed Merkle attestation of every balance on-chain, and anyone generates an inclusion proof for their own balance in the browser — no trust required. Redeemable is a live read of <code>Coffer.convertToAssets(balanceOf(you))</code>.</p>
       <div class="shots"><figure class="shot"><img src="/proof/10-por.png" alt="Proof of Reserves"><figcaption>"Prove your balance to anyone in seconds." Redeemable read live on-chain.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="codex"><h3><span class="fn">10</span>x402 API — a live, pay-per-call console</h3>
+    <div class="flow" id="codex"><h3><span class="fn">09</span>x402 API — a live, pay-per-call console</h3>
       <p class="lede">Codex is an x402-payable read API: margin, risk, positions, venue health, agent performance, attestations. The docs ship a live try-it console; public endpoints answer in the browser, per-user endpoints honestly require a signed wallet.</p>
       <div class="shots"><figure class="shot"><img src="/proof/21-tryit.png" alt="x402 try-it console"><figcaption>Codex worker LIVE · the in-browser try-it calls the real read route.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="agents"><h3><span class="fn">11</span>Agents — enforcement, on-chain</h3>
+    <div class="flow" id="agents"><h3><span class="fn">10</span>Agents — enforcement, on-chain</h3>
       <p class="lede">The agents surface shows real on-chain mandate enforcement — an agent acting under a signed mandate, and the contract rejecting an over-limit attempt (e.g. <code>NotionalExceeded</code>). The limits aren't UI theatre; they're enforced by Sigil on-chain.</p>
       <div class="shots"><figure class="shot"><img src="/proof/22-agents.png" alt="Agents enforcement"><figcaption>Agent mandate enforcement proof — signed scope enforced on-chain.</figcaption></figure></div>
     </div>
@@ -192,22 +185,22 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   <section class="act" id="act-breadth">
     <div class="act-h"><span class="n">Act III</span><h2>Breadth — every surface works</h2><span class="sub">not a one-flow demo</span></div>
 
-    <div class="flow" id="transfer"><h3><span class="fn">12</span>Cross-chain transfer — CCIP</h3>
+    <div class="flow" id="transfer"><h3><span class="fn">11</span>Cross-chain transfer — CCIP</h3>
       <p class="lede">Move collateral across chains via Aqueduct (Chainlink CCIP). Enter an amount and the estimate (fee, destination, receive) renders live.</p>
       <div class="shots"><figure class="shot"><img src="/proof/14-transfer.png" alt="Cross-chain transfer"><figcaption>Aqueduct · CCIP transfer with a live estimate.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="markets"><h3><span class="fn">13</span>Markets — the cross-venue set</h3>
+    <div class="flow" id="markets"><h3><span class="fn">12</span>Markets — the cross-venue set</h3>
       <p class="lede">Nine Portico adapters deployed and verified; seven venues in margin scope. Each is honestly badged — only Aave is openable today; the rest are deployed-but-scaffolded and say so. A "two venues, one margin account" worked example shows the netting.</p>
       <div class="shots"><figure class="shot"><img src="/proof/15-markets.png" alt="Venue adapters"><figcaption>Venue adapters · 9 deployed / 7 in margin scope · honest per-venue status.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="onboarding"><h3><span class="fn">14</span>Onboarding — ninety seconds to a position</h3>
+    <div class="flow" id="onboarding"><h3><span class="fn">13</span>Onboarding — ninety seconds to a position</h3>
       <p class="lede">A new user: passkey, faucet (5 USDC + a gas grant so they're never stranded), first cross-margin position. Honest callouts throughout — "gas sponsorship is coming", "funds are testnet only".</p>
       <div class="shots"><figure class="shot"><img src="/proof/16-onboarding.png" alt="Onboarding"><figcaption>"Step inside the atrium." Clear value, honest callouts, dual CTAs.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="palette"><h3><span class="fn">15</span>Command palette — ⌘K navigation</h3>
+    <div class="flow" id="palette"><h3><span class="fn">14</span>Command palette — ⌘K navigation</h3>
       <p class="lede">A keyboard-first command palette jumps to any surface. Opens on click and ⌘K, filters, navigates — the small touches of a real product.</p>
       <div class="shots"><figure class="shot"><img src="/proof/17-palette.png" alt="Command palette"><figcaption>⌘K palette over the live portfolio · filter and jump.</figcaption></figure></div>
     </div>
@@ -217,17 +210,17 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   <section class="act" id="act-resilience">
     <div class="act-h"><span class="n">Act IV</span><h2>Resilience — it doesn't break</h2><span class="sub">the parts judges try to break</span></div>
 
-    <div class="flow" id="apifail"><h3><span class="fn">16</span>Total backend outage — graceful</h3>
+    <div class="flow" id="apifail"><h3><span class="fn">15</span>Total backend outage — graceful</h3>
       <p class="lede">With the <em>entire</em> backend API aborted, the app degrades gracefully — no white screen, no <code>$NaN</code>, no crash. Honest empty/error states, real on-chain values where it can still read them.</p>
       <div class="shots"><figure class="shot"><img src="/proof/18-apifail.png" alt="API outage degradation"><figcaption>All <code>/api/*</code> aborted → still renders, honest, no crash.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="hostile"><h3><span class="fn">17</span>Hostile inputs — sanitized</h3>
+    <div class="flow" id="hostile"><h3><span class="fn">16</span>Hostile inputs — sanitized</h3>
       <p class="lede">Letters, symbols, negatives, scientific notation, huge values — every amount input sanitizes them, no <code>NaN</code>, no layout overflow, over-balance gated at submit.</p>
       <div class="shots"><figure class="shot"><img src="/proof/19-hostile.png" alt="Hostile input handling"><figcaption>Garbage in → sanitized; no NaN, no overflow.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="mobile"><h3><span class="fn">18</span>Smallest phone — 320px, flawless</h3>
+    <div class="flow" id="mobile"><h3><span class="fn">17</span>Smallest phone — 320px, flawless</h3>
       <p class="lede">At 320px (smaller than an iPhone SE), zero horizontal overflow, modals fit, nav works, focus rings visible on every tab. Many products break below 360px; Atrium holds.</p>
       <div class="shots"><figure class="shot"><img src="/proof/20-mobile.png" alt="320px mobile"><figcaption>320px · no overflow · usable.</figcaption></figure></div>
     </div>
