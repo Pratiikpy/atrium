@@ -2,253 +2,246 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="apps/verify/public/brand/assets/atrium-wordmark-dark-2x.png" />
-  <img src="apps/verify/public/brand/assets/atrium-wordmark-2x.png" alt="Atrium" width="280" />
+  <img src="apps/verify/public/brand/assets/atrium-wordmark-2x.png" alt="Atrium" width="300" />
 </picture>
 
-### Unified margin prime brokerage for the EVM
+### The prime broker no single venue can be for itself.
 
-**Deposit collateral once. Trade across venues. Let one on-chain margin engine price the whole portfolio.**
+Post collateral once. Hedge across venues. One on-chain engine prices the whole book and frees the margin your hedge already earned you.
 
 [![Live](https://img.shields.io/badge/live-useatrium.me-1A1714?style=flat-square)](https://www.useatrium.me)
-[![Arbitrum](https://img.shields.io/badge/Arbitrum-Sepolia-3D5AFE?style=flat-square)](./docs/deployment.md)
-[![Robinhood Chain](https://img.shields.io/badge/Robinhood%20Chain-testnet-0B6B3A?style=flat-square)](./deployments/robinhood_chain.json)
-[![Stylus](https://img.shields.io/badge/Stylus-Rust-FB8C00?style=flat-square)](#why-stylus)
-[![Proof of reserves](https://img.shields.io/badge/proof%20of%20reserves-live-2E7D32?style=flat-square)](https://www.useatrium.me/lantern)
-[![Status](https://img.shields.io/badge/status-testnet%20only-6B6259?style=flat-square)](#what-is-live-today)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE)
+[![Arbitrum](https://img.shields.io/badge/Arbitrum-Sepolia-2D374B?style=flat-square)](./docs/deployment.md)
+[![Robinhood Chain](https://img.shields.io/badge/Robinhood%20Chain-46630-0B6B3A?style=flat-square)](./deployments/robinhood_chain.json)
+[![Stylus](https://img.shields.io/badge/margin%20engine-Rust%20on%20Stylus-B5532A?style=flat-square)](#why-the-engine-runs-in-rust)
+[![Proof of reserves](https://img.shields.io/badge/reserves-signed%20on--chain-2E7D32?style=flat-square)](https://www.useatrium.me/lantern)
+[![Verified](https://img.shields.io/badge/Sourcify-6%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
+[![Status](https://img.shields.io/badge/testnet-only-6B6259?style=flat-square)](#what-is-live-what-is-mocked)
 
-[Live demo](https://www.useatrium.me) | [Pitch](https://www.useatrium.me/pitch) | [Architecture](https://www.useatrium.me/architecture) | [Verifier](https://www.useatrium.me/verify) | [Honest disclosures](https://www.useatrium.me/docs/honesty)
-
-<br />
-
-[![Atrium capital-convergence schematic: multiple venues netting into one unified-margin pool](apps/verify/public/brand/assets/readme-convergence.png)](https://www.useatrium.me/architecture)
-
-<sub>Illustrative schematic. Live testnet values are read from contracts, APIs, or signed attestations and are labelled as such.</sub>
+**[Open the app](https://www.useatrium.me)** · [Pitch](https://www.useatrium.me/pitch) · [Architecture](https://www.useatrium.me/architecture) · [Verifier](https://www.useatrium.me/verify) · [What is mock, what is real](https://www.useatrium.me/docs/honesty)
 
 <br />
-<br />
 
-<table>
-  <tr>
-    <td align="center"><strong>Protocol</strong><br />Unified margin layer</td>
-    <td align="center"><strong>Runtime</strong><br />Arbitrum Stylus + Solidity</td>
-    <td align="center"><strong>Networks</strong><br />Arbitrum Sepolia + Robinhood Chain testnet</td>
-    <td align="center"><strong>State</strong><br />Testnet only, verifiable</td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Core user flow</strong><br />Deposit, margin, delegate, revoke</td>
-    <td align="center"><strong>Safety</strong><br />Caps, timelocks, kill switch</td>
-    <td align="center"><strong>Data</strong><br />On-chain reads + signed roots</td>
-    <td align="center"><strong>Limits</strong><br />Disclosed testnet workarounds</td>
-  </tr>
-</table>
+[![Atrium capital-convergence schematic: positions on many venues netting into one unified-margin pool](apps/verify/public/brand/assets/readme-convergence.png)](https://www.useatrium.me/architecture)
+
+<sub>Illustrative schematic. Every live value in the product is read from a contract, an API, or a signed attestation, and labelled as such.</sub>
 
 </div>
 
 ---
 
-## Start here
+## Read this in 30 seconds
 
-| If you are...       | Read this first                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------ |
-| A judge             | [Judge demo path](#judge-demo-path), then [Deployed proof](#deployed-proof)                      |
-| A protocol engineer | [System map](#system-map), then [Why Stylus](#why-stylus)                                        |
-| A security reviewer | [What is live today](#what-is-live-today), [Security](#security), [`SECURITY.md`](./SECURITY.md) |
-| A contributor       | [Repository map](#repository-map), then [Contributing](#contributing)                            |
+A trader who is long perps on one venue and long tokenized T-bills on another is hedged. The risk is lower. Yet every venue today computes margin in its own silo and asks for collateral as if the account were a single one-sided bet. The hedge is real. The margin engine cannot see it. So capital is posted twice and sits idle.
 
-> **Testnet-only:** Atrium does not support real-value user funds today. The point of this build is to make the core protocol, margin math, wallet flows, and safety controls inspectable before mainnet.
+Atrium is the neutral layer that sees the whole book. You deposit USDC once into one vault. A SPAN-style scenario-grid engine, written in Rust and running on Arbitrum Stylus, nets correlated risk across every venue you hold and returns one margin number per block. It does for on-chain traders what a prime broker does for a hedge fund, without custody and without asking one venue to extend credit against a competitor's book.
 
-## The problem
+Two things make this real rather than a pitch:
 
-On-chain traders still manage risk in silos.
+1. **A netting number that cannot drift from a slide.** A hedged book that costs `$20,400` margined leg by leg costs `$10,000` netted as one portfolio. That is **51.0% freed**, and the same figure is pinned by a test in CI. [Jump to it.](#one-book-one-number)
+2. **An AI agent that acts on-chain, and a risk engine that tells it no.** A user signs one bounded mandate. The agent opens a trade inside it. The next action breaks the cap and the contract reverts. Four real transactions you can open right now. [Jump to it.](#an-agent-with-a-key-and-a-limit)
 
-A wallet can hold a perp position on one venue, a yield or T-bill position on another, and spot collateral somewhere else. Each venue asks for its own margin, even when the positions offset each other. Capital gets locked twice because no neutral layer can see and price the portfolio as a whole.
+---
 
-Centralized prime brokers solve this for institutions. Atrium brings the same idea on-chain: one non-custodial collateral vault, one portfolio-wide margin number, and venue adapters that can use collateral only within explicit limits.
+## Do not trust this page. Check it.
 
-## The product
+Atrium's product is verifiability, so the README earns its claims before it makes them. Three commands, no wallet, about a minute.
 
-Atrium is a testnet-first unified-margin protocol deployed on Arbitrum Sepolia and Robinhood Chain testnet.
+```bash
+# 1. Read the vault's testnet reserves straight from Arbitrum Sepolia.
+cast call 0xb62762000686a9589b01d63ba7e50f51f46a86ef "totalAssets()(uint256)" \
+  --rpc-url https://arbitrum-sepolia.publicnode.com
 
-| Layer      | Component                  | What it does                                                                  |
-| ---------- | -------------------------- | ----------------------------------------------------------------------------- |
-| Collateral | `Coffer`                   | Holds USDC once in an ERC-4626 vault                                          |
-| Margin     | `Plinth`                   | Computes SPAN-style portfolio margin in Arbitrum Stylus                       |
-| Routing    | `AtriumRouter` + `Portico` | Routes positions through margin checks, vault permissions, and venue adapters |
-| Agents     | `Sigil` + `Postern`        | Bounds delegated actions and revokes mandates/session keys                    |
-| Risk       | `Vigil`                    | Handles liquidation queueing and execution controls                           |
-| Reserves   | `Lantern`                  | Publishes signed proof-of-reserves roots                                      |
-| Bridge     | `Aqueduct`                 | Provides the CCIP collateral bridge path                                      |
+# 2. Ask the public app for the same number. They should agree.
+curl -s https://www.useatrium.me/api/vault/stats
 
-The user-facing promise is simple:
+# 3. Run the pinned margin invariant. The 51% is a test, not a slogan.
+cd contracts/plinth && cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture
+```
 
-> One wallet posts collateral once, then receives a single margin number across supported venues.
+When you are done here, [`/verify`](https://www.useatrium.me/verify) walks seven claims the same way, and [`/docs/honesty`](https://www.useatrium.me/docs/honesty) names every mock, relay, and testnet workaround in the system.
 
-## Why it matters
+---
 
-Atrium is not a generic trading UI. The wedge is structural.
+## The bug everyone in DeFi shipped
 
-A single venue cannot safely cross-margin a competitor's book without trusting that competitor's liquidation engine and extending credit against an external position. A neutral collateral and margin layer can do that job without asking one venue to subsidize another.
+Single-venue cross-margin is solved. Hyperliquid, dYdX, and Drift all net positions inside their own exchange. The gap is between venues.
 
-That is why prime brokerage exists outside individual exchanges in traditional finance. Atrium makes that role programmable, non-custodial, and verifiable on Arbitrum.
+No venue can safely cross-margin a competitor's book, because doing so means trusting that competitor's liquidation engine and extending credit against a position it does not control. This is not a missing feature. It is a conflict of interest baked into the venue model. Traditional finance solved it the same way: prime brokerage lives **outside** any single exchange.
 
-| Prime-brokerage property | Centralized prime broker | Single venue DeFi      | Atrium                       |
-| ------------------------ | ------------------------ | ---------------------- | ---------------------------- |
-| Cross-venue netting      | Yes                      | No                     | Yes, through a neutral layer |
-| Custody model            | Custodial                | Venue-specific         | Non-custodial vault          |
-| User-verifiable reserves | No                       | Partial                | Signed on-chain root         |
-| Agent delegation         | Manual / off-chain       | Usually all-or-nothing | Bounded EIP-712 mandates     |
+Atrium is that outside layer, made programmable and non-custodial.
 
-## Why Stylus
+| Property | Centralized prime broker | Single-venue DeFi | Atrium |
+| --- | --- | --- | --- |
+| Cross-venue netting | Yes | No | Yes, from a neutral layer |
+| Custody | Custodial | Venue-held | Non-custodial vault |
+| Reserves you can check | No | Partial | Signed on-chain root |
+| Agent delegation | Off-chain, manual | All-or-nothing | Bounded EIP-712 mandates |
 
-SPAN-style margin is compute-heavy: shock each instrument, net correlated exposures, and take the worst scenario. Running that math directly in Solidity is expensive enough to limit what can be done on-chain.
+---
 
-Atrium uses **Arbitrum Stylus with Rust** for the compute-heavy core:
+## One book, one number
 
-| Contract | Runtime       | Role                               |
-| -------- | ------------- | ---------------------------------- |
-| `Plinth` | Stylus / Rust | SPAN-style portfolio margin engine |
-| `Coffer` | Stylus / Rust | ERC-4626 collateral vault          |
-| `Sigil`  | Stylus / Rust | EIP-712 mandate validation         |
-| `Vigil`  | Stylus / Rust | Liquidation controls               |
+This is the whole thesis in one screen, and it is live at [`/app/portfolio`](https://www.useatrium.me/app/portfolio) as the Margin Lens panel.
 
-Solidity is used where the ecosystem expects Solidity: routers, adapters, CCIP, registry, governance, and the kill switch.
+Take a classic hedge: long $100k of one perp, short $100k of a correlated perp. Margined the way venues do it today, each leg is priced alone and the costs add up. Margined as one portfolio, the scenario grid sees that a shock which hurts one leg helps the other.
+
+| Same book, two ways to margin it | Initial margin |
+| --- | --- |
+| Each leg priced alone, summed (what venues charge you today) | `$20,400` |
+| Netted as one portfolio by Plinth | `$10,000` |
+| **Freed by netting** | **51.0%** |
+
+The number is a worked example, labelled as one in the product, and it is locked by `hedge_frees_a_pinned_share_of_the_isolated_margin` in `contracts/plinth`. If someone changes the engine and the saving drifts, CI goes red. The invariant underneath, that a hedged book never requires more margin than its legs do alone, is Kani-verified in `contracts/plinth/src/span.rs`.
+
+A slide can claim any number. A test that runs on every commit cannot.
+
+---
+
+## An agent with a key and a limit
+
+Atrium treats an AI agent as a first-class user that is never trusted further than its signed mandate. A user signs one EIP-712 `IntentSigil`: a per-action cap, a daily count, an expiry, a venue allowlist. A separate agent session key signs each trade. The Stylus risk engine checks every action against the mandate before any value moves.
+
+The enforcement was captured end to end on Arbitrum Sepolia. Open any row.
+
+| Step | What the agent did | On-chain outcome | Transaction |
+| --- | --- | --- | --- |
+| 1 | Opened a 2 USDC trade, inside the 5 USDC cap | Position 11 opened, owned by the **user** | [`0xd198d4e8`](https://sepolia.arbiscan.io/tx/0xd198d4e8c60d00e2ac4ca1028a03636029d4617622b5a47971724cd5f0ea678f) |
+| 2 | Tried a 10 USDC trade, over the cap | Reverts `NotionalExceeded(10000000, 5000000)` | [`0x73859be8`](https://sepolia.arbiscan.io/tx/0x73859be872fc3cbf4a59fb6df0af7471c61a03108099962adcbebda8272c47de) |
+| 3 | (User) fired the kill switch | Agent revoked, nonce 0 to 1 | [`0x65e24e9a`](https://sepolia.arbiscan.io/tx/0x65e24e9a9cebf66254e08081e520e657bb415b00f344b15b6d5386c3eed848d6) |
+| 4 | Tried to act after revocation | Reverts `MandateRevoked` | [`0x41bf9904`](https://sepolia.arbiscan.io/tx/0x41bf9904886c05a160291194d91dc346028b378981082f2b7227ee9f656551e3) |
+
+The successful trade is attributed to the user, not the agent: agent-authorized execution, not agent custody. The session key never holds funds and never carries authority past the signed caps. The full method and a script to reproduce it live under [`qa-evidence/agentic`](./qa-evidence/agentic). The same four steps are surfaced for judges at [`/app/agents`](https://www.useatrium.me/app/agents).
+
+---
+
+## Why the engine runs in Rust
+
+SPAN-style margin is heavy work: shock every instrument across a scenario grid, net correlated exposures, take the worst case. In plain Solidity that math is expensive enough to push it off-chain, which is exactly where trust goes to hide.
+
+Atrium keeps it on-chain by writing the hot path in Rust on Arbitrum Stylus.
+
+| Contract | Runtime | Role |
+| --- | --- | --- |
+| `Plinth` | Rust / Stylus | SPAN-style portfolio margin engine |
+| `Coffer` | Rust / Stylus | ERC-4626 collateral vault |
+| `Sigil` | Rust / Stylus | EIP-712 mandate validation |
+| `Vigil` | Rust / Stylus | Liquidation controls |
+
+Solidity stays where the ecosystem expects it: routers, venue adapters, the CCIP bridge, the registry, governance, and the kill switch.
+
+---
 
 ## System map
 
 ```mermaid
 flowchart TD
     U["Wallet or bounded agent"]
-    U -->|"deposit USDC once"| C["Coffer<br/>ERC-4626 vault"]
-    U -->|"open / adjust position"| R["AtriumRouter"]
-    R --> P["Plinth<br/>portfolio margin"]
+    U -->|"deposit USDC once"| C["Coffer · ERC-4626 vault"]
+    U -->|"open or adjust position"| R["AtriumRouter"]
+    R --> P["Plinth · portfolio margin"]
     P -->|"required margin + buying power"| R
     R -->|"authorized pull cap"| C
     R --> A["Portico adapter"]
     A --> V["Venue / testnet venue path"]
-    C --> L["Lantern<br/>proof of reserves"]
-    U --> S["Sigil<br/>bounded mandate"]
-    S --> K["Postern<br/>kill switch"]
-    P --> Q["Vigil<br/>liquidation controls"]
+    C --> L["Lantern · proof of reserves"]
+    U --> S["Sigil · bounded mandate"]
+    S --> K["Postern · kill switch"]
+    P --> Q["Vigil · liquidation controls"]
 ```
 
-## What is live today
+| Layer | Component | Job |
+| --- | --- | --- |
+| Collateral | `Coffer` | Holds USDC once, mints ERC-4626 shares |
+| Margin | `Plinth` | SPAN-style portfolio margin, in Stylus |
+| Routing | `AtriumRouter` + `Portico` | Margin check, vault permission, venue adapter |
+| Agents | `Sigil` + `Postern` | Bounds delegated actions, revokes them |
+| Risk | `Vigil` | Liquidation queueing and execution control |
+| Reserves | `Lantern` | Publishes signed proof-of-reserves roots |
+| Bridge | `Aqueduct` | Chainlink CCIP collateral path |
 
-Atrium is intentionally testnet-only. The goal is to make every claim inspectable before real value is supported.
+---
 
-| Surface                               | Status                                                                                                    |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Arbitrum Sepolia core protocol        | Deployed and wired                                                                                        |
-| Robinhood Chain testnet core protocol | Deployed and wired                                                                                        |
-| Vault deposit / withdraw              | Real testnet wallet flow                                                                                  |
-| SPAN-style margin engine              | Deployed Stylus contracts plus tests                                                                      |
-| Agent mandates and revoke flow        | Deployed mandate and kill-switch contracts                                                                |
-| Proof of reserves                     | Signed root published on-chain                                                                            |
-| Venue adapters                        | Deployed, with testnet limits disclosed                                                                   |
-| Aave Horizon path                     | Operational through an Atrium testnet `MockAavePool` because Aave V3 is not available on Arbitrum Sepolia |
-| Real economic funds                   | Not supported                                                                                             |
+## What is live, what is mocked
 
-For the full list of mocks, relays, blocked upstreams, and production paths, see [`/docs/honesty`](https://www.useatrium.me/docs/honesty).
+Atrium is testnet-only on purpose. The goal is to make every claim inspectable before real value is ever at stake. Honesty is the brand, so the limits are in the README, not buried.
 
-### Core flows
+| Surface | State |
+| --- | --- |
+| Core protocol on Arbitrum Sepolia | Deployed and wired |
+| Core protocol on Robinhood Chain testnet (chainId 46630) | Deployed and wired |
+| Deposit and withdraw | Real testnet wallet flow, real Arbiscan transactions |
+| SPAN-style margin engine | Deployed Stylus contracts, plus tests and Kani proofs |
+| Agent mandates, enforcement, revoke | Deployed, proven on-chain (see the table above) |
+| Proof of reserves | Signed Merkle root published on-chain by `Lantern` |
+| Venue adapters | Deployed, with each testnet limit named |
+| Aave Horizon path | Runs through an Atrium `MockAavePool`, because Aave V3 is not on Arbitrum Sepolia |
+| Governance | Deployer-admin on the live testnet stack. A 3-of-5 Safe plus 48h timelock is the documented pre-mainnet gate, and the code exists |
+| Real economic funds | Not supported |
 
-| Flow                 | What a user can verify now                   | Evidence surface                               |
-| -------------------- | -------------------------------------------- | ---------------------------------------------- |
-| Deposit collateral   | Wallet tx mints Coffer shares                | App vault flow + Arbiscan tx                   |
-| Withdraw collateral  | Wallet tx redeems shares                     | App vault flow + Arbiscan tx                   |
-| Read margin state    | Plinth-derived buying power and margin views | `/app/portfolio`, `/app/trade`, tests          |
-| Inspect reserves     | Signed Lantern root and reserve dashboards   | `/lantern`, `/app/reserves`                    |
-| Delegate to an agent | Bounded mandate surface                      | `/app/agents`, Sigil contract                  |
-| Revoke delegation    | Kill-switch path                             | `/app/settings/session-keys`, Postern contract |
-| Check limitations    | Every testnet workaround named               | `/docs/honesty`                                |
+The honest challenge to a reviewer: Atrium makes seven claims, each checkable on Arbiscan, and every mock is named at [`/docs/honesty`](https://www.useatrium.me/docs/honesty). Find one fabricated number.
+
+---
 
 ## Deployed proof
 
-The generated deployment registry is the source of truth:
+The generated registries are the source of truth: [Arbitrum Sepolia](./docs/deployment.md) and [Robinhood Chain testnet](./deployments/robinhood_chain.json).
 
-- [Arbitrum Sepolia deployment registry](./docs/deployment.md)
-- [Robinhood Chain testnet deployment registry](./deployments/robinhood_chain.json)
+**Arbitrum Sepolia**
 
-Selected Arbitrum Sepolia contracts:
+| Contract | Role | Address |
+| --- | --- | --- |
+| `Coffer` | ERC-4626 collateral vault | [`0xb627...86ef`](https://sepolia.arbiscan.io/address/0xb62762000686a9589b01d63ba7e50f51f46a86ef) |
+| `Plinth` | Portfolio margin engine | [`0xe01d...a26c`](https://sepolia.arbiscan.io/address/0xe01d09edcf889bf5577666f0aa61f5701c72a26c) |
+| `Sigil` | Agent mandate registry | [`0x517a...9cdc`](https://sepolia.arbiscan.io/address/0x517afac9b39c01c0cf044b335742c95960959cdc) |
+| `Vigil` | Liquidation controls | [`0x5e09...a194`](https://sepolia.arbiscan.io/address/0x5e099faf4fbc70832ea5e12178a9f9dec96ba194) |
+| `AtriumRouter` | Margin to vault to adapter | [`0xE3E3...B562`](https://sepolia.arbiscan.io/address/0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562) |
+| `LanternAttestor` | Proof-of-reserves attestor | [`0xF0B9...5888`](https://sepolia.arbiscan.io/address/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888) |
+| `PosternKillSwitch` | One-transaction revoke | [`0xCD89...b0b7`](https://sepolia.arbiscan.io/address/0xCD899f715462A33Ae880310d72b37bde102ab0b7) |
 
-| Contract            | Role                              | Address                                                                                           |
-| ------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `Coffer`            | ERC-4626 collateral vault         | [`0xb627...86ef`](https://sepolia.arbiscan.io/address/0xb62762000686a9589b01d63ba7e50f51f46a86ef) |
-| `Plinth`            | Portfolio margin engine           | [`0xe01d...a26c`](https://sepolia.arbiscan.io/address/0xe01d09edcf889bf5577666f0aa61f5701c72a26c) |
-| `Sigil`             | Agent mandate registry            | [`0x517a...9cdc`](https://sepolia.arbiscan.io/address/0x517afac9b39c01c0cf044b335742c95960959cdc) |
-| `Vigil`             | Liquidation controls              | [`0x5e09...a194`](https://sepolia.arbiscan.io/address/0x5e099faf4fbc70832ea5e12178a9f9dec96ba194) |
-| `AtriumRouter`      | Margin to vault to adapter router | [`0xE3E3...B562`](https://sepolia.arbiscan.io/address/0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562) |
-| `LanternAttestor`   | Proof-of-reserves attestor        | [`0xF0B9...5888`](https://sepolia.arbiscan.io/address/0xF0B90b94C0B8a52c545768bFf06a3932c67d5888) |
-| `PosternKillSwitch` | One-tx revoke path                | [`0xCD89...b0b7`](https://sepolia.arbiscan.io/address/0xCD899f715462A33Ae880310d72b37bde102ab0b7) |
+**Robinhood Chain testnet (chainId 46630).** The full core stack, mirrored on the chain tokenized equities will trade on.
 
-Example on-chain money-path transactions:
+| Contract | Address |
+| --- | --- |
+| `Plinth` | `0xa08ba28ef31658df67e874dd2bf8a2b2d34597fa` |
+| `Coffer` | `0x71d872bd76738887415439a7fc0a1acbc4218fbc` |
+| `Sigil` | `0xede8444c622b8ae28364e86784749744bd0a1c23` |
+| `AtriumRouter` | `0xB90a51A726740065BD0DbC20cD79306b30D8b676` |
 
-| Action                       | Transaction                                                                                                          |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Deposit from the mobile flow | [`0x8c8d...0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
-| Withdraw from Coffer         | [`0x976e...ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
+**Money-path transactions you can open**
 
-## Verify it yourself
+| Action | Transaction |
+| --- | --- |
+| Deposit into Coffer | [`0x8c8d...0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
+| Withdraw from Coffer | [`0x976e...ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
 
-These checks avoid screenshots and marketing copy. They read the deployed system.
+Six core and adapter contracts carry an `exact_match` verification on [Sourcify](https://sourcify.dev). Paste any address above to read the source against the deployed bytecode.
 
-```bash
-# 1. Read Coffer's testnet reserves directly from Arbitrum Sepolia.
-cast call 0xb62762000686a9589b01d63ba7e50f51f46a86ef "totalAssets()(uint256)" \
-  --rpc-url https://arbitrum-sepolia.publicnode.com
+---
 
-# 2. Compare with the public app API.
-curl -s https://www.useatrium.me/api/vault/stats
-
-# 3. Run the pinned margin-saving test.
-cd contracts/plinth
-cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture
-```
-
-The margin test checks a canonical equal-size hedge and guards the expected saving band. The illustrative dollar examples in the product are labelled as examples, not live measured capital.
-
-## Judge demo path
-
-For a fast evaluation, use the hosted app:
-
-1. Open [`useatrium.me`](https://www.useatrium.me).
-2. Connect a test wallet on Arbitrum Sepolia.
-3. Claim testnet funds from the faucet if needed.
-4. Deposit USDC into Coffer.
-5. View portfolio, margin, reserves, and deployment status.
-6. Walk the Verifier route at [`/verify`](https://www.useatrium.me/verify).
-7. Issue or inspect an agent mandate.
-8. Revoke active delegations with the kill switch.
-9. Open [`/docs/honesty`](https://www.useatrium.me/docs/honesty) to see every testnet limitation.
-
-The project should be judged as a deployed testnet protocol, not as a mainnet venue with real economic funds.
-
-## Local development
+## Run it locally
 
 ```bash
 git clone https://github.com/Pratiikpy/atrium.git atrium
 cd atrium
 pnpm install
-pnpm dev
+pnpm dev          # then open http://localhost:3000
 ```
 
-Then open `http://localhost:3000`.
-
-For the full local stack on Linux, macOS, or WSL:
+Full local stack on Linux, macOS, or WSL:
 
 ```bash
 make demo
 ```
 
-On stock Windows, use the frontend path:
+Frontend-only on stock Windows:
 
 ```bash
 make demo-frontend
 ```
 
-The Stylus contracts require a toolchain that can link Stylus WASM host symbols. Linux, macOS, and WSL are the reliable contract-development environments.
+The Stylus contracts need a toolchain that links the Stylus WASM host symbols. Linux, macOS, and WSL are the reliable environments for contract work.
 
-## Verification
+### Verify the build
 
 ```bash
 pnpm --filter @atrium/verify type-check
@@ -258,59 +251,65 @@ cargo test --workspace
 node scripts/run-kani.mjs
 ```
 
-Full repo check:
+The frontend follows one rule: a number on screen is live, signed, derived from a named source, or clearly marked as pending, illustrative, or unavailable. Nothing in between.
 
-```bash
-make test
-```
-
-The frontend follows an honesty rule: a displayed number is either live, signed, derived from a named source, or clearly marked as pending / illustrative / unavailable.
+---
 
 ## Repository map
 
 ```text
 atrium/
-├── apps/verify/              # Next.js app and verifier surface
+├── apps/verify/              # Next.js app and the verifier surface
 ├── contracts/
-│   ├── plinth/               # Portfolio margin engine, Stylus / Rust
-│   ├── coffer/               # ERC-4626 collateral vault, Stylus / Rust
-│   ├── sigil/                # EIP-712 mandate registry, Stylus / Rust
-│   ├── vigil/                # Liquidation controls, Stylus / Rust
-│   ├── aqueduct/             # Chainlink CCIP bridge, Solidity
-│   ├── postern-kill-switch/  # Emergency revoke path, Solidity
-│   ├── portico-registry/     # Adapter registry, Solidity
+│   ├── plinth/               # Portfolio margin engine        Rust / Stylus
+│   ├── coffer/               # ERC-4626 collateral vault       Rust / Stylus
+│   ├── sigil/                # EIP-712 mandate registry        Rust / Stylus
+│   ├── vigil/                # Liquidation controls            Rust / Stylus
+│   ├── aqueduct/             # Chainlink CCIP bridge           Solidity
+│   ├── postern-kill-switch/  # Emergency revoke path           Solidity
+│   ├── portico-registry/     # Adapter registry                Solidity
 │   └── adapters/             # Venue adapters
 ├── agents/                   # Reference agents
 ├── services/                 # Codex API, Lantern attestor, keepers, notifier, tablet
 ├── subgraph/                 # Scribe indexer
 ├── tests/                    # Integration and adapter-conformance tests
-├── docs/                     # Architecture, deployment, development docs
+├── docs/                     # Architecture, deployment, conventions
 ├── audits/                   # Security and quality review notes
 └── runbooks/                 # Operational procedures
 ```
 
+---
+
+## For different readers
+
+| You are | Start here |
+| --- | --- |
+| A judge | [Read this in 30 seconds](#read-this-in-30-seconds), then [Do not trust this page](#do-not-trust-this-page-check-it) |
+| A protocol engineer | [Why the engine runs in Rust](#why-the-engine-runs-in-rust), then [System map](#system-map) |
+| A security reviewer | [What is live, what is mocked](#what-is-live-what-is-mocked), [`SECURITY.md`](./SECURITY.md) |
+| A builder | [`IPorticoAdapter`](./tests/adapter-conformance/) and [Contributing](#contributing) |
+
 ## Documentation
 
-| Document                                                                 | Purpose                                             |
-| ------------------------------------------------------------------------ | --------------------------------------------------- |
-| [`PITCH.md`](./PITCH.md)                                                 | The product thesis and judge-facing narrative       |
-| [`ARCHITECTURE.md`](./ARCHITECTURE.md)                                   | Full system architecture and deployment map         |
-| [`docs/deployment.md`](./docs/deployment.md)                             | Generated Arbitrum Sepolia deployment registry      |
-| [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json) | Robinhood Chain testnet deployment registry         |
-| [`docs/development.md`](./docs/development.md)                           | Local setup and development notes                   |
-| [`docs/conventions/`](./docs/conventions/)                               | Security, testing, UI, writing, and git conventions |
-| [`SECURITY.md`](./SECURITY.md)                                           | Responsible disclosure policy                       |
+| Document | Purpose |
+| --- | --- |
+| [`PITCH.md`](./PITCH.md) | Product thesis and judge-facing narrative |
+| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Full system architecture and deployment map |
+| [`docs/deployment.md`](./docs/deployment.md) | Generated Arbitrum Sepolia registry |
+| [`deployments/robinhood_chain.json`](./deployments/robinhood_chain.json) | Robinhood Chain testnet registry |
+| [`docs/conventions/`](./docs/conventions/) | Security, testing, UI, writing, and git conventions |
+| [`SECURITY.md`](./SECURITY.md) | Responsible disclosure policy |
 
 ## Security
 
-Atrium is testnet-only and does not support real-value user funds. Contracts are upgradeable during testnet development. Sensitive controls, governance assumptions, and testnet limitations are disclosed in the public docs rather than hidden behind marketing copy.
-
-Report vulnerabilities to [`security@useatrium.me`](mailto:security@useatrium.me). For sensitive reports, use a confidential GitHub Security Advisory.
+Atrium is testnet-only and supports no real-value funds. Contracts are upgradeable during testnet development. Governance assumptions and every testnet limitation sit in the public docs, not behind marketing copy. Report vulnerabilities to [`security@useatrium.me`](mailto:security@useatrium.me), or through a confidential GitHub Security Advisory for sensitive reports.
 
 ## Contributing
 
-The `IPorticoAdapter` interface is open. Build an adapter for a venue, contribute a reference agent, or improve the verifier surface. Adapter contributions should pass the conformance tests in [`tests/adapter-conformance/`](./tests/adapter-conformance/).
+The `IPorticoAdapter` interface is open. Write an adapter for a venue, contribute a reference agent, or sharpen the verifier surface. Adapter contributions pass the conformance tests in [`tests/adapter-conformance/`](./tests/adapter-conformance/).
 
 ## License
 
-Atrium code is MIT licensed. See [`LICENSE`](./LICENSE). Third-party dependencies and cloned reference repositories under `resources/` retain their original licenses.
+MIT, see [`LICENSE`](./LICENSE). Third-party dependencies and the cloned reference repositories under `resources/` keep their original licenses.
+
+<div align="center"><br /><sub>Built on Arbitrum. Testnet only. Verify everything.</sub></div>
