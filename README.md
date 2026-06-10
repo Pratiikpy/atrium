@@ -17,7 +17,7 @@ Post collateral once. Hedge across venues. One on-chain engine prices the whole 
 [![Verified](https://img.shields.io/badge/Sourcify-6%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
 [![Status](https://img.shields.io/badge/testnet-only-6B6259?style=flat-square)](#what-is-live-what-is-mocked)
 
-**[Open the app](https://www.useatrium.me)** · [Pitch](https://www.useatrium.me/pitch) · [Architecture](https://www.useatrium.me/architecture) · [Verifier](https://www.useatrium.me/verify) · [What is mock, what is real](https://www.useatrium.me/docs/honesty)
+**[Open the app](https://www.useatrium.me)** · [Judge brief (Notion)](https://comfortable-goal-205.notion.site/Atrium-37b9c0ce7876809387c7c1a6cd95ae0e) · [Proof deck](https://www.useatrium.me/proof-deck.html) · [Pitch](https://www.useatrium.me/pitch) · [Architecture](https://www.useatrium.me/architecture) · [Verifier](https://www.useatrium.me/verify) · [What is mock, what is real](https://www.useatrium.me/docs/honesty)
 
 <br />
 
