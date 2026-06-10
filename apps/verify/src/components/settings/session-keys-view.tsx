@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useContractAddress } from '@/lib/use-coffer-address';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { arbiscanAddressUrl, arbiscanTxUrl } from '@/lib/arbiscan';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
@@ -67,6 +68,8 @@ export function SessionKeysView() {
   const { address: account } = useAccount();
   const { data: registryAddress } = useContractAddress('postern-key-registry');
   const { writeContractAsync } = useWriteContract();
+  // Launch-QA: block the clean-expired write on the wrong network.
+  const { ok: chainOk } = useChainGuard();
   const [clean, setClean] = useState<
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -102,6 +105,10 @@ export function SessionKeysView() {
   async function cleanExpired() {
     if (!account || !registryAddress) {
       setClean({ kind: 'error', reason: 'wallet_not_connected' });
+      return;
+    }
+    if (!chainOk) {
+      setClean({ kind: 'error', reason: 'wrong_network' });
       return;
     }
     setClean({ kind: 'submitting' });

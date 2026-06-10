@@ -39,6 +39,7 @@ export function humanizeWalletError(error: unknown): { message: string; raw?: st
 
   // App-specific codes
   if (raw === 'wallet_not_connected') return { message: 'Connect wallet first' };
+  if (raw === 'wrong_network') return { message: 'Switch to Arbitrum Sepolia first' };
   if (raw === 'coffer_not_deployed') return { message: 'Coffer is not deployed on this network' };
   if (raw === 'sigil_not_deployed') return { message: 'Sigil is not deployed on this network' };
   if (raw === 'router_not_deployed') return { message: 'Router is not deployed on this network' };

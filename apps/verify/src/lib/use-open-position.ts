@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
 import { VENUES } from '@/lib/venues';
@@ -75,10 +76,17 @@ export function useOpenPosition() {
   const [status, setStatus] = useState<OpenStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
   const config = useConfig();
+  // Launch-QA: block the write when the wallet is on the wrong network so the
+  // tx is never built on the wrong chain (see use-chain-guard).
+  const { ok: chainOk } = useChainGuard();
 
   async function open(params: { venue: string; side: 'long' | 'short'; sizeUsd: string }) {
     if (!account) {
       setStatus({ kind: 'error', reason: 'wallet_not_connected' });
+      return;
+    }
+    if (!chainOk) {
+      setStatus({ kind: 'error', reason: 'wrong_network' });
       return;
     }
     const parsed = (() => {

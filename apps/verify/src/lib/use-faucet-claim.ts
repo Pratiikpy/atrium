@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useChainGuard } from '@/lib/use-chain-guard';
 
 /**
  * Faucet claim hook (114-PM3.3 fix).
@@ -49,6 +50,8 @@ export function useFaucetClaim() {
   const { address: account } = useAccount();
   const [status, setStatus] = useState<FaucetClaimStatus>({ kind: 'idle' });
   const { writeContractAsync } = useWriteContract();
+  // Launch-QA: never submit the claim on the wrong network.
+  const { ok: chainOk } = useChainGuard();
 
   const claimingHash = status.kind === 'claiming' ? status.hash : undefined;
   const receipt = useWaitForTransactionReceipt({
@@ -66,6 +69,10 @@ export function useFaucetClaim() {
   async function claim() {
     if (!account) {
       setStatus({ kind: 'error', reason: 'wallet_not_connected' });
+      return;
+    }
+    if (!chainOk) {
+      setStatus({ kind: 'error', reason: 'wrong_network' });
       return;
     }
     setStatus({ kind: 'resolving' });

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
 import { waitForTransactionReceipt } from 'wagmi/actions';
 import { useContractAddress } from '@/lib/use-coffer-address';
+import { useChainGuard } from '@/lib/use-chain-guard';
 
 /**
  * Postern Kill Switch, the single button that revokes every Sigil mandate
@@ -69,10 +70,17 @@ export function useKillSwitch(killSwitchAddress: `0x${string}` | null) {
   // Owner-direct mandate revocation needs the live Sigil address (see the
   // SIGIL_REVOKE_ALL_ABI note for why we revoke owner-direct, not via Postern).
   const { data: sigilAddress } = useContractAddress('sigil');
+  // Launch-QA: a revoke on the wrong chain is a no-op (the user thinks they
+  // revoked but did not). Block it before submitting.
+  const { ok: chainOk } = useChainGuard();
 
   async function activate() {
     if (!account) {
       setStatus({ kind: 'error', reason: 'wallet_not_connected' });
+      return;
+    }
+    if (!chainOk) {
+      setStatus({ kind: 'error', reason: 'wrong_network' });
       return;
     }
     if (!killSwitchAddress) {
