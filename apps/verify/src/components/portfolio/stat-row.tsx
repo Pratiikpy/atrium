@@ -10,7 +10,7 @@ import { HelpTip } from '@/components/ui/help-tip';
  * top section. Four big stacked cards with Geist 500 bold-sans numbers
  * and concrete trader labels:
  *   - BUYING POWER       (PRIMARY), at 3.0x portfolio margin
- *   - TOTAL COLLATERAL  , across N live venues
+ *   - TOTAL COLLATERAL  , margin scope (N venues)
  *   - OPEN NOTIONAL     , % utilisation
  *   - P&L · 24H         , % on collateral (green/red)
  *
@@ -77,7 +77,7 @@ export function PortfolioStatRow() {
         value={data?.totalCollateralUsd ?? null}
         sub={
           sourceLive
-            ? `Across ${VENUE_COUNT} live venues`
+            ? `Margin scope · ${VENUE_COUNT} venues`
             : 'Plinth pending'
         }
         loading={isLoading}
