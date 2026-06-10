@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Atrium · proof deck — every flow, proven on-chain</title>
 <meta name="description" content="Every Atrium user flow proven end-to-end with a real Rabby wallet on Arbitrum Sepolia. This page verifies its own on-chain transactions live, in your browser.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* Self-hosted fonts (OFL): the site CSP intentionally blocks Google Fonts
+   (style-src 'self'), matching the app's next/font self-hosting. */
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(/proof/fonts/instrument-serif-normal.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url(/proof/fonts/instrument-serif-italic.woff2) format('woff2')}
+@font-face{font-family:'Geist';font-style:normal;font-weight:400 600;font-display:swap;src:url(/proof/fonts/geist.woff2) format('woff2')}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:400 500;font-display:swap;src:url(/proof/fonts/geist-mono.woff2) format('woff2')}
 :root{
   --parchment:#FBFAF7;--parchment-soft:#F4F1EA;--ink:#1A1714;--ink-soft:#4A453E;--muted:#8A837A;
   --divider:rgba(26,23,20,.10);--card:#FFFDF9;--green:oklch(0.55 0.13 145);--green-soft:oklch(0.55 0.13 145/.10);
@@ -257,7 +261,8 @@ const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){cons
 acts.forEach(s=>spy.observe(s));
 
 // ---- live on-chain self-verification ----
-const RPCS=['https://sepolia-rollup.arbitrum.io/rpc','https://arbitrum-sepolia.publicnode.com'];
+// publicnode only: it is the RPC the site CSP connect-src allows
+const RPCS=['https://arbitrum-sepolia.publicnode.com'];
 async function rpc(method,params){
   for(const url of RPCS){
     try{

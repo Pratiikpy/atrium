@@ -68,7 +68,10 @@ export const wagmiConfig = createConfig({
     injected({ shimDisconnect: true }),
     coinbaseWallet({
       appName: 'Atrium',
-      preference: 'smartWalletOnly',
+      // telemetry:false stops the SDK's load-time analytics beacon; the CSP
+      // blocks its endpoint anyway, which surfaced as a console TypeError on
+      // every /app page (privacy stance unchanged, just no failed fetch).
+      preference: { options: 'smartWalletOnly', telemetry: false },
     }),
   ],
   transports: {
