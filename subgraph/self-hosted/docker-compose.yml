@@ -1,0 +1,67 @@
+# Self-hosted Scribe indexer (graph-node + postgres + ipfs).
+#
+# Why this exists: Atrium's subgraph (Scribe) was hosted on The Graph Studio's
+# free testnet tier, which has repeatedly frozen its indexer + 504'd its deploy
+# endpoint (see launch-QA 2026-06-10). Per CLAUDE.md ("prefer self-hosting on the
+# $5 VPS, free tier is the design constraint"), this removes that dependency: a
+# graph-node we control reads Arbitrum Sepolia directly, so it cannot freeze the
+# way Studio did.
+#
+# Local (prove it):   docker compose up -d   then ../deploy-self-hosted.sh
+# Production (VPS):    copy this dir to the $5 VPS, set ETHEREUM_RPC to a real
+#                      archive RPC (Alchemy/Infura free tier indexes far faster
+#                      than the public node), docker compose up -d, deploy, then
+#                      point prod SCRIBE_URL at http://<vps-ip>:8000/subgraphs/name/atrium-local
+services:
+  graph-node:
+    image: graphprotocol/graph-node:v0.35.1
+    ports:
+      - '8000:8000'  # GraphQL (queries) -> SCRIBE_URL points here
+      - '8020:8020'  # JSON-RPC (deploy)
+      - '8030:8030'  # subgraph indexing status
+      - '8040:8040'  # metrics
+    depends_on:
+      ipfs:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      postgres_host: postgres
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: 'ipfs:5001'
+      # network name MUST match subgraph.yaml `network: arbitrum-sepolia`
+      ethereum: 'arbitrum-sepolia:${ETHEREUM_RPC:-https://arbitrum-sepolia.publicnode.com}'
+      GRAPH_LOG: info
+      ETHEREUM_POLLING_INTERVAL: '1000'
+    restart: unless-stopped
+  ipfs:
+    image: ipfs/kubo:v0.18.1
+    ports:
+      - '5001:5001'
+    volumes:
+      - ./data/ipfs:/data/ipfs
+    restart: unless-stopped
+  postgres:
+    image: postgres:15
+    ports:
+      - '5432:5432'
+    command:
+      - postgres
+      - -cshared_preload_libraries=pg_stat_statements
+      - -cmax_connections=200
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U graph-node']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
