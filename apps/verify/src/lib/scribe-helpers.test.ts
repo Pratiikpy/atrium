@@ -24,6 +24,7 @@ import { gql, ScribeNotConfigured } from './scribe-helpers';
 
 const originalFetch = global.fetch;
 const originalScribeUrl = process.env.NEXT_PUBLIC_SCRIBE_URL;
+const originalServerScribeUrl = process.env.SCRIBE_URL;
 
 beforeEach(() => {
   global.fetch = vi.fn();
@@ -31,6 +32,9 @@ beforeEach(() => {
   // is unset (or still on the PLACEHOLDER URL). Tests need a real-looking
   // URL so the call reaches the fetch mock. Restored in afterEach so the
   // test that EXPLICITLY tests the unconfigured path can clear the env.
+  // SCRIBE_URL (the server-only override) is cleared so the local shell's
+  // .env value cannot leak into tests and shadow NEXT_PUBLIC_SCRIBE_URL.
+  delete process.env.SCRIBE_URL;
   process.env.NEXT_PUBLIC_SCRIBE_URL = 'https://test-scribe.example.invalid/graphql';
 });
 
@@ -38,6 +42,8 @@ afterEach(() => {
   global.fetch = originalFetch;
   if (originalScribeUrl === undefined) delete process.env.NEXT_PUBLIC_SCRIBE_URL;
   else process.env.NEXT_PUBLIC_SCRIBE_URL = originalScribeUrl;
+  if (originalServerScribeUrl === undefined) delete process.env.SCRIBE_URL;
+  else process.env.SCRIBE_URL = originalServerScribeUrl;
   vi.restoreAllMocks();
 });
 
@@ -196,5 +202,16 @@ describe('gql(), iteration 41: PLACEHOLDER env detection', () => {
       'https://api.studio.thegraph.com/query/PLACEHOLDER/atrium/version/latest';
     await expect(gql('query { x }')).rejects.toBeInstanceOf(ScribeNotConfigured);
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('prefers the server-only SCRIBE_URL over NEXT_PUBLIC_SCRIBE_URL', async () => {
+    // Self-hosted cutover (2026-06-10): server routes read SCRIBE_URL (the
+    // droplet graph-node); the NEXT_PUBLIC var stays a legacy fallback.
+    process.env.SCRIBE_URL = 'https://server-scribe.example.invalid/graphql';
+    (global.fetch as any).mockResolvedValue(
+      new Response(JSON.stringify({ data: { ok: true } }), { status: 200 }),
+    );
+    await gql('query { x }');
+    expect((global.fetch as any).mock.calls[0][0]).toBe('https://server-scribe.example.invalid/graphql');
   });
 });

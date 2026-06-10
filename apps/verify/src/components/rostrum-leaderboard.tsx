@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { gql } from '@/lib/scribe-helpers';
 
 interface Agent {
   id: string;
@@ -11,22 +10,16 @@ interface Agent {
   lastActionTimestamp: string;
 }
 
-const QUERY = `
-  query Leaderboard {
-    agents(first: 100, orderBy: totalPnlSigned, orderDirection: desc, where: { totalActionsCount_gte: "10" }) {
-      id
-      totalActionsCount
-      totalPnlSigned
-      reputationScore
-      lastActionTimestamp
-    }
-  }
-`;
-
 async function fetchLeaderboard(): Promise<Agent[]> {
+  // Reads Scribe through the server proxy (/api/agents/leaderboard): the
+  // indexer endpoint is a server-only env (SCRIBE_URL), never fetched from
+  // the browser. The route returns an honest empty list until real Rostrum
+  // rankings exist, which renders this component's empty state.
   try {
-    const data = await gql<{ agents: Agent[] }>(QUERY);
-    return data.agents;
+    const res = await fetch('/api/agents/leaderboard');
+    if (!res.ok) return [];
+    const data = (await res.json()) as { agents?: Agent[] };
+    return data.agents ?? [];
   } catch {
     return [];
   }
@@ -119,9 +112,9 @@ export function RostrumLeaderboard() {
               </td>
               <td className="py-3 pr-6">
                 <details>
-                  <summary className="cursor-pointer text-xs text-muted hover:text-ink">view query</summary>
+                  <summary className="cursor-pointer text-xs text-muted hover:text-ink">view source</summary>
                   <pre className="mt-2 max-w-md whitespace-pre-wrap rounded-md bg-parchment-soft p-2 font-mono text-[10px] text-ink-soft">
-                    {QUERY.trim()}
+                    GET /api/agents/leaderboard (Rostrum reputation via Scribe, server-side)
                   </pre>
                 </details>
               </td>

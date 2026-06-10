@@ -44,8 +44,10 @@ describe('GET /api/cohort/partners: happy path', () => {
     const json = await res.json();
     expect(json.source).toBe('scribe');
     expect(json.partners).toHaveLength(2);
-    expect(json.partners[0]).toEqual({ id: '0xaaaa', name: 'Acme Markets' });
-    expect(json.partners[1]).toEqual({ id: '0xbbbb', name: 'Cohort Partner B' });
+    // Full Scribe row rides along (cohort-grid reads through this proxy);
+    // `name` stays the derived display field.
+    expect(json.partners[0]).toEqual({ id: '0xaaaa', displayName: 'Acme Markets', name: 'Acme Markets' });
+    expect(json.partners[1]).toEqual({ id: '0xbbbb', displayName: 'Cohort Partner B', name: 'Cohort Partner B' });
   });
 
   it('falls back to id.slice(0, 10) when displayName is null', async () => {

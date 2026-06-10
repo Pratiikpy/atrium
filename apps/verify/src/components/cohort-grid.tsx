@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { gql, type CohortPartner } from '@/lib/scribe-helpers';
+import type { CohortPartner } from '@/lib/scribe-helpers';
 import { parseTsOrNull } from '@/lib/format-time';
 
 /**
@@ -32,20 +32,13 @@ function formatScribeUsdc(s: string | null | undefined): string {
 }
 
 async function fetchPartners(): Promise<CohortPartner[]> {
+  // Reads Scribe through the server proxy: the indexer endpoint is a
+  // server-only env (SCRIBE_URL), never fetched from the browser.
   try {
-    const data = await gql<{ cohortPartners: CohortPartner[] }>(`
-      query Cohort {
-        cohortPartners(orderBy: joinedAtTimestamp, orderDirection: desc) {
-          id
-          displayName
-          joinedAtTimestamp
-          totalDepositsWei
-          totalTradesCount
-          lastActionTimestamp
-        }
-      }
-    `);
-    return data.cohortPartners;
+    const res = await fetch('/api/cohort/partners');
+    if (!res.ok) return [];
+    const data = (await res.json()) as { partners?: CohortPartner[] };
+    return data.partners ?? [];
   } catch {
     return [];
   }

@@ -28,13 +28,18 @@ export interface CohortPartner {
 const PLACEHOLDER_FALLBACK = 'https://api.studio.thegraph.com/query/PLACEHOLDER/atrium/version/latest';
 
 function resolveScribeUrl(): string {
-  return process.env.NEXT_PUBLIC_SCRIBE_URL ?? PLACEHOLDER_FALLBACK;
+  // Server-only SCRIBE_URL wins: the self-hosted graph-node is a plain-http
+  // droplet endpoint the browser must never call directly (mixed content +
+  // CSP). Next only inlines NEXT_PUBLIC_* into the client bundle, so this
+  // branch is server-exclusive; NEXT_PUBLIC_SCRIBE_URL stays as the legacy
+  // fallback. Browser surfaces read Scribe through /api proxies only.
+  return process.env.SCRIBE_URL ?? process.env.NEXT_PUBLIC_SCRIBE_URL ?? PLACEHOLDER_FALLBACK;
 }
 
 export class ScribeNotConfigured extends Error {
   constructor() {
     super(
-      'NEXT_PUBLIC_SCRIBE_URL is not set; gql calls will fail. ' +
+      'Neither SCRIBE_URL nor NEXT_PUBLIC_SCRIBE_URL is set; gql calls will fail. ' +
         'See `apps/verify/src/lib/scribe-helpers.ts` for the config requirement.',
     );
     this.name = 'ScribeNotConfigured';
