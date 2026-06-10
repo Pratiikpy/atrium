@@ -48,6 +48,13 @@ export function humanizeWalletError(error: unknown): { message: string; raw?: st
   if (raw === 'invalid_amount') return { message: 'Enter a positive amount' };
   if (raw === 'invalid_size') return { message: 'Enter a positive size' };
   if (raw === 'nothing_to_revoke') return { message: 'No active mandates to revoke' };
+  // On-chain RESULT codes: the wallet is fine, the tx reverted. The generic
+  // default below says "check your wallet", which misdirects here (a human
+  // whose open/close/claim reverted has no wallet problem). Launch-QA: name
+  // the real cause instead.
+  if (raw === 'transaction_reverted') return { message: 'Transaction reverted on-chain, try again' };
+  if (raw === 'faucet_claim_reverted') return { message: 'Faucet claim reverted, you may be on cooldown' };
+  if (raw === 'faucet_not_deployed') return { message: 'Faucet is not deployed on this network' };
 
   // Default
   if (raw.length > 0) {
