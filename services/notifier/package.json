@@ -13,7 +13,7 @@
     "lint": "eslint src --ext .ts --max-warnings=100"
   },
   "dependencies": {
-    "@sentry/node": "^10.53.1",
+    "@sentry/node": "^10.56.0",
     "viem": "^2.21.0"
   },
   "devDependencies": {
