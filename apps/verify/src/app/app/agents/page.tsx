@@ -2,6 +2,7 @@ import nextDynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { AgentsStatRow } from '@/components/agents/stat-row';
+import { EnforcementProofCard } from '@/components/agents/enforcement-proof-card';
 import { AgentsView } from '@/components/agents/agents-view';
 import { AgentsMobile } from '@/components/mobile/panels/agents-mobile';
 
@@ -57,6 +58,13 @@ export default function AgentsPage() {
 
       <section className="mt-8">
         <AgentsStatRow />
+      </section>
+
+      {/* Enforcement proof (2026-06-10): four real on-chain txs showing the
+          mandate is enforced by the risk engine. Recorded demonstration,
+          clickable on Arbiscan. See enforcement-proof-card.tsx. */}
+      <section className="mt-6">
+        <EnforcementProofCard />
       </section>
 
       <section className="mt-6">
