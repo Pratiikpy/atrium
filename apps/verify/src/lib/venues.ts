@@ -8,6 +8,13 @@
  *
  * RH-Chain is listed as an 8th planned adapter pending the public SDK
  * (per `human_left.md` #3); it is omitted from VENUES until it ships.
+ *
+ * Scope note (Launch-QA): VENUES is the MARGIN-SCOPE venue set (7). `/app/markets`
+ * shows a different, intentional lens, the 9 deployed Portico ADAPTERS (its const
+ * is named ADAPTERS, not VENUES, to avoid shadowing this one). The two differ
+ * because the Hyperliquid adapter backs two venues (HIP-3 + HIP-4) and three
+ * adapters (gmx/morpho/synthetix) are deployed scaffolds not yet in margin scope.
+ * /architecture states the same "9 adapters / 7 margin scope" split.
  */
 export interface Venue {
   /** Stable id used in URLs and Plinth's venue_id mapping. */

@@ -2,19 +2,23 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { StrategyCombos } from '@/components/markets/strategy-combos';
 import { MarketsMobile } from '@/components/mobile/panels/markets-mobile';
+import { VENUE_COUNT } from '@/lib/venues';
 
 export const metadata = {
   title: 'Markets',
   description: 'Every Portico-whitelisted instrument. Haircut, correlation class, oracle source.',
 };
 
-// Audit 2026-05-24 H-1 (Auditor B) fix: prior list shipped 6 of 9 deployed
-// adapters. The missing three (gmx, morpho, synthetix) all have registry
-// entries at deployments/arbitrum_sepolia.json and are referenced from the
-// /api/deployments/address allowlist. Each adapter slug maps to its
-// Portico-whitelisted venue and gets a dedicated card here so the user
-// can see the full venue surface.
-const VENUES = [
+// Launch-QA (venue-count reconciliation): this list is the DEPLOYED-ADAPTER
+// surface (9 adapters with registry entries in deployments/arbitrum_sepolia.json),
+// NOT the canonical margin-scope venue set. The canonical venue list is
+// lib/venues.ts `VENUES` (VENUE_COUNT = 7 margin-scope venues; the Hyperliquid
+// adapter serves both HIP-3 and HIP-4). These are two intentional lenses, so
+// this const is named ADAPTERS to avoid shadowing the canonical VENUES, and the
+// heading below states "9 adapters / 7 in margin scope" the way /architecture does.
+// Audit 2026-05-24 H-1 (Auditor B): prior list shipped 6 of 9 deployed adapters;
+// gmx/morpho/synthetix were added (scaffold-only, open reverts ScaffoldNotImplemented).
+const ADAPTERS = [
   {
     name: 'Hyperliquid HIP-3',
     slug: 'adapter-hyperliquid',
@@ -110,11 +114,13 @@ export default function MarketsPage() {
       <div className="hidden md:block">
       <section>
         <p className="text-xs uppercase tracking-wider text-muted">Markets</p>
-        <h1 className="mt-2 font-display text-4xl text-ink">Whitelisted venues</h1>
+        <h1 className="mt-2 font-display text-4xl text-ink">Venue adapters</h1>
         <p className="mt-3 max-w-prose text-ink-soft">
-          Every venue ships with a Portico adapter whitelisted by 3-reviewer Curator
-          approval and a 48h Praetor timelock. Bytecode pinned by hash at registration
-          time. New adapters need community veto window before going live.
+          {ADAPTERS.length} Portico adapters are deployed and verified on Arbitrum Sepolia,
+          each whitelisted by 3-reviewer Curator approval and a 48h Praetor timelock, bytecode
+          pinned by hash at registration. Margin scope spans {VENUE_COUNT} venues today (the
+          Hyperliquid adapter serves both HIP-3 and HIP-4); only Aave Horizon is openable, the
+          rest are pending or scaffold-only as marked below.
         </p>
       </section>
 
@@ -125,7 +131,7 @@ export default function MarketsPage() {
             a testnet placeholder (deployer EOA), so an open reverts until a real
             or mock venue is wired (Curve/Pendle/Trade.xyz/Polymarket/Hyperliquid).
             Only Aave Horizon is mock-backed (MockAavePool) and demoable today. */}
-        {VENUES.map((v) => {
+        {ADAPTERS.map((v) => {
           const isScaffold = 'scaffold' in v && v.scaffold === true;
           const isPending = 'pendingVenue' in v && v.pendingVenue === true;
           const dim = isScaffold || isPending;
