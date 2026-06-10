@@ -242,12 +242,12 @@
       "kind": "solidity",
       "note": "DEPRECATED. Original 100-USDC drop was too large for the testnet refill cadence. Kept for reference; do not point UI at it."
     },
-    "atrium-router-v2-current-source": {
+    "atrium-router-v2-superseded": {
       "address": "0x09BE855e5CA0fB3c11c4D0d2708660Dcc963a004",
       "tx": "0xcd6b93bcd6c64f7cc7012f0b3f4f6f72efd9ba739b72a186ec403730293ac379",
       "kind": "solidity",
       "verified": true,
-      "note": "2026-06-02 redeploy from current audited source (5-arg, V11-routing, timelock-gated). plinth=LIVE 0xd86f579e, coffer=0xc7bf, registry=0x9a9af6e5, timelock=0x0dad24d7. Verified on Arbiscan. PENDING CUTOVER: adapters need setAuthorizedCaller(this) (onlyTimelock, 48h) + app/subgraph repoint before it is the live router. Do as part of the ~June-4 fill (task #432)."
+      "note": "SUPERSEDED. A 2026-06-02 router-replacement candidate (5-arg, V11-routing) that was never cut over. The live router is `atrium-router` 0xE3E3bdc0B7FC9eC93fb0d6190A98ec1717B0B562 (deployer-admin stack, cut over 2026-06-07). Its old companion addresses (plinth 0xd86f579e, coffer 0xc7bf) are also superseded. Kept for reference; do not point UI at it."
     }
   },
   "lastUpdated": "2026-05-30T12:34:21.142Z",
