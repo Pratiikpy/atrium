@@ -3,7 +3,8 @@ set -euo pipefail
 
 # Idempotent DigitalOcean droplet provisioning for Atrium daemons.
 # Prerequisites: doctl CLI installed, DIGITALOCEAN_ACCESS_TOKEN exported.
-# After this script: follow runbooks/do-droplet-setup.md to finish setup.
+# After this script: cloud-init (scripts/cloud-init-droplet.yml) finishes the
+# host setup; see subgraph/self-hosted/README.md for the indexer droplet flow.
 
 DROPLET_NAME="atrium-daemons-prod"
 REGION="nyc1"

@@ -15,7 +15,8 @@
 # (INVALID_ACTION_SIGIL) - the Sigil selector fix works; only the instrument
 # config + Coffer approval (these timelock ops) remain.
 set -uo pipefail
-export PATH="$PATH:/c/Users/prate/.foundry/bin"
+# foundry (cast/forge) must be on PATH; add your install dir if needed, e.g.:
+#   export PATH="$PATH:$HOME/.foundry/bin"
 cd "$(dirname "$0")/.."
 REPO="$(pwd)"; REPO_WIN=$(echo "$REPO" | sed 's|^/\([a-zA-Z]\)/|\1:/|')
 set -a; source .env 2>/dev/null; set +a

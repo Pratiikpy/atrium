@@ -1,17 +1,17 @@
-# Self-hosted Scribe (graph-node) — the permanent fix for Studio outages
+# Self-hosted Scribe (graph-node): the permanent fix for Studio outages
 
 Atrium's subgraph ("Scribe") was on **The Graph Studio's free testnet tier**, which on
 2026-06-10 **froze its indexer** (stuck at block 275099999 while the chain was at 275.76M)
-**and 504'd its deploy endpoint** — taking the flagship Proof-of-Reserves and on-chain
+**and 504'd its deploy endpoint**, taking the flagship Proof-of-Reserves and on-chain
 position lists stale. This is a recurring Studio failure (see the project memory).
 
 Per `CLAUDE.md` ("Free tier is the design constraint. If a service has no free tier, prefer
 self-hosting on the $5 VPS"), this directory runs a **graph-node we control**. It reads
-Arbitrum Sepolia directly via RPC, so it **cannot freeze the way Studio did** — if it falls
+Arbitrum Sepolia directly via RPC, so it **cannot freeze the way Studio did**: if it falls
 behind, it keeps catching up; it never depends on a third party's hosted indexer.
 
 Proven 2026-06-10: graph-node connected to Arbitrum Sepolia (network 421614, archive +
-traces), the subgraph deployed, and indexing started — all locally. (Local persistent run
+traces), the subgraph deployed, and indexing started, all locally. (Local persistent run
 is flaky only on **Windows Docker Desktop**; on a Linux VPS Docker is solid.)
 
 ## Deploy on the $5 VPS (production)
