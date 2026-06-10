@@ -53,10 +53,13 @@ code{font-family:var(--mono);font-size:.85em;background:var(--parchment-soft);pa
 .flow h3{font-family:var(--serif);font-weight:400;font-size:25px;letter-spacing:-.01em;margin:0 0 6px}
 .flow h3 .fn{font-family:var(--mono);font-size:13px;color:var(--green);margin-right:10px}
 .flow .lede{font-size:15.5px;color:var(--ink-soft);line-height:1.55;max-width:780px;margin:0 0 18px}
-.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
 figure.shot{margin:0;background:var(--card);border:1px solid var(--divider);border-radius:14px;overflow:hidden;cursor:zoom-in;transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s}
 figure.shot:hover{transform:translateY(-2px);box-shadow:0 12px 28px -12px rgba(26,23,20,.28)}
-figure.shot img{display:block;width:100%;height:auto;border-bottom:1px solid var(--divider)}
+figure.shot img{display:block;width:100%;height:auto;max-height:560px;object-fit:cover;object-position:top center;border-bottom:1px solid var(--divider)}
+figure.shot.card img{object-fit:contain;background:var(--parchment-soft)}
+figure.shot.wide img{max-height:520px;object-fit:contain;background:var(--parchment-soft)}
+.shots.duo .shot img{height:380px;max-height:380px}
 figure.shot figcaption{padding:11px 15px;font-size:13px;color:var(--ink-soft)}
 .tx{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:16px;background:var(--green-soft);border:1px solid color-mix(in oklch,var(--green),transparent 72%);border-radius:12px;padding:11px 16px;font-size:13.5px}
 .tx .lbl{color:var(--ink-soft)}
@@ -102,7 +105,7 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   </header>
 
   <div class="summary">
-    <div class="stat"><div class="k">Flows proven</div><div class="v">17</div><div class="s">connect → deposit → open → withdraw → delegate → verify → and more</div></div>
+    <div class="stat"><div class="k">Flows proven</div><div class="v">15</div><div class="s">connect → deposit → open → withdraw → delegate → verify → and more</div></div>
     <div class="stat"><div class="k">On-chain txs</div><div class="v">4</div><div class="s"><span class="live" id="vTxs">verifying live…</span></div></div>
     <div class="stat"><div class="k">Tests passing</div><div class="v">792</div><div class="s">unit + contract; core SPAN invariant Kani-proven</div></div>
     <div class="stat"><div class="k">Chain tip</div><div class="v" id="tipBig" style="font-size:24px;font-family:var(--mono)">…</div><div class="s"><span class="live" id="tipNote">reading live…</span></div></div>
@@ -119,8 +122,8 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="deposit"><h3><span class="fn">02</span>Deposit — collateral in</h3>
       <p class="lede">Enter an amount, approve USDC, deposit into the Coffer (ERC-4626) vault — two real Rabby confirmations. The balance moves for real: vault value <strong>$2.88 → $7.88</strong> (+$5), and ERC-4626 shares mint accordingly.</p>
-      <div class="shots">
-        <figure class="shot"><img src="/proof/02-deposit-sign.png" alt="Rabby deposit confirmation"><figcaption>Rabby confirms the deposit tx → Coffer.</figcaption></figure>
+      <div class="shots duo">
+        <figure class="shot card"><img src="/proof/02-deposit-sign.png" alt="Rabby deposit confirmation"><figcaption>Rabby confirms the deposit tx → Coffer.</figcaption></figure>
         <figure class="shot"><img src="/proof/03-deposit-after.png" alt="Vault after deposit"><figcaption>After: <strong>Your value $7.88</strong> · shares minted · "Deposit again".</figcaption></figure>
       </div>
       <div class="tx"><span class="lbl">approve</span><a href="https://sepolia.arbiscan.io/tx/0xb866ea0225d22112d3544f38ba605677da628a545ab8a0ad7fd27f9a062bfd50" target="_blank" rel="noopener">0xb866ea02…</a><span class="lbl">deposit</span><a href="https://sepolia.arbiscan.io/tx/0x488ca0f21fb02775a45ed7ac2c0852c539eb63097a7560baf364f9d54249fd26" target="_blank" rel="noopener">0x488ca0f2…</a><span class="live" data-tx="0x488ca0f21fb02775a45ed7ac2c0852c539eb63097a7560baf364f9d54249fd26"><span class="spark"></span>checking…</span></div>
@@ -128,8 +131,8 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="open"><h3><span class="fn">03</span>Open a position — on Aave</h3>
       <p class="lede">The trade form defaults to the openable venue (Aave Horizon), computes margin impact, and routes the open through AtriumRouter → Plinth → Coffer → adapter in one signed tx. On-chain, <code>getUserPositions(0x6821…)</code> returns <code>[6, 7, 8, 10, 11, 12]</code> and the account stays healthy.</p>
-      <div class="shots">
-        <figure class="shot"><img src="/proof/04-open-sign.png" alt="Rabby open confirmation"><figcaption>Rabby confirms <code>open_position_via_adapter</code> → AtriumRouter.</figcaption></figure>
+      <div class="shots duo">
+        <figure class="shot card"><img src="/proof/04-open-sign.png" alt="Rabby open confirmation"><figcaption>Rabby confirms <code>open_position_via_adapter</code> → AtriumRouter.</figcaption></figure>
         <figure class="shot"><img src="/proof/05-open-after.png" alt="Trade after open"><figcaption>Open succeeds; on-chain account collateral <code>$7.88</code>, healthy.</figcaption></figure>
       </div>
       <div class="tx"><span class="lbl">open · Router</span><a href="https://sepolia.arbiscan.io/tx/0xbf1bcc82de3af0217ea78ea7d3612d135920dbec81707db72233921b87afb765" target="_blank" rel="noopener">0xbf1bcc82…</a><span class="live" data-tx="0xbf1bcc82de3af0217ea78ea7d3612d135920dbec81707db72233921b87afb765"><span class="spark"></span>checking…</span></div>
@@ -137,8 +140,8 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="withdraw"><h3><span class="fn">04</span>Withdraw — collateral out</h3>
       <p class="lede">The round-trip closes: withdraw from the vault, one Rabby confirmation, balance moves back — vault value <strong>$7.57 → $6.57</strong> (-$1), shares burned via <code>convertToSharesCeil</code>.</p>
-      <div class="shots">
-        <figure class="shot"><img src="/proof/06-withdraw-sign.png" alt="Rabby withdraw confirmation"><figcaption>Rabby confirms the withdraw tx → Coffer.</figcaption></figure>
+      <div class="shots duo">
+        <figure class="shot card"><img src="/proof/06-withdraw-sign.png" alt="Rabby withdraw confirmation"><figcaption>Rabby confirms the withdraw tx → Coffer.</figcaption></figure>
         <figure class="shot"><img src="/proof/07-withdraw-after.png" alt="Vault after withdraw"><figcaption>After: <strong>Your value $6.57</strong> · "Withdraw again".</figcaption></figure>
       </div>
       <div class="tx"><span class="lbl">withdraw · Coffer</span><a href="https://sepolia.arbiscan.io/tx/0xa198767b42c109c5e2d8c7c6f5a6cacab8c0167ec290c58b5e91fd835840b585" target="_blank" rel="noopener">0xa198767b…</a><span class="live" data-tx="0xa198767b42c109c5e2d8c7c6f5a6cacab8c0167ec290c58b5e91fd835840b585"><span class="spark"></span>checking…</span></div>
@@ -146,12 +149,7 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="sign"><h3><span class="fn">05</span>Sign — a clean payload, never blind</h3>
       <p class="lede">Every write surface is chain-guarded — the tx is built only on the right network. Rabby shows the real payload: chain <code>421614</code>, the correct contract, decoded calldata, before the user signs.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/09-tx-popup.png" alt="Clean Rabby payload"><figcaption>Rabby review · chain <code>421614</code> → Coffer · decoded data · Sign enabled.</figcaption></figure></div>
-    </div>
-
-    <div class="flow" id="reject"><h3><span class="fn">06</span>Reject — an honest failure state</h3>
-      <p class="lede">Cancel in the wallet and the app says so plainly with a retry — no fake "submitted", no stuck spinner, no misleading "check your wallet". Rejected, approved, wrong-network, and refresh states are all handled.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/08-reject.png" alt="Rejected state"><figcaption>Rejected in Rabby → "Failed: Cancelled in wallet · retry".</figcaption></figure></div>
+      <div class="shots"><figure class="shot card"><img src="/proof/09-tx-popup.png" alt="Clean Rabby payload"><figcaption>Rabby review · chain <code>421614</code> → Coffer · decoded data · Sign enabled.</figcaption></figure></div>
     </div>
 
   </section>
@@ -160,24 +158,19 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   <section class="act" id="act-agentic">
     <div class="act-h"><span class="n">Act II</span><h2>Agentic &amp; trust</h2><span class="sub">delegate within limits · prove reserves · pay-per-call</span></div>
 
-    <div class="flow" id="mandate"><h3><span class="fn">07</span>Delegate to an agent — a signed mandate</h3>
-      <p class="lede">Issue an EIP-712 <em>Intent Sigil</em> that lets an AI agent trade within signed limits — per-action cap, total cap, actions/day, expiry, venue allowlist. Gasless to sign; the master key never moves; a one-tap kill switch revokes everything. The contract rejects anything outside the signed scope, on-chain.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/11-mandate.png" alt="New mandate form"><figcaption>EIP-712 mandate — agent, caps, actions/day, expiry, venue allowlist. Signed via Rabby.</figcaption></figure></div>
-    </div>
-
-    <div class="flow" id="por"><h3><span class="fn">08</span>Proof of Reserves — verify it yourself</h3>
+    <div class="flow" id="por"><h3><span class="fn">06</span>Proof of Reserves — verify it yourself</h3>
       <p class="lede">Atrium never custodies funds and proves it: Lantern publishes a signed Merkle attestation of every balance on-chain, and anyone generates an inclusion proof for their own balance in the browser — no trust required. Redeemable is a live read of <code>Coffer.convertToAssets(balanceOf(you))</code>.</p>
       <div class="shots"><figure class="shot"><img src="/proof/10-por.png" alt="Proof of Reserves"><figcaption>"Prove your balance to anyone in seconds." Redeemable read live on-chain.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="codex"><h3><span class="fn">09</span>x402 API — a live, pay-per-call console</h3>
+    <div class="flow" id="codex"><h3><span class="fn">07</span>x402 API — a live, pay-per-call console</h3>
       <p class="lede">Codex is an x402-payable read API: margin, risk, positions, venue health, agent performance, attestations. The docs ship a live try-it console; public endpoints answer in the browser, per-user endpoints honestly require a signed wallet.</p>
       <div class="shots"><figure class="shot"><img src="/proof/21-tryit.png" alt="x402 try-it console"><figcaption>Codex worker LIVE · the in-browser try-it calls the real read route.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="agents"><h3><span class="fn">10</span>Agents — enforcement, on-chain</h3>
-      <p class="lede">The agents surface shows real on-chain mandate enforcement — an agent acting under a signed mandate, and the contract rejecting an over-limit attempt (e.g. <code>NotionalExceeded</code>). The limits aren't UI theatre; they're enforced by Sigil on-chain.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/22-agents.png" alt="Agents enforcement"><figcaption>Agent mandate enforcement proof — signed scope enforced on-chain.</figcaption></figure></div>
+    <div class="flow" id="agents"><h3><span class="fn">08</span>Delegate to an agent — bounded, enforced on-chain</h3>
+      <p class="lede">A user signs one EIP-712 <em>Intent Sigil</em>; a separate agent session key signs each trade within the signed scope — per-action cap, total cap, actions/day, expiry, venue allowlist. The SPAN engine (Plinth, in Stylus) checks every action against the mandate before any funds move. Four real transactions prove it: in-scope is <strong>ALLOWED</strong>, over-cap reverts <code>NotionalExceeded</code> (<strong>BLOCKED</strong>), a one-tap kill switch revokes, and a post-revocation action reverts <code>MandateRevoked</code> (<strong>BLOCKED</strong>) — each clickable on Arbiscan.</p>
+      <div class="shots"><figure class="shot wide"><img src="/proof/22-agents.png" alt="On-chain agent-mandate enforcement"><figcaption>Recorded run · the mandate is the limit, not your trust · four real txs, ALLOWED / BLOCKED.</figcaption></figure></div>
     </div>
   </section>
 
@@ -185,22 +178,22 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   <section class="act" id="act-breadth">
     <div class="act-h"><span class="n">Act III</span><h2>Breadth — every surface works</h2><span class="sub">not a one-flow demo</span></div>
 
-    <div class="flow" id="transfer"><h3><span class="fn">11</span>Cross-chain transfer — CCIP</h3>
+    <div class="flow" id="transfer"><h3><span class="fn">09</span>Cross-chain transfer — CCIP</h3>
       <p class="lede">Move collateral across chains via Aqueduct (Chainlink CCIP). Enter an amount and the estimate (fee, destination, receive) renders live.</p>
       <div class="shots"><figure class="shot"><img src="/proof/14-transfer.png" alt="Cross-chain transfer"><figcaption>Aqueduct · CCIP transfer with a live estimate.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="markets"><h3><span class="fn">12</span>Markets — the cross-venue set</h3>
+    <div class="flow" id="markets"><h3><span class="fn">10</span>Markets — the cross-venue set</h3>
       <p class="lede">Nine Portico adapters deployed and verified; seven venues in margin scope. Each is honestly badged — only Aave is openable today; the rest are deployed-but-scaffolded and say so. A "two venues, one margin account" worked example shows the netting.</p>
       <div class="shots"><figure class="shot"><img src="/proof/15-markets.png" alt="Venue adapters"><figcaption>Venue adapters · 9 deployed / 7 in margin scope · honest per-venue status.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="onboarding"><h3><span class="fn">13</span>Onboarding — ninety seconds to a position</h3>
+    <div class="flow" id="onboarding"><h3><span class="fn">11</span>Onboarding — ninety seconds to a position</h3>
       <p class="lede">A new user: passkey, faucet (5 USDC + a gas grant so they're never stranded), first cross-margin position. Honest callouts throughout — "gas sponsorship is coming", "funds are testnet only".</p>
       <div class="shots"><figure class="shot"><img src="/proof/16-onboarding.png" alt="Onboarding"><figcaption>"Step inside the atrium." Clear value, honest callouts, dual CTAs.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="palette"><h3><span class="fn">14</span>Command palette — ⌘K navigation</h3>
+    <div class="flow" id="palette"><h3><span class="fn">12</span>Command palette — ⌘K navigation</h3>
       <p class="lede">A keyboard-first command palette jumps to any surface. Opens on click and ⌘K, filters, navigates — the small touches of a real product.</p>
       <div class="shots"><figure class="shot"><img src="/proof/17-palette.png" alt="Command palette"><figcaption>⌘K palette over the live portfolio · filter and jump.</figcaption></figure></div>
     </div>
@@ -210,17 +203,17 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
   <section class="act" id="act-resilience">
     <div class="act-h"><span class="n">Act IV</span><h2>Resilience — it doesn't break</h2><span class="sub">the parts judges try to break</span></div>
 
-    <div class="flow" id="apifail"><h3><span class="fn">15</span>Total backend outage — graceful</h3>
+    <div class="flow" id="apifail"><h3><span class="fn">13</span>Total backend outage — graceful</h3>
       <p class="lede">With the <em>entire</em> backend API aborted, the app degrades gracefully — no white screen, no <code>$NaN</code>, no crash. Honest empty/error states, real on-chain values where it can still read them.</p>
       <div class="shots"><figure class="shot"><img src="/proof/18-apifail.png" alt="API outage degradation"><figcaption>All <code>/api/*</code> aborted → still renders, honest, no crash.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="hostile"><h3><span class="fn">16</span>Hostile inputs — sanitized</h3>
+    <div class="flow" id="hostile"><h3><span class="fn">14</span>Hostile inputs — sanitized</h3>
       <p class="lede">Letters, symbols, negatives, scientific notation, huge values — every amount input sanitizes them, no <code>NaN</code>, no layout overflow, over-balance gated at submit.</p>
       <div class="shots"><figure class="shot"><img src="/proof/19-hostile.png" alt="Hostile input handling"><figcaption>Garbage in → sanitized; no NaN, no overflow.</figcaption></figure></div>
     </div>
 
-    <div class="flow" id="mobile"><h3><span class="fn">17</span>Smallest phone — 320px, flawless</h3>
+    <div class="flow" id="mobile"><h3><span class="fn">15</span>Smallest phone — 320px, flawless</h3>
       <p class="lede">At 320px (smaller than an iPhone SE), zero horizontal overflow, modals fit, nav works, focus rings visible on every tab. Many products break below 360px; Atrium holds.</p>
       <div class="shots"><figure class="shot"><img src="/proof/20-mobile.png" alt="320px mobile"><figcaption>320px · no overflow · usable.</figcaption></figure></div>
     </div>
