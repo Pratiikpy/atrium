@@ -7,6 +7,7 @@ import { formatUnits } from 'viem';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultWithdraw } from '@/lib/use-vault-withdraw';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { USDC_DECIMALS } from '@/lib/testnet-tokens';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
@@ -38,6 +39,10 @@ export function VaultWithdraw() {
   const { data: deployment } = useDeploymentStatus(1);
   const { data: cofferAddress } = useContractAddress('coffer');
   const { status, withdraw, reset } = useVaultWithdraw(cofferAddress ?? null);
+  // Launch-QA (real-Rabby): gate the write on the chain guard so a wallet on the
+  // wrong network can't submit a withdraw built on the wrong chain (the
+  // WrongChainBanner warned but the button did not enforce it).
+  const { ok: chainOk, switchChain } = useChainGuard();
 
   // Redeemable USDC = convertToAssets(balanceOf(user)). Gates over-balance.
   const { data: shares } = useReadContract({
@@ -74,7 +79,8 @@ export function VaultWithdraw() {
     !!address &&
     parseFloat(amount) >= 0.000001 &&
     !overBalance &&
-    !balanceUnverified;
+    !balanceUnverified &&
+    chainOk;
   const busy = status.kind === 'submitting';
 
   return (
@@ -122,13 +128,23 @@ export function VaultWithdraw() {
             </span>
           )}
         </label>
-        <button
-          type="submit"
-          disabled={!ready || busy}
-          className="w-full rounded-md border border-divider bg-parchment-light px-5 py-3 text-sm min-h-[44px] font-medium text-ink hover:border-ink/30 disabled:opacity-50"
-        >
-          {buttonLabel(status, amount, balanceUnverified)}
-        </button>
+        {!chainOk ? (
+          <button
+            type="button"
+            onClick={switchChain}
+            className="w-full rounded-md bg-testnet px-5 py-3 text-sm min-h-[44px] font-medium text-parchment hover:bg-testnet/90"
+          >
+            Switch to Arbitrum Sepolia
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!ready || busy}
+            className="w-full rounded-md border border-divider bg-parchment-light px-5 py-3 text-sm min-h-[44px] font-medium text-ink hover:border-ink/30 disabled:opacity-50"
+          >
+            {buttonLabel(status, amount, balanceUnverified)}
+          </button>
+        )}
         {helper && (
           <p className="text-[10px] uppercase tracking-wider text-muted">{helper}</p>
         )}

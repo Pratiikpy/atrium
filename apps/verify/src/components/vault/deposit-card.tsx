@@ -6,6 +6,7 @@ import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-stat
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useVaultDeposit } from '@/lib/use-vault-deposit';
 import { useBalanceAware } from '@/lib/use-balance-aware';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { ARB_SEPOLIA_USDC, USDC_DECIMALS } from '@/lib/testnet-tokens';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
@@ -37,12 +38,18 @@ export function VaultDeposit() {
     decimals: USDC_DECIMALS,
     inputAmount: amount,
   });
+  // Launch-QA (real-Rabby): a wallet on the wrong network (e.g. Ethereum) could
+  // submit this tx and have it built on the wrong chain. The WrongChainBanner
+  // warned but the button did not enforce it. Gate on the chain guard and turn
+  // the button into a one-click switch when on the wrong network.
+  const { ok: chainOk, switchChain } = useChainGuard();
 
   const helper = readinessMessage(deployment, 'Deposit');
   // >= 1 micro-USDC (USDC has 6 decimals): a sub-precision amount like 0.0000001
   // is > 0 but parseUnits-floors to 0, so the deposit would revert. Floor at
   // 0.000001 so the button never enables an amount that can only round to zero.
-  const ready = deployment?.ready === true && parseFloat(amount) >= 0.000001 && !disabledReason;
+  const ready =
+    deployment?.ready === true && parseFloat(amount) >= 0.000001 && !disabledReason && chainOk;
   const busy =
     status.kind === 'checking' || status.kind === 'approving' || status.kind === 'depositing';
 
@@ -82,13 +89,23 @@ export function VaultDeposit() {
             <p className="mt-1 text-[10px] text-neg">{disabledReason}</p>
           )}
         </label>
-        <button
-          type="submit"
-          disabled={!ready || busy}
-          className="w-full rounded-md bg-ink px-5 py-3 text-sm min-h-[44px] font-medium text-parchment hover:bg-ink-dark disabled:opacity-50"
-        >
-          {buttonLabel(status, amount)}
-        </button>
+        {!chainOk ? (
+          <button
+            type="button"
+            onClick={switchChain}
+            className="w-full rounded-md bg-testnet px-5 py-3 text-sm min-h-[44px] font-medium text-parchment hover:bg-testnet/90"
+          >
+            Switch to Arbitrum Sepolia
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!ready || busy}
+            className="w-full rounded-md bg-ink px-5 py-3 text-sm min-h-[44px] font-medium text-parchment hover:bg-ink-dark disabled:opacity-50"
+          >
+            {buttonLabel(status, amount)}
+          </button>
+        )}
         {helper && (
           <p className="text-[10px] uppercase tracking-wider text-muted">{helper}</p>
         )}
