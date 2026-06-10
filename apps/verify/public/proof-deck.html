@@ -59,6 +59,7 @@ figure.shot:hover{transform:translateY(-2px);box-shadow:0 12px 28px -12px rgba(2
 figure.shot img{display:block;width:100%;height:auto;max-height:560px;object-fit:cover;object-position:top center;border-bottom:1px solid var(--divider)}
 figure.shot.card img{object-fit:contain;background:var(--parchment-soft)}
 figure.shot.wide img{max-height:520px;object-fit:contain;background:var(--parchment-soft)}
+figure.shot.full img{max-height:none}
 .shots.duo .shot img{height:380px;max-height:380px}
 figure.shot figcaption{padding:11px 15px;font-size:13px;color:var(--ink-soft)}
 .tx{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:16px;background:var(--green-soft);border:1px solid color-mix(in oklch,var(--green),transparent 72%);border-radius:12px;padding:11px 16px;font-size:13.5px}
@@ -163,7 +164,7 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="agents"><h3><span class="fn">07</span>Delegate to an agent — bounded, enforced on-chain</h3>
       <p class="lede">A user signs one EIP-712 <em>Intent Sigil</em>; a separate agent session key signs each trade within the signed scope — per-action cap, total cap, actions/day, expiry, venue allowlist. The SPAN engine (Plinth, in Stylus) checks every action against the mandate before any funds move. Four real transactions prove it: in-scope is <strong>ALLOWED</strong>, over-cap reverts <code>NotionalExceeded</code> (<strong>BLOCKED</strong>), a one-tap kill switch revokes, and a post-revocation action reverts <code>MandateRevoked</code> (<strong>BLOCKED</strong>) — each clickable on Arbiscan.</p>
-      <div class="shots"><figure class="shot wide"><img src="/proof/22-agents.png" alt="On-chain agent-mandate enforcement"><figcaption>Recorded run · the mandate is the limit, not your trust · four real txs, ALLOWED / BLOCKED.</figcaption></figure></div>
+      <div class="shots"><figure class="shot full"><img src="/proof/22-agents-v2.png" alt="Agents page with on-chain enforcement proof"><figcaption>Recorded run · the mandate is the limit, not your trust · four real txs, ALLOWED / BLOCKED, each clickable on Arbiscan.</figcaption></figure></div>
     </div>
   </section>
 
@@ -173,12 +174,12 @@ footer{margin-top:84px;padding-top:26px;border-top:1px solid var(--divider);font
 
     <div class="flow" id="transfer"><h3><span class="fn">08</span>Cross-chain transfer — CCIP</h3>
       <p class="lede">Move collateral across chains via Aqueduct (Chainlink CCIP). Enter an amount and the estimate (fee, destination, receive) renders live.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/14-transfer.png" alt="Cross-chain transfer"><figcaption>Aqueduct · CCIP transfer with a live estimate.</figcaption></figure></div>
+      <div class="shots"><figure class="shot full"><img src="/proof/14-transfer-v2.png" alt="Cross-chain transfer with estimate"><figcaption>5 USDC entered → estimate renders: time, CCIP fee, Postern-sponsored gas, Plinth credit on arrival · "Transfer 5 USDC" armed.</figcaption></figure></div>
     </div>
 
     <div class="flow" id="markets"><h3><span class="fn">09</span>Markets — the cross-venue set</h3>
       <p class="lede">Nine Portico adapters deployed and verified; seven venues in margin scope. Each is honestly badged — only Aave is openable today; the rest are deployed-but-scaffolded and say so. A "two venues, one margin account" worked example shows the netting.</p>
-      <div class="shots"><figure class="shot"><img src="/proof/15-markets.png" alt="Venue adapters"><figcaption>Venue adapters · 9 deployed / 7 in margin scope · honest per-venue status.</figcaption></figure></div>
+      <div class="shots"><figure class="shot full"><img src="/proof/15-markets-v2.png" alt="Two venues, one margin account"><figcaption>"Two venues, one margin account" · the worked example computes from the same SPAN engine that margins on-chain.</figcaption></figure></div>
     </div>
 
     <div class="flow" id="onboarding"><h3><span class="fn">10</span>Onboarding — ninety seconds to a position</h3>
