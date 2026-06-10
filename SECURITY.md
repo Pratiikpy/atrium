@@ -56,7 +56,7 @@ Design intent (formal-verification CI lane lands Month 3):
 - Kani plus proptest formal-method invariants: 9 Kani proofs authored; 5 of 9 proptest invariants pass locally today. The formal-verification CI lane lands Month 3.
 - Dual oracle (Chainlink + Pyth) with 50 bps tolerance and 60 s freshness on every Plinth price read.
 - 3-keeper redundancy with economic slashing.
-- Praetor 3-of-5 multisig with a 48-hour PraetorTimelock on every parameter change.
+- Praetor 3-of-5 multisig with a 48-hour PraetorTimelock on every parameter change. This is the pre-mainnet gate: on the live testnet stack today the admin and timelock roles both resolve to a single deployer key, so no 48-hour delay is active.
 - ERC-7201 namespaced storage for safe upgrades.
 - Per-adapter per-block notional cap on Coffer.
 

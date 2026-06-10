@@ -7,7 +7,7 @@
  * bundler export with fabricated "7/8 venues", em-dashes, and no real proof).
  * This recreation keeps the deck's design + narrative but uses ONLY real,
  * verifiable data: the deployed + verified contract addresses, the on-chain
- * money-path tx hashes, the real 768-test count, and the honest 7-venue scope.
+ * money-path tx hashes, the real test count (792, recomputed 2026-06-10), and the honest 7-venue scope.
  * No em-dashes, no invented numbers.
  */
 
@@ -29,7 +29,7 @@ const NAV: { n: string; label: string }[] = [
   { n: 'VII', label: 'The proof' },
   { n: 'VIII', label: 'Who it is for' },
   { n: 'IX', label: 'The wedge' },
-  { n: 'X', label: 'The founder' },
+  { n: 'X', label: 'The founders' },
 ];
 
 const TOTAL = NAV.length;
@@ -138,14 +138,17 @@ function Slide({ index }: { index: number }) {
   }
 }
 
-/* ── Slide 10 · The founder ──────────────────────────────────── */
+/* ── Slide 10 · The founders ─────────────────────────────────── */
 function Founder() {
   return (
     <div className="dk-grid2 dk-founder">
       <div>
-        <SectionMark roman="X" label="The founder" />
-        <h2 className="dk-h2 serif-i">Pratik</h2>
-        <p className="dk-body">Hosted offline Web3 events at two universities. Contributed to multiple Web3 products.</p>
+        <SectionMark roman="X" label="The founders" />
+        <h2 className="dk-h2 serif-i">A three-founder team</h2>
+        <p className="dk-body">
+          Atrium is built by three founders. Pratik (pictured) hosted offline Web3 events at two universities and has
+          contributed to multiple Web3 products.
+        </p>
         <p className="dk-body dk-muted">
           The wedge is durable because it is structural, not a feature. The proof is that it already runs, end to end, on
           testnet today.
@@ -153,7 +156,7 @@ function Founder() {
       </div>
       <figure className="dk-founder-photo">
         <img src="/brand/assets/founder.jpg" alt="Pratik presenting Atrium" loading="eager" />
-        <figcaption>Speaking on Web3 at a college event I hosted</figcaption>
+        <figcaption>Pratik speaking on Web3 at a college event he hosted</figcaption>
       </figure>
     </div>
   );
@@ -389,7 +392,7 @@ function Stylus() {
 
 /* ── Slide 7 · The proof ─────────────────────────────────────── */
 const STATS = [
-  { v: '768', l: 'frontend + library tests passing' },
+  { v: '792', l: 'frontend + library tests passing' },
   { v: '9', l: 'Kani proofs authored (CI lane Month 3)' },
   { v: '2', l: 'testnets, full stack deployed + verified' },
   { v: '7', l: 'venue adapters in scope (1 operational)' },

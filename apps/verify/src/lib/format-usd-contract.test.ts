@@ -58,6 +58,10 @@ describe('formatUsd callsite contract', () => {
       'app/api/reserves/summary/route.ts',
       'app/api/trade/margin-impact/route.ts',
       'app/api/vault/stats/route.ts',
+      // Margin Lens (2026-06-10): formats requiredMargin()/hedgeFreedBps()
+      // outputs, which are non-negative by construction (span-margin.ts
+      // clamps scenario losses at 0n and sums them; see classScenarioLoss).
+      'components/portfolio/margin-lens-card.tsx',
     ];
     const actualRelative = callsiteFiles
       .map((f) => f.replace(SRC_ROOT + '\\', '').replace(SRC_ROOT + '/', ''))

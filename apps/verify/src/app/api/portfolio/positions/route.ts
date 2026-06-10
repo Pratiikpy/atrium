@@ -113,6 +113,10 @@ export async function GET(req?: Request) {
       return {
         id: p.id,
         plinthPositionId: p.id,
+        // Margin Lens (2026-06-10): the raw signed notional (1e6 USDC scale)
+        // so the client-side SPAN parity port (lib/span-margin.ts) can margin
+        // the live book without re-parsing display strings. Additive field.
+        notionalSignedRaw: p.notionalSigned,
         // Audit U-21 (resolved 2026-05-25): now distinct from `id`. The
         // close action passes both to AtriumRouter.close_position_via_adapter.
         venuePositionId: venueSidePositionId,

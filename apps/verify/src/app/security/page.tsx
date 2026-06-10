@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
+import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 
 export const metadata = {
   title: 'Security',
@@ -24,11 +25,22 @@ export default function SecurityPage() {
       </p>
 
       <section className="mt-12 space-y-6">
+        <Block id="audit-findings-register" heading="Audit findings register">
+          <p className="text-ink-soft">
+            A live register of security findings, triage status, and remediation
+            progress. This is the reference surface for ongoing review and
+            release gating.
+          </p>
+          <div className="mt-4">
+            <AuditFindingsTable />
+          </div>
+        </Block>
+
         <Block heading="Protocol controls">
           <ul className="space-y-2 text-ink-soft">
             <li>• Kani and property tests cover the margin and mandate invariants used by the live testnet build.</li>
             <li>• Dual oracle design: Chainlink plus Pyth, tolerance checks, and freshness checks on Plinth price reads.</li>
-            <li>• Timelocked administrative changes for protocol parameters.</li>
+            <li>• Admin on the live testnet stack is a single deployer key today; the 3-of-5 Safe behind a 48h PraetorTimelock is the documented pre-mainnet gate (code in the repo, not active on the live stack).</li>
             <li>• ERC-7201 namespaced storage for safe upgrades.</li>
             <li>• Per-adapter per-block notional cap on Coffer.</li>
             <li>• Kill Switch path for revoking active Sigil mandates from the connected owner wallet.</li>

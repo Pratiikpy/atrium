@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { PortfolioStatRow } from '@/components/portfolio/stat-row';
+import { MarginLensCard } from '@/components/portfolio/margin-lens-card';
 import { MarginEngineCard } from '@/components/portfolio/margin-engine-card';
 import { BuyingPowerCard } from '@/components/portfolio/buying-power-card';
 import { PositionsFilter } from '@/components/portfolio/positions-filter';
@@ -110,6 +111,13 @@ export default function PortfolioPage() {
 
       <section className="mt-8">
         <PortfolioStatRow />
+      </section>
+
+      {/* Margin Lens (2026-06-10): the SPAN netting moment, isolated-sum vs
+          netted margin for the live book plus a worked hedged book, surfaced
+          on the first screen instead of living only in the markets combos. */}
+      <section className="mt-6">
+        <MarginLensCard />
       </section>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">

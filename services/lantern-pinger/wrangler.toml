@@ -1,0 +1,25 @@
+# Lantern PoR pinger (2026-06-10).
+#
+# WHY THIS EXISTS: the lantern-cron GHA workflow self-loops for ~5.3h per run,
+# but GitHub throttles `schedule:` triggers on this repo (fires hours apart),
+# so when a loop ended nothing restarted it and the on-chain attestation went
+# stale (291 min observed on 2026-06-10, 1249 min on 2026-06-09) under landing
+# copy that promises ~45 min. Cloudflare cron triggers are exact, so this
+# worker fires a workflow_dispatch every 30 minutes; the workflow's
+# cancel-in-progress concurrency makes each ping a clean loop restart.
+#
+# Secrets (set via `wrangler secret put NAME`):
+#   GH_TOKEN  - GitHub token with workflow dispatch rights on Pratiikpy/atrium
+#   PING_KEY  - shared key for the manual POST /ping verification path
+name = "atrium-lantern-pinger"
+main = "src/index.js"
+compatibility_date = "2026-04-01"
+
+[triggers]
+# :07 and :37, off the :00/:30 marks. Repo is public, GHA minutes are free.
+crons = ["7,37 * * * *"]
+
+[vars]
+GH_REPO = "Pratiikpy/atrium"
+GH_WORKFLOW = "lantern-cron.yml"
+GH_REF = "master"

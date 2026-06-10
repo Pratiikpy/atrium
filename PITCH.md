@@ -105,7 +105,8 @@ and the cross-chain layer are Solidity, because every venue documents in Solidit
 ## Proof it is real
 
 This is not a mockup. The whole protocol is deployed, wired, and verified on two
-testnets, and the core flows produce real on-chain transactions.
+testnets, the app is live at [https://useatrium.me](https://useatrium.me), and the
+core flows produce real on-chain transactions.
 
 - **Dual-chain, fully deployed.** The protocol is deployed, wired, and verified on
   Arbitrum Sepolia (chain 421614), and the 15-contract core is replicated on
@@ -130,9 +131,11 @@ testnets, and the core flows produce real on-chain transactions.
   steps against the live contracts: deposit, open, see the margin saving, trigger a
   chaos fault, run a liquidation drill, verify proof of reserves, revoke with the
   kill switch.
-- **The suite is green.** 768 frontend and library tests pass; the Stylus core
-  has 9 Kani formal-verification proofs authored on solvency and mandate-expiry
-  invariants (the dedicated CI lane lands Month 3).
+- **The suite is green.** 792 frontend and library tests pass (recomputed
+  2026-06-10); the Stylus core has 9 Kani formal-verification proofs authored.
+  The core SPAN invariant (a hedged book margins below the sum of its isolated
+  legs) is proven; 2 of the 9 proofs are placeholders disclosed in source, and
+  5 of 9 proptest invariants pass locally (the dedicated CI lane lands Month 3).
 
 ---
 
@@ -165,25 +168,30 @@ Being defensible means stating what is not done, in the same breath as the claim
 
 - **Testnet, Year 1.** Arbitrum Sepolia and Robinhood Chain testnets. Nothing here
   has economic value yet.
-- **Upgradeable contracts.** UUPS behind a 48-hour timelock. Today the timelock is
-  controlled by a founder deployer key; the production model is a 3-of-5 multisig
-  behind the same timelock. We say so on `/docs/honesty` rather than claiming false
-  immutability.
+- **Upgradeable contracts, single-key admin today.** On the live testnet stack the
+  admin and timelock roles both resolve to a single founder deployer key, so
+  parameter changes take effect with no 48-hour delay today. The production model
+  is a 3-of-5 multisig behind the 48-hour PraetorTimelock; that code is in the
+  repo and is the documented pre-mainnet gate, not active on the live stack. We
+  say so on `/docs/honesty` rather than claiming false immutability.
 - **Some venues are mocked or relayed** where the real upstream is not on the
   testnet (for example Aave V3 via a MockAavePool, certain perp venues). Each one is
   named with its mechanism and path to real on `/docs/honesty`.
-- **Trade-fill on a new venue is timelock-gated.** Enabling a live fill on a venue
-  requires a scheduled 48-hour timelock batch, exactly as a production parameter
-  change would. The contracts are deployed and wired; the gate is by design.
+- **Trade-fill on a new venue is admin-gated.** Enabling a live fill on a venue
+  requires explicit instrument-risk and adapter-registration configuration. On the
+  current deployer-admin testnet stack that executes without a delay; under the
+  pre-mainnet Safe + timelock it becomes a scheduled 48-hour batch. The contracts
+  are deployed and wired; the gate is by design.
 
 None of these change the wedge. They are the honest state of a Year-1 testnet build,
 and disclosing them is part of the trust argument, not a footnote to it.
 
 ## Where this goes next
 
-1. Flip the deployer-key timelock owner to the 3-of-5 multisig.
-2. Open the public app at a hosted URL (the app reads the live contracts today; the
-   pending piece is DNS and deploy).
+1. Hand admin from the single deployer key to the 3-of-5 Safe behind the 48-hour
+   PraetorTimelock (the documented pre-mainnet gate).
+2. Wire more venues into the live margin scope: nine adapter contracts are
+   deployed and verified, seven venues are in scope, one is operational today.
 3. Year-2 mainnet, with the most critical contracts locked.
 
 The wedge is durable because it is structural. The proof is that it already runs.
