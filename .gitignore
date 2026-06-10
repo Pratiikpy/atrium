@@ -251,3 +251,6 @@ apps/verify/_check_*.mjs
 apps/verify/.tmp_*
 apps/verify/_audit_shot.mjs
 PUBLIC_RELEASE_ACTION_PLAN.md
+
+.vercel
+ops/scribe-node/data/
