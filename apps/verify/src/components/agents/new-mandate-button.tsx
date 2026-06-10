@@ -8,6 +8,7 @@ import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useContractAddress } from '@/lib/use-coffer-address';
 import { useIssueMandate } from '@/lib/use-issue-mandate';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 
 const SIGIL_MAX_VENUES = 8;
 const ZERO_ADDR = '0x' + '0'.repeat(40);
@@ -306,12 +307,33 @@ function humanizeIssueError(reason: string): string {
   // vault/withdraw-card, and humanizeOpenReason in trade/order-form.
   // Pre-fix this one used sentence-case + trailing periods, the only
   // outlier. Founder-voice (writing.md): plain, conversational copy.
-  if (reason === 'wallet_not_connected') return 'connect wallet first';
-  if (reason === 'sigil_not_deployed')
-    return 'Sigil is not deployed on this network, mandate signing lights up once Sigil is live on this network';
-  if (reason === 'signature_rejected') return 'wallet rejected the signature';
+  // Launch-QA: every code the issue-mandate route AND this hook can emit is
+  // mapped, so a human never sees a raw token (e.g. origin_not_allowed,
+  // signature_wallet_mismatch). Surfaced by signing a mandate that actually
+  // errored; pre-fix only 3 of 10+ codes were humanized and the rest fell
+  // through to the raw slice. Keep founder-voice: lowercase, no trailing period.
+  const map: Record<string, string> = {
+    wallet_not_connected: 'connect wallet first',
+    sigil_not_deployed:
+      'Sigil is not deployed on this network, mandate signing lights up once Sigil is live on this network',
+    signature_rejected: 'wallet rejected the signature',
+    origin_not_allowed: 'request blocked for security, reload the page and try again',
+    bad_request_body: 'the mandate request was malformed, refresh and try again',
+    intent_hash_mismatch: 'the mandate details changed during signing, try again',
+    signature_recovery_failed: 'could not verify your signature, try again',
+    signature_wallet_mismatch: 'the signature did not match your wallet, reconnect and try again',
+    unauthorized: 'not authorized to issue this mandate',
+    server_rejected_signature: 'the server could not verify the mandate, try again',
+    bad_response: 'the server could not verify the mandate, try again',
+    envelope_build_failed: 'could not build the mandate envelope, try again',
+    instrument_mapping_failed: 'could not map the selected venue, try again',
+  };
+  if (map[reason]) return map[reason];
   if (reason.startsWith('Unknown venue slug:')) return reason;
-  return reason.slice(0, 200);
+  // Fallback: the hook can surface a raw wallet-thrown message (4001, reverts,
+  // insufficient gas) as the reason. Route it through the shared wallet
+  // humanizer so it reads human, not raw, instead of a 200-char slice.
+  return humanizeWalletError(reason).message;
 }
 
 function NumberField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
