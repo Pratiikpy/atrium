@@ -45,7 +45,7 @@ export default function ManifestoPage() {
 
         <h2 className="font-display text-3xl text-ink">What we will</h2>
         <ul className="space-y-3">
-          <li>· Stay testnet for Year 1. No real money at risk until the audit closes mainnet-grade.</li>
+          <li>· Ship no real-money product until a mainnet-grade audit closes. We move at the speed safety allows, not the speed of hype.</li>
           <li>· Keep the contracts upgradeable behind governance: a single deployer key on testnet today, moving to a timelock and a multisig at mainnet. Year one needs to fix bugs fast, and we say so out loud.</li>
           <li>· Publish proofs of reserves on a continuous cadence. Per-wallet inclusion proofs land once the tree is pinned to IPFS.</li>
           <li>· Open-source the adapter standard. Curator grant for every accepted adapter and reference agent.</li>
