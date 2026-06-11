@@ -178,6 +178,7 @@ export function CommandPalette() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={onInputKey}
+                aria-label="Search pages and actions"
                 placeholder="Jump to…"
                 style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', font: 'inherit', fontSize: 15, color: 'var(--ink, #1A1714)' }}
               />

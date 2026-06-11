@@ -9,6 +9,7 @@ import {
   readinessMessage,
 } from '@/lib/use-deployment-status';
 import { useOpenPosition } from '@/lib/use-open-position';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES } from '@/lib/venues';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
@@ -131,6 +132,10 @@ export function OrderForm({
   // so a user never signs a transaction that is guaranteed to revert.
   const venueOperational =
     VENUES.find((v) => v.id === venue)?.operational ?? false;
+  // UI/UX audit: gate the Open button on the chain too, and offer a Switch
+  // action on the wrong network instead of letting the user submit a tx that
+  // would hit the wrong contracts (mirrors deposit-card / withdraw-card).
+  const { ok: chainOk, switchChain } = useChainGuard();
   const helper = !venueOperational
     ? `${venueShortLabel(venue)} is deployed but not openable on testnet yet. Open positions are live on Aave Horizon today.`
     : readinessMessage(
@@ -151,7 +156,7 @@ export function OrderForm({
   const sizeNum = parseFloat(size);
   const sizeValid = Number.isFinite(sizeNum) && sizeNum > 0;
   const ready =
-    deployment?.ready === true && sizeValid && !busy && venueOperational;
+    deployment?.ready === true && sizeValid && !busy && venueOperational && chainOk;
 
   // First-trade risk preview gate. The flow doc treats this as required
   // before the very first open-position click. Persistence is per-device
@@ -298,14 +303,24 @@ export function OrderForm({
           : 'margin pending · figures populate once Plinth prices your order'}
       </p>
 
-      <button
-        type="button"
-        onClick={handleOpenClick}
-        disabled={!ready}
-        className="mt-5 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment transition-colors hover:bg-ink-dark disabled:opacity-50"
-      >
-        {openButtonLabel(openStatus, side)}
-      </button>
+      {chainOk ? (
+        <button
+          type="button"
+          onClick={handleOpenClick}
+          disabled={!ready}
+          className="mt-5 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment transition-colors hover:bg-ink-dark disabled:opacity-50"
+        >
+          {openButtonLabel(openStatus, side)}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={switchChain}
+          className="mt-5 w-full rounded-md bg-testnet px-4 py-3 text-sm font-medium text-parchment transition-colors hover:bg-testnet/90"
+        >
+          Switch to Arbitrum Sepolia
+        </button>
+      )}
       {helper && (
         <p className="mt-2 text-[10px] uppercase tracking-wider text-muted">
           {helper}

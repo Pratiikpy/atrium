@@ -188,12 +188,11 @@ export function SystemMap() {
 
   return (
     <div className="arch-map">
-      <div className="arch-map-grid" role="list">
+      <div className="arch-map-grid">
         {NODES.map((n) => (
           <button
             key={n.key}
             type="button"
-            role="listitem"
             onClick={() => setSelected(n.key)}
             onMouseEnter={() => setSelected(n.key)}
             className={`arch-node ${selected === n.key ? 'is-active' : ''}`}

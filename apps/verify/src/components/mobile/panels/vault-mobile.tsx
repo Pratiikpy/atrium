@@ -153,6 +153,7 @@ export function VaultMobile() {
           inputMode="decimal"
           value={amount}
           onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
+          aria-label="Amount in USDC"
           placeholder="0.00"
           className="h-[56px] w-full rounded-xl border border-mob-line bg-mob-bg-card pl-8 pr-20 text-[18px] text-mob-ink placeholder:text-mob-muted focus:border-mob-accent focus:outline-none"
         />

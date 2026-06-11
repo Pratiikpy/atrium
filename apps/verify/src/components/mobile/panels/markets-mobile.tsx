@@ -79,9 +79,10 @@ export function MarketsMobile() {
     <div className="flex flex-col gap-3" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       {/* Search */}
       <input
-        type="text"
+        type="search"
         value={search}
         onChange={e => setSearch(e.target.value)}
+        aria-label="Search venues"
         placeholder="Search venues…"
         className="h-[44px] w-full rounded-xl border border-mob-line bg-mob-bg-card px-4 text-[16px] text-mob-ink placeholder:text-mob-muted focus:border-mob-accent focus:outline-none"
       />

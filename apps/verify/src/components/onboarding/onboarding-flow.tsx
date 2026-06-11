@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useFaucetClaim } from '@/lib/use-faucet-claim';
+import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { VENUES, VENUE_COUNT } from '@/lib/venues';
 
 /**
@@ -341,18 +342,21 @@ function SecondDeviceWarning({ onContinue, onCancel }: { onContinue: () => void;
     onContinue();
   }
 
-  // Check if dismissed within 24h
-  const dismissed = (() => {
+  // Was this warning dismissed ("Remind me later") within the last 24h?
+  // useState initializer so the value is stable and read once on the client.
+  const [dismissed] = useState(() => {
     try {
       const ts = localStorage.getItem('atrium_second_device_remind');
-      return ts && Date.now() < parseInt(ts, 10);
+      return !!ts && Date.now() < parseInt(ts, 10);
     } catch { return false; }
-  })();
-  if (dismissed) {
-    // Auto-advance if user previously dismissed
-    onContinue();
-    return null;
-  }
+  });
+  // Auto-advance from an EFFECT, never during render: calling the parent's
+  // setStep (onContinue) in the render body throws React's
+  // "cannot update a component while rendering a different component".
+  useEffect(() => {
+    if (dismissed) onContinue();
+  }, [dismissed, onContinue]);
+  if (dismissed) return null;
 
   return (
     <div
@@ -440,10 +444,14 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
     // cooldown + dropped-already check reads the user's history, not the
     // demo wallet's. Faucet route already supported ?wallet= since audit
     // U-28; this wires the connected-wallet through.
+    // UI/UX audit: cancellation guard so a slow response for a prior wallet
+    // can't resolve last and overwrite the current wallet's status.
+    let cancelled = false;
     fetch(walletQuery('/api/faucet/status', wallet))
       .then((r) => r.json())
-      .then((d: FaucetStatus) => setStatus(d))
-      .catch((e) => setError(e instanceof Error ? e.message : 'Faucet status unavailable'));
+      .then((d: FaucetStatus) => { if (!cancelled) setStatus(d); })
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Faucet status unavailable'); });
+    return () => { cancelled = true; };
   }, [wallet]);
 
   // Build the drop rows from the real route fields (usdcDrop/ethDrop).
@@ -547,7 +555,7 @@ function Faucet({ onNext, onBack }: { onNext: () => void; onBack: () => void }) 
         </p>
       )}
       {claimStatus.kind === 'error' && (
-        <p className="mt-3 text-center text-xs text-neg">Claim failed · {claimStatus.reason}</p>
+        <p className="mt-3 text-center text-xs text-neg">Claim failed · {humanizeWalletError(claimStatus.reason).message}</p>
       )}
       <p className="mt-3 text-center text-[11px] uppercase tracking-wider text-muted">
         {error
@@ -582,10 +590,16 @@ function MarginPosted({ onNext, onBack }: { onNext: () => void; onBack: () => vo
     // buying power is now Y". Pre-fix it would have shown the demo
     // wallet's buying power as the success-confirmation number, which
     // is meaningless to the user who just funded their own wallet.
+    // UI/UX audit: short-circuit the disconnected case (don't fetch the demo
+    // wallet on disconnect) + cancellation guard so a late response for a prior
+    // wallet can't overwrite the current wallet's buying power.
+    if (!wallet) { setBp(null); return; }
+    let cancelled = false;
     fetch(walletQuery('/api/portfolio/buying-power', wallet))
       .then((r) => r.json())
-      .then((d: BuyingPower) => setBp(d))
-      .catch(() => setBp({ currentUsd: null, source: 'pending' }));
+      .then((d: BuyingPower) => { if (!cancelled) setBp(d); })
+      .catch(() => { if (!cancelled) setBp({ currentUsd: null, source: 'pending' }); });
+    return () => { cancelled = true; };
   }, [wallet]);
 
   // plinthReachable: Plinth returned a buying-power figure (it is deployed and
