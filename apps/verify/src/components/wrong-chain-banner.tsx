@@ -12,7 +12,11 @@ export function WrongChainBanner() {
   if (ok) return null;
 
   return (
-    <div className="flex items-center justify-between gap-3 bg-testnet/10 border-b border-testnet/30 px-4 py-2.5 text-sm">
+    // col-span-full: AppShell's `.atrium-app` is a 2-col grid (sidebar | main).
+    // Without this the banner auto-places into the narrow sidebar cell and shoves
+    // the whole layout out of place when on the wrong network. Span both columns
+    // so it is a full-width bar on its own row above the sidebar + main.
+    <div className="col-span-full flex items-center justify-between gap-3 bg-testnet/10 border-b border-testnet/30 px-4 py-2.5 text-sm">
       <p className="text-testnet font-medium">
         Wrong network{current ? ` (${current.name})` : ''}. Atrium runs on Arbitrum Sepolia.
       </p>
