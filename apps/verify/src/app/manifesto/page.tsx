@@ -46,8 +46,8 @@ export default function ManifestoPage() {
         <h2 className="font-display text-3xl text-ink">What we will</h2>
         <ul className="space-y-3">
           <li>· Stay testnet for Year 1. No real money at risk until the audit closes mainnet-grade.</li>
-          <li>· Keep the contracts upgradeable behind governance: a single deployer key on testnet today, a 48-hour timelock and a 3-of-5 multisig at mainnet. Year-1 needs to fix bugs fast.</li>
-          <li>· Publish proofs of reserves about every 45 minutes. Per-wallet inclusion proofs land once the tree is pinned to IPFS.</li>
+          <li>· Keep the contracts upgradeable behind governance: a single deployer key on testnet today, moving to a timelock and a multisig at mainnet. Year one needs to fix bugs fast, and we say so out loud.</li>
+          <li>· Publish proofs of reserves on a continuous cadence. Per-wallet inclusion proofs land once the tree is pinned to IPFS.</li>
           <li>· Open-source the adapter standard. Curator grant for every accepted adapter and reference agent.</li>
           <li>· Let agents trade for you under bounded mandates. One-tap revocation of every delegation in a single tx.</li>
         </ul>
