@@ -250,6 +250,17 @@ apps/verify/vf_*.html
 apps/verify/_check_*.mjs
 apps/verify/.tmp_*
 apps/verify/_audit_shot.mjs
+# One-off local QA/audit probe scripts at the app root (never product code).
+# Root-scoped (single *) so config + scripts/ + src/ .mjs stay tracked.
+apps/verify/qa-*.mjs
+apps/verify/disco-*.mjs
+apps/verify/pitch-*.mjs
+apps/verify/*-audit.mjs
+apps/verify/visual-audit-app.mjs
+apps/verify/check-overlap.mjs
+apps/verify/zoom-deploy.mjs
+arch_tmp.html
+honesty_tmp.html
 PUBLIC_RELEASE_ACTION_PLAN.md
 
 .vercel
