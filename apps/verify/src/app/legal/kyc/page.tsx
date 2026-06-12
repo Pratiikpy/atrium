@@ -4,6 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'KYC Disclosure',
   description: 'How and when Atrium triggers KYC verification via Sumsub.',
+  alternates: { canonical: '/legal/kyc' },
 };
 
 export default function KycPage() {

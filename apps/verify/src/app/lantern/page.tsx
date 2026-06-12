@@ -2,6 +2,12 @@ import { LanternDashboard } from '@/components/lantern-dashboard';
 import { WagmiProviders } from '@/components/wagmi-providers';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 
+export const metadata = {
+  title: 'Proof of reserves',
+  description: 'Lantern publishes a signed Merkle root of every Coffer balance on Arbitrum Sepolia about every 45 minutes. The live root age and IPFS pin status are shown on-page.',
+  alternates: { canonical: '/lantern' },
+};
+
 export default function LanternPage() {
   return (
     <MarketingShell>

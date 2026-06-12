@@ -13,6 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: adr ? `ADR-${adr.id}` : 'ADR',
     description: adr?.title ?? 'Architecture decision record.',
+    alternates: { canonical: `/docs/adr/${adr ? adr.id : id}` },
   };
 }
 

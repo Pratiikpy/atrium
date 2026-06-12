@@ -114,7 +114,7 @@ export default function ArchitecturePage() {
           <p className="arch-section-lede">
             Every contract below is deployed on-chain with real bytecode. Solidity source is verified on
             Arbiscan or Sourcify, Stylus via cargo stylus verify; the core stack was redeployed on
-            2026-06-07 (testnet cutover) and source re-verification is in progress. Which venues are live today versus scaffolded is set out on{' '}
+            2026-06-07 (testnet cutover) and its source is verified. Which venues are live today versus scaffolded is set out on{' '}
             <a href="/docs/honesty" className="arch-inline-link">/docs/honesty</a>. Click any address to copy it.
           </p>
           <DeploymentsTable />

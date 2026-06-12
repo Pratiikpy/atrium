@@ -4,6 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Sub-processors',
   description: 'List of third-party sub-processors that handle data on behalf of Atrium.',
+  alternates: { canonical: '/legal/sub-processors' },
 };
 
 const PROCESSORS = [

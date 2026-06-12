@@ -10,9 +10,14 @@ import { arbitrumSepolia } from 'viem/chains';
  * than 60s. Pyth on Arbitrum Sepolia is PULL-based (nobody keeps it fresh),
  * so a trade's margin check reverts ERR_ORACLE_STALE unless a fresh update was
  * pushed in the last 60s. This route pulls a signed update from Hermes and
- * pushes it on-chain. A Vercel cron (every minute, see vercel.json) keeps the
- * Pyth leg inside the window so Aave-Horizon opens succeed continuously.
- * Mirrors scripts/pyth-push-usdc.sh, the manual per-trade equivalent.
+ * pushes it on-chain.
+ *
+ * LIVE KEEPER: the GitHub Actions workflow .github/workflows/pyth-keeper.yml is
+ * what actually keeps the Pyth leg fresh today (a self-looping run that pushes
+ * every ~50s). This route is a Vercel-cron fallback that is NOT scheduled: the
+ * app runs on the Hobby plan, which rejects sub-daily crons, so vercel.json has
+ * no `crons` block. It becomes live only if the project moves to Pro and a cron
+ * entry is added. Mirrors scripts/pyth-push-usdc.sh, the manual per-trade push.
  */
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;

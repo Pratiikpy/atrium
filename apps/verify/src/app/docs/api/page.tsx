@@ -14,6 +14,7 @@ import { CodexLiveStatus, CodexTryIt } from '@/components/docs/codex-live';
 export const metadata = {
   title: 'Codex API',
   description: 'x402-payable HTTP API for cross-venue margin data, agent performance, proof of reserves.',
+  alternates: { canonical: '/docs/api' },
 };
 
 interface Endpoint {

@@ -6,6 +6,7 @@ import { ADRS } from '@/lib/adrs';
 export const metadata = {
   title: 'Architecture Decision Records',
   description: 'ADR-001 through ADR-012: every consequential design decision, with context and alternatives.',
+  alternates: { canonical: '/docs/adr' },
 };
 
 export default function AdrIndexPage() {

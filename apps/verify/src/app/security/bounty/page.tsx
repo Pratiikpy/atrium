@@ -4,6 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Responsible Disclosure',
   description: 'Atrium responsible disclosure scope and reporting process.',
+  alternates: { canonical: '/security/bounty' },
 };
 
 export default function BountyPage() {

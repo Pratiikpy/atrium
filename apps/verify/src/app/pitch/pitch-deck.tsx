@@ -356,7 +356,7 @@ function Architecture() {
       </div>
       <p className="dk-aside">
         Seven venue adapters are in the launch scope (Aave Horizon operational today); nine adapter contracts are
-        deployed and verified on Arbitrum Sepolia. Every address above is live on-chain; click to read the source (the AtriumRouter is pending re-verification after its 2026-06-02 redeploy).
+        deployed and verified on Arbitrum Sepolia. Every address above is live on-chain; click to read the source.
       </p>
     </div>
   );

@@ -121,7 +121,12 @@
   --color-mob-bg-elev:   oklch(0.17 0.008 60);
   --color-mob-ink:       oklch(0.97 0.003 60);
   --color-mob-ink-soft:  oklch(0.82 0.005 60);
-  --color-mob-muted:     oklch(0.58 0.005 60);
+  /* A11Y: raised from L0.58 to L0.68 so the <14px captions on the dark Agents
+     panel clear WCAG AA (4.5:1). At L0.68 muted text hits 6.6-7.2:1 on every
+     dark surface (bg/card/elev) while staying a quiet warm gray, not white.
+     Dark-surface-only token; never used on a light surface, so zero desktop
+     risk. Keep both definition blocks in sync. */
+  --color-mob-muted:     oklch(0.68 0.006 60);
   --color-mob-faint:     oklch(0.40 0.005 60);
   --color-mob-line:      oklch(1 0 0 / 0.12);
   --color-mob-hairline:  oklch(1 0 0 / 0.06);
@@ -248,7 +253,8 @@
   --color-mob-bg-elev: oklch(0.17 0.008 60);
   --color-mob-ink: oklch(0.97 0.003 60);
   --color-mob-ink-soft: oklch(0.82 0.005 60);
-  --color-mob-muted: oklch(0.58 0.005 60);
+  /* A11Y: kept in sync with the block above (raised L0.58 -> L0.68 for AA). */
+  --color-mob-muted: oklch(0.68 0.006 60);
   --color-mob-faint: oklch(0.40 0.005 60);
   --color-mob-line: oklch(1 0 0 / 0.12);
   --color-mob-hairline: oklch(1 0 0 / 0.06);

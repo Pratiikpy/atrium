@@ -5,6 +5,7 @@ import { arbiscanAddressUrl } from '@/lib/arbiscan';
 export const metadata = {
   title: 'Deployment',
   description: 'Every Atrium contract on Arbitrum Sepolia: address, Arbiscan link, and who controls it.',
+  alternates: { canonical: '/docs/deployment' },
 };
 
 // Reads the deployments registry at request time (fs), so the table always

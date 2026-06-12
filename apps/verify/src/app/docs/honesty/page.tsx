@@ -15,6 +15,7 @@ export const metadata = {
   title: 'Honest disclosures',
   description:
     'Every place Atrium uses a mock, stub, or relay on Arbitrum Sepolia. Each item names the gap, why it exists, and when it goes away.',
+  alternates: { canonical: '/docs/honesty' },
   openGraph: {
     title: 'Honest disclosures · Atrium',
     description:

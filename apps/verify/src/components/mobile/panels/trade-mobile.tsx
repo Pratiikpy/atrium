@@ -131,18 +131,10 @@ export function TradeMobile() {
 
   return (
     <div className="md:hidden flex flex-col gap-4">
-      {/* n=17 wrong-chain banner (mirrors vault-mobile): proactive switch
-          affordance so a connected wallet on the wrong network is told before
-          the CTA dead-ends into a raw error. */}
-      {!chainGuard.ok && (
-        <button
-          type="button"
-          onClick={chainGuard.switchChain}
-          className="min-h-[44px] w-full rounded-xl bg-testnet/10 border border-testnet/40 px-4 py-3 text-[16px] text-testnet"
-        >
-          Wrong network, tap to switch to {chainGuard.target.name}
-        </button>
-      )}
+      {/* Wrong-network banner is rendered once by the mobile AppShell
+          (app-shell.tsx) above every /app panel; no per-panel copy here to
+          avoid the duplicate banner the audit caught. `chainGuard.ok` still
+          gates `ready`, so the CTA stays correctly disabled on the wrong net. */}
 
       {/* Venue selector  mirrors the desktop VenueChipBar. A live dot marks
           the operational venue(s); a muted dot marks scaffold/pending ones, so

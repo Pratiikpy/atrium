@@ -92,15 +92,10 @@ export function VaultMobile() {
 
   return (
     <div className="flex flex-col gap-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      {/* Wrong chain banner */}
-      {!chainGuard.ok && (
-        <button
-          onClick={chainGuard.switchChain}
-          className="min-h-[44px] w-full rounded-xl bg-testnet/10 border border-testnet/40 px-4 py-3 text-[16px] text-testnet"
-        >
-          Wrong network, tap to switch to {chainGuard.target.name}
-        </button>
-      )}
+      {/* Wrong-network banner is rendered once by the mobile AppShell
+          (app-shell.tsx) above every /app panel; no per-panel copy here to
+          avoid the duplicate banner the audit caught. `chainGuard.ok` still
+          disables the submit button below, so the guard is unaffected. */}
 
       {/* Contract paused banner */}
       {paused && (

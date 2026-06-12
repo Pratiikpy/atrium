@@ -6,6 +6,7 @@ import { getRunbooks, getRunbooksByCategory } from '@/lib/runbooks';
 export const metadata = {
   title: 'Runbooks',
   description: 'Operational runbooks: incident response, deploy, keys, monitoring, setup.',
+  alternates: { canonical: '/docs/runbooks' },
 };
 
 export default function RunbooksIndexPage() {

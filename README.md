@@ -14,7 +14,7 @@ Post collateral once. Hedge across venues. One on-chain engine prices the whole 
 [![Robinhood Chain](https://img.shields.io/badge/Robinhood%20Chain-46630-0B6B3A?style=flat-square)](./deployments/robinhood_chain.json)
 [![Stylus](https://img.shields.io/badge/margin%20engine-Rust%20on%20Stylus-B5532A?style=flat-square)](#why-the-engine-runs-in-rust)
 [![Proof of reserves](https://img.shields.io/badge/reserves-signed%20on--chain-2E7D32?style=flat-square)](https://www.useatrium.me/lantern)
-[![Verified](https://img.shields.io/badge/Sourcify-6%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
+[![Verified](https://img.shields.io/badge/Sourcify-9%20adapters%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
 [![Status](https://img.shields.io/badge/testnet-only-6B6259?style=flat-square)](#what-is-live-what-is-mocked)
 
 **[Open the app](https://www.useatrium.me)** · [Demo video](https://youtu.be/LliZ3DdxF3E) · [Pitch video](https://youtu.be/ZckBcF9dSs4) · [Judge brief (Notion)](https://comfortable-goal-205.notion.site/Atrium-37b9c0ce7876809387c7c1a6cd95ae0e) · [Proof deck](https://www.useatrium.me/proof-deck.html) · [Pitch deck](https://www.useatrium.me/pitch) · [Architecture](https://www.useatrium.me/architecture) · [Verifier](https://www.useatrium.me/verify) · [What is mock, what is real](https://www.useatrium.me/docs/honesty)
@@ -110,7 +110,7 @@ The enforcement was captured end to end on Arbitrum Sepolia. Open any row.
 | 3 | (User) fired the kill switch | Agent revoked, nonce 0 to 1 | [`0x65e24e9a`](https://sepolia.arbiscan.io/tx/0x65e24e9a9cebf66254e08081e520e657bb415b00f344b15b6d5386c3eed848d6) |
 | 4 | Tried to act after revocation | Reverts `MandateRevoked` | [`0x41bf9904`](https://sepolia.arbiscan.io/tx/0x41bf9904886c05a160291194d91dc346028b378981082f2b7227ee9f656551e3) |
 
-The successful trade is attributed to the user, not the agent: agent-authorized execution, not agent custody. The session key never holds funds and never carries authority past the signed caps. The full method and a script to reproduce it live under [`qa-evidence/agentic`](./qa-evidence/agentic). The same four steps are surfaced for judges at [`/app/agents`](https://www.useatrium.me/app/agents).
+The successful trade is attributed to the user, not the agent: agent-authorized execution, not agent custody. The session key never holds funds and never carries authority past the signed caps. Each of the four steps above is a live transaction on Arbitrum Sepolia; click any hash to inspect it on Arbiscan. The same flow is surfaced for judges at [`/app/agents`](https://www.useatrium.me/app/agents).
 
 ---
 
@@ -214,7 +214,7 @@ The generated registries are the source of truth: [Arbitrum Sepolia](./docs/depl
 | Deposit into Coffer | [`0x8c8d...0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
 | Withdraw from Coffer | [`0x976e...ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
 
-Six core and adapter contracts carry an `exact_match` verification on [Sourcify](https://sourcify.dev). Paste any address above to read the source against the deployed bytecode.
+All nine venue adapters carry an `exact_match` verification on [Sourcify](https://sourcify.dev), and so do the Solidity core contracts (router, registry, attestor, kill-switch, timelock). The Stylus engine (Plinth, Coffer, Sigil, Vigil) is verified via `cargo stylus verify`, which Sourcify does not yet support. Paste any address above to read the source against the deployed bytecode.
 
 ---
 

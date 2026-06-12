@@ -5,6 +5,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Agents marketplace',
   description: 'Reference agents and Curator-grant submissions. Open-source, signed mandates.',
+  alternates: { canonical: '/agents/marketplace' },
 };
 
 const REFERENCE = [

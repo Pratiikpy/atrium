@@ -5,6 +5,7 @@ import { ResetConsentButton } from '@/components/reset-consent-button';
 export const metadata = {
   title: 'Privacy Policy',
   description: 'Privacy policy for Atrium testnet surfaces.',
+  alternates: { canonical: '/legal/privacy' },
 };
 
 export default function PrivacyPage() {

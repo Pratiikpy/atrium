@@ -91,7 +91,7 @@ export function AgentsMobile() {
           {/* Single CTA: the "+ New mandate" button in the header above. Pre-fix
               this card rendered a SECOND NewMandateButton, stacking two identical
               "+ New mandate" affordances. */}
-          <p className="mt-1.5 text-[12.5px] text-mob-muted/70">
+          <p className="mt-1.5 text-[12.5px] text-mob-muted">
             Use &ldquo;+ New mandate&rdquo; above to delegate to an agent.
           </p>
         </div>
@@ -105,7 +105,7 @@ export function AgentsMobile() {
           <span className="font-display text-[15px] italic text-mob-ink">The mandate is the limit.</span>
           <span className="shrink-0 font-mono text-[8px] uppercase tracking-wider text-mob-muted">recorded · arb-sepolia</span>
         </div>
-        <p className="mt-1 text-[11.5px] text-mob-muted/80">Enforced on-chain by the risk engine. Tap a tx to verify on Arbiscan.</p>
+        <p className="mt-1 text-[11.5px] text-mob-muted">Enforced on-chain by the risk engine. Tap a tx to verify on Arbiscan.</p>
         <ul className="mt-3 flex flex-col gap-1.5">
           {([
             ['Agent opens 2 USDC (in cap)', 'Position 11, owned by you', 'ok', '0xd198d4e8c60d00e2ac4ca1028a03636029d4617622b5a47971724cd5f0ea678f'],
@@ -124,7 +124,7 @@ export function AgentsMobile() {
                   <span className="block text-[12px] text-mob-ink">{step}</span>
                   <span className="block text-[10.5px] text-mob-muted">{outcome}</span>
                 </span>
-                <span className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wide ${kind === 'no' ? 'bg-neg/15 text-neg' : 'bg-mob-accent/20 text-mob-accent'}`}>
+                <span className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wide ${kind === 'no' ? 'bg-neg/15 text-neg' : 'bg-mob-live/20 text-mob-live'}`}>
                   {kind === 'no' ? 'blocked' : 'allowed'} ↗
                 </span>
               </a>

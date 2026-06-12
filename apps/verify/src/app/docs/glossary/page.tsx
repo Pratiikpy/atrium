@@ -5,6 +5,7 @@ import { SUBSYSTEMS } from '@/lib/atrium/copy';
 export const metadata = {
   title: 'Glossary',
   description: 'Every Atrium subsystem in plain English: what it is, and what it does for you.',
+  alternates: { canonical: '/docs/glossary' },
 };
 
 const ENTRIES = Object.values(SUBSYSTEMS);

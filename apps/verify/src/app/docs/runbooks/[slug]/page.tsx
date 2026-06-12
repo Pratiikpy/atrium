@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     // produced the doubled "Atrium · Deploy runbook · Atrium".
     title: rb ? rb.title : 'Runbook',
     description: rb?.summary || 'Operational runbook.',
+    alternates: { canonical: `/docs/runbooks/${slug}` },
   };
 }
 

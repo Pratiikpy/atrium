@@ -107,6 +107,10 @@ export default function MarketsPage() {
   return (
     <AppShell
       active="/app/markets"
+      breadcrumb={[
+        { label: 'Markets' },
+        { label: 'Venue adapters' },
+      ]}
       // Viewport slots: only the active layout mounts (mobile gets the
       // thumb-friendly venue browser, desktop the dense list), so neither
       // double-mounts the other's hooks.

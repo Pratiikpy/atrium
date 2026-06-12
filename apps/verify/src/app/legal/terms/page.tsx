@@ -4,6 +4,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Terms of Service',
   description: 'Terms of service for Atrium Verifier Mode on Arbitrum Sepolia testnet.',
+  alternates: { canonical: '/legal/terms' },
 };
 
 export default function TermsPage() {

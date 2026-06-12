@@ -1,5 +1,19 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Wordmark } from '@/components/wordmark';
+
+/* SEO-K1: the 404 must carry exactly one robots directive: noindex. The root
+   layout sets a global `index, follow`; the bug was that the not-found response
+   shipped BOTH that and Next.js's own auto-injected noindex, a conflicting pair
+   that reads as sloppy in view-source and can let crawlers index error pages.
+   Setting robots: null here drops the layout's inherited `index, follow` from
+   the resolved metadata, leaving Next.js's single built-in noindex as the only
+   robots meta on the 404. (Setting robots to noindex instead would add a SECOND
+   noindex tag alongside the framework's, so null is the correct override.) */
+export const metadata: Metadata = {
+  title: 'Page not found',
+  robots: null,
+};
 
 export default function NotFound() {
   return (
