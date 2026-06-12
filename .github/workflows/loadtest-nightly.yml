@@ -50,7 +50,7 @@ jobs:
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
         uses: peter-evans/create-pull-request@4320041ed380b20e97d388d56a7fb4f9b8c20e79 # v7.0.0
         with:
-          branch: ci-data/${{ github.workflow }}
+          branch: ci-data/loadtest-nightly
           title: "ci: ${{ github.workflow }} data update"
           commit-message: "ci: refresh ${{ github.workflow }} data"
           delete-branch: true
