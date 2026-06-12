@@ -48,6 +48,7 @@ jobs:
         run: node scripts/build-report.mjs
       - name: Create PR with loadtest data
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        continue-on-error: true
         uses: peter-evans/create-pull-request@4320041ed380b20e97d388d56a7fb4f9b8c20e79 # v7.0.0
         with:
           branch: ci-data/loadtest-nightly
