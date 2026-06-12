@@ -12,8 +12,10 @@
  *  - The reference prints "atrium.fi/app" URLs. The real app lives at
  *    useatrium.me, so every app link is a relative Next <Link href="/app">
  *    (and /verify/1 for the verifier walk). No hardcoded marketing domain.
- *  - The faucet detail avoids inventing a per-claim amount: it says "claim
- *    test USDC + test ETH from the in-app faucet" rather than a fixed number.
+ *  - The faucet detail states the same per-claim amount the landing closing CTA
+ *    states (5 test USDC + 0.0005 test ETH), so the two onboarding surfaces are
+ *    consistent rather than one exact and one vague (n=21). The figure matches
+ *    the on-chain Faucet drop surfaced live by /api/faucet/status + onboarding.
  *  - Demo stat tiles are illustrative of the UI shape, labelled as such, and
  *    never presented as a live reading of the reader's own account.
  *
@@ -70,7 +72,7 @@ const STEPS: Step[] = [
         Claim free <em>test funds.</em>
       </>
     ),
-    body: 'Atrium ships its own faucet so you can run the whole flow. Claim test USDC plus a little test ETH from the in-app faucet. The ETH covers gas; the USDC becomes your collateral. None of it has real value.',
+    body: 'Atrium ships its own faucet so you can run the whole flow. Each claim drops 5 test USDC and 0.0005 test ETH from the in-app faucet. The ETH covers gas; the USDC becomes your collateral. None of it has real value.',
     spec: 'In-app testnet faucet · cooldown enforced per wallet',
     href: '/app',
     hrefLabel: 'Open the faucet',

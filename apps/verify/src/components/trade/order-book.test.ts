@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { symbolForVenue } from './order-book';
+import { symbolForVenue, emptyBookMessage } from './order-book';
 import { VENUES } from '@/lib/venues';
 
 /**
@@ -50,5 +50,30 @@ describe('symbolForVenue', () => {
     const c = symbolForVenue('curve');
     expect(a).toBe(b);
     expect(b).toBe(c);
+  });
+});
+
+/**
+ * n=10: the empty-book message must reflect the SELECTED venue, never the
+ * hardcoded "Hyperliquid HIP-3" string regardless of selection.
+ */
+describe('emptyBookMessage', () => {
+  it('never names Hyperliquid HIP-3 for the Aave Horizon venue', () => {
+    const msg = emptyBookMessage('aave-horizon');
+    expect(msg).not.toMatch(/Hyperliquid/i);
+    expect(msg).toMatch(/Aave Horizon/);
+    // Aave Horizon is a live lending market - it should say it has no perp book,
+    // not imply a pending adapter.
+    expect(msg).toMatch(/lending market/i);
+  });
+
+  it('names the selected scaffold venue in the pending-adapter message', () => {
+    const msg = emptyBookMessage('pendle-v2');
+    expect(msg).toMatch(/Pendle V2/);
+    expect(msg).not.toMatch(/Hyperliquid HIP-3/);
+  });
+
+  it('names Hyperliquid HIP-3 only when that venue is selected', () => {
+    expect(emptyBookMessage('hyperliquid')).toMatch(/Hyperliquid HIP-3/);
   });
 });

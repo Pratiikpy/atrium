@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { VENUES } from '@/lib/venues';
 
 interface OrderBookLevel {
   price: string;
@@ -37,6 +38,24 @@ const SYMBOL_BY_VENUE: Record<string, string> = {
 
 export function symbolForVenue(venueId: string): string {
   return SYMBOL_BY_VENUE[venueId] ?? 'HSLA-PERP';
+}
+
+/**
+ * n=10: venue-aware empty-book message. Pre-fix this was hardcoded to
+ * "Hyperliquid HIP-3" regardless of the selected venue, so the panel for the
+ * one openable venue (Aave Horizon, a lending market with no perp order book)
+ * told the user to wait on a different venue's adapter. Now:
+ *  - operational lending/cash-equiv markets explain they have no perp book
+ *  - non-operational scaffold venues name the SELECTED venue's pending adapter
+ */
+export function emptyBookMessage(venueId: string): string {
+  const venue = VENUES.find((v) => v.id === venueId);
+  const label = venue?.label ?? 'this venue';
+  const symbol = symbolForVenue(venueId);
+  if (venue?.operational && venue.kind === 'cash-equiv') {
+    return `${label} is a lending market, so it has no perp order book. Margin and positions update from on-chain reserves.`;
+  }
+  return `Order book for ${symbol} populates once the ${label} adapter routes through Aqueduct.`;
 }
 
 async function fetchBook(venue: string): Promise<BookResponse> {
@@ -103,7 +122,7 @@ export function OrderBook({ venue }: { venue: string }) {
         </div>
       ) : (data?.bids.length === 0 && data?.asks.length === 0) ? (
         <div className="mt-12 text-center text-sm text-muted">
-          Order book populates once the Hyperliquid HIP-3 adapter routes through Aqueduct.
+          {emptyBookMessage(venue)}
         </div>
       ) : (
         <div className="mt-5 grid grid-cols-2 gap-3 text-xs">

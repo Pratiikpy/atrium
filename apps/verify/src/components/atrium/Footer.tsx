@@ -11,7 +11,8 @@ export function Footer() {
             <BrandWordmark size={28} />
             <p className="max-w-xs text-[13.5px] text-[var(--ink-soft)]">
               Unified margin prime brokerage for the EVM. Testnet-first. Built on
-              Arbitrum Sepolia with Chainlink CCIP, ERC-8004, and ERC-4337 / 7702.
+              Arbitrum Sepolia with Chainlink CCIP and ERC-8004 agent mandates;
+              ERC-4337 / 7702 account abstraction is a documented Year-2 path.
             </p>
             <div className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
               {APP_VERSION} · {BUILD_PERIOD_SHORT} · testnet only

@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import { VENUES, type Venue } from '@/lib/venues';
 import { useQuery } from '@tanstack/react-query';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
+import { BottomSheet } from '@/components/ui/bottom-sheet';
+import { HelpTip } from '@/components/ui/help-tip';
 
 interface VenueStatus {
   id: string;
@@ -121,15 +123,17 @@ export function MarketsMobile() {
         );
       })}
 
-      {/* Sheet modal */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/50" onClick={() => setSelected(null)}>
-          <div
-            className="w-full rounded-t-2xl bg-mob-bg px-4 pb-8 pt-4"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-mob-muted/40" />
+      {/* Venue detail sheet. n=12: routed through the shared BottomSheet so it
+          gets role="dialog", aria-modal, focus trap, Escape-to-close, scroll-lock
+          and focus restore instead of the prior mouse/touch-only hand-rolled
+          overlay. */}
+      <BottomSheet
+        open={selected != null}
+        onClose={() => setSelected(null)}
+        label={selected?.label ?? 'Venue detail'}
+      >
+        {selected && (
+          <>
             {/* Show the operational status in the sheet too: the sheet covers the
                 list's StatusPill, so a SOON (not-yet-openable) venue must read as
                 SOON here before the user taps Trade and hits the gate on /app/trade. */}
@@ -139,7 +143,11 @@ export function MarketsMobile() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-[14px]">
               <div><span className="text-mob-muted">Kind</span><br/><span className="text-mob-ink capitalize">{selected.kind}</span></div>
-              <div><span className="text-mob-muted">Haircut</span><br/><span className="text-mob-ink">{(selected.haircutBps / 100).toFixed(1)}%</span></div>
+              {/* n=22: gloss "haircut" inline on mobile too. */}
+              <div>
+                <span className="inline-flex items-center gap-1 text-mob-muted">Haircut <HelpTip term="haircut" /></span>
+                <br/><span className="text-mob-ink">{(selected.haircutBps / 100).toFixed(1)}%</span>
+              </div>
               <div><span className="text-mob-muted">Venue ID</span><br/><span className="text-mob-ink">{selected.venueId}</span></div>
               <div><span className="text-mob-muted">Adapter</span><br/><span className="text-mob-ink">{selected.adapterSlug}</span></div>
             </div>
@@ -163,9 +171,9 @@ export function MarketsMobile() {
             <button onClick={() => setSelected(null)} className="mt-3 min-h-[44px] w-full text-[14px] text-mob-muted">
               Close
             </button>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </BottomSheet>
     </div>
   );
 }

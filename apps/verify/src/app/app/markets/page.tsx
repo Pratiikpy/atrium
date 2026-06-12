@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { StrategyCombos } from '@/components/markets/strategy-combos';
 import { MarketsMobile } from '@/components/mobile/panels/markets-mobile';
+import { HelpTip } from '@/components/ui/help-tip';
 import { VENUE_COUNT } from '@/lib/venues';
 
 export const metadata = {
@@ -157,7 +158,19 @@ export default function MarketsPage() {
                 )}
               </header>
               <p className="mt-2 text-sm text-ink-soft">{v.desc}</p>
-              <p className="mt-3 text-xs text-muted">{v.risk}</p>
+              {/* n=22: the risk line carries finance jargon ("haircut",
+                  "correlation class") that a non-finance judge will not know.
+                  Glossed inline via the shared HelpTip where the terms first
+                  appear, instead of leaving them raw. */}
+              <p className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                <span>{v.risk}</span>
+                <span className="inline-flex items-center gap-0.5 normal-case">
+                  haircut <HelpTip term="haircut" />
+                </span>
+                <span className="inline-flex items-center gap-0.5 normal-case">
+                  correlation class <HelpTip term="correlation class" />
+                </span>
+              </p>
               <p className="mt-1 text-xs text-muted">Instruments: {v.instruments}</p>
               {isScaffold && (
                 <p className="mt-3 text-xs text-testnet">
@@ -167,10 +180,12 @@ export default function MarketsPage() {
                 </p>
               )}
               {isPending && (
+                /* n=19: dropped the repeated global "Aave Horizon is the one
+                   mock-backed venue" sentence (already stated once in the intro
+                   above), so it no longer reads as filler on every pending card. */
                 <p className="mt-3 text-xs text-testnet">
                   Venue address is a testnet placeholder, so an open reverts until a
-                  real (or mock) venue is wired. Aave Horizon is the one mock-backed
-                  venue demoable on testnet today.
+                  real (or mock) venue is wired.
                 </p>
               )}
             </article>

@@ -8,10 +8,11 @@
  * Includes persistent FAB (KillSwitchFAB) for every authenticated mobile page.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useKillSwitch } from '@/lib/use-kill-switch';
 import { useContractAddress } from '@/lib/use-coffer-address';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
@@ -20,7 +21,16 @@ export function KillSwitchMobile({ onClose }: { onClose?: () => void }) {
   const { data: killSwitchAddress } = useContractAddress('postern-kill-switch');
   const { status, activate } = useKillSwitch(killSwitchAddress ?? null);
   const wallet = useScopedWallet();
+  // n=18: the fixed inset-0 overlay covers the global WrongChainBanner, so this
+  // sheet is where a user could complete the irreversible-confirm tap before
+  // learning the chain is wrong. Surface the switch affordance up front and
+  // reset the confirm gate whenever the chain check flips, so confirm never runs
+  // on the wrong chain. chainOk is true when disconnected.
+  const chainGuard = useChainGuard();
   const [confirmed, setConfirmed] = useState(false);
+  useEffect(() => {
+    if (!chainGuard.ok) setConfirmed(false);
+  }, [chainGuard.ok]);
 
   const mandates = useQuery({
     queryKey: ['kill-switch-mandates', wallet],
@@ -114,14 +124,24 @@ export function KillSwitchMobile({ onClose }: { onClose?: () => void }) {
         <p className="mb-4 self-center text-[14px] text-neg">{humanizeWalletError(status.reason).message}</p>
       )}
 
-      {/* Submit */}
-      <button
-        onClick={handleActivate}
-        disabled={status.kind === 'submitting' || status.kind === 'success'}
-        className="h-[64px] w-full rounded-xl bg-neg text-[18px] font-medium text-white disabled:opacity-40"
-      >
-        {!confirmed ? 'Activate Kill Switch' : status.kind === 'submitting' ? 'Revoking…' : status.kind === 'success' ? 'Revoked ✓' : 'Confirm, this is irreversible'}
-      </button>
+      {/* Submit. On the wrong network, swap in a switch affordance BEFORE the
+          confirm gate so the irreversible action can never be confirmed there. */}
+      {wallet && !chainGuard.ok ? (
+        <button
+          onClick={chainGuard.switchChain}
+          className="h-[64px] w-full rounded-xl bg-testnet text-[18px] font-medium text-mob-bg"
+        >
+          Switch to {chainGuard.target.name} first
+        </button>
+      ) : (
+        <button
+          onClick={handleActivate}
+          disabled={status.kind === 'submitting' || status.kind === 'success'}
+          className="h-[64px] w-full rounded-xl bg-neg text-[18px] font-medium text-white disabled:opacity-40"
+        >
+          {!confirmed ? 'Activate Kill Switch' : status.kind === 'submitting' ? 'Revoking…' : status.kind === 'success' ? 'Revoked ✓' : 'Confirm, this is irreversible'}
+        </button>
+      )}
     </div>
   );
 }

@@ -22,6 +22,12 @@ const TERMS: Record<string, string> = {
   hedging: 'Holding offsetting positions to reduce net directional exposure.',
   'basis trade': 'Simultaneously long spot and short futures to capture the funding rate spread.',
   slippage: 'Difference between expected and actual execution price due to market movement or thin liquidity.',
+  // n=22: finance terms shown raw on /app/markets, glossed in plain language so
+  // a first-time judge understands them where they first appear.
+  haircut:
+    'The margin discount Atrium applies to this collateral or venue. A 10% haircut means $100 of exposure backs about $90 of buying power; safer assets (T-bills at 1%) get a smaller discount than volatile ones (binary markets at 50%).',
+  'correlation class':
+    'The risk bucket a venue’s positions net within. Atrium offsets risk inside a class (e.g. two CRYPTO_PERP legs) but, in v1, does not credit across classes.',
 };
 
 /**
@@ -32,6 +38,13 @@ export function HelpTip({ term }: { term: string }) {
   const [open, setOpen] = useState(false);
   const explanation = TERMS[term.toLowerCase()];
   if (!explanation) return null;
+
+  // n=24: associate the explanation with its trigger so assistive tech actually
+  // announces the definition. The tooltip stays mounted with a stable id (toggled
+  // visible/sr-only) so aria-describedby always resolves; pre-fix the span was
+  // only rendered while open and carried no id, so a screen reader heard the
+  // button name but never the explanation.
+  const tipId = `help-${term.toLowerCase().replace(/\s+/g, '-')}`;
 
   return (
     <span
@@ -44,19 +57,23 @@ export function HelpTip({ term }: { term: string }) {
       <button
         type="button"
         aria-label={`What is ${term}?`}
+        aria-describedby={tipId}
         className="inline-flex size-4 items-center justify-center rounded-full border border-divider text-[9px] text-muted hover:border-ink/40 hover:text-ink focus:outline-none focus:ring-1 focus:ring-ink/20"
         tabIndex={0}
       >
         ?
       </button>
-      {open && (
-        <span
-          role="tooltip"
-          className="absolute bottom-full left-1/2 z-50 mb-1.5 w-56 -translate-x-1/2 rounded-md border border-divider bg-parchment px-3 py-2 text-[11px] font-normal normal-case tracking-normal leading-[1.5] text-ink shadow-md"
-        >
-          {explanation}
-        </span>
-      )}
+      <span
+        id={tipId}
+        role="tooltip"
+        className={
+          open
+            ? 'absolute bottom-full left-1/2 z-50 mb-1.5 w-56 -translate-x-1/2 rounded-md border border-divider bg-parchment px-3 py-2 text-[11px] font-normal normal-case tracking-normal leading-[1.5] text-ink shadow-md'
+            : 'sr-only'
+        }
+      >
+        {explanation}
+      </span>
     </span>
   );
 }

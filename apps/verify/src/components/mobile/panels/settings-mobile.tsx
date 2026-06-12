@@ -52,7 +52,7 @@ export function SettingsMobile() {
         <MoreRow
           href="/app/reserves"
           label="Proof of reserves"
-          right="~hourly"
+          right="~45 min"
           icon={<ShieldIcon />}
         />
         <MoreRow

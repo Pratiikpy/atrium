@@ -6,6 +6,7 @@ import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-stat
 import { VENUES } from '@/lib/venues';
 import { Modal, ModalCloseButton } from '@/components/ui/modal';
 import { useContractAddress } from '@/lib/use-coffer-address';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { useIssueMandate } from '@/lib/use-issue-mandate';
 import { sanitizeAmount } from '@/lib/sanitize-amount';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
@@ -118,6 +119,12 @@ function MandateModal({
 
   const chainId = useChainId();
   const { data: sigilAddress } = useContractAddress('sigil');
+  // UI/UX audit (n=7): gate the mandate signature on the chain. On the wrong
+  // network the EIP-712 IntentSigil domain would carry the wrong chainId, so
+  // Sigil on Arbitrum Sepolia could never validate it - yet the UI would show a
+  // green "Mandate signed" success. Mirror the order-form pattern: swap the
+  // submit for a "Switch to Arbitrum Sepolia" button when off-chain.
+  const { ok: chainOk, switchChain } = useChainGuard();
   const { status, issue, reset } = useIssueMandate(sigilAddress ?? null, chainId);
   const busy = status.kind === 'signing' || status.kind === 'storing';
 
@@ -149,6 +156,13 @@ function MandateModal({
   async function submit() {
     const a = agent.trim();
     setValidationError(null);
+    // n=7 defense-in-depth: never build a signature on the wrong chain even if
+    // the UI gate is bypassed. chainOk is true when disconnected, so this only
+    // blocks a connected wallet on a non-Arbitrum-Sepolia network.
+    if (!chainOk) {
+      setValidationError('Switch to Arbitrum Sepolia to sign this mandate.');
+      return;
+    }
     if (!/^0x[0-9a-fA-F]{40}$/.test(a)) {
       setValidationError('Agent address must be 0x-prefixed 40-hex.');
       return;
@@ -250,14 +264,24 @@ function MandateModal({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={submit}
-          disabled={busy}
-          className="mt-6 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
-        >
-          {buttonLabel(status, busy)}
-        </button>
+        {chainOk ? (
+          <button
+            type="button"
+            onClick={submit}
+            disabled={busy}
+            className="mt-6 w-full rounded-md bg-ink px-4 py-3 text-sm font-medium text-parchment disabled:opacity-50"
+          >
+            {buttonLabel(status, busy)}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={switchChain}
+            className="mt-6 w-full rounded-md bg-testnet px-4 py-3 text-sm font-medium text-parchment transition-colors hover:bg-testnet/90"
+          >
+            Switch to Arbitrum Sepolia
+          </button>
+        )}
         {validationError && (
           <div className="mt-3 rounded-md border border-neg/40 bg-neg/5 p-3 text-xs text-neg">
             {validationError}
@@ -314,6 +338,7 @@ function humanizeIssueError(reason: string): string {
   // through to the raw slice. Keep founder-voice: lowercase, no trailing period.
   const map: Record<string, string> = {
     wallet_not_connected: 'connect wallet first',
+    wrong_network: 'switch to Arbitrum Sepolia to sign this mandate',
     sigil_not_deployed:
       'Sigil is not deployed on this network, mandate signing lights up once Sigil is live on this network',
     signature_rejected: 'wallet rejected the signature',

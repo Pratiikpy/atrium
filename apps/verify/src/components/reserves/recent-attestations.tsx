@@ -41,7 +41,7 @@ export function RecentAttestationsTable({
       <div className="rounded-md border border-divider bg-parchment-soft/40 p-12 text-center text-sm">
         <p className="text-ink-soft">No attestations yet.</p>
         <p className="mt-2 text-[11px] uppercase tracking-wider text-muted">
-          {data?.source === 'pending' ? 'lantern attestor deploy month 6' : 'cron fires every hour'}
+          {data?.source === 'pending' ? 'lantern attestor deploy month 6' : 'cron self-loops every ~45 min'}
         </p>
       </div>
     );

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { PortfolioStatRow } from '@/components/portfolio/stat-row';
+import { PortfolioConnectPrompt } from '@/components/portfolio/connect-prompt';
 import { MarginLensCard } from '@/components/portfolio/margin-lens-card';
 import { MarginEngineCard } from '@/components/portfolio/margin-engine-card';
 import { BuyingPowerCard } from '@/components/portfolio/buying-power-card';
@@ -107,6 +108,12 @@ export default function PortfolioPage() {
           otherwise, does not push the stat row down for healthy accounts. */}
       <section className="mt-6">
         <TopUpBanner />
+      </section>
+
+      {/* n=2: above-the-fold connect affordance on the default app landing while
+          disconnected (renders nothing once connected). */}
+      <section className="mt-6">
+        <PortfolioConnectPrompt />
       </section>
 
       <section className="mt-8">

@@ -50,6 +50,11 @@ export function PortfolioStatRow() {
   // Derived sublines, fall back to honest pending state when live data
   // hasn't arrived. The card SHELLS render always so the layout shape
   // matches the design contract; only the numeric content swaps in.
+  // n=2: when there is no wallet, the sublabel must NOT read "Plinth pending"
+  // (that conflates "disconnected" with "system pending" and gives the user no
+  // next action). Show an actionable connect prompt instead, and reserve
+  // "Plinth pending" strictly for the connected-but-no-live-data case.
+  const disconnected = wallet == null;
   const sourceLive = data?.source === 'plinth';
   const marginX = data?.portfolioMarginMultiplier;
   const utilisation = data?.utilisationPct;
@@ -64,9 +69,11 @@ export function PortfolioStatRow() {
         sub={
           marginX != null
             ? `At ${marginX.toFixed(1)}× portfolio margin`
-            : sourceLive
-              ? 'Plinth · cross-product margin'
-              : 'Plinth pending'
+            : disconnected
+              ? 'Connect to view buying power'
+              : sourceLive
+                ? 'Plinth · cross-product margin'
+                : 'Plinth pending'
         }
         loading={isLoading}
         emphasis
@@ -76,9 +83,11 @@ export function PortfolioStatRow() {
         tip="total collateral"
         value={data?.totalCollateralUsd ?? null}
         sub={
-          sourceLive
-            ? `Margin scope · ${VENUE_COUNT} venues`
-            : 'Plinth pending'
+          disconnected
+            ? 'Connect to view collateral'
+            : sourceLive
+              ? `Margin scope · ${VENUE_COUNT} venues`
+              : 'Plinth pending'
         }
         loading={isLoading}
       />
@@ -89,9 +98,11 @@ export function PortfolioStatRow() {
         sub={
           utilisation != null
             ? `${utilisation.toFixed(1)}% utilisation`
-            : sourceLive
-              ? 'No open positions yet'
-              : 'Plinth pending'
+            : disconnected
+              ? 'Connect to view positions'
+              : sourceLive
+                ? 'No open positions yet'
+                : 'Plinth pending'
         }
         loading={isLoading}
       />
@@ -102,9 +113,11 @@ export function PortfolioStatRow() {
         sub={
           pnlPct != null
             ? `${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}% on collateral`
-            : sourceLive
-              ? 'No realised PnL yet'
-              : 'Plinth pending'
+            : disconnected
+              ? 'Connect to view P&L'
+              : sourceLive
+                ? 'No realised PnL yet'
+                : 'Plinth pending'
         }
         loading={isLoading}
         direction={data?.pnl24hDirection}

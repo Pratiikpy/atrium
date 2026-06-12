@@ -5,6 +5,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Press',
   description: 'Brand assets, boilerplate, and press contacts for Atrium.',
+  alternates: { canonical: '/press' },
 };
 
 export default function PressPage() {

@@ -52,7 +52,7 @@ cast call 0xb62762000686a9589b01d63ba7e50f51f46a86ef "totalAssets()(uint256)" \
   --rpc-url https://arbitrum-sepolia.publicnode.com
 
 # 2. Ask the public app for the same number. They should agree.
-curl -s https://www.useatrium.me/api/vault/stats
+curl -s https://useatrium.me/api/vault/stats
 
 # 3. Run the pinned margin invariant. The 51% is a test, not a slogan.
 cd contracts/plinth && cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture

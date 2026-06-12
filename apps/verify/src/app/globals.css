@@ -1312,11 +1312,21 @@ input[type="range"] { cursor: ew-resize; }
   -webkit-backdrop-filter: saturate(140%) blur(12px);
   position: sticky; top: 0; z-index: 30;
 }
-.atrium-app .crumb { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.atrium-app .crumb-main { font-weight: 500; color: var(--ink); }
-.atrium-app .crumb-sep  { color: var(--faint); }
-.atrium-app .crumb-sub  { color: var(--ink-soft); }
+.atrium-app .crumb { display: flex; align-items: center; gap: 10px; font-size: 13px; min-width: 0; }
+.atrium-app .crumb-main { font-weight: 500; color: var(--ink); white-space: nowrap; }
+.atrium-app .crumb-sep  { color: var(--faint); white-space: nowrap; }
+.atrium-app .crumb-sub  { color: var(--ink-soft); white-space: nowrap; }
 .atrium-app .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+/* n=9 (tablet breadcrumb wrap): at the tablet band the fixed-width right
+   cluster (LIVE chip + icon buttons + New trade) starves the 1fr crumb column
+   and the secondary breadcrumb wraps to 2-3 lines, hyphen-breaking words like
+   "Cross-chain". The page H1 already supplies full context at this width, so
+   drop the redundant sub-crumb (and its separator) until the topbar has room. */
+@media (max-width: 880px) {
+  .atrium-app .crumb-sub,
+  .atrium-app .crumb-sep { display: none; }
+}
 
 .atrium-app .pill {
   display: inline-flex; align-items: center; gap: 7px;

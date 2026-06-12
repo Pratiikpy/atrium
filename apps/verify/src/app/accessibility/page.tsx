@@ -3,6 +3,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Accessibility',
   description: 'Accessibility statement, WCAG 2.1 AA compliance target.',
+  alternates: { canonical: '/accessibility' },
 };
 
 export default function AccessibilityPage() {

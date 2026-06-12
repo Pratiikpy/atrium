@@ -4,6 +4,7 @@ export const metadata = {
   title: 'Withdrawal SLA',
   description:
     'How fast you can withdraw from Atrium, and the on-chain circuit-breakers (live and planned) that can pause redemptions.',
+  alternates: { canonical: '/sla' },
 };
 
 export default function SlaPage() {

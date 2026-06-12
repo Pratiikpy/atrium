@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useOpenPosition } from '@/lib/use-open-position';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
 import { useDeploymentStatus, readinessMessage } from '@/lib/use-deployment-status';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
@@ -57,6 +58,10 @@ export function TradeMobile() {
   const [amount, setAmount] = useState('');
   const [leverage, setLeverage] = useState(4);
   const { status, open, reset } = useOpenPosition();
+  // n=17: gate the open on the chain too (desktop OrderForm + vault-mobile
+  // parity). chainGuard.ok is true when disconnected, so this only engages for
+  // a connected wallet on a non-Arbitrum-Sepolia network.
+  const chainGuard = useChainGuard();
 
   // Audit fix (#15): the mobile panel bypassed the desktop's deployment-
   // readiness gate, so it would let a user fire an open before Plinth is
@@ -73,7 +78,7 @@ export function TradeMobile() {
   const venueOperational = selectedVenue?.operational ?? false;
   const venueLabel = selectedVenue?.shortLabel ?? 'HL-HIP3';
   const instrument = INSTRUMENT_BY_VENUE[venueId] ?? 'HSLA-PERP';
-  const ready = deployment?.ready === true && amountValid && !isSubmitting && venueOperational;
+  const ready = deployment?.ready === true && amountValid && !isSubmitting && venueOperational && chainGuard.ok;
   const helper = readinessMessage(deployment, side === 'long' ? 'Open long' : 'Open short');
 
   // Bug-hunt fix (2026-06-02): mobile computed notional = amount * leverage and
@@ -126,6 +131,19 @@ export function TradeMobile() {
 
   return (
     <div className="md:hidden flex flex-col gap-4">
+      {/* n=17 wrong-chain banner (mirrors vault-mobile): proactive switch
+          affordance so a connected wallet on the wrong network is told before
+          the CTA dead-ends into a raw error. */}
+      {!chainGuard.ok && (
+        <button
+          type="button"
+          onClick={chainGuard.switchChain}
+          className="min-h-[44px] w-full rounded-xl bg-testnet/10 border border-testnet/40 px-4 py-3 text-[16px] text-testnet"
+        >
+          Wrong network, tap to switch to {chainGuard.target.name}
+        </button>
+      )}
+
       {/* Venue selector  mirrors the desktop VenueChipBar. A live dot marks
           the operational venue(s); a muted dot marks scaffold/pending ones, so
           the user sees at a glance which venue is openable and can switch to it

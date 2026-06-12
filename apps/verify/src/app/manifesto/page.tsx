@@ -3,6 +3,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Manifesto',
   description: 'Why Atrium exists. What we will not do. What we will.',
+  alternates: { canonical: '/manifesto' },
   openGraph: {
     title: 'Manifesto · Atrium',
     description: 'Why Atrium exists. What we will not do. What we will.',

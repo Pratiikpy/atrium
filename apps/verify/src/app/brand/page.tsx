@@ -24,6 +24,7 @@ import { MarketingShell } from '@/components/atrium/MarketingShell';
 export const metadata = {
   title: 'Brand',
   description: 'Atrium brand kit. Tokens, typography, palette, logo. Source of truth.',
+  alternates: { canonical: '/brand' },
 };
 
 export default function BrandPage() {

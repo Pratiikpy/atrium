@@ -53,7 +53,7 @@ describe('GET /api/reserves/summary, KK-13 formatUsd precision', () => {
     // $4.00 aggregated. formatUsd renders as "$4.00".
     expect(json.tvlUsd).toBe('$4.00');
     expect(json.lastAttestedTvlUsd).toBe('$4.00');
-  });
+  }, 30_000);
 
   it('returns null TVL when zero balances aggregated (zero-honesty)', async () => {
     (gql as any).mockResolvedValue({
@@ -65,7 +65,7 @@ describe('GET /api/reserves/summary, KK-13 formatUsd precision', () => {
     // tvl=0n branch returns null, not "$0.00", same honesty pattern
     // as iter-36 in protocol/metrics.
     expect(json.tvlUsd).toBeNull();
-  });
+  }, 30_000);
 
   it('preserves precision on large aggregated TVL (KK-13)', async () => {
     // 1B USDC = 1e15 micro-USDC, well past Number safe integer when

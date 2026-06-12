@@ -57,6 +57,7 @@ const RELEASES: Release[] = [
 export const metadata = {
   title: 'Changelog',
   description: 'Published milestones and their dated git tags.',
+  alternates: { canonical: '/changelog' },
 };
 
 export default function ChangelogPage() {

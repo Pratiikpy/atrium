@@ -45,20 +45,19 @@ export function ReservesStatRow() {
   const { data } = useQuery({ queryKey: ['reserves-summary'], queryFn: fetchSummary, refetchInterval: 60_000 });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Tile label="Redeemable now" value={data?.redeemableUsd ?? '-'} sub="Coffer.totalAssets() · live read" />
-      <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '-'} sub="last hourly attestation" />
+      <Tile label="Redeemable now" value={data?.redeemableUsd ?? '-'} sub="live on-chain balance" />
+      <Tile label="Last attested" value={data?.lastAttestedTvlUsd ?? '-'} sub="last on-chain attestation" />
       <Tile
         label="Last attestation"
         value={data?.lastAttestedAgo ?? '-'}
         sub={
           data?.isStale
             ? `STALE · ${data.staleReason ?? 'past freshness threshold'}`
-            : 'every 60 min'
+            : 'every ~45 min'
         }
-        // Iteration 34: visual flag when stale. The "every 60 min" sub-label
-        // pre-fix was the only freshness signal, implicit, and only readable
-        // to a user who notices the discrepancy between "25 hours ago" + "every
-        // 60 min." Now the sub-label flips to STALE + reason when isStale.
+        // Iteration 34: visual flag when stale. The cadence sub-label flips to
+        // STALE + reason when isStale, so freshness is explicit rather than
+        // implicit. Cadence ~45 min mirrors lantern-cron.yml `sleep 2700`.
         warn={data?.isStale === true}
       />
       <Tile label="Leaves in tree" value={data?.leafCount?.toLocaleString('en-US') ?? '-'} sub="one per Coffer balance" />

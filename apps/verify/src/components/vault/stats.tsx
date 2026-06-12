@@ -38,9 +38,9 @@ export function VaultStats() {
   const connected = wallet != null;
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      <Tile label="Vault TVL" value={data?.vaultTvlUsd ?? '-'} sub="from Coffer.totalAssets()" source={sourceCaption} />
-      <Tile label="Your value" value={connected ? (data?.userValueUsd ?? '-') : '-'} sub="redeemable · convertToAssets(your shares)" source={connected ? sourceCaption : 'connect a wallet'} />
-      <Tile label="Your shares" value={connected ? (data?.userSharesFormatted ?? '-') : '-'} sub="ERC-4626 · 1e12 virtual-offset scale" source={connected ? sourceCaption : 'connect a wallet'} />
+      <Tile label="Vault TVL" value={data?.vaultTvlUsd ?? '-'} sub="vault USDC · live on-chain" source={sourceCaption} />
+      <Tile label="Your value" value={connected ? (data?.userValueUsd ?? '-') : '-'} sub="your redeemable USDC" source={connected ? sourceCaption : 'connect a wallet'} />
+      <Tile label="Your shares" value={connected ? (data?.userSharesFormatted ?? '-') : '-'} sub="vault shares · ERC-4626" source={connected ? sourceCaption : 'connect a wallet'} />
     </div>
   );
 }

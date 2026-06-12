@@ -132,7 +132,11 @@ const NODES: MapNode[] = [
 ];
 
 const ARBISCAN = 'https://sepolia.arbiscan.io/address/';
-const RH_EXPLORER = 'https://testnet.robinhood.com/address/'; // Robinhood Chain testnet explorer
+// n=8: the previous host (testnet.robinhood.com) was an invented URL that
+// returned a TLS handshake_failure - the 8 RH-Chain rows linked to a dead
+// explorer. This is the real, live Robinhood Chain testnet explorer
+// (Blockscout, HTTP 200, resolves the deployed addresses; chainId 46630).
+const RH_EXPLORER = 'https://explorer.testnet.chain.robinhood.com/address/';
 
 type Row = { name: string; address: string; lang: Lang; explorer: string };
 
@@ -401,20 +405,34 @@ export function DeploymentsTable() {
             </span>
             <span className="arch-table-addr" role="cell">
               {current.copyable ? (
-                <button
-                  type="button"
-                  className="arch-addr-btn"
-                  onClick={() => {
-                    navigator.clipboard?.writeText(r.address).then(() => {
-                      setCopied(r.address);
-                      setTimeout(() => setCopied(null), 1400);
-                    });
-                  }}
-                  title="Copy address"
-                >
-                  <code>{r.address}</code>
-                  <span className="arch-addr-copy">{copied === r.address ? '✓' : 'copy'}</span>
-                </button>
+                <span className="inline-flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="arch-addr-btn"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(r.address).then(() => {
+                        setCopied(r.address);
+                        setTimeout(() => setCopied(null), 1400);
+                      });
+                    }}
+                    title="Copy address"
+                  >
+                    <code>{r.address}</code>
+                    <span className="arch-addr-copy">{copied === r.address ? '✓' : 'copy'}</span>
+                  </button>
+                  {/* n=8: "verified on chain" is now actually clickable - each
+                      address links to its live explorer (Arbiscan / RH-Chain
+                      Blockscout). */}
+                  <a
+                    href={`${r.explorer}${r.address}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="arch-addr-copy"
+                    title="View on block explorer"
+                  >
+                    ↗
+                  </a>
+                </span>
               ) : (
                 <code className="arch-addr-static">{r.address}</code>
               )}
@@ -430,7 +448,7 @@ export function DeploymentsTable() {
           ? 'Robinhood Chain testnet (chainId 46630) · the full Atrium stack mirrored from Arbitrum. Click any address to copy it.'
           : tab === 'venues'
             ? '9 venue-adapter contracts deployed + verified. Seven venues are in the launch margin scope (Aave Horizon operational today); GMX, Morpho, and Synthetix are deployed but outside the initial seven. Click any address to copy it.'
-            : 'Solidity verified on Arbiscan or Sourcify (router 0xF593 pending re-verification) · Stylus via cargo stylus verify. Click any address to copy it.'}
+            : 'Solidity verified on Arbiscan or Sourcify · Stylus via cargo stylus verify. Click any address to copy it.'}
       </p>
     </div>
   );

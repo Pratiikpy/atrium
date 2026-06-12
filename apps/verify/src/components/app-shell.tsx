@@ -9,6 +9,7 @@ import { ConnectWallet } from './connect-wallet';
 import { WrongChainBanner } from './wrong-chain-banner';
 import { MobileBottomNav } from './mobile/mobile-bottom-nav';
 import { CommandPalette } from './command-palette';
+import { useChainGuard } from '@/lib/use-chain-guard';
 
 /**
  * Audit fix (#44): render {children} ONCE.
@@ -93,6 +94,11 @@ const NAV_GROUPS = [
   {
     heading: 'Account',
     items: [
+      // n=1: the 5-step onboarding walkthrough was built but linked from
+      // nowhere, so a first-time judge landed straight on the bare Portfolio.
+      // A persistent sidebar entry makes it discoverable from every /app screen
+      // without forcing returning users back through it (no redirect change).
+      { href: '/app/onboarding',    label: 'Start here',    icon: 'doc' },
       { href: '/app/notifications', label: 'Notifications', icon: 'bell' },
       { href: '/app/settings',      label: 'Settings',      icon: 'gear' },
     ],
@@ -137,6 +143,13 @@ export function AppShell({
   // Surface a working ConnectWallet in the mobile header whenever disconnected,
   // so every mobile app screen has a visible, functional connect entry point.
   const { isConnected } = useAccount();
+  // n=16: the desktop branch renders WrongChainBanner but the mobile branch had
+  // no wrong-network affordance, so mobile kill-switch / settings revoke / etc.
+  // hit a raw wallet revert mid-flow. Surface a dark-themed switch banner inside
+  // the mobile main, mirroring vault-mobile's proven inline pattern. Gated on
+  // isMobile so it mounts once (the #44 single-mount rule). chainGuard.ok is true
+  // when disconnected, so it only shows for a connected wallet on the wrong net.
+  const chainGuard = useChainGuard();
   return (
     <>
       {/* Mobile branch: minimal chrome wrapping the
@@ -173,7 +186,18 @@ export function AppShell({
             "Liquidation buffer" value, which is right-aligned under the FAB)
             scrolled behind the shield. 164px = 152px FAB reach + a 12px margin.
             Found via real-wallet mobile QA (29-mobile-trade-margin-wired.png). */}
-        <main style={{ padding: '16px', paddingBottom: 'calc(164px + env(safe-area-inset-bottom, 0px))' }}>{isMobile ? (mobile ?? children) : null}</main>
+        <main style={{ padding: '16px', paddingBottom: 'calc(164px + env(safe-area-inset-bottom, 0px))' }}>
+          {isMobile && !chainGuard.ok && (
+            <button
+              type="button"
+              onClick={chainGuard.switchChain}
+              className="mb-4 min-h-[44px] w-full rounded-xl bg-testnet/10 border border-testnet/40 px-4 py-3 text-[16px] text-testnet"
+            >
+              Wrong network, tap to switch to {chainGuard.target.name}
+            </button>
+          )}
+          {isMobile ? (mobile ?? children) : null}
+        </main>
         {/* Audit fix (#16): the mobile branch reserved 80px for a nav bar but
             never rendered one - the built MobileBottomNav was orphaned, leaving
             mobile users with no in-app navigation between screens. Now wired. */}

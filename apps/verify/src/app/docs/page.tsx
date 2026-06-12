@@ -6,6 +6,7 @@ import { DISCLOSURES } from '@/app/docs/honesty/page';
 export const metadata = {
   title: 'Docs',
   description: 'Product, architecture, API, operations, security. Everything Atrium does, documented on the site.',
+  alternates: { canonical: '/docs' },
   openGraph: {
     title: 'Docs · Atrium',
     description: 'Product, architecture, API, operations, security. Everything Atrium does, documented on the site.',

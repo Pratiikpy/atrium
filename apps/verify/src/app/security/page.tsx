@@ -5,6 +5,7 @@ import { AuditFindingsTable } from '@/components/security/audit-findings-table';
 export const metadata = {
   title: 'Security',
   description: 'Atrium security posture and responsible disclosure policy.',
+  alternates: { canonical: '/security' },
   openGraph: {
     title: 'Security · Atrium',
     description: 'Atrium security posture and responsible disclosure policy.',

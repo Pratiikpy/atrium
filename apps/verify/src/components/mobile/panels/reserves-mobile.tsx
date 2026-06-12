@@ -10,6 +10,7 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
+import { BottomSheet } from '@/components/ui/bottom-sheet';
 
 interface Attestation {
   root: `0x${string}`;
@@ -330,59 +331,51 @@ export function ReservesMobile() {
         {address ? 'Verify my balance' : 'Connect wallet to verify'}
       </button>
 
-      {/* Verify sheet */}
-      {verifyOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-black/50"
-          onClick={() => setVerifyOpen(false)}
-        >
-          <div
-            className="w-full rounded-t-2xl bg-mob-bg px-4 pb-8 pt-4"
-            style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-mob-muted/40" />
-            <h3 className="text-[18px] font-medium text-mob-ink">
-              Balance Verification
-            </h3>
-            <div className="mt-4 text-[16px]">
-              {proofResult === 'verifying' && (
-                <p className="text-mob-muted">Checking inclusion…</p>
-              )}
-              {proofResult === 'verified' && (
-                <p className="text-live">
-                  ✓ Your wallet is included in the latest Merkle tree
-                </p>
-              )}
-              {proofResult === 'absent' && (
-                <p className="text-testnet">
-                  Your wallet is not in this attestation tree
-                </p>
-              )}
-              {proofResult === 'not_pinned' && (
-                <p className="text-testnet">
-                  The attested leaf tree is not pinned to IPFS yet, so
-                  per-wallet inclusion can&apos;t be checked. The root above is
-                  on chain and verifiable now.
-                </p>
-              )}
-              {proofResult === 'error' && (
-                <p className="text-neg">
-                  Verification failed, IPFS gateway may be unreachable
-                </p>
-              )}
-            </div>
-            <button
-              onClick={() => setVerifyOpen(false)}
-              className="mt-6 min-h-[44px] w-full rounded-xl border border-mob-line text-[16px] text-mob-ink"
-            >
-              Close
-            </button>
-          </div>
+      {/* Verify sheet. n=12: routed through the shared BottomSheet so it gets
+          role="dialog", aria-modal, focus trap, Escape, scroll-lock and focus
+          restore (was a mouse/touch-only hand-rolled overlay). */}
+      <BottomSheet
+        open={verifyOpen}
+        onClose={() => setVerifyOpen(false)}
+        label="Balance Verification"
+      >
+        <h3 className="text-[18px] font-medium text-mob-ink">
+          Balance Verification
+        </h3>
+        <div className="mt-4 text-[16px]">
+          {proofResult === 'verifying' && (
+            <p className="text-mob-muted">Checking inclusion…</p>
+          )}
+          {proofResult === 'verified' && (
+            <p className="text-live">
+              ✓ Your wallet is included in the latest Merkle tree
+            </p>
+          )}
+          {proofResult === 'absent' && (
+            <p className="text-testnet">
+              Your wallet is not in this attestation tree
+            </p>
+          )}
+          {proofResult === 'not_pinned' && (
+            <p className="text-testnet">
+              The attested leaf tree is not pinned to IPFS yet, so
+              per-wallet inclusion can&apos;t be checked. The root above is
+              on chain and verifiable now.
+            </p>
+          )}
+          {proofResult === 'error' && (
+            <p className="text-neg">
+              Verification failed, IPFS gateway may be unreachable
+            </p>
+          )}
         </div>
-      )}
+        <button
+          onClick={() => setVerifyOpen(false)}
+          className="mt-6 min-h-[44px] w-full rounded-xl border border-mob-line text-[16px] text-mob-ink"
+        >
+          Close
+        </button>
+      </BottomSheet>
 
       {/* Source pill */}
       <div className="flex items-center gap-2">

@@ -12,7 +12,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const rb = getRunbook(slug);
   return {
-    title: rb ? `Atrium · ${rb.title}` : 'Atrium · Runbook',
+    // n=15: return a bare title and let the root layout template ('%s · Atrium')
+    // add the brand once. Pre-fix this prefixed "Atrium · " too, so the template
+    // produced the doubled "Atrium · Deploy runbook · Atrium".
+    title: rb ? rb.title : 'Runbook',
     description: rb?.summary || 'Operational runbook.',
   };
 }

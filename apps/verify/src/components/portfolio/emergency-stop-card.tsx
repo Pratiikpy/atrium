@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useKillSwitch } from '@/lib/use-kill-switch';
 import { useContractAddress } from '@/lib/use-coffer-address';
+import { useChainGuard } from '@/lib/use-chain-guard';
 import { humanizeWalletError } from '@/lib/humanize-wallet-error';
 import { arbiscanTxUrl } from '@/lib/arbiscan';
 import { useScopedWallet, walletQuery } from '@/lib/use-scoped-wallet';
@@ -24,6 +25,11 @@ export function EmergencyStopCard() {
   const { data: killSwitchAddress } = useContractAddress('postern-kill-switch');
   const { status, activate } = useKillSwitch(killSwitchAddress ?? null);
   const wallet = useScopedWallet();
+  // n=18: surface the wrong-network state at the point of action (matching the
+  // deposit/withdraw convention) instead of only after the irreversible confirm.
+  // chainOk is true when disconnected, so this only swaps in for a connected
+  // wallet on a non-Arbitrum-Sepolia chain.
+  const { ok: chainOk, switchChain } = useChainGuard();
   const [confirmed, setConfirmed] = useState(false);
 
   const mandates = useQuery({
@@ -122,16 +128,25 @@ export function EmergencyStopCard() {
           ) : null;
         })()}
 
-      <button
-        onClick={handle}
-        disabled={!deployed || !wallet || busy || status.kind === 'success'}
-        className={`mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40 ${
-          deployed && wallet ? 'bg-neg' : 'bg-ink'
-        }`}
-        title={!deployed ? 'Kill switch contract pending deployment' : !wallet ? 'Connect a wallet first' : undefined}
-      >
-        {label}
-      </button>
+      {deployed && wallet && !chainOk ? (
+        <button
+          onClick={switchChain}
+          className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-md bg-testnet px-4 py-2.5 text-sm font-medium text-parchment transition hover:opacity-90"
+        >
+          Switch to Arbitrum Sepolia
+        </button>
+      ) : (
+        <button
+          onClick={handle}
+          disabled={!deployed || !wallet || busy || status.kind === 'success'}
+          className={`mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40 ${
+            deployed && wallet ? 'bg-neg' : 'bg-ink'
+          }`}
+          title={!deployed ? 'Kill switch contract pending deployment' : !wallet ? 'Connect a wallet first' : undefined}
+        >
+          {label}
+        </button>
+      )}
     </div>
   );
 }

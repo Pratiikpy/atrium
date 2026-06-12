@@ -46,7 +46,7 @@ const ROOM_DESC: Record<string, string> = {
   edict:     "Jurisdiction-tier registry. Sumsub sandbox KYC. Gates venue access by tier.",
   praetor:   "CLI and ops tooling. Built on Foundry + cargo-stylus.",
   coffer:    "ERC-4626 collateral vaults in Rust on the OpenZeppelin Rust ERC-4626 base.",
-  lantern:   "Merkle attestations published roughly hourly on-chain. Independent 14kb verifier.",
+  lantern:   "Merkle attestations published about every 45 minutes on-chain. Independent 14kb verifier.",
   cohort:    "Five to eight named design partners, sharing venue-specific knowledge.",
   curator:   "Open-source grant programme, $20–50K ARB, for community-built Portico adapters.",
   postern:   "ERC-4337 + EIP-7702 wallet abstraction. Passkey login, session keys, social recovery.",

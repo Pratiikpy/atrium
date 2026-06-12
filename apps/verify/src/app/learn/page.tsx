@@ -50,7 +50,7 @@ export default function LearnPage() {
         <Step
           n={6}
           title="Lantern proves reserves"
-          body="Lantern publishes a Merkle root of every Coffer balance on chain, verifiable now; the free scheduler refreshes it roughly hourly. Per-wallet inclusion proofs light up once the attestor pins the full tree to IPFS with a web3.storage token."
+          body="Lantern publishes a Merkle root of every Coffer balance on chain, verifiable now; the free scheduler refreshes it about every 45 minutes. Per-wallet inclusion proofs light up once the attestor pins the full tree to IPFS with a web3.storage token."
         />
       </section>
 

@@ -431,7 +431,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
               <div className="feature-split-copy">
                 <div className="eyebrow mono cap">Lantern · proof-of-reserves</div>
                 <p className="section-sub">
-                  Lantern publishes a signed Merkle attestation roughly hourly. Anyone
+                  Lantern publishes a signed Merkle attestation about every 45 minutes. Anyone
                   can verify a balance against it locally, without trusting Atrium.
                 </p>
               </div>
@@ -458,7 +458,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                     <div>
                       <div className="mono cap muted">Proof-of-reserves · Atrium</div>
                       <div className="strong" style={{ fontSize: 17, marginTop: 6 }}>
-                        Merkle attestation · every 10 min
+                        Merkle attestation · every 45 min
                       </div>
                     </div>
                     <div className="check-badge" style={d.lanternStale ? { opacity: 0.6 } : undefined}>
@@ -553,10 +553,14 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                 <div className="mono cap muted" style={{ marginTop: 14 }}>Codex queries · 24h</div>
                 <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>x402 micropayments</div>
               </div>
+              {/* n=14: a bare "7 / 7" reads as "all venues live" at a glance.
+                  Keep the live deployed count but put the operational truth in
+                  the headline (1 openable today), matching the split /architecture
+                  and /app/markets already use, so it can't read as fully done. */}
               <div className="number-big">
-                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesDeployed} / {d.venuesTotal}</div>
+                <div className="num" style={{ fontSize: 'clamp(36px,4vw,56px)', letterSpacing: '-0.025em', lineHeight: 1 }}>{d.venuesDeployed} / {d.venuesTotal}<span style={{ fontSize: '0.42em', letterSpacing: '0.04em', opacity: 0.75 }}> · 1 openable</span></div>
                 <div className="mono cap muted" style={{ marginTop: 14 }}>Venue adapters deployed</div>
-                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>Aave Horizon registered; rest ship Month 1 W2</div>
+                <div className="mono cap muted" style={{ marginTop: 4, opacity: 0.7 }}>Aave Horizon openable today; rest register as lanes land</div>
               </div>
             </div>
           </div>

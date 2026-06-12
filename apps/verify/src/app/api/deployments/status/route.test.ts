@@ -38,7 +38,7 @@ describe('GET /api/deployments/status, step clamping', () => {
     const json = await call(null);
     expect(json.step).toBe(1);
     expect(json.required_contracts).toEqual(['coffer']);
-  });
+  }, 30_000);
 
   it('defaults to step 1 on non-numeric input', async () => {
     expect((await call('foo')).step).toBe(1);

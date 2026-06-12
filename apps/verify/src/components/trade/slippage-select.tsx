@@ -78,6 +78,10 @@ export function SlippageSelect({
           onBlur={applyCustom}
           onKeyDown={(e) => e.key === 'Enter' && applyCustom()}
           placeholder="0.00"
+          /* n=23: a placeholder is not an accessible name (it disappears on
+             input and many AT ignore it). Give the lone custom-slippage input a
+             real accessible name like every other amount input in the app. */
+          aria-label="Custom slippage tolerance (%)"
           className="w-14 rounded border border-divider bg-parchment-light px-1.5 py-0.5 text-[11px] font-mono text-ink focus:outline-none"
           autoFocus
         />
