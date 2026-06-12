@@ -97,7 +97,8 @@ export function SessionGate({ children }: { children: React.ReactNode }) {
       {children}
       {showChip && (
         <div
-          className="fixed bottom-4 left-4 z-40 flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-2 text-xs text-ink shadow-sm"
+          className="fixed left-4 z-40 mb-[68px] flex items-center gap-2 rounded-md border border-divider bg-parchment px-3 py-2 text-xs text-ink shadow-sm md:mb-0"
+          style={{ bottom: 'calc(1rem + var(--consent-h, 0px) + env(safe-area-inset-bottom, 0px))' }}
           role="status"
         >
           {state === 'signing' ? (

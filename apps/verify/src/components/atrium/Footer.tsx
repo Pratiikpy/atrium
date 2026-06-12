@@ -32,6 +32,8 @@ export function Footer() {
             ["Verifier walk", "/verify"],
             ["Reserves", "/lantern"],
             ["Docs", "/docs"],
+            ["Demo video", "https://youtu.be/LliZ3DdxF3E"],
+            ["Pitch video", "https://youtu.be/ZckBcF9dSs4"],
           ]} />
           <FootCol title="Company" links={[
             ["Manifesto", "/manifesto"],
@@ -69,9 +71,15 @@ function FootCol({ title, links }: { title: string; links: [string, string][] })
       <ul className="flex flex-col gap-2.5">
         {links.map(([label, href]) => (
           <li key={href}>
-            <Link href={href as any} className="text-[13.5px] text-[var(--ink-soft)] hover:text-[var(--ink)]">
-              {label}
-            </Link>
+            {href.startsWith("http") ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" className="text-[13.5px] text-[var(--ink-soft)] hover:text-[var(--ink)]">
+                {label}
+              </a>
+            ) : (
+              <Link href={href as any} className="text-[13.5px] text-[var(--ink-soft)] hover:text-[var(--ink)]">
+                {label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>

@@ -179,7 +179,7 @@ const STEPS: Step[] = [
     tiles: [
       { v: 'signed root', l: 'PUBLISHED ON-CHAIN' },
       { v: 'inclusion proof', l: 'YOUR BALANCE' },
-      { v: '~10 min', l: 'ATTESTATION CADENCE' },
+      { v: '~45 min', l: 'ATTESTATION CADENCE' },
     ],
     note: 'The check returns a real result against the on-chain root, never a hardcoded "verified".',
   },

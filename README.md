@@ -37,7 +37,7 @@ Atrium is the neutral layer that sees the whole book. You deposit USDC once into
 
 Two things make this real rather than a pitch:
 
-1. **A netting number that cannot drift from a slide.** A hedged book that costs `$20,400` margined leg by leg costs `$10,000` netted as one portfolio. That is **51.0% freed**, and the same figure is pinned by a test in CI. [Jump to it.](#one-book-one-number)
+1. **A netting number that cannot drift from a slide.** A hedged book that costs `$20,400` margined leg by leg costs `$10,000` netted as one portfolio. That is **51.0% freed**, and a test in CI guards the engine's netting so this figure cannot silently weaken. [Jump to it.](#one-book-one-number)
 2. **An AI agent that acts on-chain, and a risk engine that tells it no.** A user signs one bounded mandate. The agent opens a trade inside it. The next action breaks the cap and the contract reverts. Four real transactions you can open right now. [Jump to it.](#an-agent-with-a-key-and-a-limit)
 
 ---
@@ -54,7 +54,7 @@ cast call 0xb62762000686a9589b01d63ba7e50f51f46a86ef "totalAssets()(uint256)" \
 # 2. Ask the public app for the same number. They should agree.
 curl -s https://useatrium.me/api/vault/stats
 
-# 3. Run the pinned margin invariant. The 51% is a test, not a slogan.
+# 3. Run the SPAN netting invariant. The figure comes from the engine, not a slide.
 cd contracts/plinth && cargo test hedge_frees_a_pinned_share_of_the_isolated_margin -- --nocapture
 ```
 

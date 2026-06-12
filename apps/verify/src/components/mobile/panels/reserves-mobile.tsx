@@ -234,7 +234,7 @@ export function ReservesMobile() {
         </p>
         <p className="mt-0.5 text-[11px] text-mob-muted">
           {summary.data?.redeemableUsd != null
-            ? 'Coffer.totalAssets() · live read'
+            ? 'live on-chain balance'
             : 'pending'}
         </p>
       </section>

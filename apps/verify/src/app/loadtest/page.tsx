@@ -31,7 +31,7 @@ export default function LoadtestPage() {
           <li>• Codex API, ≤ 200ms P95</li>
           <li>• Scribe indexer lag, ≤ 30s normal</li>
           <li>• Verifier Mode time-to-interactive, ≤ 1.5s on broadband</li>
-          <li>• Lantern attestation cadence, 1 publish/hour ± 15min jitter</li>
+          <li>• Lantern attestation cadence, about every 45 min</li>
         </ul>
       </section>
       </div>

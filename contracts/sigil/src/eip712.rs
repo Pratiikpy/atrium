@@ -447,15 +447,16 @@ pub fn day_index(timestamp_seconds: u64) -> u64 {
 mod kani_proofs {
     use super::*;
 
-    /// **Invariant: Mandate expiry.** If now > expires_at, validation must fail.
-    /// Tested via caps_respected does not include expiry, but the lower-level
-    /// guard is straightforward: this proof asserts the boundary.
+    /// **Placeholder harness (authored, not yet proven).** The real expiry guard
+    /// lives in `Sigil.validate_action` (lib.rs), which rejects when
+    /// `now > expires_at`. This stub is a scaffold for a future symbolic check of
+    /// that boundary; it does not yet assert a non-trivial predicate.
     #[kani::proof]
     fn expiry_boundary() {
         let now: u64 = kani::any();
         let expires_at: u64 = kani::any();
         if now > expires_at {
-            // Caller should reject in Sigil.validate_action
+            // Caller rejects in Sigil.validate_action; symbolic check TODO.
             assert!(true);
         }
     }

@@ -236,7 +236,7 @@ export function TradeMobile() {
           aria-label="Leverage"
         />
         <div className="mt-1 flex justify-between font-mono text-[9.5px] uppercase tracking-wider text-mob-muted">
-          <span>1x</span><span>2x</span><span>4x</span><span>6x</span><span>10x</span>
+          <span>1x</span><span>10x</span>
         </div>
         {/* #8 (2026-06-09): on-chain notional is 1x on testnet (notional = amount,
             leverage UI-only by design); the Notional + margin below reflect 1x. */}
