@@ -41,7 +41,7 @@ exports[`Static catalog arrays (snapshot) > SUBSYSTEMS matches snapshot 1`] = `
     "name": "Sigil",
     "num": "06",
     "phase": "P1",
-    "stack": "Solidity · ERC-8004",
+    "stack": "Stylus · ERC-8004",
     "sub": "Agent credit",
   },
   {

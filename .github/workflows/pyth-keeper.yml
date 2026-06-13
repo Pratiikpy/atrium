@@ -2,8 +2,13 @@ name: pyth-keeper
 
 # Keeps the on-chain Pyth USDC/USD price fresh inside Plinth's 60s window so
 # Aave-Horizon opens never revert ERR_ORACLE_STALE. Free always-on keeper for
-# Hobby (no Vercel Pro): each run self-loops for ~5.4h pushing every ~50s, and
-# the */30 cron restarts it. GitHub throttles schedules (see the Lantern
+# Hobby (no Vercel Pro): each run self-loops for ~5.4h pushing every ~30s, and
+# the */30 cron restarts it. The cadence is 30s (not 50s) on purpose: with the
+# per-push tx-confirmation latency stacked on a 50s sleep, the on-chain price
+# age peaked near ~56s under jitter and could cross the 60s gate, opening a
+# real window where any trade-open reverted ERR_ORACLE_STALE. A 30s sleep caps
+# on-chain age near ~35-40s with comfortable headroom under the contract bound.
+# GitHub throttles schedules (see the Lantern
 # incident: cron fires hours apart), so the long in-run loop is what actually
 # provides coverage; the cron + workflow_dispatch just (re)start it. The
 # equivalent Vercel cron lives in apps/verify (route + vercel.json) and is the
@@ -27,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Foundry (cast)
         uses: foundry-rs/foundry-toolchain@v1
-      - name: Push fresh Pyth price every ~50s
+      - name: Push fresh Pyth price every ~30s
         env:
           ARBITRUM_SEPOLIA_RPC_URL: ${{ secrets.ARBITRUM_SEPOLIA_RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.PYTH_KEEPER_KEY }}
@@ -44,6 +49,6 @@ jobs:
             else
               echo "[$n] push failed (will retry next tick):"; tail -2 /tmp/push.log
             fi
-            sleep 50
+            sleep 30
           done
           echo "loop done after $n pushes; cron will restart"
