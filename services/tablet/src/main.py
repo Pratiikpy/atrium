@@ -96,7 +96,8 @@ def _disposal_events(report, currency, limit=200):
         disp = getattr(d, "disposal", None)  # UK keeps the sell Trade here
         if sold is None and disp is not None:
             sold = getattr(disp, "timestamp", None)
-        asset = getattr(d, "description", None)
+        # US row -> description, DE row -> asset_key, UK -> the disposal Trade.
+        asset = getattr(d, "description", None) or getattr(d, "asset_key", None)
         if asset is None and disp is not None:
             asset = getattr(disp, "instrument_id", None)
         proceeds = _first(d, ("proceeds", "proceeds_eur")) or 0.0
