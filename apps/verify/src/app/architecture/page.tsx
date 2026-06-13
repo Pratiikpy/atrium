@@ -120,9 +120,54 @@ export default function ArchitecturePage() {
           <DeploymentsTable />
         </section>
 
-        {/* 04 SECURITY */}
+        {/* 04 ROBINHOOD CHAIN */}
+        <section className="arch-section" id="robinhood-chain">
+          <div className="arch-section-num">04 · BUILT FOR ROBINHOOD CHAIN</div>
+          <h2 className="arch-h2">
+            Tokenized equities, <em>finally usable as collateral.</em>
+          </h2>
+          <p className="arch-section-lede">
+            Robinhood Chain is built for tokenized equities. But an equity you can only hold is half an
+            asset; the other half is putting it to work as margin without selling it. That is exactly what
+            Atrium does: it sees your whole book and returns one portfolio margin number, so a position can
+            back trades everywhere instead of sitting idle on one venue. The full Atrium core, Coffer,
+            Plinth, Sigil, Vigil and the Router, is already deployed and running on Robinhood Chain testnet
+            (chainId 46630), the same Rust + Solidity stack verified on Arbitrum. Not a pitch; an on-chain
+            stack you can read.
+          </p>
+          <div className="arch-sec-grid">
+            <div className="arch-sec-card">
+              <h3 className="arch-sec-title">Without Atrium</h3>
+              <p className="arch-sec-body">
+                A tokenized equity is held on one chain and margined in isolation, idle as collateral. To
+                trade against it anywhere else you post fresh capital, and an agent given access holds the
+                whole wallet.
+              </p>
+            </div>
+            <div className="arch-sec-card">
+              <h3 className="arch-sec-title">With Atrium</h3>
+              <p className="arch-sec-body">
+                The same position joins one cross-margin account: one deposit, one buying-power number,
+                freed capital across every venue, and a contract-enforced kill switch on any agent, which
+                can act only inside a signed risk box.
+              </p>
+            </div>
+          </div>
+          <p className="arch-section-lede" style={{ marginTop: 18 }}>
+            <a
+              href="https://explorer.testnet.chain.robinhood.com/address/0x71d872bd76738887415439a7fc0a1acbc4218fbc"
+              className="arch-inline-link"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Open the Coffer vault on the Robinhood Chain explorer ↗
+            </a>
+          </p>
+        </section>
+
+        {/* 05 SECURITY */}
         <section className="arch-section" id="security">
-          <div className="arch-section-num">04 · SECURITY MODEL</div>
+          <div className="arch-section-num">05 · SECURITY MODEL</div>
           <h2 className="arch-h2">
             Built to fail <em>loudly,</em> not silently.
           </h2>
