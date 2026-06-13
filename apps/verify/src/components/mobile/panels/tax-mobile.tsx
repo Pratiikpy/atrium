@@ -156,19 +156,32 @@ export function TaxMobile() {
         </>
       )}
 
-      {/* Honest empty state: pre-fix, with no stats data + no events (the
-          disconnected/pending case) the panel showed the selectors then a big
-          blank gap. Fill it so the screen reads as "empty by design", not broken. */}
-      {!stats.isLoading && !events.isLoading && !stats.data && (events.data?.events?.length ?? 0) === 0 && (
+      {/* Disconnected: instead of a bare prompt over a viewport of empty space,
+          fill the screen with the public, wallet-free context for the selected
+          jurisdiction (what the report does, its accounting method, its annual
+          allowance). These are public legal constants, never user data, and the
+          card re-reads when the jurisdiction tab changes. Connected-but-empty
+          keeps the simple "no events yet" sentinel. */}
+      {!wallet ? (
+        <section className="rounded-xl border border-mob-line bg-mob-bg-card px-4 py-5">
+          <p className="text-[16px] text-mob-ink">Realised gains, computed for you</p>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-mob-muted">
+            Atrium reads your on-chain trades and applies {jurLabel(jurisdiction)}&apos;s accounting
+            method to produce an auditor-ready cost-basis report.
+          </p>
+          <div className="mt-4 flex flex-col divide-y divide-mob-line/50">
+            <TaxInfoRow label="Method" value={methodFor(jurisdiction)} />
+            <TaxInfoRow label="Annual allowance" value={allowanceFor(jurisdiction)} />
+            <TaxInfoRow label="Exports" value="CSV · PDF · signed proof" />
+          </div>
+          <p className="mt-4 text-[12px] text-mob-muted/70">Connect your wallet to see your figures.</p>
+        </section>
+      ) : !stats.isLoading && !events.isLoading && !stats.data && (events.data?.events?.length ?? 0) === 0 ? (
         <div className="rounded-xl border border-dashed border-mob-line bg-mob-bg-card/40 px-4 py-12 text-center">
-          <p className="text-[15px] text-mob-muted">
-            {wallet ? `No realised events for ${year} yet` : 'Connect your wallet to view tax'}
-          </p>
-          <p className="mt-1 text-[12px] text-mob-muted/60">
-            Figures populate after your first taxable event.
-          </p>
+          <p className="text-[15px] text-mob-muted">No realised events for {year} yet</p>
+          <p className="mt-1 text-[12px] text-mob-muted/60">Figures populate after your first taxable event.</p>
         </div>
-      )}
+      ) : null}
 
       {/* Export buttons. Gated on a HEAD availability probe: while the Tablet
           service is undeployed the export route 503s, so live links would hand the
@@ -201,6 +214,27 @@ export function TaxMobile() {
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+// Public, wallet-free jurisdiction context for the disconnected mobile tax
+// screen. Method names + annual allowances are public legal constants (HMRC
+// HS283, §23 EStG, IRS Form 8949), never user-specific data.
+function jurLabel(j: TaxJurisdiction): string {
+  return j === 'uk' ? 'the UK' : j === 'de' ? 'Germany' : 'the US';
+}
+function methodFor(j: TaxJurisdiction): string {
+  return j === 'uk' ? 'HMRC same-day · B&B · s.104 pool' : j === 'de' ? 'FIFO · §23 EStG' : 'FIFO · IRS Form 8949';
+}
+function allowanceFor(j: TaxJurisdiction): string {
+  return j === 'uk' ? '£3,000 · 2026/27' : j === 'de' ? '€1,000 Sparer-Pauschbetrag' : 'No general exemption';
+}
+function TaxInfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2.5">
+      <span className="text-[12px] uppercase tracking-wide text-mob-muted">{label}</span>
+      <span className="text-right text-[13px] text-mob-ink">{value}</span>
     </div>
   );
 }
