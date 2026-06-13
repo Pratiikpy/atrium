@@ -108,23 +108,35 @@ describe('GET /api/tax/summary, Tablet integration', () => {
     expect(json.realisedGainUsd).toBeNull();
   });
 
-  it('passes through Tablet response on success', async () => {
+  it('maps Tablet snake_case numeric summary to the page shape', async () => {
     process.env.TABLET_URL = 'http://tablet-mock';
-    const upstream = {
-      totalProceedsUsd: '$12,345.67',
-      costBasisUsd: '$5,000.00',
-      realisedGainUsd: '$7,345.67',
-      realisedGainDirection: 'up',
-      taxOwedEstUsd: '$734.57',
-      taxRate: '10%',
-      source: 'tablet',
+    // The REAL Tablet /summary shape: native-currency numbers + a currency code
+    // + the rate it used. The route formats these into the stat-row strings.
+    const tablet = {
+      proceeds: 12345.67,
+      cost_basis: 5000,
+      realized_gain: 7345.67,
+      taxable_gain: 4345.67,
+      tax_owed: 1042.97,
+      tax_rate_pct: 24,
+      allowance_total: 3000,
+      allowance_used: 3000,
+      currency: 'GBP',
     };
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(upstream), { status: 200 }),
+      new Response(JSON.stringify(tablet), { status: 200 }),
     );
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest(''))).json();
-    expect(json).toEqual(upstream);
+    expect(json).toEqual({
+      totalProceedsUsd: '£12,345.67',
+      costBasisUsd: '£5,000.00',
+      realisedGainUsd: '£7,345.67',
+      realisedGainDirection: 'up',
+      taxOwedEstUsd: '£1,042.97',
+      taxRate: '24%',
+      source: 'tablet',
+    });
     fetchSpy.mockRestore();
   });
 

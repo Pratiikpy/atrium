@@ -30,6 +30,27 @@ app = FastAPI(title="Atrium Tablet", version="0.2.0")
 
 _INTERNAL_KEY = os.environ.get("ATRIUM_INTERNAL_KEY", "")
 
+# Per-jurisdiction annual allowance + an indicative headline rate. The proceeds,
+# cost basis, and realized gain are computed for real from the wallet's on-chain
+# trades; only the rate is an assumption, and the client labels the tax figure
+# "estimate, not tax advice". Values in the jurisdiction's native currency.
+_TAX_PARAMS = {
+    "uk": {"allowance": 3000.0, "rate_pct": 24.0, "currency": "GBP"},    # 2024/25 AEA + higher-rate crypto CGT
+    "us": {"allowance": 0.0, "rate_pct": 15.0, "currency": "USD"},       # long-term capital-gains, indicative
+    "de": {"allowance": 1000.0, "rate_pct": 26.375, "currency": "EUR"},  # Abgeltungsteuer + soli, indicative
+}
+
+
+def _disposal_totals(report):
+    """Sum proceeds + cost across a report's disposals, or (None, None) when the
+    jurisdiction's report does not expose per-disposal figures (never fakes a 0)."""
+    disposals = getattr(report, "disposals", None)
+    if not disposals:
+        return None, None
+    proceeds = sum(getattr(d, "proceeds", 0.0) or 0.0 for d in disposals)
+    cost = sum(getattr(d, "cost", 0.0) or 0.0 for d in disposals)
+    return proceeds, cost
+
 
 async def require_internal_key(
     authorization: str = Header(..., alias="Authorization"),
@@ -161,10 +182,32 @@ async def summary(
     except FxRateUnavailable as e:
         raise HTTPException(502, f"FX rate unavailable: {e}") from e
 
+    # Real disposal totals (FIFO + pooling over the wallet's on-chain trades).
+    proceeds, cost_basis = _disposal_totals(report)
+    # Tax-owed is an ESTIMATE: gain above the annual allowance times an
+    # indicative headline rate. The proceeds / cost / gain are real; only the
+    # rate is an assumption, surfaced as "estimate, not tax advice" on the page.
+    params = _TAX_PARAMS.get(jurisdiction, _TAX_PARAMS["uk"])
+    allowance = params["allowance"]
+    rate_pct = params["rate_pct"]
+    taxable = max(0.0, realized - allowance)
+    tax_owed = round(taxable * rate_pct / 100.0, 2)
+    allowance_used = min(max(realized, 0.0), allowance)
+
     return {
-        "realized_gain_usd": realized,
+        "proceeds": round(proceeds, 2) if proceeds is not None else None,
+        "cost_basis": round(cost_basis, 2) if cost_basis is not None else None,
+        "realized_gain": round(realized, 2),
+        "taxable_gain": round(taxable, 2),
+        "tax_owed": tax_owed,
+        "tax_rate_pct": rate_pct,
+        "allowance_total": allowance,
+        "allowance_used": round(allowance_used, 2),
+        "allowance_used_pct": round(allowance_used / allowance * 100.0, 1) if allowance > 0 else None,
+        "currency": params["currency"],
+        # Back-compat with any older consumer that read the v0.1 shape.
+        "realized_gain_usd": round(realized, 2),
         "unrealized_gain_usd": None,
-        "allowance_used_pct": None,
     }
 
 

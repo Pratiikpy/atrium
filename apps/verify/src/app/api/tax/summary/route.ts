@@ -21,6 +21,33 @@ function taxRateFor(j: string): string {
   return '25%';
 }
 
+const CURRENCY_SYMBOL: Record<string, string> = { GBP: '£', USD: '$', EUR: '€' };
+
+/** Format a Tablet numeric figure into the native-currency string the tax
+ *  stat-row renders (typed string | null). Null stays null (honest "-"). */
+function fmtMoney(n: unknown, currency: string): string | null {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return null;
+  const sym = CURRENCY_SYMBOL[currency] ?? '';
+  return `${sym}${n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/** Map Tablet's snake_case numeric summary to the camelCase string shape the
+ *  tax stat-row consumes. Tablet ships native-currency numbers + a currency
+ *  code + the real rate it used; we format and pass the rate through. */
+function mapTabletSummary(t: Record<string, unknown>, jurisdiction: string) {
+  const currency = typeof t.currency === 'string' ? t.currency : 'GBP';
+  const realised = typeof t.realized_gain === 'number' ? t.realized_gain : null;
+  return {
+    totalProceedsUsd: fmtMoney(t.proceeds, currency),
+    costBasisUsd: fmtMoney(t.cost_basis, currency),
+    realisedGainUsd: fmtMoney(realised, currency),
+    realisedGainDirection: realised == null ? null : realised > 0 ? 'up' : realised < 0 ? 'down' : 'flat',
+    taxOwedEstUsd: fmtMoney(t.tax_owed, currency),
+    taxRate: typeof t.tax_rate_pct === 'number' ? `${t.tax_rate_pct}%` : taxRateFor(jurisdiction),
+    source: 'tablet' as const,
+  };
+}
+
 function pendingPayload(jurisdiction: string) {
   return {
     totalProceedsUsd: null,
@@ -65,7 +92,8 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error();
-    return NextResponse.json(await r.json(), { headers: noCacheHeaders });
+    const tablet = (await r.json()) as Record<string, unknown>;
+    return NextResponse.json(mapTabletSummary(tablet, jurisdiction), { headers: noCacheHeaders });
   } catch {
     return NextResponse.json(pendingPayload(jurisdiction));
   }
