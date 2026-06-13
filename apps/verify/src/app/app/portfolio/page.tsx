@@ -3,6 +3,7 @@ import { AppShell } from '@/components/app-shell';
 import { PortfolioStatRow } from '@/components/portfolio/stat-row';
 import { PortfolioConnectPrompt } from '@/components/portfolio/connect-prompt';
 import { MarginLensCard } from '@/components/portfolio/margin-lens-card';
+import { StressLensCard } from '@/components/portfolio/stress-lens-card';
 import { MarginEngineCard } from '@/components/portfolio/margin-engine-card';
 import { BuyingPowerCard } from '@/components/portfolio/buying-power-card';
 import { PositionsFilter } from '@/components/portfolio/positions-filter';
@@ -125,6 +126,13 @@ export default function PortfolioPage() {
           on the first screen instead of living only in the markets combos. */}
       <section className="mt-6">
         <MarginLensCard />
+      </section>
+
+      {/* Stress Lens (2026-06-13): storm-state margin, how much market shock the
+          book absorbs before it breaches collateral, and the netting survival
+          edge under a crash. The risk-desk companion to the calm Margin Lens. */}
+      <section className="mt-6">
+        <StressLensCard />
       </section>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">
