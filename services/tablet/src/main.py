@@ -42,13 +42,34 @@ _TAX_PARAMS = {
 
 
 def _disposal_totals(report):
-    """Sum proceeds + cost across a report's disposals, or (None, None) when the
-    jurisdiction's report does not expose per-disposal figures (never fakes a 0)."""
-    disposals = getattr(report, "disposals", None)
-    if not disposals:
+    """Sum proceeds + cost across a report's disposal rows, or (None, None) when
+    the report exposes no rows at all (never fakes a 0).
+
+    The three jurisdiction reports differ in BOTH the collection attribute and
+    the per-row field names, so a single `.disposals` / `.proceeds` lookup only
+    worked for the UK and silently returned (None, None) for US and (0, 0) for
+    DE - the US tab showed "-" and the DE tab showed 0 proceeds next to a real
+    gain. Normalise across all three:
+      - UK  CgtReport      -> .disposals[]                 .proceeds / .cost
+      - US  Form8949Report -> .short_term[] + .long_term[] .proceeds / .cost_basis
+      - DE  DeFifoReport    -> .disposals[]                 .proceeds_eur / .cost_basis_eur
+    """
+    rows = list(getattr(report, "disposals", None) or [])
+    # US splits its rows across short_term + long_term instead of `.disposals`.
+    rows.extend(getattr(report, "short_term", None) or [])
+    rows.extend(getattr(report, "long_term", None) or [])
+    if not rows:
         return None, None
-    proceeds = sum(getattr(d, "proceeds", 0.0) or 0.0 for d in disposals)
-    cost = sum(getattr(d, "cost", 0.0) or 0.0 for d in disposals)
+
+    def _first(obj, names):
+        for n in names:
+            v = getattr(obj, n, None)
+            if v is not None:
+                return v
+        return 0.0
+
+    proceeds = sum(_first(d, ("proceeds", "proceeds_eur")) for d in rows)
+    cost = sum(_first(d, ("cost", "cost_basis", "cost_basis_eur")) for d in rows)
     return proceeds, cost
 
 
