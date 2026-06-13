@@ -32,7 +32,9 @@ export async function GET(req: NextRequest) {
   try {
     const params = new URLSearchParams({ jurisdiction, year, address: session.walletAddress });
     const r = await fetch(`${TABLET_URL}/events?${params.toString()}`, {
-      signal: AbortSignal.timeout(3000),
+      // 8s for the same reason as /summary: survive a Tablet cold start +
+      // compute instead of mislabelling real events as "pending".
+      signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error();

@@ -88,7 +88,11 @@ export async function GET(req: NextRequest) {
     // the session. URLSearchParams re-encodes as defence-in-depth.
     const params = new URLSearchParams({ jurisdiction, year, address: session.walletAddress });
     const r = await fetch(`${TABLET_URL}/summary?${params.toString()}`, {
-      signal: AbortSignal.timeout(3000),
+      // Tablet is serverless; a cold start plus the full FIFO CGT compute can
+      // exceed a tight 3s budget and falsely fall back to "pending" even when
+      // the data is real. 8s matches the headroom the /export route already
+      // uses (10s) without letting a genuinely dead upstream hang the page.
+      signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${process.env.ATRIUM_INTERNAL_KEY ?? ''}` },
     });
     if (!r.ok) throw new Error();
