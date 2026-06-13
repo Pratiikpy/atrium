@@ -37,6 +37,13 @@ function fmtMoney(n: unknown, currency: string): string | null {
 function mapTabletSummary(t: Record<string, unknown>, jurisdiction: string) {
   const currency = typeof t.currency === 'string' ? t.currency : 'GBP';
   const realised = typeof t.realized_gain === 'number' ? t.realized_gain : null;
+  // Allowance figures Tablet already computes from the same FIFO disposals.
+  // Surfacing them here lets the allowance card read the one working /summary
+  // path instead of its old hardcoded-pending stub.
+  const allowanceTotal = typeof t.allowance_total === 'number' ? t.allowance_total : null;
+  const allowanceUsed = typeof t.allowance_used === 'number' ? t.allowance_used : null;
+  const allowanceRemaining =
+    allowanceTotal != null && allowanceUsed != null ? Math.max(0, allowanceTotal - allowanceUsed) : null;
   return {
     totalProceedsUsd: fmtMoney(t.proceeds, currency),
     costBasisUsd: fmtMoney(t.cost_basis, currency),
@@ -44,6 +51,12 @@ function mapTabletSummary(t: Record<string, unknown>, jurisdiction: string) {
     realisedGainDirection: realised == null ? null : realised > 0 ? 'up' : realised < 0 ? 'down' : 'flat',
     taxOwedEstUsd: fmtMoney(t.tax_owed, currency),
     taxRate: typeof t.tax_rate_pct === 'number' ? `${t.tax_rate_pct}%` : taxRateFor(jurisdiction),
+    // Native-currency allowance fields (null stays "-"). pctUsed is a number 0-100.
+    currency,
+    allowanceTotal: fmtMoney(allowanceTotal, currency),
+    allowanceUsed: fmtMoney(allowanceUsed, currency),
+    allowanceRemaining: fmtMoney(allowanceRemaining, currency),
+    allowancePctUsed: typeof t.allowance_used_pct === 'number' ? t.allowance_used_pct : null,
     source: 'tablet' as const,
   };
 }
@@ -59,6 +72,11 @@ function pendingPayload(jurisdiction: string) {
     realisedGainDirection: null,
     taxOwedEstUsd: null,
     taxRate: taxRateFor(jurisdiction),
+    currency: null,
+    allowanceTotal: null,
+    allowanceUsed: null,
+    allowanceRemaining: null,
+    allowancePctUsed: null,
     source: 'pending' as const,
   };
 }

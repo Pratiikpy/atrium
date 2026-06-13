@@ -73,6 +73,50 @@ def _disposal_totals(report):
     return proceeds, cost
 
 
+def _disposal_events(report, currency, limit=200):
+    """Flatten a report's disposal rows into a uniform realised-event list
+    (date, asset, proceeds, cost, gain) for the /events table. Same three-shape
+    problem as _disposal_totals, plus the date/asset live in different places:
+    US/DE rows expose date_sold + description; the UK row keeps the disposal
+    Trade (its .timestamp / .instrument_id)."""
+    rows = list(getattr(report, "disposals", None) or [])
+    rows.extend(getattr(report, "short_term", None) or [])
+    rows.extend(getattr(report, "long_term", None) or [])
+
+    def _first(obj, names):
+        for n in names:
+            v = getattr(obj, n, None)
+            if v is not None:
+                return v
+        return None
+
+    out = []
+    for d in rows:
+        sold = getattr(d, "date_sold", None)
+        disp = getattr(d, "disposal", None)  # UK keeps the sell Trade here
+        if sold is None and disp is not None:
+            sold = getattr(disp, "timestamp", None)
+        asset = getattr(d, "description", None)
+        if asset is None and disp is not None:
+            asset = getattr(disp, "instrument_id", None)
+        proceeds = _first(d, ("proceeds", "proceeds_eur")) or 0.0
+        cost = _first(d, ("cost", "cost_basis", "cost_basis_eur")) or 0.0
+        gain = _first(d, ("gain", "gain_eur"))
+        if gain is None:
+            gain = proceeds - cost
+        out.append({
+            "date": sold.isoformat() if hasattr(sold, "isoformat") else (str(sold) if sold else None),
+            "asset": str(asset) if asset else "",
+            "event": "Disposal",
+            "proceeds": round(proceeds, 2),
+            "cost_basis": round(cost, 2),
+            "gain": round(gain, 2),
+            "currency": currency,
+        })
+    out.sort(key=lambda e: e["date"] or "", reverse=True)  # newest first
+    return out[:limit]
+
+
 async def require_internal_key(
     authorization: str = Header(..., alias="Authorization"),
 ) -> None:
@@ -258,27 +302,28 @@ async def events(
     except ScribeError as e:
         raise HTTPException(502, f"Scribe upstream failed: {e}") from e
 
-    # Simple cursor-based pagination over trade list
-    trades_sorted = sorted(trades, key=lambda t: t.timestamp)
+    # Realised DISPOSAL events (matched sells with proceeds/cost/gain), not raw
+    # trades, so the page's "Realised events" table renders populated rows
+    # instead of blank ones. Run the same jurisdiction calculator as /summary.
+    try:
+        if jurisdiction == "uk":
+            report = calculate_uk_cgt(trades)
+        elif jurisdiction == "de":
+            report = calculate_de_fifo(trades)
+        else:
+            report = calculate_us_form_8949(trades)
+    except FxRateUnavailable as e:
+        raise HTTPException(502, f"FX rate unavailable: {e}") from e
+
+    params = _TAX_PARAMS.get(jurisdiction, _TAX_PARAMS["uk"])
+    all_events = _disposal_events(report, params["currency"])
+
     start_idx = 0
     if cursor:
         try:
             start_idx = int(cursor)
         except ValueError:
             start_idx = 0
-
-    page = trades_sorted[start_idx : start_idx + limit]
-    next_cursor = str(start_idx + limit) if start_idx + limit < len(trades_sorted) else ""
-
-    events_out = [
-        {
-            "timestamp": t.timestamp.isoformat(),
-            "venue_id": t.venue_id,
-            "instrument_id": t.instrument_id,
-            "side": t.side,
-            "quantity": t.quantity,
-            "price": t.price,
-        }
-        for t in page
-    ]
-    return {"events": events_out, "cursor": next_cursor}
+    page = all_events[start_idx : start_idx + limit]
+    next_cursor = str(start_idx + limit) if start_idx + limit < len(all_events) else ""
+    return {"events": page, "cursor": next_cursor}

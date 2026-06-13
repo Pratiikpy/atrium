@@ -77,15 +77,38 @@ describe('GET /api/tax/events, NN-1 query-injection prevention', () => {
     fetchSpy.mockRestore();
   });
 
-  it('passes through valid Tablet success response', async () => {
+  it('maps Tablet disposal events to the table row shape', async () => {
     process.env.TABLET_URL = 'http://tablet-mock';
-    const upstream = { events: [{ id: 'e1', kind: 'disposal' }], source: 'tablet' };
+    // Real Tablet /events shape: realised disposals in native currency.
+    const upstream = {
+      events: [
+        {
+          date: '2026-06-08T03:05:02',
+          asset: '0x128570b155efd3ba4fae8e482ebd851f483ef0bd8056503fc4e12ffd3e6ceedc',
+          event: 'Disposal',
+          proceeds: 1000.5,
+          cost_basis: 900.25,
+          gain: 100.25,
+          currency: 'GBP',
+        },
+      ],
+      cursor: '',
+    };
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify(upstream), { status: 200 }),
     );
     const { GET } = await import('./route');
     const json = await (await GET(makeRequest(''))).json();
-    expect(json).toEqual(upstream);
+    expect(json.source).toBe('scribe');
+    expect(json.events).toHaveLength(1);
+    const e = json.events[0];
+    expect(e.proceedsUsd).toBe('£1,000.50');
+    expect(e.costBasisUsd).toBe('£900.25');
+    expect(e.gainUsd).toBe('£100.25');
+    expect(e.gainDirection).toBe('up');
+    expect(e.asset).toContain('0x1285');
+    expect(e.eventLabel).toBe('Disposal');
+    expect(e.date).toContain('2026');
     fetchSpy.mockRestore();
   });
 });

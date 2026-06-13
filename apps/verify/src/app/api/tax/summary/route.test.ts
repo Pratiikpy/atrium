@@ -135,6 +135,13 @@ describe('GET /api/tax/summary, Tablet integration', () => {
       realisedGainDirection: 'up',
       taxOwedEstUsd: '£1,042.97',
       taxRate: '24%',
+      // Allowance fields now surfaced so the allowance card reads this one
+      // working path (used 3000 of a 3000 allowance -> 0 remaining).
+      currency: 'GBP',
+      allowanceTotal: '£3,000.00',
+      allowanceUsed: '£3,000.00',
+      allowanceRemaining: '£0.00',
+      allowancePctUsed: null,
       source: 'tablet',
     });
     fetchSpy.mockRestore();
