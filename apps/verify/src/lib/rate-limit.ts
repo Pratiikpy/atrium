@@ -21,7 +21,10 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-const redis =
+/** Shared Upstash client. Exported so other server routes (e.g. the cohort
+ *  waitlist counter) reuse one client instead of instantiating their own.
+ *  Null when env is unset (local dev without Upstash), so callers must guard. */
+export const redis =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
     ? new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL,

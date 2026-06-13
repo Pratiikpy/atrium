@@ -144,7 +144,7 @@ export function AgentsMobile() {
         )}
         {!board.isLoading && rows.length === 0 && (
           <li className="rounded-2xl border border-mob-line bg-mob-bg-card p-5 text-center text-[12.5px] text-mob-muted">
-            Rostrum indexer pending . cohort opens Month 2
+            Rostrum indexer pending . cohort waitlist open
           </li>
         )}
         {rows.slice(0, 5).map((r) => (

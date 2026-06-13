@@ -103,11 +103,11 @@ export const DISCLOSURES: Disclosure[] = [
     id: 'partners',
     surface: 'Cohort partner logos',
     what:
-      'No partner logos render on the cohort strip. The landing has an honest empty state: "No partners signed yet. cohort opens Month 2."',
+      'No partner logos render on the cohort strip. The /cohort grid shows an honest empty state ("Partners appear here once they have signed and made their first testnet deposit") with a live waitlist whose counter reads the real unique-signup number from Upstash, never a seeded base. Partners onboard from Month 2.',
     why:
-      'Per `docs/conventions/writing.md`: partner names ship only with a signed source on file. None of the candidate partners (Pendle, Aave, Hyperliquid, IOSG, Variational, Horizen, Chainlink Labs, Pyth) have signed yet.',
+      'Per `docs/conventions/writing.md`: partner names ship only with a signed source on file. None of the candidate partners (Pendle, Aave, Hyperliquid, IOSG, Variational, Horizen, Chainlink Labs, Pyth) have signed yet. The waitlist counter is a real number even when it is small.',
     whenReal:
-      'As each signs, we drop a `data/cohort/<partner>.json` file + logo SVG; the landing reads it and renders. No pre-announcement.',
+      'As each signs, we drop a `data/cohort/<partner>.json` file + logo SVG; the grid reads it and renders. No pre-announcement.',
     severity: 'interim',
   },
   {

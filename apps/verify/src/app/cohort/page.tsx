@@ -1,4 +1,5 @@
 import { CohortGrid } from '@/components/cohort-grid';
+import { CohortWaitlist } from '@/components/cohort-waitlist';
 import { MarketingShell } from '@/components/atrium/MarketingShell';
 import { buildMetadata } from '@/lib/build-metadata';
 
@@ -22,17 +23,15 @@ export default function CohortPage() {
       <CohortGrid />
 
       <section className="mt-16 rounded-md border border-divider bg-parchment-soft/40 p-8">
-        <h2 className="font-display text-2xl text-ink">Want to become a Cohort partner?</h2>
-        <p className="mt-3 text-ink-soft">
-          Cohort partners get direct line to F1/F2/F3, advance review of new adapters and
-          governance proposals, and Atrium credits toward future mainnet activity.
+        <h2 className="font-display text-2xl text-ink">Become a Cohort partner</h2>
+        <p className="mt-3 max-w-prose text-ink-soft">
+          The waitlist is open now; we onboard partners from Month 2. Partners get a direct line to
+          F1/F2/F3, advance review of new adapters and governance proposals, and Atrium credits toward
+          future mainnet activity.
         </p>
-        <a
-          href="mailto:cohort@useatrium.me"
-          className="mt-4 inline-flex rounded-md bg-ink px-4 py-2 text-sm font-medium text-parchment hover:bg-ink/90"
-        >
-          Email cohort@useatrium.me
-        </a>
+        <div className="mt-5">
+          <CohortWaitlist />
+        </div>
       </section>
       </div>
     </MarketingShell>

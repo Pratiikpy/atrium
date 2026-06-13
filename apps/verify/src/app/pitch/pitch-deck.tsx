@@ -29,7 +29,8 @@ const NAV: { n: string; label: string }[] = [
   { n: 'VII', label: 'The proof' },
   { n: 'VIII', label: 'Who it is for' },
   { n: 'IX', label: 'The wedge' },
-  { n: 'X', label: 'The founders' },
+  { n: 'X', label: 'How Atrium earns' },
+  { n: 'XI', label: 'The founders' },
 ];
 
 const TOTAL = NAV.length;
@@ -132,13 +133,57 @@ function Slide({ index }: { index: number }) {
     case 9:
       return <Wedge />;
     case 10:
+      return <Earns />;
+    case 11:
       return <Founder />;
     default:
       return null;
   }
 }
 
-/* ── Slide 10 · The founders ─────────────────────────────────── */
+/* ── Slide 10 · How Atrium earns ─────────────────────────────── */
+function Earns() {
+  const lines = [
+    {
+      name: 'Netting fee',
+      body: 'A few bps on the margin our SPAN engine frees. We earn only when cross-margin saves you capital, so the incentive points the same way you do. No other venue can copy it without the engine.',
+    },
+    {
+      name: 'Codex API',
+      body: 'Per-call x402 fees on the data API. The USDC payment rail is live on testnet today, verified on-chain before each call, not a roadmap line.',
+    },
+    {
+      name: 'Collateral spread',
+      body: 'A thin spread on idle Coffer collateral, the standard ERC-4626 vault model, earned while capital sits unused.',
+    },
+  ];
+  return (
+    <div className="dk-grid2">
+      <div>
+        <SectionMark roman="X" label="How Atrium earns" />
+        <h2 className="dk-h2">Aligned revenue, not rent.</h2>
+        <p className="dk-body">
+          Three revenue lines, each tied to value the protocol actually creates. The payment plumbing for the API line
+          already runs on testnet, so this is a working model, not a slide.
+        </p>
+        <p className="dk-body dk-muted">
+          Testnet charges are set to zero while we prove the product; the model turns on at mainnet GA. Today the x402
+          rail is the one piece already live.
+        </p>
+      </div>
+      <div className="dk-pillars">
+        {lines.map((l) => (
+          <div className="dk-pillar" key={l.name}>
+            <span className="dk-pillar-n serif-i">{l.name}</span>
+            <span className="dk-pillar-b">{l.body}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Slide 11 · The founders ─────────────────────────────────── */
 function Founder() {
   return (
     <div className="dk-grid2 dk-founder">
