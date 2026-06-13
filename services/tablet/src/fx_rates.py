@@ -10,6 +10,7 @@ import io
 import logging
 import os
 import sqlite3
+import tempfile
 import zipfile
 from datetime import date, datetime
 from pathlib import Path
@@ -18,7 +19,11 @@ import httpx
 
 _log = logging.getLogger(__name__)
 
-_DATA_DIR = Path(os.environ.get("TABLET_DATA_DIR", str(Path(__file__).resolve().parent.parent / "data")))
+# Default to a writable temp dir: the serverless filesystem (Vercel) is
+# read-only outside /tmp, so the source-dir default would crash the SQLite
+# cache write. The cache is an optimization only; see _ensure_db for the
+# additional defensive guard that degrades to no-cache on any DB failure.
+_DATA_DIR = Path(os.environ.get("TABLET_DATA_DIR", str(Path(tempfile.gettempdir()) / "atrium-tablet")))
 _DB_PATH = _DATA_DIR / "fx-cache.sqlite"
 _CSV_PATH = _DATA_DIR / "eurofxref-hist.csv"
 
@@ -36,30 +41,47 @@ class FxRateUnavailable(Exception):
     """Raised when FX rate cannot be obtained from any source."""
 
 
-def _ensure_db() -> sqlite3.Connection:
-    _DATA_DIR.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(_DB_PATH))
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS fx_rates "
-        "(date TEXT PRIMARY KEY, gbp_rate REAL, eur_rate REAL, fetched_at TEXT)"
-    )
-    conn.commit()
-    return conn
+def _ensure_db() -> sqlite3.Connection | None:
+    """Open the FX cache DB, or None if the filesystem is not writable. The
+    cache is purely an optimization, so a read-only FS must degrade to
+    no-cache rather than crash the tax report."""
+    try:
+        _DATA_DIR.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(_DB_PATH))
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS fx_rates "
+            "(date TEXT PRIMARY KEY, gbp_rate REAL, eur_rate REAL, fetched_at TEXT)"
+        )
+        conn.commit()
+        return conn
+    except Exception as exc:
+        _log.warning("FX cache DB unavailable (degrading to no-cache): %s", exc)
+        return None
 
 
-def _cache_get(conn: sqlite3.Connection, d: date) -> tuple[float | None, float | None]:
-    row = conn.execute("SELECT gbp_rate, eur_rate FROM fx_rates WHERE date = ?", (d.isoformat(),)).fetchone()
-    if row:
-        return row[0], row[1]
+def _cache_get(conn: sqlite3.Connection | None, d: date) -> tuple[float | None, float | None]:
+    if conn is None:
+        return None, None
+    try:
+        row = conn.execute("SELECT gbp_rate, eur_rate FROM fx_rates WHERE date = ?", (d.isoformat(),)).fetchone()
+        if row:
+            return row[0], row[1]
+    except Exception as exc:
+        _log.warning("FX cache read failed (ignoring): %s", exc)
     return None, None
 
 
-def _cache_set(conn: sqlite3.Connection, d: date, gbp: float | None, eur: float | None) -> None:
-    conn.execute(
-        "INSERT OR REPLACE INTO fx_rates (date, gbp_rate, eur_rate, fetched_at) VALUES (?, ?, ?, ?)",
-        (d.isoformat(), gbp, eur, datetime.utcnow().isoformat()),
-    )
-    conn.commit()
+def _cache_set(conn: sqlite3.Connection | None, d: date, gbp: float | None, eur: float | None) -> None:
+    if conn is None:
+        return
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO fx_rates (date, gbp_rate, eur_rate, fetched_at) VALUES (?, ?, ?, ?)",
+            (d.isoformat(), gbp, eur, datetime.utcnow().isoformat()),
+        )
+        conn.commit()
+    except Exception as exc:
+        _log.warning("FX cache write failed (ignoring): %s", exc)
 
 
 def _fetch_from_api(d: date) -> tuple[float | None, float | None]:
