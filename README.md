@@ -205,6 +205,7 @@ The generated registries are the source of truth: [Arbitrum Sepolia](./docs/depl
 | `Plinth` | `0xa08ba28ef31658df67e874dd2bf8a2b2d34597fa` |
 | `Coffer` | `0x71d872bd76738887415439a7fc0a1acbc4218fbc` |
 | `Sigil` | `0xede8444c622b8ae28364e86784749744bd0a1c23` |
+| `Vigil` | `0x6c6901a9ca6f13aede06f0d20050052a94a854da` |
 | `AtriumRouter` | `0xB90a51A726740065BD0DbC20cD79306b30D8b676` |
 
 **Money-path transactions you can open**
