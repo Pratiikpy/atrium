@@ -14,7 +14,7 @@ Post collateral once. Hedge across venues. One on-chain engine prices the whole 
 [![Robinhood Chain](https://img.shields.io/badge/Robinhood%20Chain-46630-0B6B3A?style=flat-square)](./deployments/robinhood_chain.json)
 [![Stylus](https://img.shields.io/badge/margin%20engine-Rust%20on%20Stylus-B5532A?style=flat-square)](#why-the-engine-runs-in-rust)
 [![Proof of reserves](https://img.shields.io/badge/reserves-signed%20on--chain-2E7D32?style=flat-square)](https://www.useatrium.me/lantern)
-[![Verified](https://img.shields.io/badge/Sourcify-9%20adapters%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
+[![Verified](https://img.shields.io/badge/Sourcify-8%20adapters%20exact%20match-2E7D32?style=flat-square)](https://sourcify.dev)
 [![Status](https://img.shields.io/badge/testnet-only-6B6259?style=flat-square)](#what-is-live-what-is-mocked)
 
 **[Open the app](https://www.useatrium.me)** · [Demo video](https://youtu.be/LliZ3DdxF3E) · [Pitch video](https://youtu.be/ZckBcF9dSs4) · [Judge brief (Notion)](https://comfortable-goal-205.notion.site/Atrium-37b9c0ce7876809387c7c1a6cd95ae0e) · [Proof deck](https://www.useatrium.me/proof-deck.html) · [Pitch deck](https://www.useatrium.me/pitch) · [Architecture](https://www.useatrium.me/architecture) · [Verifier](https://www.useatrium.me/verify) · [What is mock, what is real](https://www.useatrium.me/docs/honesty)
@@ -91,7 +91,7 @@ Take a classic hedge: long $100k of one perp, short $100k of a correlated perp. 
 | Netted as one portfolio by Plinth | `$10,000` |
 | **Freed by netting** | **51.0%** |
 
-The number is a worked example, labelled as one in the product, and it is locked by `hedge_frees_a_pinned_share_of_the_isolated_margin` in `contracts/plinth`. If someone changes the engine and the saving drifts, CI goes red. The invariant underneath, that a hedged book never requires more margin than its legs do alone, is Kani-verified in `contracts/plinth/src/span.rs`.
+The number is a worked example, labelled as one in the product, and it is locked by `hedge_frees_a_pinned_share_of_the_isolated_margin` in `contracts/plinth`. If someone changes the engine and the saving drifts, CI goes red. The invariant underneath, that a hedged book never requires more margin than its legs do alone, is locked by that property test on every commit; the adjacent solvency and notional-monotonicity invariants are Kani-verified in `contracts/plinth/src/span.rs`.
 
 A slide can claim any number. A test that runs on every commit cannot.
 
@@ -214,7 +214,7 @@ The generated registries are the source of truth: [Arbitrum Sepolia](./docs/depl
 | Deposit into Coffer | [`0x8c8d...0347`](https://sepolia.arbiscan.io/tx/0x8c8d1f0ddf292bac321f0da5fe33115238ecfbe848ab56b1dee74a277b820347) |
 | Withdraw from Coffer | [`0x976e...ddbf`](https://sepolia.arbiscan.io/tx/0x976e098cad97978b4d34f5a0ddc85f48e03f023937d9a678485b530c3d4addbf) |
 
-All nine venue adapters carry an `exact_match` verification on [Sourcify](https://sourcify.dev), and so do the Solidity core contracts (router, registry, attestor, kill-switch, timelock). The Stylus engine (Plinth, Coffer, Sigil, Vigil) is verified via `cargo stylus verify`, which Sourcify does not yet support. Paste any address above to read the source against the deployed bytecode.
+Eight venue adapters carry an `exact_match` verification on [Sourcify](https://sourcify.dev), with the Aave Horizon adapter verified on Arbiscan (Aave V3 is not on Arbitrum Sepolia); the Solidity core contracts (router, registry, attestor, kill-switch, timelock) are also `exact_match` on Sourcify. The Stylus engine (Plinth, Coffer, Sigil, Vigil) is verified via `cargo stylus verify`, which Sourcify does not yet support. Paste any address above to read the source against the deployed bytecode.
 
 ---
 

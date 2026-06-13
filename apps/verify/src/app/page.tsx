@@ -27,6 +27,7 @@ export const metadata = {
  */
 type LandingData = {
   tvl: string;
+  redeemable: string;
   venuesDeployed: number;
   venuesTotal: number;
   agents: string;
@@ -48,7 +49,16 @@ async function getLandingData(): Promise<LandingData> {
       return null;
     }
   };
-  const [m, l] = await Promise.all([safe('/api/protocol/metrics'), safe('/api/lantern/latest')]);
+  // Also fetch the on-chain redeemable (Coffer.totalAssets via /api/reserves/
+  // summary) so the proof-of-reserves card shows what actually backs every
+  // share, not the cumulative net-deposit TVL counter. The two diverge (e.g.
+  // $23.06 redeemable vs $24.70 net-deposit TVL), and a tile literally labelled
+  // "On-chain reserves" / "Redeemable claims" must read the on-chain figure.
+  const [m, l, r] = await Promise.all([
+    safe('/api/protocol/metrics'),
+    safe('/api/lantern/latest'),
+    safe('/api/reserves/summary'),
+  ]);
   const venues = (m?.venuesDeployed ?? {}) as { count?: number; total?: number };
   const root = typeof l?.root === 'string' ? (l.root as string) : '';
   const shortRoot = root ? `${root.slice(0, 6)}…${root.slice(-4)}` : '—';
@@ -57,6 +67,9 @@ async function getLandingData(): Promise<LandingData> {
   const minsAgo = ts ? Math.max(0, Math.round((Date.now() / 1000 - ts) / 60)) : null;
   return {
     tvl: typeof m?.testnetTvlUsd === 'string' ? (m.testnetTvlUsd as string) : '—',
+    // redeemableUsd is null when the Coffer read reverts (honest pending); guard
+    // exactly like tvl so the tile never renders the literal "null".
+    redeemable: typeof r?.redeemableUsd === 'string' ? (r.redeemableUsd as string) : '—',
     venuesDeployed: typeof venues.count === 'number' ? venues.count : 0,
     venuesTotal: typeof venues.total === 'number' ? venues.total : 0,
     agents: m?.registeredAgents != null ? String(m.registeredAgents) : '—',
@@ -471,11 +484,11 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                   <div className="lantern-grid">
                     <div className="stat-card">
                       <div className="mono cap muted">On-chain reserves</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.redeemable}</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Redeemable claims</div>
-                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.tvl}</div>
+                      <div className="num" style={{ fontSize: 20, marginTop: 6 }}>{d.redeemable}</div>
                     </div>
                     <div className="stat-card">
                       <div className="mono cap muted">Backing</div>
@@ -609,7 +622,7 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
                   block: 'Block 03', title: 'Agents + APIs', count: '5 subsystems',
                   sub: 'ERC-8004 mandates, copy-trading marketplace, paid agent surface, indexing.',
                   cards: [
-                    { n: '06', p: 'P1', name: 'Sigil', sub: 'Agent credit', stack: 'Solidity · ERC-8004' },
+                    { n: '06', p: 'P1', name: 'Sigil', sub: 'Agent credit', stack: 'Stylus · ERC-8004' },
                     { n: '07', p: 'P1', name: 'Rostrum', sub: 'Agent marketplace', stack: 'Solidity · Indexer' },
                     { n: '08', p: 'P1', name: 'Codex', sub: 'Paid agent APIs', stack: 'Node · x402' },
                     { n: '09', p: 'P1', name: 'Scribe', sub: 'Indexer', stack: 'The Graph' },
@@ -677,8 +690,8 @@ How a bounded agent mandate executes, step by step · issue a live mandate in /a
               {[
                 { num: 'L01', name: 'Postern', sub: 'User entry · wallet abstraction', chips: ['Passkey login', 'Gas sponsorship', 'Session keys', 'Social recovery'], side: 'PWA · Next.js' },
                 { num: 'L02', name: 'Backend services', sub: 'Off-chain orchestration', chips: ['Tablet · tax', 'Codex · x402', 'Aqueduct coordinator', 'Rostrum copy-trade'], side: 'Single region · EU' },
-                { num: 'L03', name: 'Stylus', sub: 'Rust → WASM · hot math', chips: ['Plinth · margin', 'Vigil · liquidations', 'Stoa · options'], side: 'Robinhood · Arbitrum Sepolia' },
-                { num: 'L04', name: 'Solidity', sub: 'Venue + vault layer', chips: ['Portico v1.0.0', '9 adapter contracts', 'Coffer · ERC-4626', 'Sigil · ERC-8004'], side: 'OpenZeppelin' },
+                { num: 'L03', name: 'Stylus', sub: 'Rust → WASM · hot math', chips: ['Plinth · margin', 'Vigil · liquidations', 'Stoa · options', 'Coffer · ERC-4626', 'Sigil · ERC-8004'], side: 'Robinhood · Arbitrum Sepolia' },
+                { num: 'L04', name: 'Solidity', sub: 'Venue layer', chips: ['Portico v1.0.0', '9 adapter contracts'], side: 'OpenZeppelin' },
                 { num: 'L05', name: 'Oracles + data', sub: 'Free testnet feeds', chips: ['Price Feeds', 'CCIP testnet', 'Pyth', 'Scribe'], side: 'Chainlink · Pyth · The Graph' },
               ].map((l) => (
                 <div className="arch-row" key={l.num}>

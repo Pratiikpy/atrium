@@ -37,7 +37,7 @@ export const SUBSYSTEMS: Subsystem[] = [
   { num: "03", name: "Stoa",     sub: "Options pricing",      stack: "Stylus · Rust",       phase: "P2" },
   { num: "04", name: "Portico",  sub: "Venue framework",      stack: "Solidity · OZ",       phase: "P1" },
   { num: "05", name: "Aqueduct", sub: "Cross-chain bridge",   stack: "Solidity · CCIP",     phase: "P1" },
-  { num: "06", name: "Sigil",    sub: "Agent credit",         stack: "Solidity · ERC-8004", phase: "P1" },
+  { num: "06", name: "Sigil",    sub: "Agent credit",         stack: "Stylus · ERC-8004",   phase: "P1" },
   { num: "07", name: "Rostrum",  sub: "Agent marketplace",    stack: "Solidity · Indexer",  phase: "P1" },
   { num: "08", name: "Codex",    sub: "Paid agent APIs",      stack: "Node · x402",         phase: "P1" },
   { num: "09", name: "Scribe",   sub: "Indexer",              stack: "The Graph",           phase: "P1" },

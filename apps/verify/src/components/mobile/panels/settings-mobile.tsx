@@ -2,7 +2,32 @@
 
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
+import { useQuery } from '@tanstack/react-query';
 import { ConnectWallet } from '@/components/connect-wallet';
+
+/**
+ * Real Proof-of-reserves freshness for the Trust row, read from the SAME
+ * source the /app/reserves panel uses (/api/lantern/latest), so Settings and
+ * Reserves never disagree (they used to: Settings hardcoded "~45 min" while
+ * Reserves computed the real "6 min ago" from the attestation timestamp). 404
+ * = no attestation yet, any failure = honest "verify ↗" affordance, never a
+ * fabricated minute count next to a row that deep-links to live data.
+ */
+function timeAgo(ts: number): string {
+  const diff = Math.floor(Date.now() / 1000) - ts;
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
+}
+
+async function fetchPorAge(): Promise<number | null> {
+  const r = await fetch('/api/lantern/latest');
+  if (!r.ok) return null; // 404 = no attestation published yet
+  const j = await r.json();
+  if (j?.exists === false) return null;
+  const ts = Number(j.timestamp);
+  return Number.isFinite(ts) ? ts : null;
+}
 
 /**
  * SettingsMobile  the More panel for /app/settings at < md.
@@ -18,6 +43,13 @@ export function SettingsMobile() {
   const chainLabel = chain?.name
     ? chain.name.toLowerCase().replace(/\s+/g, '-')
     : 'arb-sepolia';
+
+  const { data: porTs } = useQuery({
+    queryKey: ['settings-por-age'],
+    queryFn: fetchPorAge,
+    refetchInterval: 60_000,
+  });
+  const porRight = porTs != null ? timeAgo(porTs) : 'verify ↗';
 
   return (
     <div className="md:hidden flex flex-col gap-4">
@@ -52,7 +84,7 @@ export function SettingsMobile() {
         <MoreRow
           href="/app/reserves"
           label="Proof of reserves"
-          right="~45 min"
+          right={porRight}
           icon={<ShieldIcon />}
         />
         <MoreRow

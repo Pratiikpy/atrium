@@ -439,7 +439,7 @@ function Stylus() {
 const STATS = [
   { v: '792', l: 'frontend + library tests passing' },
   { v: '9', l: 'Kani proofs authored (CI lane Month 3)' },
-  { v: '2', l: 'testnets, full stack deployed + verified' },
+  { v: '2', l: 'testnets, full stack deployed + wired' },
   { v: '7', l: 'venue adapters in scope (1 operational)' },
 ];
 const HASHES = [
@@ -450,7 +450,7 @@ function Proof() {
   return (
     <div>
       <SectionMark roman="VII" label="The proof" />
-      <h2 className="dk-h2">Not a mockup. Deployed, wired, and verified on two testnets.</h2>
+      <h2 className="dk-h2">Not a mockup. Deployed and wired on two testnets, source-verified on Arbitrum.</h2>
       <div className="dk-proof-stats">
         {STATS.map((s) => (
           <div className="dk-proof-stat" key={s.l}>

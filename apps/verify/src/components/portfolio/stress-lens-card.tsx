@@ -45,9 +45,21 @@ const MAINT_BUFFER_BPS = 200; // 2% maintenance buffer
 const FLAT_PRICE_Q64 = 1_000n; // entry = mark; the storm ratio is scale-invariant
 const BPS_DENOM = 10_000n;
 
-/** Storm scenarios: a calm baseline plus escalating adverse moves. */
-const STORMS: ReadonlyArray<{ key: string; label: string; magBps: number }> = [
-  { key: 'calm', label: 'Calm', magBps: 0 },
+/**
+ * Storm scenarios: escalating adverse moves only.
+ *
+ * The no-shock "Calm" row (magBps 0) was removed deliberately. The Stress Lens
+ * story is "how big a shock can this book take", so the no-shock row carries no
+ * narrative weight, and it was the ONE row whose leg-by-leg figure contradicted
+ * the Margin Lens directly above it on the same page: stormMargin([leg], 0)
+ * returns only the 5% notional floor ($5,000/leg = $10,000 sum for the worked
+ * pair), while the Margin Lens prices the same isolated leg through the full
+ * +/-10% scenario grid ($10,200/leg = $20,400 sum). Same book, same disclosed
+ * params, two different "leg-by-leg" numbers one card apart. Dropping Calm lets
+ * the Margin Lens be the single source of the calm isolated/netted baseline; the
+ * Stress Lens only ever shows adverse-shock rows, which it computes consistently.
+ */
+export const STORMS: ReadonlyArray<{ key: string; label: string; magBps: number }> = [
   { key: 'squall', label: 'Squall -10%', magBps: 1_000 },
   { key: 'storm', label: 'Storm -20%', magBps: 2_000 },
   { key: 'crash', label: 'Crash -35%', magBps: 3_500 },
@@ -59,7 +71,7 @@ const STORMS: ReadonlyArray<{ key: string; label: string; magBps: number }> = [
  * buffer, floored at the min-initial notional floor. magBps 0 returns the floor
  * (the calm baseline). Uses only the exported, parity-tested primitives.
  */
-function stormMargin(positions: PositionView[], magBps: number): bigint {
+export function stormMargin(positions: PositionView[], magBps: number): bigint {
   if (positions.length === 0) return 0n;
   let total = 0n;
   for (let c = 0; c < MAX_CORRELATION_CLASSES; c++) {
@@ -132,7 +144,7 @@ async function fetchCollateralRaw(wallet: string | null): Promise<bigint | null>
 }
 
 /** The hedged worked example (mirrors the Margin Lens worked pair). */
-const WORKED_LEGS: PositionView[] = [
+export const WORKED_LEGS: PositionView[] = [
   { notionalSigned: 100_000n, entryPriceQ64: FLAT_PRICE_Q64, currentPriceQ64: FLAT_PRICE_Q64, haircutBps: 1000, correlationClass: 1 },
   { notionalSigned: -100_000n, entryPriceQ64: FLAT_PRICE_Q64, currentPriceQ64: FLAT_PRICE_Q64, haircutBps: 1000, correlationClass: 1 },
 ];
