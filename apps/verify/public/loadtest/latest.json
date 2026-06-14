@@ -1,6 +1,25 @@
 {
-  "generatedAt": "2026-05-25T20:30:00.000Z",
+  "generatedAt": "2026-06-14T06:42:41.011Z",
   "k6_base_url": null,
-  "metrics": [],
-  "note": "No run yet. The nightly GHA workflow at .github/workflows/loadtest-nightly.yml fires k6 + contract-gas.mjs and overwrites this file. Until the first run completes, the loadtest dashboard renders the empty state."
+  "k6_profile": null,
+  "metrics": [
+    {
+      "name": "Plinth.updateMargin",
+      "unit": "gas",
+      "p50": 251833,
+      "p95": 251833,
+      "p99": 251833,
+      "budget": 80000,
+      "source": "viem.estimateContractGas"
+    },
+    {
+      "name": "Sigil.isRevoked",
+      "unit": "gas",
+      "p50": 71430,
+      "p95": 71430,
+      "p99": 71430,
+      "budget": 30000,
+      "source": "viem.estimateContractGas"
+    }
+  ]
 }
