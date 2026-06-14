@@ -1,15 +1,14 @@
 {
-  "strategy": null,
-  "period_start": null,
-  "period_end": null,
+  "strategy": "mean-reversion-v1",
+  "period_start": "2026-06-07T07:21:54.255764+00:00",
+  "period_end": "2026-06-14T07:21:54.255764+00:00",
   "trades_count": 0,
   "baseline_collateral_usd": 0,
   "atrium_collateral_usd": 0,
-  "delta_bps": null,
-  "notebook_url": null,
+  "delta_bps": 0,
+  "notebook_url": "./services/archive/notebooks/mean-reversion-v1-1781421714.ipynb",
   "ipfs_cid": null,
   "publish_tx": null,
-  "generated_at": null,
-  "source": "pending",
-  "note": "Weekly archive backtest cron has not yet run. Set RESEARCH_SIGNER_KEY + WEB3_STORAGE_TOKEN + RESEARCH_CONTRACT_ADDR in GHA repo secrets, then trigger .github/workflows/archive-weekly.yml via workflow_dispatch."
+  "generated_at": "2026-06-14T07:21:54.255764+00:00",
+  "publish_failed": false
 }
