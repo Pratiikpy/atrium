@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 340
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Foundry (cast)
         uses: foundry-rs/foundry-toolchain@v1
       - name: Push fresh Pyth price every ~50s
