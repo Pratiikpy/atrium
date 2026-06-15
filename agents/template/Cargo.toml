@@ -23,4 +23,4 @@ clap.workspace = true
 chrono = "0.4"
 # Audit K-10: encoders that mirror the on-chain Sigil decoder layout -
 # version-pinned to the same alloy-primitives the contracts use.
-alloy-primitives = "0.8"
+alloy-primitives = "1.6"
