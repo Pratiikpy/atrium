@@ -30,7 +30,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "siwe": "^2.3.2",
-    "tailwind-merge": "^2.5.0",
+    "tailwind-merge": "^3.6.0",
     "viem": "^2.21.0",
     "wagmi": "^2.13.0"
   },
